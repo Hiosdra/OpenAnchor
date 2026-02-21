@@ -10,7 +10,7 @@ The PWA provides a web-based interface that can be installed on any device and u
 - **Visual Alarm System**: Map-based visualization with customizable radius
 - **Offline Support**: Service Worker enables offline functionality
 - **Installable**: Can be installed as a standalone app on mobile devices
-- **Multiple Notification Methods**: Audio alarms, vibration, browser notifications, and push notifications
+- **Multiple Notification Methods**: Audio alarms, vibration, and browser notifications
 - **Night Vision Mode**: Special display mode for use at night
 - **AI Assistant**: Integration with AI for weather and navigation assistance
 
@@ -29,7 +29,7 @@ The PWA provides a web-based interface that can be installed on any device and u
 - **Service Worker**: Provides offline caching and background notifications
 - **Web App Manifest**: Makes the app installable on home screen
 - **Responsive Design**: Works on mobile, tablet, and desktop
-- **Browser Notifications**: Local and push notifications for alarms
+- **Browser Notifications**: Local notifications for alarms
 
 ## Getting Started
 
@@ -98,7 +98,6 @@ pwa/
 - **Geolocation API**: GPS position tracking
 - **Web Audio API**: Alarm sounds
 - **Notification API**: Local notifications
-- **Push API**: Server-driven push notifications
 - **Wake Lock API**: Keep screen on during monitoring
 
 ### Browser Compatibility
@@ -112,7 +111,6 @@ pwa/
 - ✅ Installable as standalone app
 - ✅ Responsive design
 - ✅ Local notifications (Notification API)
-- ✅ Push notifications (Push API)
 - ✅ Background sync capability (Background Sync API)
 - ✅ App-like experience
 
@@ -138,17 +136,8 @@ The service worker (`sw.js`) implements:
 - **Stale-While-Revalidate**: Serves cached content immediately while updating in the background
 - **Background Sync**: Syncs position data when connection is restored (requires app integration)
 - **Periodic Sync**: Can periodically check anchor position in the background (Chrome-only feature)
-- **Push API**: Handles server-driven push notifications with payload parsing and automatic resubscription
 
 Update the `CACHE_NAME` version when making changes that require cache refresh.
-
-### Push Notifications Setup
-To enable push notifications:
-1. Generate VAPID keys on your push notification server
-2. Update the placeholder VAPID public key in `sw.js` (line 150)
-3. Configure your server endpoint URL at line 154 (`/api/push/subscribe`)
-4. Subscribe users via `registration.pushManager.subscribe()` in your app
-5. Send push notifications from your server using the Web Push protocol
 
 ### Manifest
 The `manifest.json` file uses properly URL-encoded SVG data URLs for icons. The anchor emoji (⚓) is displayed on a dark background matching the app's theme.
