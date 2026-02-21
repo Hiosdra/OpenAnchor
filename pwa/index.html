@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Alert Kotwiczny (Anchor Alarm)</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" id="manifest-placeholder">
+
+    <!-- Tailwind CSS & Plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* === BAZOWE STYLE === */
+        body {
+            -webkit-user-select: none;
+            user-select: none;
+            overscroll-behavior-y: none;
+            transition: filter 0.3s ease;
+        }
+
+        /* === MOTYWY === */
+        .night-vision {
+            filter: grayscale(100%) sepia(100%) hue-rotate(315deg) saturate(500%) brightness(70%);
+            background-color: #000 !important;
+        }
+
+        /* === ANIMACJE === */
+        @keyframes alarmFlash {
+            0% { background-color: #ef4444; }
+            50% { background-color: #7f1d1d; }
+            100% { background-color: #ef4444; }
+        }
+        .bg-alarm-active {
+            animation: alarmFlash 1s infinite !important;
+        }
+
+        /* === MAPA LEAFLET === */
+        #map {
+            background-color: #1e293b;
+            z-index: 10;
+        }
+
+        body:not(.map-sat) .leaflet-layer,
+        body:not(.map-sat) .leaflet-control-zoom-in,
+        body:not(.map-sat) .leaflet-control-zoom-out,
+        body:not(.map-sat) .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+
+        .boat-icon-wrapper {
+            transition: transform 0.4s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* === KONTROLKI FORMULARZY === */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -8px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-hidden" id="app-body">
+
+<!-- === HEADER === -->
+<header class="bg-slate-800 p-3 shadow-md flex justify-between items-center z-20">
+    <div class="flex items-center gap-2">
+        <i data-lucide="anchor" class="text-blue-400 w-5 h-5"></i>
+        <h1 class="text-lg font-bold tracking-wide">Alert Kotwiczny</h1>
+    </div>
+    <div class="flex items-center gap-3">
+        <button id="night-mode-btn" class="text-slate-400 hover:text-red-500 transition-colors" title="Tryb nocny">
+            <i data-lucide="moon" class="w-5 h-5"></i>
+        </button>
+        <button id="unit-toggle" class="bg-slate-700 px-3 py-1 rounded text-sm font-bold text-slate-300 border border-slate-600">
+            METRY
+        </button>
+        <div class="flex items-center gap-1.5 bg-slate-900 px-2 py-1 rounded border border-slate-700">
+            <!-- Wskaźnik połączenia WS -->
+            <i data-lucide="smartphone" id="ws-status-icon" class="w-3.5 h-3.5 text-slate-600" title="Status połączenia z Androidem"></i>
+            <div id="gps-status" class="flex items-center gap-1 text-xs text-yellow-500 ml-1">
+                <i data-lucide="satellite" class="w-3.5 h-3.5"></i>
+                <span id="gps-status-text">Szukam...</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- === DASHBOARD === -->
+<div class="grid grid-cols-4 bg-slate-800 border-b border-slate-700 divide-x divide-slate-700 text-center z-20 shadow-lg">
+    <div class="p-2">
+        <div class="text-[10px] text-slate-400 uppercase">Dystans</div>
+        <div class="font-mono font-bold text-xl text-white" id="val-dist">--</div>
+    </div>
+    <div class="p-2">
+        <div class="text-[10px] text-slate-400 uppercase">SOG <span class="text-[8px]">(węzły)</span></div>
+        <div class="font-mono font-bold text-xl text-blue-400" id="val-sog">0.0</div>
+    </div>
+    <div class="p-2">
+        <div class="text-[10px] text-slate-400 uppercase">COG <span class="text-[8px]">(st)</span></div>
+        <div class="font-mono font-bold text-xl text-blue-400" id="val-cog">---</div>
+    </div>
+    <div class="p-2">
+        <div class="text-[10px] text-slate-400 uppercase">Dokł GPS</div>
+        <div class="font-mono font-bold text-xl text-slate-300" id="val-acc">--</div>
+    </div>
+</div>
+
+<!-- === MAP WIDGET === -->
+<div id="map" class="flex-grow w-full relative">
+    <div id="no-signal-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm z-[1000]">
+        <i data-lucide="map-pin-off" class="w-10 h-10 text-slate-500 mb-2"></i>
+        <p class="text-slate-400 text-sm font-medium">Brak sygnału GPS</p>
+    </div>
+
+    <div id="active-watch-banner" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-indigo-600/90 backdrop-blur-sm text-white text-xs font-bold py-1.5 px-4 rounded-full shadow-lg hidden z-[1000] flex items-center gap-2 border border-indigo-400 transition-all">
+        <i data-lucide="user" class="w-3.5 h-3.5"></i>
+        <span>Wachta: <span id="active-watch-name">--</span></span>
+    </div>
+
+    <button id="toggle-map-layer-btn" class="absolute top-4 right-4 bg-slate-800 p-2.5 rounded-full shadow-lg border border-slate-600 z-[1000] text-slate-300 hover:text-white transition-colors" title="Zmień mapę">
+        <i data-lucide="layers"></i>
+    </button>
+
+    <button id="center-map-btn" class="absolute bottom-4 right-4 bg-slate-800 p-3 rounded-full shadow-lg border border-slate-600 z-[1000] text-blue-400 hidden">
+        <i data-lucide="crosshair"></i>
+    </button>
+</div>
+
+<!-- === CONTROLS === -->
+<div class="w-full bg-slate-800 p-4 rounded-t-3xl shadow-[0_-10px_15px_rgba(0,0,0,0.3)] border-t border-slate-700 z-20 relative">
+    <div class="mb-4 max-w-md mx-auto">
+        <div class="flex justify-between items-end mb-2">
+            <label class="text-sm text-slate-400 font-medium">Bezpieczny promień <span id="sector-badge" class="ml-2 hidden text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full">SEKTOR</span></label>
+            <div class="flex items-baseline gap-1">
+                <input type="number" id="radius-number" value="50" min="10" max="1000" class="bg-slate-700 text-white font-mono text-xl w-20 text-right rounded p-1 outline-none focus:ring-2 ring-blue-500">
+                <span class="text-slate-400 unit-label">m</span>
+            </div>
+        </div>
+        <input type="range" id="radius-slider" min="10" max="500" value="50" step="5">
+    </div>
+
+    <div class="flex gap-2 max-w-md mx-auto">
+        <button id="main-btn" class="flex-grow py-3 rounded-xl text-base font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50" disabled>
+            <i data-lucide="anchor" class="w-5 h-5"></i>
+            <span id="main-btn-text">Rzuć Kotwicę</span>
+        </button>
+        <button id="offset-btn" class="w-14 py-3 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center bg-slate-700 border border-slate-600 text-slate-300 disabled:opacity-50" disabled title="Odłóż pozycję w tył">
+            <i data-lucide="move-down-left" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <!-- Narzędzia (Siatka 4x2) -->
+    <div class="grid grid-cols-4 gap-2 max-w-md mx-auto mt-3">
+        <button data-modal="calc-modal" class="tool-btn py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors">
+            <i data-lucide="ruler" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">Łańcuch</span>
+        </button>
+        <button data-modal="sector-modal" class="tool-btn py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors">
+            <i data-lucide="pie-chart" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">Sektor</span>
+        </button>
+        <button data-modal="watch-setup-modal" class="tool-btn py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors relative">
+            <i data-lucide="timer" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">Wachta</span>
+            <span id="watch-badge" class="absolute top-1.5 right-2 w-2 h-2 bg-green-500 rounded-full hidden shadow-[0_0_5px_#22c55e]"></span>
+        </button>
+        <button data-modal="ws-sync-modal" class="tool-btn py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors">
+            <i data-lucide="smartphone" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">Android</span>
+        </button>
+
+        <button id="export-gpx-btn" class="py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors">
+            <i data-lucide="download" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">GPX</span>
+        </button>
+        <button id="share-pos-btn" class="py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors col-span-2">
+            <i data-lucide="share-2" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">Udostępnij Pozycję</span>
+        </button>
+        <button id="open-ai-btn" class="py-2 rounded-xl bg-purple-700 hover:bg-purple-600 text-white flex flex-col items-center justify-center gap-1 border border-purple-500 transition-colors shadow-[0_0_10px_rgba(147,51,234,0.3)]">
+            <i data-lucide="sparkles" class="w-4 h-4 text-purple-300"></i><span class="text-[9px] font-bold uppercase tracking-wider">Asystent</span>
+        </button>
+    </div>
+
+    <button id="stop-alarm-btn" class="w-full max-w-md mx-auto py-3 rounded-xl text-base font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white mt-3 hidden border border-slate-600">
+        <i data-lucide="bell-off" class="w-5 h-5"></i>
+        <span>Wycisz Alarm</span>
+    </button>
+</div>
+
+<!-- === MODALS (Popups) === -->
+
+<!-- Drag Warning -->
+<div id="drag-warning-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[4000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border-2 border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]">
+        <h3 class="text-xl font-bold text-orange-500 mb-2 flex items-center gap-2"><i data-lucide="alert-circle"></i> Uwaga: Pełzanie?</h3>
+        <p class="text-slate-300 text-sm mb-6 leading-relaxed">Algorytm wykrył, że jacht powoli, ale stabilnie oddala się od środka. Sprawdź, czy kotwica nie pełznie!</p>
+        <div class="flex gap-3">
+            <button class="modal-close-btn flex-1 bg-slate-700 py-3 rounded-xl font-bold border border-slate-600">Zignoruj</button>
+            <button id="check-drag-btn" class="flex-1 bg-orange-600 hover:bg-orange-500 py-3 rounded-xl font-bold text-white transition-colors">Sprawdzę to</button>
+        </div>
+    </div>
+</div>
+
+<!-- System Wacht -->
+<div id="watch-setup-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] hidden p-4">
+    <div class="bg-slate-800 p-5 rounded-2xl max-w-sm w-full border border-slate-700 flex flex-col max-h-[90vh]">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="clipboard-list" class="text-blue-400"></i> System Wacht</h3>
+        <div class="overflow-y-auto flex-grow space-y-4 pr-1">
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-700">
+                <h4 class="text-sm font-bold text-slate-300 mb-2 flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4 text-blue-400"></i> Minutnik</h4>
+                <div class="flex gap-2">
+                    <input type="number" id="watch-minutes-input" value="10" min="1" max="120" class="w-16 bg-slate-700 text-white p-2 rounded-lg border border-slate-600 outline-none text-center font-mono">
+                    <button id="start-watch-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 py-2 rounded-lg font-bold text-white text-sm">Start</button>
+                    <button id="cancel-watch-btn" class="bg-slate-700 hover:bg-slate-600 py-2 px-3 rounded-lg font-bold border border-slate-600 text-sm">Stop</button>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-700">
+                <h4 class="text-sm font-bold text-slate-300 mb-2 flex items-center gap-2"><i data-lucide="calendar-clock" class="w-4 h-4 text-purple-400"></i> Grafik Wacht</h4>
+                <div class="flex gap-1 mb-2">
+                    <input type="time" id="schedule-start" class="w-[30%] bg-slate-700 text-white p-1.5 rounded border border-slate-600 text-xs outline-none">
+                    <input type="time" id="schedule-end" class="w-[30%] bg-slate-700 text-white p-1.5 rounded border border-slate-600 text-xs outline-none">
+                    <input type="text" id="schedule-name" placeholder="Imię" class="w-[40%] bg-slate-700 text-white p-1.5 rounded border border-slate-600 text-xs outline-none">
+                </div>
+                <button id="add-schedule-btn" class="w-full bg-slate-700 hover:bg-slate-600 py-2 rounded-lg font-bold border border-slate-600 text-xs mb-3 text-slate-200"><i data-lucide="plus" class="w-3.5 h-3.5 inline"></i> Dodaj</button>
+                <div id="schedule-list" class="space-y-1.5 max-h-32 overflow-y-auto"></div>
+            </div>
+        </div>
+        <button class="modal-close-btn w-full bg-slate-700 hover:bg-slate-600 py-3 mt-4 rounded-xl font-bold border border-slate-600">Zamknij</button>
+    </div>
+</div>
+
+<!-- Alert Wachty -->
+<div id="watch-alert-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[5000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border-2 border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.3)] text-center">
+        <i data-lucide="timer" class="w-16 h-16 text-blue-500 mx-auto mb-4 animate-bounce"></i>
+        <h3 class="text-2xl font-bold text-white mb-2">Czas na wachtę!</h3>
+        <p class="text-slate-300 text-sm mb-6 leading-relaxed">Sprawdź pozycję jachtu na mapie.</p>
+        <button id="watch-alert-ok-btn" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white">Wszystko OK (Resetuj)</button>
+    </div>
+</div>
+
+<!-- Kalkulator -->
+<div id="calc-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-slate-700">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="ruler" class="text-blue-400"></i> Kalkulator</h3>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div><label class="block text-slate-300 text-xs mb-1">Głębokość + Dziób (<span class="unit-label">m</span>)</label><input type="number" id="calc-depth" value="5" class="w-full bg-slate-700 text-white p-2 rounded-lg border border-slate-600 outline-none"></div>
+            <div><label class="block text-slate-300 text-xs mb-1">Mnożnik</label><select id="calc-ratio" class="w-full bg-slate-700 text-white p-2.5 rounded-lg border border-slate-600 outline-none"><option value="3">3:1</option><option value="5" selected>5:1</option><option value="7">7:1</option></select></div>
+        </div>
+        <div class="bg-slate-900 p-3 rounded-xl mb-4 text-center border border-slate-700"><div class="text-slate-400 text-xs">Wypuść łańcucha:</div><div class="text-2xl font-bold text-blue-400"><span id="calc-chain-result">25</span> <span class="unit-label text-sm">m</span></div><div class="text-[10px] text-slate-500 mt-1">+10m marginesu jachtu</div></div>
+        <div class="flex gap-3"><button class="modal-close-btn flex-1 bg-slate-700 py-3 rounded-xl font-bold border border-slate-600">Zamknij</button><button id="apply-calc-btn" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold">Zastosuj</button></div>
+    </div>
+</div>
+
+<!-- Sektor -->
+<div id="sector-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-slate-700">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="pie-chart" class="text-blue-400"></i> Sektor</h3>
+        <label class="flex items-center gap-3 bg-slate-700 p-3 rounded-xl mb-4 border border-slate-600 cursor-pointer"><input type="checkbox" id="sector-enable" class="w-5 h-5 accent-blue-500 rounded"><span class="text-white font-medium">Aktywuj Sektor</span></label>
+        <div class="grid grid-cols-2 gap-4 mb-6 opacity-50 transition-opacity" id="sector-inputs">
+            <div><label class="block text-slate-300 text-xs mb-1">Centrum (st)</label><input type="number" id="sector-bearing" value="0" min="0" max="360" class="w-full bg-slate-900 text-white p-2 rounded-lg border border-slate-600 outline-none"></div>
+            <div><label class="block text-slate-300 text-xs mb-1">Szerokość (st)</label><input type="number" id="sector-width" value="90" min="10" max="360" class="w-full bg-slate-900 text-white p-2 rounded-lg border border-slate-600 outline-none"></div>
+        </div>
+        <div class="flex gap-3"><button class="modal-close-btn flex-1 bg-slate-700 py-3 rounded-xl font-bold border border-slate-600">Anuluj</button><button id="save-sector-btn" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold">Zapisz</button></div>
+    </div>
+</div>
+
+<!-- Offset -->
+<div id="offset-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-slate-700">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="move-down-left" class="text-blue-400"></i> Rzut wsteczny</h3>
+        <div class="mb-4"><label class="block text-slate-300 text-sm mb-1">Dystans (<span class="unit-label">m</span>)</label><input type="number" id="offset-dist" value="30" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 outline-none"></div>
+        <div class="mb-6"><label class="block text-slate-300 text-sm mb-1">Namiar (st)</label><div class="flex gap-2"><input type="number" id="offset-bearing" value="0" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 outline-none"><button id="set-bearing-behind-btn" class="bg-slate-600 px-3 rounded-lg text-xs font-bold text-slate-300">Z tyłu</button></div></div>
+        <div class="flex gap-3"><button class="modal-close-btn flex-1 bg-slate-700 py-3 rounded-xl font-bold border border-slate-600">Anuluj</button><button id="confirm-offset-btn" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold">Ustaw</button></div>
+    </div>
+</div>
+
+<!-- Battery Warning -->
+<div id="battery-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[3000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.3)]">
+        <h3 class="text-xl font-bold text-red-500 mb-2 flex items-center gap-2"><i data-lucide="battery-warning"></i> Niski stan baterii!</h3>
+        <p class="text-slate-300 text-sm mb-6 leading-relaxed">Poziom naładowania spadł poniżej 15%. <strong>Podłącz ładowanie</strong>!</p>
+        <button class="modal-close-btn w-full bg-red-600 hover:bg-red-500 py-3 rounded-xl font-bold text-white">Zrozumiałem</button>
+    </div>
+</div>
+
+<!-- Generic Warning -->
+<div id="warning-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-slate-700">
+        <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2" id="warning-title"><i data-lucide="alert-triangle" class="text-yellow-500"></i> Informacja</h3>
+        <p class="text-slate-300 text-sm mb-6 leading-relaxed" id="warning-text"></p>
+        <button class="modal-close-btn w-full bg-blue-600 py-3 rounded-xl font-bold">Zrozumiałem</button>
+    </div>
+</div>
+
+<!-- Android Sync (WebSocket) -->
+<div id="ws-sync-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[4000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+        <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="smartphone" class="text-blue-400"></i> Zewnętrzny Monitor</h3>
+        <p class="text-slate-300 text-xs mb-4">Połącz się z telefonem z Androidem w koi przez lokalne Wi-Fi (Hotspot), aby działał jako zapasowy alarm.</p>
+        <label class="block text-slate-300 text-xs mb-1">Adres IP z aplikacji Android (WebSocket)</label>
+        <input type="text" id="ws-url-input" placeholder="ws://192.168.43.1:8080" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 outline-none mb-4 font-mono text-sm">
+        <div class="flex gap-3">
+            <button id="ws-disconnect-btn" class="flex-1 bg-red-900/50 hover:bg-red-900 text-red-300 py-3 rounded-xl font-bold border border-red-800 transition-colors">Rozłącz</button>
+            <button id="ws-connect-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white transition-colors">Połącz</button>
+        </div>
+        <button class="modal-close-btn w-full mt-3 bg-slate-700 py-2 rounded-xl text-sm font-bold border border-slate-600">Zamknij okno</button>
+    </div>
+</div>
+
+<!-- AI Modals -->
+<div id="api-key-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[4000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.3)]">
+        <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="key" class="text-purple-400"></i> Klucz API</h3>
+        <p class="text-slate-300 text-sm mb-4">Podaj darmowy klucz API od Google AI Studio.</p>
+        <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 outline-none mb-4 font-mono text-sm">
+        <div class="flex gap-3"><button class="modal-close-btn flex-1 bg-slate-700 py-3 rounded-xl font-bold">Anuluj</button><button id="save-api-key-btn" class="flex-1 bg-purple-600 py-3 rounded-xl font-bold text-white">Zapisz</button></div>
+        <button id="clear-api-key-btn" class="w-full mt-3 text-xs text-red-400 underline hidden">Usuń zapisany klucz</button>
+    </div>
+</div>
+
+<div id="ai-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[3000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.3)] flex flex-col max-h-[90vh]">
+        <div class="flex justify-between items-start mb-2"><h3 class="text-xl font-bold text-white flex items-center gap-2"><i data-lucide="sparkles" class="text-purple-400"></i> AI Asystent</h3><button id="edit-api-key-btn" class="text-slate-400"><i data-lucide="key" class="w-5 h-5"></i></button></div>
+        <div id="ai-form" class="space-y-3 mb-4 shrink-0">
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="block text-slate-300 text-xs mb-1">Głębokość (m)</label><input type="number" id="ai-depth" value="5" min="1" class="w-full bg-slate-700 text-white p-2 rounded-lg outline-none"></div>
+                <div><label class="block text-slate-300 text-xs mb-1">Łańcuch (m)</label><input type="number" id="ai-chain" value="25" min="1" class="w-full bg-slate-700 text-white p-2 rounded-lg outline-none"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="block text-slate-300 text-xs mb-1">Wiatr (w)</label><input type="number" id="ai-wind" value="15" min="0" class="w-full bg-slate-700 text-white p-2 rounded-lg outline-none"></div>
+                <div><label class="block text-slate-300 text-xs mb-1">Rodzaj dna</label><select id="ai-bottom" class="w-full bg-slate-700 text-white p-2.5 rounded-lg outline-none"><option>Piasek</option><option>Muł</option><option>Skały</option><option>Wodorosty</option><option>Glina</option></select></div>
+            </div>
+            <div><label class="block text-slate-300 text-xs mb-1">Dodatkowe uwagi</label><input type="text" id="ai-extra" class="w-full bg-slate-700 text-white p-2 rounded-lg outline-none"></div>
+            <div class="text-[10px] text-blue-400 mt-1 flex items-center gap-1"><i data-lucide="cloud-lightning" class="w-3 h-3"></i> Oceniane uwzględniając prognozę z nadchodzącą falą.</div>
+        </div>
+        <button id="ai-ask-btn" class="w-full bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-bold text-white mb-4 transition-colors shrink-0">Zapytaj Eksperta</button>
+        <div id="ai-response-container" class="flex-grow overflow-y-auto bg-slate-900 p-3 rounded-lg border border-slate-700 mb-4 text-sm text-slate-300 hidden">
+            <div id="ai-response-text" class="prose prose-sm prose-invert max-w-none leading-relaxed"></div>
+            <div id="ai-loader" class="hidden flex items-center justify-center text-purple-400 py-4 gap-2"><i data-lucide="loader-2" class="animate-spin w-5 h-5"></i> <span id="ai-loader-text">Analizuję...</span></div>
+        </div>
+        <button class="modal-close-btn w-full bg-slate-700 py-3 rounded-xl font-bold shrink-0">Zamknij</button>
+    </div>
+</div>
+
+<div id="ai-summary-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[3000] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="book-open" class="text-blue-400"></i> Dziennik Pokładowy</h3>
+        <div id="ai-summary-loader" class="flex flex-col items-center justify-center text-blue-400 py-6 gap-3"><i data-lucide="loader-2" class="animate-spin w-8 h-8"></i><span class="text-sm">Pisanie...</span></div>
+        <div id="ai-summary-text" class="text-slate-200 text-sm mb-6 leading-relaxed italic border-l-4 border-blue-500 pl-4 bg-slate-900/50 p-3 rounded-r-lg hidden"></div>
+        <button class="modal-close-btn w-full bg-blue-600 py-3 rounded-xl font-bold text-white">Dołącz do logbooka</button>
+    </div>
+</div>
+
+<!-- === ONBOARDING === -->
+<div id="onboarding-overlay" class="fixed inset-0 bg-slate-900 z-[6000] hidden flex-col">
+    <div class="flex-grow relative overflow-hidden">
+        <div class="onboarding-step absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-300 opacity-100 z-10">
+            <i data-lucide="anchor" class="w-24 h-24 text-blue-500 mb-6"></i>
+            <h2 class="text-3xl font-bold text-white mb-4">Witaj na pokładzie!</h2>
+            <p class="text-slate-300 text-sm leading-relaxed max-w-sm">Alert Kotwiczny to Twoja osobista wachta nawigacyjna. Zobacz jak to działa, by bezpiecznie spać na kotwicy.</p>
+        </div>
+        <div class="onboarding-step absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-300 opacity-0 z-0 pointer-events-none">
+            <i data-lucide="crosshair" class="w-20 h-20 text-green-500 mb-6"></i>
+            <h2 class="text-2xl font-bold text-white mb-4">Ustaw Strefę</h2>
+            <p class="text-slate-300 text-sm leading-relaxed max-w-sm">Dostosuj bezpieczny promień. Naciśnij "Rzuć Kotwicę", a aplikacja zacznie monitorować dryf jachtu ostrzegając Cię o jego pełzaniu.</p>
+        </div>
+        <div class="onboarding-step absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-300 opacity-0 z-0 pointer-events-none">
+            <i data-lucide="battery-warning" class="w-20 h-20 text-orange-500 mb-6"></i>
+            <h2 class="text-2xl font-bold text-white mb-4">Ważne zasady!</h2>
+            <p class="text-slate-300 text-sm leading-relaxed max-w-sm">Telefony usypiają aplikacje w tle. <strong>Nie blokuj ekranu!</strong> Nasz system zapobiega wygaszaniu, ale dla pewności użyj <strong>Trybu Nocnego</strong> i <strong>podłącz ładowarkę</strong>.</p>
+        </div>
+        <div class="onboarding-step absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-300 opacity-0 z-0 pointer-events-none">
+            <i data-lucide="smartphone" class="w-20 h-20 text-purple-400 mb-6"></i>
+            <h2 class="text-2xl font-bold text-white mb-4">Rozbuduj System</h2>
+            <p class="text-slate-300 text-sm leading-relaxed max-w-sm">Używaj narzędzi takich jak AI Asystent, Harmonogram Wacht czy połączenie WebSocket z zapasowym telefonem z Androidem. Pomyślnych wiatrów!</p>
+        </div>
+    </div>
+    <div class="p-6 bg-slate-800 border-t border-slate-700 flex justify-between items-center">
+        <button id="ob-skip-btn" class="text-slate-400 font-medium text-sm px-4 py-2 hover:text-white transition-colors">Pomiń</button>
+        <div class="flex gap-2" id="ob-dots">
+            <span class="w-2 h-2 rounded-full bg-blue-500 transition-colors duration-300"></span>
+            <span class="w-2 h-2 rounded-full bg-slate-600 transition-colors duration-300"></span>
+            <span class="w-2 h-2 rounded-full bg-slate-600 transition-colors duration-300"></span>
+            <span class="w-2 h-2 rounded-full bg-slate-600 transition-colors duration-300"></span>
+        </div>
+        <button id="ob-next-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded-xl transition-colors">Dalej</button>
+    </div>
+</div>
+
+<script>
+    /**
+     * ALERT KOTWICZNY - PWA
+     * Refactored Architecture: Modules & Classes
+     */
+
+        // ==========================================
+        // 1. UTILS: Narzędzia matematyczne i systemowe
+        // ==========================================
+    class GeoUtils {
+        static M2FT = 3.28084;
+        static MPS2KNOTS = 1.94384;
+
+        static formatDist(meters, unit) { return Math.round(unit === 'ft' ? meters * this.M2FT : meters); }
+
+        static getDestinationPoint(lat, lng, distance, bearing) {
+            const R = 6371e3, brng = bearing * Math.PI / 180, lat1 = lat * Math.PI / 180, lon1 = lng * Math.PI / 180;
+            const lat2 = Math.asin(Math.sin(lat1) * Math.cos(distance / R) + Math.cos(lat1) * Math.sin(distance / R) * Math.cos(brng));
+            const lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(distance / R) * Math.cos(lat1), Math.cos(distance / R) - Math.sin(lat1) * Math.sin(lat2));
+            return L.latLng(lat2 * 180 / Math.PI, lon2 * 180 / Math.PI);
+        }
+
+        static getBearing(start, end) {
+            const lat1 = start.lat * Math.PI/180, lat2 = end.lat * Math.PI/180;
+            const lon1 = start.lng * Math.PI/180, lon2 = end.lng * Math.PI/180;
+            const y = Math.sin(lon2 - lon1) * Math.cos(lat2);
+            const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+            return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+        }
+
+        static getSectorPolygonPoints(center, radiusMeters, bearing, width) {
+            const points = [];
+            const startAngle = bearing - (width / 2);
+            for (let i = 0; i <= 30; i++) points.push(this.getDestinationPoint(center.lat, center.lng, radiusMeters, startAngle + (width * i / 30)));
+            return points;
+        }
+    }
+
+    // ==========================================
+    // 2. SERVICES: Klasy zarządzające logiką zewnętrzną
+    // ==========================================
+
+    class AlertController {
+        constructor() {
+            this.audioCtx = null;
+            this.alarmInterval = null;
+            this.wakeLock = null;
+            this.batteryWarningShown = false;
+            this.isAlarming = false;
+
+            this.lastKnownBatteryLevel = 1.0;
+            this.lastKnownChargingState = false;
+            this._initBatteryMonitor();
+        }
+
+        initPermissions() {
+            if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+            this.requestWakeLock();
+            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") Notification.requestPermission();
+        }
+
+        async requestWakeLock() {
+            try { if ('wakeLock' in navigator) this.wakeLock = await navigator.wakeLock.request('screen'); }
+            catch (err) { console.warn('WakeLock error:', err); }
+        }
+
+        releaseWakeLock() { if (this.wakeLock) this.wakeLock.release().then(() => this.wakeLock = null); }
+
+        playBeep(type = 'square') {
+            if (!this.audioCtx) return;
+            const osc = this.audioCtx.createOscillator(), gain = this.audioCtx.createGain();
+            osc.type = type;
+            if (type === 'square') {
+                osc.frequency.setValueAtTime(800, this.audioCtx.currentTime); osc.frequency.setValueAtTime(1200, this.audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(1, this.audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.4);
+                osc.stop(this.audioCtx.currentTime + 0.5);
+            } else {
+                osc.frequency.setValueAtTime(600, this.audioCtx.currentTime); gain.gain.setValueAtTime(0, this.audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.5, this.audioCtx.currentTime + 0.1); gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 1);
+                osc.stop(this.audioCtx.currentTime + 1);
+            }
+            osc.connect(gain); gain.connect(this.audioCtx.destination); osc.start();
+        }
+
+        triggerNotification(msg) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                navigator.serviceWorker.ready.then(reg => { reg.showNotification("🚨 KOTWICA", { body: msg, vibrate: [500,200,500] }); })
+                    .catch(() => new Notification("🚨 KOTWICA", { body: msg }));
+            }
+        }
+
+        start(reason, distStr) {
+            if (this.isAlarming) return;
+            this.isAlarming = true;
+            document.getElementById('app-body').classList.add('bg-alarm-active');
+            document.getElementById('stop-alarm-btn').classList.remove('hidden');
+
+            if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+            this.playBeep('square');
+            this.triggerNotification(`${reason} Dystans: ${distStr}`);
+
+            this.alarmInterval = setInterval(() => { this.playBeep('square'); if (navigator.vibrate) navigator.vibrate([500, 200, 500]); }, 1000);
+        }
+
+        stop() {
+            this.isAlarming = false;
+            document.getElementById('app-body').classList.remove('bg-alarm-active');
+            document.getElementById('stop-alarm-btn').classList.add('hidden');
+            clearInterval(this.alarmInterval);
+        }
+
+        _initBatteryMonitor() {
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(b => {
+                    this.lastKnownBatteryLevel = b.level;
+                    this.lastKnownChargingState = b.charging;
+                    const check = () => {
+                        this.lastKnownBatteryLevel = b.level;
+                        this.lastKnownChargingState = b.charging;
+                        if (b.level <= 0.15 && !b.charging && window.app && window.app.state.isAnchored && !this.batteryWarningShown) {
+                            this.batteryWarningShown = true; UI.showModal('battery-modal'); this.playBeep('square');
+                            if (window.app.syncCtrl) window.app.syncCtrl.send('TRIGGER_ALARM', { reason: "LOW_BATTERY", message: "Bateria urządzenia PWA na wyczerpaniu!", severity: "WARNING" });
+                        }
+                        if (b.charging) this.batteryWarningShown = false;
+                    };
+                    b.addEventListener('levelchange', check); b.addEventListener('chargingchange', check);
+                    setInterval(check, 60000);
+                });
+            }
+        }
+    }
+
+    class MapController {
+        constructor(containerId) {
+            this.osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+            this.satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: '&copy; Esri' });
+            this.currentLayer = this.osmLayer;
+
+            this.map = L.map(containerId, { zoomControl: false, layers: [this.currentLayer] }).setView([0, 0], 2);
+            this.boatMarker = null; this.anchorMarker = null; this.safeZone = null; this.accuracyCircle = null;
+            this.trackPolyline = L.polyline([], {color: '#3b82f6', weight: 3, opacity: 0.6, dashArray: '5, 5'}).addTo(this.map);
+            this.compassRose = L.layerGroup().addTo(this.map);
+
+            const boatSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L20 20L12 17L4 20L12 2Z"/></svg>`;
+            this.icons = {
+                boat: L.divIcon({ html: `<div id="boat-icon-el" class="boat-icon-wrapper" style="width: 24px; height: 24px; filter: drop-shadow(0 0 4px rgba(59,130,246,0.8));">${boatSvg}</div>`, className: '', iconSize: [24, 24], iconAnchor: [12, 12] }),
+                anchor: L.divIcon({ html: `<div class="bg-white rounded-full p-1 border-2 border-slate-700 flex items-center justify-center w-8 h-8 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8M5 12H2a10 10 0 0 0 20 0h-3M9 12v2a3 3 0 0 0 6 0v-2M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg></div>`, className: '', iconSize: [32, 32], iconAnchor: [16, 16] })
+            };
+
+            this.map.on('dragstart', () => { if(window.app) window.app.state.mapAutoCenter = false; document.getElementById('center-map-btn').classList.remove('hidden'); });
+        }
+
+        toggleLayer() {
+            this.map.removeLayer(this.currentLayer);
+            const btn = document.getElementById('toggle-map-layer-btn');
+            if (this.currentLayer === this.osmLayer) {
+                this.currentLayer = this.satLayer; document.body.classList.add('map-sat'); btn.classList.replace('text-slate-300', 'text-blue-400');
+            } else {
+                this.currentLayer = this.osmLayer; document.body.classList.remove('map-sat'); btn.classList.replace('text-blue-400', 'text-slate-300');
+            }
+            this.currentLayer.addTo(this.map);
+        }
+
+        updateBoat(pos, accuracy, cog, autoCenter) {
+            if (!this.boatMarker) {
+                this.boatMarker = L.marker(pos, { icon: this.icons.boat, zIndexOffset: 1000 }).addTo(this.map);
+                this.accuracyCircle = L.circle(pos, { radius: accuracy, color: '#3b82f6', weight: 1, fillOpacity: 0.1, interactive: false }).addTo(this.map);
+                this.map.setView(pos, 18);
+            } else {
+                this.boatMarker.setLatLng(pos); this.accuracyCircle.setLatLng(pos); this.accuracyCircle.setRadius(accuracy);
+            }
+            if (cog !== null) { const el = document.getElementById('boat-icon-el'); if (el) el.style.transform = `rotate(${cog}deg)`; }
+            if (autoCenter) this.map.setView(pos);
+        }
+
+        updateTrack(trackArr) { this.trackPolyline.setLatLngs(trackArr); }
+
+        setAnchor(pos) {
+            if (this.anchorMarker) this.map.removeLayer(this.anchorMarker);
+            this.anchorMarker = L.marker(pos, { icon: this.icons.anchor }).addTo(this.map);
+        }
+
+        clearAnchor() {
+            if (this.anchorMarker) this.map.removeLayer(this.anchorMarker);
+            if (this.safeZone) this.map.removeLayer(this.safeZone);
+            this.compassRose.clearLayers();
+            this.anchorMarker = null; this.safeZone = null;
+        }
+
+        drawSafeZone(anchorPos, radius, sectorParams, isOut) {
+            if (this.safeZone) { this.map.removeLayer(this.safeZone); this.safeZone = null; }
+            this.compassRose.clearLayers();
+
+            const dirs = [{l:'N',b:0},{l:'E',b:90},{l:'S',b:180},{l:'W',b:270}];
+            dirs.forEach(d => {
+                const pt = GeoUtils.getDestinationPoint(anchorPos.lat, anchorPos.lng, radius, d.b);
+                const icon = L.divIcon({ html: `<div class="text-white font-bold text-[10px] bg-slate-800/80 rounded px-1 border border-slate-600 shadow-sm">${d.l}</div>`, className: '', iconSize: [16, 16], iconAnchor: [8, 8] });
+                L.marker(pt, { icon, interactive: false }).addTo(this.compassRose);
+            });
+
+            const style = { ...(isOut ? { color: '#ef4444', fillColor: '#ef4444' } : { color: '#22c55e', fillColor: '#22c55e' }), fillOpacity: 0.15, weight: 2 };
+
+            if (sectorParams.enabled) {
+                const pts = GeoUtils.getSectorPolygonPoints(anchorPos, radius, sectorParams.bearing, sectorParams.width);
+                pts.push(anchorPos); this.safeZone = L.polygon(pts, style).addTo(this.map);
+            } else {
+                this.safeZone = L.circle(anchorPos, { radius: radius, ...style }).addTo(this.map);
+            }
+        }
+
+        fitSafeZone() { if (this.safeZone) this.map.fitBounds(this.safeZone.getBounds(), { padding: [20, 20] }); }
+    }
+
+    class AIController {
+        constructor() {
+            this.apiKey = localStorage.getItem('anchor_ai_key') || "";
+            this.pendingAction = null;
+        }
+
+        setKey(key) { this.apiKey = key; localStorage.setItem('anchor_ai_key', key); }
+        clearKey() { this.apiKey = ""; localStorage.removeItem('anchor_ai_key'); }
+
+        async ask(prompt, systemInstruction) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${this.apiKey}`;
+            const payload = { contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: systemInstruction }] } };
+            const delays = [1000, 2000, 4000, 8000, 16000];
+
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (response.status === 400 || response.status === 403) return "Błąd: Nieprawidłowy klucz API.";
+                    if (response.status === 429) { if (i === 2) return "Limit zapytań! Odczekaj 60 sekund."; throw new Error("Rate limit 429"); }
+                    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Brak odpowiedzi.";
+                } catch (error) {
+                    if (i === 5) return "Błąd połączenia. Sprawdź sieć na morzu.";
+                    await new Promise(r => setTimeout(r, delays[i]));
+                }
+            }
+        }
+
+        async fetchWeather(lat, lng) {
+            try {
+                const marineRes = await fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lng}&current=wave_height,wave_direction,wave_period&hourly=wave_height,wave_direction,wave_period`);
+                const windRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&timezone=auto&forecast_days=2`);
+                const windData = await windRes.json();
+                const curWind = windData.current.wind_speed_10m, curGust = windData.current.wind_gusts_10m || curWind, curDir = windData.current.wind_direction_10m;
+                const now = new Date(); const nowIdx = windData.hourly.time.findIndex(t => new Date(t) > now) || 0;
+                const next12hGusts = windData.hourly.wind_gusts_10m.slice(nowIdx, nowIdx + 12).filter(g => g !== null);
+                const maxGust12h = next12hGusts.length > 0 ? Math.max(...next12hGusts) : curGust;
+
+                let marineTxt = "";
+                if (marineRes.ok) {
+                    const mData = await marineRes.json();
+                    marineTxt = ` Zafalowanie: ${mData.current.wave_height}m, kierunek ${mData.current.wave_direction}°, okres ${mData.current.wave_period}s.`;
+                }
+                return `[GPS]: Wiatr ${curWind} węzłów (kier: ${curDir}°), porywy ${curGust} w. Max porywy w 12h: ${maxGust12h} w.${marineTxt}`;
+            } catch (error) { return "[GPS]: Nie udało się pobrać prognozy."; }
+        }
+    }
+
+    // ==========================================
+    // 2.5 WS SYNC CONTROLLER
+    // ==========================================
+    class SyncController {
+        constructor(appContext) {
+            this.app = appContext;
+            this.ws = null;
+            this.url = localStorage.getItem('anchor_ws_url') || "";
+            this.isConnected = false;
+            this.pingInterval = null;
+            this.syncInterval = null;
+        }
+
+        connect(url) {
+            if (this.ws) this.disconnect();
+            this.url = url;
+            localStorage.setItem('anchor_ws_url', url);
+
+            try {
+                this.ws = new WebSocket(url);
+                this.ws.onopen = () => this._onOpen();
+                this.ws.onclose = () => this._onClose();
+                this.ws.onerror = (e) => this._onError(e);
+                this.ws.onmessage = (msg) => this._onMessage(msg);
+            } catch (err) {
+                console.error("WS Connect error", err);
+                this._onClose();
+            }
+        }
+
+        disconnect() {
+            if (this.ws) { this.ws.close(); this.ws = null; }
+            this._onClose();
+        }
+
+        send(type, payload = {}) {
+            if (!this.isConnected || !this.ws) return;
+            const msg = JSON.stringify({ type, timestamp: Date.now(), payload });
+            this.ws.send(msg);
+        }
+
+        _onOpen() {
+            this.isConnected = true;
+            document.getElementById('ws-status-icon').classList.replace('text-slate-600', 'text-green-400');
+
+            this.send('FULL_SYNC', {
+                isAnchored: this.app.state.isAnchored,
+                anchorPos: this.app.state.anchorPos,
+                radiusMeters: this.app.state.radius,
+                sector: { enabled: this.app.state.sectorEnabled, bearing: this.app.state.sectorBearing, width: this.app.state.sectorWidth },
+                units: this.app.state.unit,
+                watchTimerActive: this.app.state.watchActive
+            });
+
+            this.pingInterval = setInterval(() => this.send('PING'), 5000);
+
+            this.syncInterval = setInterval(() => {
+                this.send('STATE_UPDATE', {
+                    currentPos: this.app.state.currentPos,
+                    gpsAccuracy: this.app.state.accuracy,
+                    distanceToAnchor: this.app.state.distance,
+                    sog: this.app.state.sog,
+                    cog: this.app.state.cog,
+                    batteryLevel: this.app.alertCtrl.lastKnownBatteryLevel || 1.0,
+                    isCharging: this.app.alertCtrl.lastKnownChargingState || false
+                });
+            }, 2000);
+        }
+
+        _onClose() {
+            this.isConnected = false;
+            document.getElementById('ws-status-icon').classList.replace('text-green-400', 'text-slate-600');
+            clearInterval(this.pingInterval);
+            clearInterval(this.syncInterval);
+        }
+
+        _onError(e) { console.warn("WS Error", e); }
+
+        _onMessage(event) {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'ACTION_COMMAND' && data.payload.command === 'MUTE_ALARM') {
+                    this.app.alertCtrl.stop();
+                    this.app.alertCtrl.isAlarming = true;
+                    setTimeout(() => this.app.alertCtrl.isAlarming = false, 5000);
+                }
+            } catch(err) {}
+        }
+    }
+
+    // ==========================================
+    // 3. UI: Warstwa prezentacji
+    // ==========================================
+    const UI = {
+        init() {
+            lucide.createIcons();
+            this._bindGlobalEvents();
+        },
+
+        _bindGlobalEvents() {
+            document.querySelectorAll('.modal-close-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => e.target.closest('.modal').classList.add('hidden'));
+            });
+            document.querySelectorAll('[data-modal]').forEach(btn => {
+                btn.addEventListener('click', (e) => this.showModal(e.currentTarget.getAttribute('data-modal')));
+            });
+        },
+
+        showModal(id) { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); },
+        hideModal(id) { const el = document.getElementById(id); if (el) el.classList.add('hidden'); },
+
+        updateDashboard(dist, sog, cog, acc, unit, isAnchored) {
+            const lbl = unit === 'm' ? 'm' : 'ft';
+            document.querySelectorAll('.unit-label').forEach(el => el.textContent = lbl);
+            document.getElementById('unit-toggle').textContent = unit === 'm' ? 'METRY' : 'STOPY';
+            document.getElementById('val-dist').innerHTML = isAnchored ? `${dist}<span class="text-xs text-slate-500">${lbl}</span>` : '--';
+            document.getElementById('val-acc').innerHTML = `${acc}<span class="text-[10px] text-slate-500">${lbl}</span>`;
+            document.getElementById('val-sog').textContent = sog.toFixed(1);
+            document.getElementById('val-cog').textContent = cog !== null ? Math.round(cog) + '°' : '---';
+        },
+
+        updateRadiusControls(radius, unit) {
+            const slider = document.getElementById('radius-slider');
+            slider.max = unit === 'm' ? 500 : 1500;
+            slider.value = radius; document.getElementById('radius-number').value = radius;
+        },
+
+        setAnchorMode(isAnchored) {
+            const btn = document.getElementById('main-btn'), text = document.getElementById('main-btn-text');
+            if (isAnchored) {
+                text.textContent = "Podnieś Kotwicę"; btn.classList.replace('bg-blue-600', 'bg-slate-700'); btn.classList.replace('hover:bg-blue-500', 'hover:bg-slate-600');
+            } else {
+                text.textContent = "Rzuć Kotwicę"; btn.classList.replace('bg-slate-700', 'bg-blue-600'); btn.classList.replace('hover:bg-slate-600', 'hover:bg-blue-500');
+            }
+        }
+    };
+
+    class OnboardingController {
+        constructor() {
+            this.overlay = document.getElementById('onboarding-overlay');
+            this.steps = document.querySelectorAll('.onboarding-step');
+            this.dots = document.getElementById('ob-dots').children;
+            this.nextBtn = document.getElementById('ob-next-btn');
+            this.skipBtn = document.getElementById('ob-skip-btn');
+            this.currentStep = 0;
+
+            if (localStorage.getItem('anchor_onboarding_done') !== 'true') this.show();
+            this.nextBtn.addEventListener('click', () => this.next());
+            this.skipBtn.addEventListener('click', () => this.finish());
+        }
+        show() { this.overlay.classList.remove('hidden'); this.overlay.classList.add('flex'); this.updateUI(); }
+        next() { if (this.currentStep < this.steps.length - 1) { this.currentStep++; this.updateUI(); } else this.finish(); }
+        finish() { localStorage.setItem('anchor_onboarding_done', 'true'); this.overlay.classList.add('hidden'); this.overlay.classList.remove('flex'); }
+        updateUI() {
+            this.steps.forEach((step, idx) => {
+                if (idx === this.currentStep) { step.classList.remove('opacity-0', 'z-0', 'pointer-events-none'); step.classList.add('opacity-100', 'z-10'); }
+                else { step.classList.add('opacity-0', 'z-0', 'pointer-events-none'); step.classList.remove('opacity-100', 'z-10'); }
+            });
+            Array.from(this.dots).forEach((dot, idx) => {
+                if (idx === this.currentStep) dot.classList.replace('bg-slate-600', 'bg-blue-500'); else dot.classList.replace('bg-blue-500', 'bg-slate-600');
+            });
+            if (this.currentStep === this.steps.length - 1) {
+                this.nextBtn.textContent = "Zaczynamy!"; this.nextBtn.classList.replace('bg-blue-600', 'bg-green-600'); this.nextBtn.classList.replace('hover:bg-blue-500', 'hover:bg-green-500'); this.skipBtn.classList.add('invisible');
+            } else {
+                this.nextBtn.textContent = "Dalej"; this.nextBtn.classList.replace('bg-green-600', 'bg-blue-600'); this.nextBtn.classList.replace('hover:bg-green-500', 'hover:bg-blue-500'); this.skipBtn.classList.remove('invisible');
+            }
+        }
+    }
+
+    // ==========================================
+    // 4. MAIN APP CORE
+    // ==========================================
+    class AnchorApp {
+        constructor() {
+            this.state = {
+                unit: 'm', isAnchored: false, anchorPos: null, currentPos: null, track: [],
+                dragHistory: [], dragWarningDismissed: false,
+                sog: 0, cog: null, accuracy: 0, distance: 0, radius: 50, mapAutoCenter: true,
+                sectorEnabled: false, sectorBearing: 0, sectorWidth: 90,
+                anchorStartTime: null, maxDistanceSwing: 0, maxSogDuringAnchor: 0,
+                watchActive: false, watchEndTime: null, watchMinutes: 10,
+                schedule: JSON.parse(localStorage.getItem('anchor_schedule')) || []
+            };
+
+            this.mapCtrl = new MapController('map');
+            this.alertCtrl = new AlertController();
+            this.aiCtrl = new AIController();
+            this.syncCtrl = new SyncController(this);
+
+            UI.init();
+            this._bindAppEvents();
+            this._initGPS();
+
+            if (this.syncCtrl.url) document.getElementById('ws-url-input').value = this.syncCtrl.url;
+
+            setInterval(() => this._onTick(), 1000);
+        }
+
+        _onTick() {
+            this._checkWatchTimer();
+            this._checkSchedule();
+        }
+
+        toggleAnchor() {
+            this.alertCtrl.initPermissions();
+            if (this.state.isAnchored) this._liftAnchor(); else if (this.state.currentPos) this._setAnchor(this.state.currentPos);
+        }
+
+        _setAnchor(latlng) {
+            this.state.isAnchored = true; this.state.anchorPos = latlng;
+            this.mapCtrl.setAnchor(latlng);
+            this.state.track = [this.state.currentPos]; this.mapCtrl.updateTrack(this.state.track);
+
+            this.state.dragHistory = []; this.state.dragWarningDismissed = false;
+            this.state.anchorStartTime = Date.now(); this.state.maxDistanceSwing = 0; this.state.maxSogDuringAnchor = 0;
+
+            UI.setAnchorMode(true);
+            this._recalculate();
+            this.mapCtrl.fitSafeZone();
+            this.state.mapAutoCenter = true; document.getElementById('center-map-btn').classList.add('hidden');
+
+            if(this.syncCtrl.isConnected) this.syncCtrl.send('FULL_SYNC', {
+                isAnchored: true, anchorPos: this.state.anchorPos, radiusMeters: this.state.radius,
+                sector: { enabled: this.state.sectorEnabled, bearing: this.state.sectorBearing, width: this.state.sectorWidth },
+                units: this.state.unit, watchTimerActive: this.state.watchActive
+            });
+        }
+
+        _liftAnchor() {
+            this._generateLogbookEntry();
+            this.state.isAnchored = false; this.state.anchorPos = null; this.state.distance = 0;
+
+            this.alertCtrl.stop(); this.mapCtrl.clearAnchor();
+            this.state.track = [this.state.currentPos]; this.mapCtrl.updateTrack(this.state.track);
+
+            this.alertCtrl.releaseWakeLock();
+            UI.setAnchorMode(false);
+            this._syncUI();
+
+            if(this.syncCtrl.isConnected) this.syncCtrl.send('FULL_SYNC', { isAnchored: false });
+        }
+
+        _recalculate() {
+            if (!this.state.isAnchored || !this.state.currentPos || !this.state.anchorPos) return;
+
+            this.state.distance = this.state.anchorPos.distanceTo(this.state.currentPos);
+            if (this.state.distance > this.state.maxDistanceSwing) this.state.maxDistanceSwing = this.state.distance;
+
+            this.state.dragHistory.push(this.state.distance);
+            if (this.state.dragHistory.length > 5) this.state.dragHistory.shift();
+
+            if (!this.state.dragWarningDismissed && this.state.dragHistory.length === 5 && this.state.distance > this.state.radius * 0.4) {
+                const [d1, d2, d3, d4, d5] = this.state.dragHistory;
+                if (d1 < d2 && d2 < d3 && d3 < d4 && d4 < d5 && (d5 - d1) > 2) {
+                    UI.showModal('drag-warning-modal');
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    this.state.dragWarningDismissed = true;
+                    this.syncCtrl.send('TRIGGER_ALARM', { reason: "DRAG_WARNING", message: "Ostrzeżenie: Kotwica może pełznąć!", severity: "WARNING" });
+                }
+            }
+
+            let isOut = this.state.distance > this.state.radius;
+            let reason = "Poza strefą!";
+
+            if (this.state.sectorEnabled && !isOut) {
+                const brngToBoat = GeoUtils.getBearing(this.state.anchorPos, this.state.currentPos);
+                let diff = Math.abs(brngToBoat - this.state.sectorBearing) % 360;
+                if (diff > 180) diff = 360 - diff;
+                if (diff > this.state.sectorWidth / 2) { isOut = true; reason = "Wyjście z bezpiecznego sektora!"; }
+            }
+
+            if (isOut && !this.alertCtrl.isAlarming) {
+                this.alertCtrl.start(reason, GeoUtils.formatDist(this.state.distance, this.state.unit));
+                this.syncCtrl.send('TRIGGER_ALARM', { reason: "DRAG", message: reason, severity: "CRITICAL" });
+            }
+
+            this.mapCtrl.drawSafeZone(this.state.anchorPos, this.state.radius, { enabled: this.state.sectorEnabled, bearing: this.state.sectorBearing, width: this.state.sectorWidth }, isOut);
+            this._syncUI();
+        }
+
+        _initGPS() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.watchPosition(
+                    (pos) => this._onPosition(pos),
+                    (err) => { document.getElementById('no-signal-overlay').classList.remove('hidden'); if (err.code === 1) { document.getElementById('warning-text').textContent = "Brak uprawnień do GPS."; UI.showModal('warning-modal'); } },
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                );
+            } else document.getElementById('no-signal-overlay').classList.remove('hidden');
+        }
+
+        _onPosition(position) {
+            this.state.currentPos = L.latLng(position.coords.latitude, position.coords.longitude);
+            this.state.accuracy = position.coords.accuracy;
+
+            if (position.coords.speed !== null) {
+                this.state.sog = position.coords.speed * GeoUtils.MPS2KNOTS;
+                if (this.state.isAnchored && this.state.sog > this.state.maxSogDuringAnchor) this.state.maxSogDuringAnchor = this.state.sog;
+            }
+            if (position.coords.heading !== null && !isNaN(position.coords.heading)) this.state.cog = position.coords.heading;
+
+            if (!this.state.hasGpsFix) {
+                this.state.hasGpsFix = true;
+                document.getElementById('no-signal-overlay').classList.add('hidden');
+                document.getElementById('main-btn').disabled = false; document.getElementById('offset-btn').disabled = false;
+            }
+
+            document.getElementById('gps-status-text').textContent = "OK";
+            document.getElementById('gps-status').classList.replace('text-yellow-500', 'text-green-500');
+
+            this.mapCtrl.updateBoat(this.state.currentPos, this.state.accuracy, this.state.cog, !this.state.isAnchored && this.state.mapAutoCenter);
+            this.state.track.push(this.state.currentPos);
+            if (this.state.track.length > 500) this.state.track.shift();
+            this.mapCtrl.updateTrack(this.state.track);
+
+            this._recalculate();
+        }
+
+        _syncUI() {
+            UI.updateDashboard(GeoUtils.formatDist(this.state.distance, this.state.unit), this.state.sog, this.state.cog, GeoUtils.formatDist(this.state.accuracy, this.state.unit), this.state.unit, this.state.isAnchored);
+            document.getElementById('sector-badge').classList.toggle('hidden', !this.state.sectorEnabled);
+        }
+
+        _checkWatchTimer() {
+            if (!this.state.watchActive) return;
+            if (Date.now() >= this.state.watchEndTime) {
+                this.state.watchActive = false; document.getElementById('watch-badge').classList.add('hidden');
+                this.alertCtrl.playBeep('sine');
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+                UI.showModal('watch-alert-modal');
+                this.syncCtrl.send('TRIGGER_ALARM', { reason: "WATCH_TIMER", message: "Czas na wachtę!", severity: "WARNING" });
+            }
+        }
+
+        _checkSchedule() {
+            const banner = document.getElementById('active-watch-banner');
+            if (this.state.schedule.length === 0) { banner.classList.add('hidden'); return; }
+
+            const now = new Date(); const currentVal = now.getHours() * 60 + now.getMinutes(); let activePerson = null;
+
+            for (const item of this.state.schedule) {
+                const [startH, startM] = item.start.split(':').map(Number); const [endH, endM] = item.end.split(':').map(Number);
+                const startVal = startH * 60 + startM, endVal = endH * 60 + endM;
+                let isActive = startVal < endVal ? (currentVal >= startVal && currentVal < endVal) : (currentVal >= startVal || currentVal < endVal);
+                if (isActive) { activePerson = item; break; }
+            }
+
+            if (activePerson) { document.getElementById('active-watch-name').textContent = activePerson.person; banner.classList.remove('hidden'); }
+            else { banner.classList.add('hidden'); }
+        }
+
+        _renderScheduleList() {
+            const list = document.getElementById('schedule-list'); list.innerHTML = '';
+            this.state.schedule.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-slate-800 p-2 rounded border border-slate-700 text-xs";
+                div.innerHTML = `<span class="text-blue-400 font-mono">${item.start} - ${item.end}</span><span class="text-white font-bold truncate px-2">${item.person}</span><button class="text-red-400 hover:text-red-300 transition-colors" data-idx="${index}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`;
+                div.querySelector('button').addEventListener('click', (e) => { this.state.schedule.splice(e.currentTarget.dataset.idx, 1); localStorage.setItem('anchor_schedule', JSON.stringify(this.state.schedule)); this._renderScheduleList(); });
+                list.appendChild(div);
+            });
+            lucide.createIcons(); this._checkSchedule();
+        }
+
+        async _handleAskAI() {
+            const depth = document.getElementById('ai-depth').value, chain = document.getElementById('ai-chain').value;
+            if (!depth || !chain) return;
+
+            const responseContainer = document.getElementById('ai-response-container'), responseText = document.getElementById('ai-response-text'), loader = document.getElementById('ai-loader'), btn = document.getElementById('ai-ask-btn'), loaderText = document.getElementById('ai-loader-text');
+
+            responseContainer.classList.remove('hidden'); loader.classList.remove('hidden'); responseText.classList.add('hidden'); btn.disabled = true; loaderText.textContent = "Pobieram prognozę (wiatr/fale)...";
+
+            let weatherContext = this.state.currentPos ? await this.aiCtrl.fetchWeather(this.state.currentPos.lat, this.state.currentPos.lng) : "Brak GPS.";
+            loaderText.textContent = "Analizuję sytuację...";
+
+            const prompt = `Głębokość: ${depth}m. Łańcuch: ${chain}m. Wiatr u usera: ${document.getElementById('ai-wind').value} w. Dno: ${document.getElementById('ai-bottom').value}. ${document.getElementById('ai-extra').value}\nPrognoza GPS: ${weatherContext}\nOceń bezpieczeństwo i daj rady.`;
+            const response = await this.aiCtrl.ask(prompt, "Jesteś kapitanem. Udzielaj krótkich, fachowych porad kotwicznych. Używaj poprawnej terminologii.");
+
+            loader.classList.add('hidden'); responseText.classList.remove('hidden');
+            responseText.innerHTML = marked.parse(response) + "<hr class='border-slate-600 my-3'><span class='text-xs text-slate-400 italic block'>⚠️ AI może się mylić. Kotwicz z głową.</span>";
+            btn.disabled = false;
+        }
+
+        async _generateLogbookEntry() {
+            if (!this.state.anchorStartTime || !this.aiCtrl.apiKey) return;
+            UI.showModal('ai-summary-modal'); document.getElementById('ai-summary-loader').classList.remove('hidden'); document.getElementById('ai-summary-text').classList.add('hidden');
+
+            const dMs = Date.now() - this.state.anchorStartTime, h = Math.floor(dMs / 3600000), m = Math.floor((dMs % 3600000) / 60000);
+            const prompt = `Czas postoju: ${h > 0 ? `${h}h ${m}m` : `${m}m`}. Max myszkowanie: ${Math.round(this.state.maxDistanceSwing)}m. Max prędkość (SOG): ${this.state.maxSogDuringAnchor.toFixed(1)} w. Promień: ${this.state.radius}m.`;
+            const response = await this.aiCtrl.ask(prompt, "Wygeneruj JEDEN krótki, poetycki wpis do dziennika morskiego o postoju.");
+
+            document.getElementById('ai-summary-loader').classList.add('hidden'); document.getElementById('ai-summary-text').classList.remove('hidden');
+            document.getElementById('ai-summary-text').textContent = `"${response.replace(/"/g, '')}"`;
+        }
+
+        _bindAppEvents() {
+            document.getElementById('main-btn').addEventListener('click', () => this.toggleAnchor());
+            document.getElementById('stop-alarm-btn').addEventListener('click', () => { this.alertCtrl.stop(); this.alertCtrl.isAlarming = true; setTimeout(() => this.alertCtrl.isAlarming = false, 5000); });
+            document.getElementById('night-mode-btn').addEventListener('click', () => document.body.classList.toggle('night-vision'));
+            document.getElementById('unit-toggle').addEventListener('click', () => { this.state.unit = this.state.unit === 'm' ? 'ft' : 'm'; this._syncUI(); });
+            document.getElementById('toggle-map-layer-btn').addEventListener('click', () => this.mapCtrl.toggleLayer());
+
+            const handleRadius = (val) => {
+                let num = parseInt(val) || 10; if (this.state.unit === 'ft') num = num / GeoUtils.M2FT; if (num < 5) num = 5;
+                this.state.radius = num; UI.updateRadiusControls(GeoUtils.formatDist(num, this.state.unit), this.state.unit); this._recalculate();
+                if(this.syncCtrl.isConnected) this.syncCtrl.send('FULL_SYNC', { radiusMeters: this.state.radius });
+            };
+            document.getElementById('radius-slider').addEventListener('input', e => handleRadius(e.target.value)); document.getElementById('radius-number').addEventListener('change', e => handleRadius(e.target.value));
+
+            document.getElementById('center-map-btn').addEventListener('click', () => {
+                this.state.mapAutoCenter = true; document.getElementById('center-map-btn').classList.add('hidden');
+                if (this.state.isAnchored && this.state.anchorPos) this.mapCtrl.map.setView(this.state.anchorPos); else if (this.state.currentPos) this.mapCtrl.map.setView(this.state.currentPos, 18);
+            });
+
+            document.getElementById('offset-btn').addEventListener('click', () => { UI.showModal('offset-modal'); if (this.state.cog !== null) document.getElementById('offset-bearing').value = Math.round((this.state.cog + 180) % 360); });
+            document.getElementById('set-bearing-behind-btn').addEventListener('click', () => document.getElementById('offset-bearing').value = this.state.cog !== null ? Math.round((this.state.cog + 180) % 360) : 180);
+            document.getElementById('confirm-offset-btn').addEventListener('click', () => {
+                if (!this.state.currentPos) return; this.alertCtrl.initPermissions();
+                let d = parseFloat(document.getElementById('offset-dist').value) || 0; if (this.state.unit === 'ft') d = d / GeoUtils.M2FT;
+                this._setAnchor(GeoUtils.getDestinationPoint(this.state.currentPos.lat, this.state.currentPos.lng, d, parseFloat(document.getElementById('offset-bearing').value) || 0)); UI.hideModal('offset-modal');
+            });
+
+            document.getElementById('check-drag-btn').addEventListener('click', () => { UI.hideModal('drag-warning-modal'); this.mapCtrl.map.setView(this.state.currentPos, 19); });
+
+            document.getElementById('export-gpx-btn').addEventListener('click', () => {
+                if (this.state.track.length === 0) {
+                    document.getElementById('warning-text').textContent = "Brak śladu do wyeksportowania.";
+                    UI.showModal('warning-modal');
+                    return;
+                }
+                let gpx = '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Alert Kotwiczny"><trk><trkseg>\n';
+                this.state.track.forEach(p => gpx += `<trkpt lat="${p.lat}" lon="${p.lng}"></trkpt>\n`); gpx += '</trkseg></trk></gpx>';
+                const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([gpx], {type: 'application/gpx+xml'}));
+                a.download = `kotwica_slad_${new Date().toISOString().slice(0,10)}.gpx`; a.click();
+            });
+
+            document.getElementById('share-pos-btn').addEventListener('click', () => {
+                if (!this.state.currentPos) {
+                    document.getElementById('warning-text').textContent = "Brak ustalonej pozycji GPS do udostępnienia.";
+                    UI.showModal('warning-modal');
+                    return;
+                }
+                const url = `https://www.google.com/maps?q=${this.state.currentPos.lat},${this.state.currentPos.lng}`;
+                if (navigator.share) {
+                    navigator.share({ title: 'Alert Kotwiczny', text: `Moja pozycja: ${this.state.currentPos.lat.toFixed(5)}, ${this.state.currentPos.lng.toFixed(5)}`, url: url }).catch(console.error);
+                } else {
+                    document.getElementById('warning-text').innerHTML = `Skopiuj ten link, by udostępnić pozycję:<br><br><a href="${url}" target="_blank" class="text-blue-400 break-all">${url}</a>`;
+                    UI.showModal('warning-modal');
+                }
+            });
+
+            document.getElementById('start-watch-btn').addEventListener('click', () => {
+                this.alertCtrl.initPermissions(); this.state.watchMinutes = parseInt(document.getElementById('watch-minutes-input').value) || 10;
+                this.state.watchEndTime = Date.now() + (this.state.watchMinutes * 60000); this.state.watchActive = true; document.getElementById('watch-badge').classList.remove('hidden'); UI.hideModal('watch-setup-modal');
+            });
+            document.getElementById('cancel-watch-btn').addEventListener('click', () => { this.state.watchActive = false; document.getElementById('watch-badge').classList.add('hidden'); UI.hideModal('watch-setup-modal'); });
+            document.getElementById('watch-alert-ok-btn').addEventListener('click', () => {
+                UI.hideModal('watch-alert-modal'); this.state.watchEndTime = Date.now() + (this.state.watchMinutes * 60000); this.state.watchActive = true; document.getElementById('watch-badge').classList.remove('hidden');
+            });
+
+            this._renderScheduleList();
+            document.getElementById('add-schedule-btn').addEventListener('click', () => {
+                const s = document.getElementById('schedule-start').value, e = document.getElementById('schedule-end').value, p = document.getElementById('schedule-name').value.trim();
+                if (s && e && p) { this.state.schedule.push({ start: s, end: e, person: p }); document.getElementById('schedule-start').value=''; document.getElementById('schedule-end').value=''; document.getElementById('schedule-name').value=''; this._renderScheduleList(); localStorage.setItem('anchor_schedule', JSON.stringify(this.state.schedule));}
+            });
+
+            const calcIn = document.getElementById('calc-depth'), calcRat = document.getElementById('calc-ratio'), calcRes = document.getElementById('calc-chain-result');
+            const updateCalc = () => calcRes.textContent = ((parseFloat(calcIn.value) || 0) * (parseFloat(calcRat.value) || 5)).toFixed(0);
+            calcIn.addEventListener('input', updateCalc); calcRat.addEventListener('change', updateCalc); document.querySelector('[data-modal="calc-modal"]').addEventListener('click', updateCalc);
+            document.getElementById('apply-calc-btn').addEventListener('click', () => {
+                let totalRadius = parseFloat(calcRes.textContent) + 10; if (this.state.unit === 'ft') totalRadius = totalRadius / GeoUtils.M2FT;
+                handleRadius(totalRadius * (this.state.unit === 'ft' ? GeoUtils.M2FT : 1)); UI.hideModal('calc-modal');
+            });
+
+            document.getElementById('save-sector-btn').addEventListener('click', () => {
+                this.state.sectorEnabled = document.getElementById('sector-enable').checked; this.state.sectorBearing = parseFloat(document.getElementById('sector-bearing').value) || 0; this.state.sectorWidth = parseFloat(document.getElementById('sector-width').value) || 90;
+                UI.hideModal('sector-modal'); this._syncUI(); this._recalculate();
+                if(this.syncCtrl.isConnected) this.syncCtrl.send('FULL_SYNC', { sector: { enabled: this.state.sectorEnabled, bearing: this.state.sectorBearing, width: this.state.sectorWidth } });
+            });
+            document.getElementById('sector-enable').addEventListener('change', (e) => document.getElementById('sector-inputs').style.opacity = e.target.checked ? '1' : '0.5');
+
+            document.getElementById('ws-connect-btn').addEventListener('click', () => {
+                const url = document.getElementById('ws-url-input').value.trim();
+                if (url) { this.syncCtrl.connect(url); UI.hideModal('ws-sync-modal'); }
+            });
+            document.getElementById('ws-disconnect-btn').addEventListener('click', () => { this.syncCtrl.disconnect(); UI.hideModal('ws-sync-modal'); });
+
+            const checkAiKey = (action) => { if (this.aiCtrl.apiKey) action(); else { this.aiCtrl.pendingAction = action; document.getElementById('api-key-input').value = this.aiCtrl.apiKey; document.getElementById('clear-api-key-btn').classList.toggle('hidden', !this.aiCtrl.apiKey); UI.showModal('api-key-modal'); } };
+            document.getElementById('open-ai-btn').addEventListener('click', () => checkAiKey(() => UI.showModal('ai-modal')));
+            document.getElementById('edit-api-key-btn').addEventListener('click', () => { document.getElementById('api-key-input').value = this.aiCtrl.apiKey; document.getElementById('clear-api-key-btn').classList.toggle('hidden', !this.aiCtrl.apiKey); UI.showModal('api-key-modal'); });
+            document.getElementById('save-api-key-btn').addEventListener('click', () => {
+                const val = document.getElementById('api-key-input').value.trim();
+                if(val) { this.aiCtrl.setKey(val); UI.hideModal('api-key-modal'); if(this.aiCtrl.pendingAction){ this.aiCtrl.pendingAction(); this.aiCtrl.pendingAction=null; } }
+            });
+            document.getElementById('clear-api-key-btn').addEventListener('click', () => { this.aiCtrl.clearKey(); document.getElementById('api-key-input').value=""; document.getElementById('clear-api-key-btn').classList.add('hidden'); });
+            document.getElementById('ai-ask-btn').addEventListener('click', () => this._handleAskAI());
+        }
+    }
+
+    // ==========================================
+    // 5. BOOTSTRAP: Uruchomienie aplikacji
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+        new OnboardingController();
+        window.app = new AnchorApp();
+    });
+
+</script>
+</body>
+</html>
