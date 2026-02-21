@@ -68,6 +68,24 @@
             justify-content: center;
         }
 
+        /* === ALARM STATE BAR === */
+        .alarm-bar-safe { background-color: #22c55e; color: #052e16; }
+        .alarm-bar-caution { background-color: #eab308; color: #422006; animation: cautionPulse 2s infinite; }
+        .alarm-bar-warning { background-color: #f97316; color: #431407; animation: warningPulse 1.5s infinite; }
+        .alarm-bar-alarm { background-color: #ef4444; color: #450a0a; animation: alarmFlash 0.5s infinite; }
+
+        @keyframes cautionPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        @keyframes warningPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* === BUFFER ZONE === */
+        .buffer-zone { stroke-dasharray: 8, 4; }
+
         /* === KONTROLKI FORMULARZY === */
         input[type=range] {
             -webkit-appearance: none;
@@ -159,6 +177,11 @@
     </button>
 </div>
 
+<!-- === ALARM STATE INDICATOR === -->
+<div id="alarm-state-bar" class="w-full py-1 text-center text-xs font-bold uppercase tracking-widest z-20 hidden transition-all">
+    <span id="alarm-state-text"></span>
+</div>
+
 <!-- === CONTROLS === -->
 <div class="w-full bg-slate-800 p-4 rounded-t-3xl shadow-[0_-10px_15px_rgba(0,0,0,0.3)] border-t border-slate-700 z-20 relative">
     <div class="mb-4 max-w-md mx-auto">
@@ -198,8 +221,8 @@
             <i data-lucide="smartphone" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">Android</span>
         </button>
 
-        <button id="export-gpx-btn" class="py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors">
-            <i data-lucide="download" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">GPX</span>
+        <button id="open-history-btn" class="py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors">
+            <i data-lucide="history" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">Historia</span>
         </button>
         <button id="share-pos-btn" class="py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 flex flex-col items-center justify-center gap-1 border border-slate-600 transition-colors col-span-2">
             <i data-lucide="share-2" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-wider">Udostępnij Pozycję</span>
@@ -389,6 +412,45 @@
     </div>
 </div>
 
+<!-- GPS Signal Lost Warning -->
+<div id="gps-lost-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[3500] hidden p-4">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border-2 border-yellow-500 shadow-[0_0_25px_rgba(234,179,8,0.3)]">
+        <h3 class="text-xl font-bold text-yellow-500 mb-2 flex items-center gap-2"><i data-lucide="satellite-dish"></i> Utrata sygnału GPS!</h3>
+        <p class="text-slate-300 text-sm mb-2 leading-relaxed">Brak odczytu GPS przez ponad 60 sekund. Monitoring kotwicy jest zagrożony!</p>
+        <p class="text-slate-400 text-xs mb-6">Sprawdź, czy urządzenie ma widoczność nieba. Upewnij się, że aplikacja nie została zminimalizowana.</p>
+        <button class="modal-close-btn w-full bg-yellow-600 hover:bg-yellow-500 py-3 rounded-xl font-bold text-white">Zrozumiałem</button>
+    </div>
+</div>
+
+<!-- Session History -->
+<div id="history-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] hidden p-4">
+    <div class="bg-slate-800 p-5 rounded-2xl max-w-sm w-full border border-slate-700 flex flex-col max-h-[90vh]">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="history" class="text-blue-400"></i> Historia Sesji</h3>
+        <div id="history-list" class="overflow-y-auto flex-grow space-y-2 pr-1 min-h-[100px]">
+            <div class="text-slate-500 text-sm text-center py-4">Ładowanie...</div>
+        </div>
+        <button class="modal-close-btn w-full bg-slate-700 hover:bg-slate-600 py-3 mt-4 rounded-xl font-bold border border-slate-600">Zamknij</button>
+    </div>
+</div>
+
+<!-- Session Replay -->
+<div id="replay-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2500] hidden p-4">
+    <div class="bg-slate-800 p-5 rounded-2xl max-w-sm w-full border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] flex flex-col max-h-[90vh]">
+        <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="play-circle" class="text-blue-400"></i> Sesja</h3>
+        <div id="replay-info" class="text-slate-300 text-xs mb-3 space-y-1"></div>
+        <div id="replay-map" class="w-full h-48 rounded-lg mb-3 bg-slate-900 border border-slate-700"></div>
+        <div class="flex gap-2">
+            <button id="replay-export-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2">
+                <i data-lucide="download" class="w-4 h-4"></i> Eksport GPX
+            </button>
+            <button id="replay-delete-btn" class="flex-1 bg-red-900/50 hover:bg-red-900 text-red-300 py-3 rounded-xl font-bold border border-red-800 text-sm flex items-center justify-center gap-2">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Usuń
+            </button>
+        </div>
+        <button class="modal-close-btn w-full mt-3 bg-slate-700 py-2 rounded-xl text-sm font-bold border border-slate-600">Zamknij</button>
+    </div>
+</div>
+
 <!-- === ONBOARDING === -->
 <div id="onboarding-overlay" class="fixed inset-0 bg-slate-900 z-[6000] hidden flex-col">
     <div class="flex-grow relative overflow-hidden">
@@ -436,13 +498,122 @@
     }
 
     /**
-     * ALERT KOTWICZNY - PWA
-     * Refactored Architecture: Modules & Classes
+     * ALERT KOTWICZNY - PWA v2
+     * Faza 1: IndexedDB persistence, 4-level alarm, GPS watchdog, session history
      */
 
-        // ==========================================
-        // 1. UTILS: Narzędzia matematyczne i systemowe
-        // ==========================================
+    // ==========================================
+    // 0. IndexedDB PERSISTENCE LAYER
+    // ==========================================
+    class SessionDB {
+        constructor() {
+            this.db = null;
+            this.DB_NAME = 'AnchorAlertDB';
+            this.DB_VERSION = 1;
+        }
+
+        open() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('sessions')) {
+                        const store = db.createObjectStore('sessions', { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('startTime', 'startTime', { unique: false });
+                    }
+                    if (!db.objectStoreNames.contains('trackpoints')) {
+                        const store = db.createObjectStore('trackpoints', { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('sessionId', 'sessionId', { unique: false });
+                    }
+                    if (!db.objectStoreNames.contains('activeState')) {
+                        db.createObjectStore('activeState', { keyPath: 'key' });
+                    }
+                };
+                request.onsuccess = (e) => { this.db = e.target.result; resolve(this.db); };
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        _tx(storeName, mode = 'readonly') {
+            const tx = this.db.transaction(storeName, mode);
+            return tx.objectStore(storeName);
+        }
+
+        _txMulti(storeNames, mode = 'readonly') {
+            const tx = this.db.transaction(storeNames, mode);
+            return storeNames.map(n => tx.objectStore(n));
+        }
+
+        _req(request) {
+            return new Promise((resolve, reject) => {
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // -- Sessions --
+        async createSession(session) {
+            return this._req(this._tx('sessions', 'readwrite').add(session));
+        }
+
+        async updateSession(id, updates) {
+            const store = this._tx('sessions', 'readwrite');
+            const existing = await this._req(store.get(id));
+            if (existing) {
+                Object.assign(existing, updates);
+                return this._req(store.put(existing));
+            }
+        }
+
+        async getSession(id) {
+            return this._req(this._tx('sessions').get(id));
+        }
+
+        async getAllSessions() {
+            return this._req(this._tx('sessions').index('startTime').getAll());
+        }
+
+        async deleteSession(id) {
+            // Delete track points first
+            const store = this._tx('trackpoints', 'readwrite');
+            const idx = store.index('sessionId');
+            const points = await this._req(idx.getAll(id));
+            for (const p of points) store.delete(p.id);
+            // Delete session
+            return this._req(this._tx('sessions', 'readwrite').delete(id));
+        }
+
+        // -- Track Points --
+        async addTrackPoint(point) {
+            return this._req(this._tx('trackpoints', 'readwrite').add(point));
+        }
+
+        async addTrackPointsBatch(points) {
+            const store = this._tx('trackpoints', 'readwrite');
+            for (const p of points) store.add(p);
+        }
+
+        async getTrackPoints(sessionId) {
+            return this._req(this._tx('trackpoints').index('sessionId').getAll(sessionId));
+        }
+
+        // -- Active State (persist across refresh) --
+        async saveActiveState(state) {
+            return this._req(this._tx('activeState', 'readwrite').put({ key: 'current', ...state }));
+        }
+
+        async getActiveState() {
+            return this._req(this._tx('activeState').get('current'));
+        }
+
+        async clearActiveState() {
+            return this._req(this._tx('activeState', 'readwrite').delete('current'));
+        }
+    }
+
+    // ==========================================
+    // 1. UTILS: Narzędzia matematyczne i systemowe
+    // ==========================================
     class GeoUtils {
         static M2FT = 3.28084;
         static MPS2KNOTS = 1.94384;
@@ -469,6 +640,84 @@
             const startAngle = bearing - (width / 2);
             for (let i = 0; i <= 30; i++) points.push(this.getDestinationPoint(center.lat, center.lng, radiusMeters, startAngle + (width * i / 30)));
             return points;
+        }
+    }
+
+    // ==========================================
+    // 1.5 ALARM ENGINE (4-level, ported from Android)
+    // ==========================================
+    class AlarmEngine {
+        constructor() {
+            this.violationCount = 0;
+            this.firstViolationTime = null;
+            this.bufferActive = false;
+        }
+
+        /**
+         * Zone check result: 'INSIDE', 'BUFFER', or 'OUTSIDE'
+         * Matches Android's ZoneCheckResult enum
+         */
+        static checkZone(distance, radius, bufferRadius, sectorEnabled, sectorBearing, sectorWidth, anchorPos, boatPos) {
+            // Check sector first if enabled
+            if (sectorEnabled && anchorPos && boatPos) {
+                const brngToBoat = GeoUtils.getBearing(anchorPos, boatPos);
+                let diff = Math.abs(brngToBoat - sectorBearing) % 360;
+                if (diff > 180) diff = 360 - diff;
+                if (diff > sectorWidth / 2 && distance > radius * 0.5) {
+                    // Outside sector - check if in buffer
+                    if (bufferRadius && distance <= bufferRadius) return 'BUFFER';
+                    return 'OUTSIDE';
+                }
+            }
+
+            if (distance <= radius) return 'INSIDE';
+            if (bufferRadius && distance <= bufferRadius) return 'BUFFER';
+            return 'OUTSIDE';
+        }
+
+        /**
+         * Process a GPS reading. Returns: 'SAFE', 'CAUTION', 'WARNING', or 'ALARM'
+         * Mirrors Android AlarmEngine.processReading()
+         */
+        processReading(zoneResult) {
+            switch (zoneResult) {
+                case 'INSIDE':
+                    this.reset();
+                    return 'SAFE';
+
+                case 'BUFFER':
+                    // In buffer zone: reset violation count but report CAUTION
+                    this.reset();
+                    this.bufferActive = true;
+                    return 'CAUTION';
+
+                case 'OUTSIDE':
+                    this.bufferActive = false;
+                    this.violationCount++;
+                    if (this.firstViolationTime === null) {
+                        this.firstViolationTime = Date.now();
+                    }
+                    return this.currentState;
+
+                default:
+                    return 'SAFE';
+            }
+        }
+
+        get currentState() {
+            if (this.violationCount >= 3 && this.elapsedSinceFirstViolation >= 3000) return 'ALARM';
+            if (this.violationCount > 0) return 'WARNING';
+            return 'SAFE';
+        }
+
+        get elapsedSinceFirstViolation() {
+            return this.firstViolationTime ? Date.now() - this.firstViolationTime : 0;
+        }
+
+        reset() {
+            this.violationCount = 0;
+            this.firstViolationTime = null;
+            this.bufferActive = false;
         }
     }
 
@@ -511,6 +760,13 @@
                 osc.frequency.setValueAtTime(800, this.audioCtx.currentTime); osc.frequency.setValueAtTime(1200, this.audioCtx.currentTime + 0.2);
                 gain.gain.setValueAtTime(1, this.audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.4);
                 osc.stop(this.audioCtx.currentTime + 0.5);
+            } else if (type === 'warning') {
+                // Gentler warning beep for WARNING state
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, this.audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.5, this.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.3);
+                osc.stop(this.audioCtx.currentTime + 0.4);
             } else {
                 osc.frequency.setValueAtTime(600, this.audioCtx.currentTime); gain.gain.setValueAtTime(0, this.audioCtx.currentTime);
                 gain.gain.linearRampToValueAtTime(0.5, this.audioCtx.currentTime + 0.1); gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 1);
@@ -524,6 +780,26 @@
                 navigator.serviceWorker.ready.then(reg => { reg.showNotification("🚨 KOTWICA", { body: msg, vibrate: [500,200,500] }); })
                     .catch(() => new Notification("🚨 KOTWICA", { body: msg }));
             }
+        }
+
+        /**
+         * Start alarm based on alarm state level
+         * @param {string} alarmState - 'CAUTION', 'WARNING', or 'ALARM'
+         */
+        startForState(alarmState, reason, distStr) {
+            if (alarmState === 'ALARM') {
+                this.start(reason, distStr);
+            } else if (alarmState === 'WARNING') {
+                // Warning: vibration + single beep every 3s, no full alarm
+                if (!this.isAlarming) {
+                    this.isAlarming = true;
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    this.playBeep('warning');
+                    this.triggerNotification(`⚠️ OSTRZEŻENIE: ${reason} Dystans: ${distStr}`);
+                    document.getElementById('stop-alarm-btn').classList.remove('hidden');
+                }
+            }
+            // CAUTION: silent, visual only
         }
 
         start(reason, distStr) {
@@ -574,7 +850,7 @@
             this.currentLayer = this.osmLayer;
 
             this.map = L.map(containerId, { zoomControl: false, layers: [this.currentLayer] }).setView([0, 0], 2);
-            this.boatMarker = null; this.anchorMarker = null; this.safeZone = null; this.accuracyCircle = null;
+            this.boatMarker = null; this.anchorMarker = null; this.safeZone = null; this.bufferZone = null; this.accuracyCircle = null;
             this.phoneMarker = null; this.phoneAccuracyCircle = null;
             this.trackPolyline = L.polyline([], {color: '#3b82f6', weight: 3, opacity: 0.6, dashArray: '5, 5'}).addTo(this.map);
             this.compassRose = L.layerGroup().addTo(this.map);
@@ -622,12 +898,14 @@
         clearAnchor() {
             if (this.anchorMarker) this.map.removeLayer(this.anchorMarker);
             if (this.safeZone) this.map.removeLayer(this.safeZone);
+            if (this.bufferZone) this.map.removeLayer(this.bufferZone);
             this.compassRose.clearLayers();
-            this.anchorMarker = null; this.safeZone = null;
+            this.anchorMarker = null; this.safeZone = null; this.bufferZone = null;
         }
 
-        drawSafeZone(anchorPos, radius, sectorParams, isOut) {
+        drawSafeZone(anchorPos, radius, bufferRadius, sectorParams, alarmState) {
             if (this.safeZone) { this.map.removeLayer(this.safeZone); this.safeZone = null; }
+            if (this.bufferZone) { this.map.removeLayer(this.bufferZone); this.bufferZone = null; }
             this.compassRose.clearLayers();
 
             const dirs = [{l:'N',b:0},{l:'E',b:90},{l:'S',b:180},{l:'W',b:270}];
@@ -637,13 +915,31 @@
                 L.marker(pt, { icon, interactive: false }).addTo(this.compassRose);
             });
 
-            const style = { ...(isOut ? { color: '#ef4444', fillColor: '#ef4444' } : { color: '#22c55e', fillColor: '#22c55e' }), fillOpacity: 0.15, weight: 2 };
+            // Color based on alarm state
+            const zoneColors = {
+                'SAFE': { color: '#22c55e', fillColor: '#22c55e' },
+                'CAUTION': { color: '#eab308', fillColor: '#eab308' },
+                'WARNING': { color: '#f97316', fillColor: '#f97316' },
+                'ALARM': { color: '#ef4444', fillColor: '#ef4444' }
+            };
+            const style = { ...(zoneColors[alarmState] || zoneColors['SAFE']), fillOpacity: 0.15, weight: 2 };
 
             if (sectorParams.enabled) {
                 const pts = GeoUtils.getSectorPolygonPoints(anchorPos, radius, sectorParams.bearing, sectorParams.width);
                 pts.push(anchorPos); this.safeZone = L.polygon(pts, style).addTo(this.map);
             } else {
                 this.safeZone = L.circle(anchorPos, { radius: radius, ...style }).addTo(this.map);
+            }
+
+            // Draw buffer zone if configured
+            if (bufferRadius && bufferRadius > radius) {
+                const bufferStyle = { color: zoneColors[alarmState]?.color || '#22c55e', fillOpacity: 0.05, weight: 1, dashArray: '8, 4' };
+                if (sectorParams.enabled) {
+                    const bpts = GeoUtils.getSectorPolygonPoints(anchorPos, bufferRadius, sectorParams.bearing, sectorParams.width);
+                    bpts.push(anchorPos); this.bufferZone = L.polygon(bpts, bufferStyle).addTo(this.map);
+                } else {
+                    this.bufferZone = L.circle(anchorPos, { radius: bufferRadius, ...bufferStyle }).addTo(this.map);
+                }
             }
         }
 
@@ -765,6 +1061,7 @@
                 anchorPos: s.anchorPos,
                 zoneType: s.sectorEnabled ? 'SECTOR' : 'CIRCLE',
                 radiusMeters: s.radius,
+                bufferRadiusMeters: s.bufferRadius,
                 units: s.unit
             };
             if (s.sectorEnabled) {
@@ -844,14 +1141,14 @@
                 if (data.type === 'ACTION_COMMAND') {
                     const cmd = data.payload.command;
                     if (cmd === 'MUTE_ALARM') {
-                        // Silence sound but keep monitoring — alarm will re-trigger on next violation
                         this.app.alertCtrl.stop();
                         this.app.alertCtrl.isAlarming = true;
                         setTimeout(() => { this.app.alertCtrl.isAlarming = false; }, 5000);
                     } else if (cmd === 'DISMISS_ALARM') {
-                        // Silence and reset — alarm won't re-trigger until re-entry + exit
                         this.app.alertCtrl.stop();
+                        this.app.alarmEngine.reset();
                         this.app.state.alarmState = 'SAFE';
+                        this.app._updateAlarmStateBar();
                     }
                 }
 
@@ -945,22 +1242,38 @@
     }
 
     // ==========================================
-    // 4. MAIN APP CORE
+    // 4. MAIN APP CORE (v2 with persistence + 4-level alarm)
     // ==========================================
     class AnchorApp {
         constructor() {
             this.state = {
                 unit: 'm', isAnchored: false, anchorPos: null, currentPos: null, track: [],
                 dragHistory: [], dragWarningDismissed: false,
-                sog: 0, cog: null, accuracy: 0, distance: 0, radius: 50, mapAutoCenter: true,
+                sog: 0, cog: null, accuracy: 0, distance: 0, radius: 50,
+                bufferRadius: null, // auto-calculated as radius * 1.2
+                mapAutoCenter: true,
                 sectorEnabled: false, sectorBearing: 0, sectorWidth: 90,
                 anchorStartTime: null, maxDistanceSwing: 0, maxSogDuringAnchor: 0,
                 watchActive: false, watchEndTime: null, watchMinutes: 10,
                 schedule: JSON.parse(localStorage.getItem('anchor_schedule')) || [],
                 chainLengthM: null, depthM: null,
-                alarmState: 'SAFE'
+                alarmState: 'SAFE',
+                sessionId: null, // IndexedDB session id
+                hasGpsFix: false,
+                gpsSignalLost: false
             };
 
+            // GPS watchdog
+            this.lastGpsFixTime = Date.now();
+            this.GPS_WATCHDOG_TIMEOUT = 60000; // 60 seconds
+            this.gpsWatchdogAlerted = false;
+
+            // Track point batching for IndexedDB
+            this._trackPointBuffer = [];
+            this._trackFlushInterval = null;
+
+            this.db = new SessionDB();
+            this.alarmEngine = new AlarmEngine();
             this.mapCtrl = new MapController('map');
             this.alertCtrl = new AlertController();
             this.aiCtrl = new AIController();
@@ -973,12 +1286,178 @@
             if (this.syncCtrl.url) document.getElementById('ws-url-input').value = this.syncCtrl.url;
 
             setInterval(() => this._onTick(), 1000);
+
+            // Init DB and restore state
+            this._initDB();
+        }
+
+        async _initDB() {
+            try {
+                await this.db.open();
+                await this._restoreActiveState();
+            } catch (err) {
+                console.error('IndexedDB init failed:', err);
+            }
+        }
+
+        async _restoreActiveState() {
+            const saved = await this.db.getActiveState();
+            if (!saved || !saved.isAnchored) return;
+
+            console.log('Restoring active anchor session from IndexedDB...');
+
+            // Restore state
+            this.state.isAnchored = true;
+            this.state.anchorPos = L.latLng(saved.anchorLat, saved.anchorLng);
+            this.state.radius = saved.radius || 50;
+            this.state.bufferRadius = saved.bufferRadius || null;
+            this.state.sectorEnabled = saved.sectorEnabled || false;
+            this.state.sectorBearing = saved.sectorBearing || 0;
+            this.state.sectorWidth = saved.sectorWidth || 90;
+            this.state.sessionId = saved.sessionId || null;
+            this.state.anchorStartTime = saved.anchorStartTime || Date.now();
+            this.state.maxDistanceSwing = saved.maxDistanceSwing || 0;
+            this.state.maxSogDuringAnchor = saved.maxSogDuringAnchor || 0;
+            this.state.chainLengthM = saved.chainLengthM || null;
+            this.state.depthM = saved.depthM || null;
+            this.state.unit = saved.unit || 'm';
+            this.state.alarmState = 'SAFE';
+
+            // Restore map visuals
+            this.mapCtrl.setAnchor(this.state.anchorPos);
+            UI.setAnchorMode(true);
+            UI.updateRadiusControls(GeoUtils.formatDist(this.state.radius, this.state.unit), this.state.unit);
+
+            // Restore track from DB
+            if (this.state.sessionId) {
+                const points = await this.db.getTrackPoints(this.state.sessionId);
+                this.state.track = points.map(p => L.latLng(p.lat, p.lng));
+                this.mapCtrl.updateTrack(this.state.track);
+            }
+
+            // Redraw zone
+            this._recalculateZone();
+
+            // Start track flushing
+            this._startTrackFlushing();
+
+            console.log(`Restored session #${this.state.sessionId} with ${this.state.track.length} track points.`);
+        }
+
+        async _persistActiveState() {
+            if (!this.db.db) return;
+            try {
+                await this.db.saveActiveState({
+                    isAnchored: this.state.isAnchored,
+                    anchorLat: this.state.anchorPos?.lat,
+                    anchorLng: this.state.anchorPos?.lng,
+                    radius: this.state.radius,
+                    bufferRadius: this.state.bufferRadius,
+                    sectorEnabled: this.state.sectorEnabled,
+                    sectorBearing: this.state.sectorBearing,
+                    sectorWidth: this.state.sectorWidth,
+                    sessionId: this.state.sessionId,
+                    anchorStartTime: this.state.anchorStartTime,
+                    maxDistanceSwing: this.state.maxDistanceSwing,
+                    maxSogDuringAnchor: this.state.maxSogDuringAnchor,
+                    chainLengthM: this.state.chainLengthM,
+                    depthM: this.state.depthM,
+                    unit: this.state.unit
+                });
+            } catch (err) { console.warn('Failed to persist state:', err); }
+        }
+
+        _startTrackFlushing() {
+            if (this._trackFlushInterval) clearInterval(this._trackFlushInterval);
+            this._trackFlushInterval = setInterval(() => this._flushTrackPoints(), 10000); // flush every 10s
+        }
+
+        async _flushTrackPoints() {
+            if (this._trackPointBuffer.length === 0 || !this.state.sessionId) return;
+            const batch = this._trackPointBuffer.splice(0);
+            try {
+                await this.db.addTrackPointsBatch(batch);
+            } catch (err) { console.warn('Track flush failed:', err); }
+            // Also persist max values
+            this._persistActiveState();
         }
 
         _onTick() {
             this._checkWatchTimer();
             this._checkSchedule();
             if (this.syncCtrl) this.syncCtrl.checkHeartbeat();
+            this._checkGpsWatchdog();
+        }
+
+        // ==========================================
+        // GPS WATCHDOG (60s timeout)
+        // ==========================================
+        _checkGpsWatchdog() {
+            if (!this.state.isAnchored || !this.state.hasGpsFix) return;
+
+            const elapsed = Date.now() - this.lastGpsFixTime;
+            const signalLost = elapsed > this.GPS_WATCHDOG_TIMEOUT;
+
+            if (signalLost && !this.state.gpsSignalLost) {
+                this.state.gpsSignalLost = true;
+                this.gpsWatchdogAlerted = true;
+
+                // Update GPS status indicator
+                document.getElementById('gps-status-text').textContent = "UTRATA!";
+                document.getElementById('gps-status').classList.replace('text-green-500', 'text-red-500');
+                document.getElementById('no-signal-overlay').classList.remove('hidden');
+
+                // Show warning modal
+                UI.showModal('gps-lost-modal');
+
+                // Alert sound
+                this.alertCtrl.playBeep('warning');
+                if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
+
+                // Notify Android via WebSocket
+                this.syncCtrl.send('TRIGGER_ALARM', {
+                    reason: "GPS_LOST",
+                    message: "iPad GPS signal lost for 60+ seconds!",
+                    alarmState: "WARNING"
+                });
+            } else if (!signalLost && this.state.gpsSignalLost) {
+                this.state.gpsSignalLost = false;
+                this.gpsWatchdogAlerted = false;
+                document.getElementById('no-signal-overlay').classList.add('hidden');
+            }
+        }
+
+        // ==========================================
+        // ALARM STATE BAR
+        // ==========================================
+        _updateAlarmStateBar() {
+            const bar = document.getElementById('alarm-state-bar');
+            const text = document.getElementById('alarm-state-text');
+
+            // Remove all alarm classes
+            bar.classList.remove('alarm-bar-safe', 'alarm-bar-caution', 'alarm-bar-warning', 'alarm-bar-alarm', 'hidden');
+
+            if (!this.state.isAnchored) {
+                bar.classList.add('hidden');
+                return;
+            }
+
+            const labels = {
+                'SAFE': 'Bezpiecznie',
+                'CAUTION': 'Uwaga — strefa buforowa',
+                'WARNING': 'Ostrzeżenie — weryfikacja...',
+                'ALARM': 'ALARM — Poza strefą!'
+            };
+
+            bar.classList.add(`alarm-bar-${this.state.alarmState.toLowerCase()}`);
+            text.textContent = labels[this.state.alarmState] || this.state.alarmState;
+
+            // Distance info
+            if (this.state.distance > 0) {
+                const dist = GeoUtils.formatDist(this.state.distance, this.state.unit);
+                const lbl = this.state.unit === 'm' ? 'm' : 'ft';
+                text.textContent += ` (${dist}${lbl})`;
+            }
         }
 
         toggleAnchor() {
@@ -986,37 +1465,99 @@
             if (this.state.isAnchored) this._liftAnchor(); else if (this.state.currentPos) this._setAnchor(this.state.currentPos);
         }
 
-        _setAnchor(latlng) {
+        async _setAnchor(latlng) {
             this.state.isAnchored = true; this.state.anchorPos = latlng;
+            this.state.alarmState = 'SAFE';
+            this.state.bufferRadius = this.state.radius * 1.2; // 20% buffer zone
             this.mapCtrl.setAnchor(latlng);
             this.state.track = [this.state.currentPos]; this.mapCtrl.updateTrack(this.state.track);
 
             this.state.dragHistory = []; this.state.dragWarningDismissed = false;
             this.state.anchorStartTime = Date.now(); this.state.maxDistanceSwing = 0; this.state.maxSogDuringAnchor = 0;
+            this.alarmEngine.reset();
 
             UI.setAnchorMode(true);
-            this._recalculate();
+            this._recalculateZone();
             this.mapCtrl.fitSafeZone();
             this.state.mapAutoCenter = true; document.getElementById('center-map-btn').classList.add('hidden');
+            this._updateAlarmStateBar();
+
+            // Create session in IndexedDB
+            if (this.db.db) {
+                try {
+                    const sessionId = await this.db.createSession({
+                        anchorLat: latlng.lat,
+                        anchorLng: latlng.lng,
+                        radius: this.state.radius,
+                        bufferRadius: this.state.bufferRadius,
+                        sectorEnabled: this.state.sectorEnabled,
+                        sectorBearing: this.state.sectorBearing,
+                        sectorWidth: this.state.sectorWidth,
+                        startTime: this.state.anchorStartTime,
+                        endTime: null,
+                        chainLengthM: this.state.chainLengthM,
+                        depthM: this.state.depthM,
+                        alarmTriggered: false,
+                        alarmCount: 0,
+                        maxDistance: 0,
+                        maxSog: 0
+                    });
+                    this.state.sessionId = sessionId;
+                    this._persistActiveState();
+                    this._startTrackFlushing();
+                } catch (err) { console.warn('Failed to create session:', err); }
+            }
 
             if(this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
         }
 
-        _liftAnchor() {
+        async _liftAnchor() {
             this._generateLogbookEntry();
-            this.state.isAnchored = false; this.state.anchorPos = null; this.state.distance = 0;
-            this.state.alarmState = 'SAFE';
 
-            this.alertCtrl.stop(); this.mapCtrl.clearAnchor();
+            // Flush remaining track points
+            await this._flushTrackPoints();
+
+            // Finalize session in IndexedDB
+            if (this.db.db && this.state.sessionId) {
+                try {
+                    await this.db.updateSession(this.state.sessionId, {
+                        endTime: Date.now(),
+                        maxDistance: this.state.maxDistanceSwing,
+                        maxSog: this.state.maxSogDuringAnchor,
+                        alarmTriggered: this.alarmEngine.violationCount > 0
+                    });
+                } catch (err) { console.warn('Failed to finalize session:', err); }
+            }
+
+            // Clear active state
+            if (this.db.db) this.db.clearActiveState();
+
+            if (this._trackFlushInterval) clearInterval(this._trackFlushInterval);
+
+            this.state.isAnchored = false; this.state.anchorPos = null; this.state.distance = 0;
+            this.state.alarmState = 'SAFE'; this.state.sessionId = null;
+            this.state.bufferRadius = null;
+
+            this.alertCtrl.stop(); this.alarmEngine.reset(); this.mapCtrl.clearAnchor();
             this.state.track = [this.state.currentPos]; this.mapCtrl.updateTrack(this.state.track);
 
             this.alertCtrl.releaseWakeLock();
             UI.setAnchorMode(false);
+            this._updateAlarmStateBar();
             this._syncUI();
 
             if(this.syncCtrl.isConnected) {
                 this.syncCtrl.send('DISCONNECT', { reason: 'SESSION_ENDED' });
             }
+        }
+
+        _recalculateZone() {
+            if (!this.state.isAnchored || !this.state.anchorPos) return;
+            this.mapCtrl.drawSafeZone(
+                this.state.anchorPos, this.state.radius, this.state.bufferRadius,
+                { enabled: this.state.sectorEnabled, bearing: this.state.sectorBearing, width: this.state.sectorWidth },
+                this.state.alarmState
+            );
         }
 
         _recalculate() {
@@ -1025,6 +1566,7 @@
             this.state.distance = this.state.anchorPos.distanceTo(this.state.currentPos);
             if (this.state.distance > this.state.maxDistanceSwing) this.state.maxDistanceSwing = this.state.distance;
 
+            // Drag detection (unchanged)
             this.state.dragHistory.push(this.state.distance);
             if (this.state.dragHistory.length > 5) this.state.dragHistory.shift();
 
@@ -1038,25 +1580,44 @@
                 }
             }
 
-            let isOut = this.state.distance > this.state.radius;
-            let reason = "Poza strefą!";
+            // 4-LEVEL ZONE CHECK (ported from Android AlarmEngine)
+            const zoneResult = AlarmEngine.checkZone(
+                this.state.distance, this.state.radius, this.state.bufferRadius,
+                this.state.sectorEnabled, this.state.sectorBearing, this.state.sectorWidth,
+                this.state.anchorPos, this.state.currentPos
+            );
 
-            if (this.state.sectorEnabled && !isOut) {
-                const brngToBoat = GeoUtils.getBearing(this.state.anchorPos, this.state.currentPos);
-                let diff = Math.abs(brngToBoat - this.state.sectorBearing) % 360;
-                if (diff > 180) diff = 360 - diff;
-                if (diff > this.state.sectorWidth / 2) { isOut = true; reason = "Wyjście z bezpiecznego sektora!"; }
+            const previousAlarmState = this.state.alarmState;
+            const newAlarmState = this.alarmEngine.processReading(zoneResult);
+            this.state.alarmState = newAlarmState;
+
+            // Handle alarm transitions
+            if (newAlarmState !== previousAlarmState) {
+                const distStr = GeoUtils.formatDist(this.state.distance, this.state.unit);
+
+                if (newAlarmState === 'ALARM' && !this.alertCtrl.isAlarming) {
+                    this.alertCtrl.start("Poza strefą bezpieczną!", distStr);
+                    this.syncCtrl.send('TRIGGER_ALARM', { reason: "OUT_OF_ZONE", message: `Yacht outside safe zone! (${distStr})`, alarmState: "ALARM" });
+
+                    // Update session alarm count
+                    if (this.db.db && this.state.sessionId) {
+                        this.db.getSession(this.state.sessionId).then(s => {
+                            if (s) this.db.updateSession(this.state.sessionId, { alarmTriggered: true, alarmCount: (s.alarmCount || 0) + 1 });
+                        });
+                    }
+                } else if (newAlarmState === 'WARNING' && previousAlarmState !== 'ALARM') {
+                    this.alertCtrl.startForState('WARNING', "Weryfikacja pozycji...", distStr);
+                    this.syncCtrl.send('TRIGGER_ALARM', { reason: "OUT_OF_ZONE", message: `Position verification in progress (${distStr})`, alarmState: "WARNING" });
+                } else if (newAlarmState === 'CAUTION' && previousAlarmState === 'SAFE') {
+                    // Caution: silent, visual only
+                    this.syncCtrl.send('STATE_UPDATE', { alarmState: 'CAUTION' });
+                } else if (newAlarmState === 'SAFE' && (previousAlarmState === 'ALARM' || previousAlarmState === 'WARNING')) {
+                    this.alertCtrl.stop();
+                }
             }
 
-            if (isOut && !this.alertCtrl.isAlarming) {
-                this.state.alarmState = 'ALARM';
-                this.alertCtrl.start(reason, GeoUtils.formatDist(this.state.distance, this.state.unit));
-                this.syncCtrl.send('TRIGGER_ALARM', { reason: "OUT_OF_ZONE", message: reason, alarmState: "ALARM" });
-            } else if (!isOut && this.state.alarmState !== 'SAFE') {
-                this.state.alarmState = 'SAFE';
-            }
-
-            this.mapCtrl.drawSafeZone(this.state.anchorPos, this.state.radius, { enabled: this.state.sectorEnabled, bearing: this.state.sectorBearing, width: this.state.sectorWidth }, isOut);
+            this._updateAlarmStateBar();
+            this._recalculateZone();
             this._syncUI();
         }
 
@@ -1071,6 +1632,7 @@
         }
 
         _onPosition(position) {
+            this.lastGpsFixTime = Date.now(); // GPS watchdog reset
             this.state.currentPos = L.latLng(position.coords.latitude, position.coords.longitude);
             this.state.accuracy = position.coords.accuracy;
 
@@ -1086,13 +1648,33 @@
                 document.getElementById('main-btn').disabled = false; document.getElementById('offset-btn').disabled = false;
             }
 
+            // Recover from GPS signal lost
+            if (this.state.gpsSignalLost) {
+                this.state.gpsSignalLost = false;
+                this.gpsWatchdogAlerted = false;
+            }
+
             document.getElementById('gps-status-text').textContent = "OK";
             document.getElementById('gps-status').classList.replace('text-yellow-500', 'text-green-500');
+            document.getElementById('gps-status').classList.replace('text-red-500', 'text-green-500');
 
             this.mapCtrl.updateBoat(this.state.currentPos, this.state.accuracy, this.state.cog, !this.state.isAnchored && this.state.mapAutoCenter);
             this.state.track.push(this.state.currentPos);
             if (this.state.track.length > 500) this.state.track.shift();
             this.mapCtrl.updateTrack(this.state.track);
+
+            // Buffer track point for IndexedDB persistence
+            if (this.state.isAnchored && this.state.sessionId) {
+                this._trackPointBuffer.push({
+                    sessionId: this.state.sessionId,
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    timestamp: Date.now(),
+                    distance: this.state.distance,
+                    alarmState: this.state.alarmState
+                });
+            }
 
             this._recalculate();
         }
@@ -1142,6 +1724,179 @@
             lucide.createIcons(); this._checkSchedule();
         }
 
+        // ==========================================
+        // SESSION HISTORY (Faza 1.4)
+        // ==========================================
+        async _showHistory() {
+            UI.showModal('history-modal');
+            const list = document.getElementById('history-list');
+            list.innerHTML = '<div class="text-slate-500 text-sm text-center py-4">Ładowanie...</div>';
+
+            if (!this.db.db) {
+                list.innerHTML = '<div class="text-slate-500 text-sm text-center py-4">Baza danych niedostępna</div>';
+                return;
+            }
+
+            try {
+                const sessions = await this.db.getAllSessions();
+                if (sessions.length === 0) {
+                    list.innerHTML = '<div class="text-slate-500 text-sm text-center py-4">Brak zapisanych sesji</div>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                // Show newest first
+                for (const session of sessions.reverse()) {
+                    const startDate = new Date(session.startTime);
+                    const endDate = session.endTime ? new Date(session.endTime) : null;
+                    const duration = session.endTime ? this._formatDuration(session.endTime - session.startTime) : 'Aktywna';
+                    const alarmBadge = session.alarmTriggered
+                        ? `<span class="text-[9px] bg-red-900 text-red-300 px-1.5 py-0.5 rounded-full">${session.alarmCount || 0} alarm</span>`
+                        : `<span class="text-[9px] bg-green-900 text-green-300 px-1.5 py-0.5 rounded-full">OK</span>`;
+
+                    const div = document.createElement('div');
+                    div.className = "bg-slate-900 p-3 rounded-xl border border-slate-700 cursor-pointer hover:border-blue-500 transition-colors";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-white">${startDate.toLocaleDateString('pl-PL')} ${startDate.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit'})}</span>
+                            ${alarmBadge}
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400">
+                            <span>Czas: ${duration}</span>
+                            <span>R: ${Math.round(session.radius)}m</span>
+                            <span>Max: ${Math.round(session.maxDistance || 0)}m</span>
+                        </div>
+                    `;
+                    div.addEventListener('click', () => this._showReplay(session.id));
+                    list.appendChild(div);
+                }
+            } catch (err) {
+                list.innerHTML = `<div class="text-red-400 text-sm text-center py-4">Błąd: ${err.message}</div>`;
+            }
+        }
+
+        async _showReplay(sessionId) {
+            UI.showModal('replay-modal');
+            const info = document.getElementById('replay-info');
+            info.innerHTML = '<div class="text-slate-500 text-sm">Ładowanie...</div>';
+
+            try {
+                const session = await this.db.getSession(sessionId);
+                const points = await this.db.getTrackPoints(sessionId);
+
+                if (!session) { info.innerHTML = '<div class="text-red-400">Sesja nie znaleziona</div>'; return; }
+
+                const startDate = new Date(session.startTime);
+                const endDate = session.endTime ? new Date(session.endTime) : null;
+                const duration = session.endTime ? this._formatDuration(session.endTime - session.startTime) : 'Aktywna';
+
+                info.innerHTML = `
+                    <div class="flex justify-between"><span class="text-slate-400">Data:</span><span class="text-white font-mono">${startDate.toLocaleDateString('pl-PL')} ${startDate.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit'})}</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Czas trwania:</span><span class="text-white">${duration}</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Promień:</span><span class="text-white">${Math.round(session.radius)}m</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Max odchylenie:</span><span class="text-white">${Math.round(session.maxDistance || 0)}m</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Alarmy:</span><span class="${session.alarmTriggered ? 'text-red-400' : 'text-green-400'}">${session.alarmCount || 0}</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Punkty GPS:</span><span class="text-white">${points.length}</span></div>
+                `;
+
+                // Render mini-map
+                this._renderReplayMap(session, points);
+
+                // Wire up buttons
+                document.getElementById('replay-export-btn').onclick = () => this._exportSessionGPX(session, points);
+                document.getElementById('replay-delete-btn').onclick = async () => {
+                    if (confirm('Czy na pewno usunąć tę sesję?')) {
+                        await this.db.deleteSession(sessionId);
+                        UI.hideModal('replay-modal');
+                        this._showHistory();
+                    }
+                };
+            } catch (err) {
+                info.innerHTML = `<div class="text-red-400">Błąd: ${err.message}</div>`;
+            }
+        }
+
+        _renderReplayMap(session, points) {
+            const container = document.getElementById('replay-map');
+            container.innerHTML = '';
+
+            if (points.length === 0) {
+                container.innerHTML = '<div class="text-slate-500 text-sm text-center py-8">Brak danych GPS</div>';
+                return;
+            }
+
+            const replayMap = L.map(container, { zoomControl: false, attributionControl: false });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(replayMap);
+
+            // Draw anchor
+            const anchorPos = L.latLng(session.anchorLat, session.anchorLng);
+            L.circleMarker(anchorPos, { radius: 6, color: '#fff', fillColor: '#334155', fillOpacity: 1, weight: 2 }).addTo(replayMap);
+
+            // Draw safe zone
+            L.circle(anchorPos, { radius: session.radius, color: '#22c55e', fillOpacity: 0.1, weight: 1 }).addTo(replayMap);
+
+            // Draw track with color coding
+            const trackCoords = points.map(p => L.latLng(p.lat, p.lng));
+            L.polyline(trackCoords, { color: '#3b82f6', weight: 2, opacity: 0.7 }).addTo(replayMap);
+
+            // Highlight alarm points
+            points.filter(p => p.alarmState === 'ALARM').forEach(p => {
+                L.circleMarker(L.latLng(p.lat, p.lng), { radius: 3, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.8, weight: 0 }).addTo(replayMap);
+            });
+
+            // Fit bounds
+            if (trackCoords.length > 0) {
+                const bounds = L.latLngBounds(trackCoords).extend(anchorPos);
+                replayMap.fitBounds(bounds, { padding: [10, 10] });
+            }
+
+            // Invalidate size after modal is visible
+            setTimeout(() => replayMap.invalidateSize(), 100);
+        }
+
+        _exportSessionGPX(session, points) {
+            if (points.length === 0) return;
+
+            const startDate = new Date(session.startTime);
+            let gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Alert Kotwiczny PWA" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Anchor Session ${startDate.toISOString()}</name>
+    <time>${startDate.toISOString()}</time>
+  </metadata>
+  <wpt lat="${session.anchorLat}" lon="${session.anchorLng}">
+    <name>Anchor Position</name>
+    <desc>Radius: ${session.radius}m</desc>
+    <sym>Anchor</sym>
+  </wpt>
+  <trk>
+    <name>Track</name>
+    <trkseg>\n`;
+
+            for (const p of points) {
+                const time = new Date(p.timestamp).toISOString();
+                gpx += `      <trkpt lat="${p.lat}" lon="${p.lng}"><time>${time}</time></trkpt>\n`;
+            }
+
+            gpx += `    </trkseg>
+  </trk>
+</gpx>`;
+
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([gpx], { type: 'application/gpx+xml' }));
+            a.download = `kotwica_${startDate.toISOString().slice(0,10)}_${startDate.toISOString().slice(11,16).replace(':','')}.gpx`;
+            a.click();
+        }
+
+        _formatDuration(ms) {
+            const h = Math.floor(ms / 3600000);
+            const m = Math.floor((ms % 3600000) / 60000);
+            return h > 0 ? `${h}h ${m}m` : `${m}m`;
+        }
+
+        // ==========================================
+        // AI FEATURES (unchanged)
+        // ==========================================
         async _handleAskAI() {
             const depth = document.getElementById('ai-depth').value, chain = document.getElementById('ai-chain').value;
             if (!depth || !chain) return;
@@ -1173,16 +1928,29 @@
             document.getElementById('ai-summary-text').textContent = `"${response.replace(/"/g, '')}"`;
         }
 
+        // ==========================================
+        // EVENT BINDINGS
+        // ==========================================
         _bindAppEvents() {
             document.getElementById('main-btn').addEventListener('click', () => this.toggleAnchor());
-            document.getElementById('stop-alarm-btn').addEventListener('click', () => { this.alertCtrl.stop(); this.alertCtrl.isAlarming = true; setTimeout(() => this.alertCtrl.isAlarming = false, 5000); });
+            document.getElementById('stop-alarm-btn').addEventListener('click', () => {
+                this.alertCtrl.stop();
+                // Don't reset alarm engine — alarm will re-trigger if still outside zone
+                this.alertCtrl.isAlarming = true;
+                setTimeout(() => this.alertCtrl.isAlarming = false, 5000);
+            });
             document.getElementById('night-mode-btn').addEventListener('click', () => document.body.classList.toggle('night-vision'));
-            document.getElementById('unit-toggle').addEventListener('click', () => { this.state.unit = this.state.unit === 'm' ? 'ft' : 'm'; this._syncUI(); });
+            document.getElementById('unit-toggle').addEventListener('click', () => { this.state.unit = this.state.unit === 'm' ? 'ft' : 'm'; this._syncUI(); this._persistActiveState(); });
             document.getElementById('toggle-map-layer-btn').addEventListener('click', () => this.mapCtrl.toggleLayer());
 
             const handleRadius = (val) => {
                 let num = parseInt(val) || 10; if (this.state.unit === 'ft') num = num / GeoUtils.M2FT; if (num < 5) num = 5;
-                this.state.radius = num; UI.updateRadiusControls(GeoUtils.formatDist(num, this.state.unit), this.state.unit); this._recalculate();
+                this.state.radius = num;
+                this.state.bufferRadius = num * 1.2; // 20% buffer
+                UI.updateRadiusControls(GeoUtils.formatDist(num, this.state.unit), this.state.unit);
+                this._recalculateZone();
+                this._recalculate();
+                this._persistActiveState();
                 if(this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
             };
             document.getElementById('radius-slider').addEventListener('input', e => handleRadius(e.target.value)); document.getElementById('radius-number').addEventListener('change', e => handleRadius(e.target.value));
@@ -1202,17 +1970,8 @@
 
             document.getElementById('check-drag-btn').addEventListener('click', () => { UI.hideModal('drag-warning-modal'); this.mapCtrl.map.setView(this.state.currentPos, 19); });
 
-            document.getElementById('export-gpx-btn').addEventListener('click', () => {
-                if (this.state.track.length === 0) {
-                    document.getElementById('warning-text').textContent = "Brak śladu do wyeksportowania.";
-                    UI.showModal('warning-modal');
-                    return;
-                }
-                let gpx = '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Alert Kotwiczny"><trk><trkseg>\n';
-                this.state.track.forEach(p => gpx += `<trkpt lat="${p.lat}" lon="${p.lng}"></trkpt>\n`); gpx += '</trkseg></trk></gpx>';
-                const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([gpx], {type: 'application/gpx+xml'}));
-                a.download = `kotwica_slad_${new Date().toISOString().slice(0,10)}.gpx`; a.click();
-            });
+            // Session History button
+            document.getElementById('open-history-btn').addEventListener('click', () => this._showHistory());
 
             document.getElementById('share-pos-btn').addEventListener('click', () => {
                 if (!this.state.currentPos) {
@@ -1258,7 +2017,7 @@
 
             document.getElementById('save-sector-btn').addEventListener('click', () => {
                 this.state.sectorEnabled = document.getElementById('sector-enable').checked; this.state.sectorBearing = parseFloat(document.getElementById('sector-bearing').value) || 0; this.state.sectorWidth = parseFloat(document.getElementById('sector-width').value) || 90;
-                UI.hideModal('sector-modal'); this._syncUI(); this._recalculate();
+                UI.hideModal('sector-modal'); this._syncUI(); this._recalculateZone(); this._recalculate(); this._persistActiveState();
                 if(this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
             });
             document.getElementById('sector-enable').addEventListener('change', (e) => document.getElementById('sector-inputs').style.opacity = e.target.checked ? '1' : '0.5');
