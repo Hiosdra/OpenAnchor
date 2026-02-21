@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" id="manifest-placeholder">
+    <link rel="manifest" href="manifest.json">
 
     <!-- Tailwind CSS & Plugins -->
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
@@ -414,6 +414,15 @@
 </div>
 
 <script>
+    // Register Service Worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(registration => console.log('Service Worker registered:', registration.scope))
+                .catch(err => console.log('Service Worker registration failed:', err));
+        });
+    }
+
     /**
      * ALERT KOTWICZNY - PWA
      * Refactored Architecture: Modules & Classes
