@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">OpenAnchor</string>
+    <string name="wear_app_name">OpenAnchor</string>
+    <string name="wear_waiting">Oczekiwanie na telefon\u2026\nUruchom monitoring w aplikacji.</string>
+    <string name="wear_gps_lost">UTRATA SYGNAŁU GPS</string>
+    <string name="wear_meters">m</string>
+    <string name="wear_gps_accuracy">GPS: \u00B1%1$d m</string>
+    <string name="wear_state_safe">BEZPIECZNY</string>
+    <string name="wear_state_caution">OSTROŻNOŚĆ</string>
+    <string name="wear_state_warning">OSTRZEŻENIE</string>
+    <string name="wear_state_alarm">ALARM</string>
+</resources>

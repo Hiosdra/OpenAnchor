@@ -1,0 +1,131 @@
+<resources>
+    <string name="app_name">OpenAnchor</string>
+
+    <!-- Home -->
+    <string name="home_subtitle">Alarm kotwiczny dla żeglarzy</string>
+    <string name="drop_anchor">Rzuć kotwicę</string>
+    <string name="history">Historia</string>
+    <string name="settings">Ustawienia</string>
+    <string name="resume_monitoring">Wznów monitoring</string>
+
+    <!-- Setup -->
+    <string name="setup_drop_point">Pozycja kotwicy</string>
+    <string name="setup_zone_type">Typ strefy</string>
+    <string name="setup_radius">Promień bezpieczeństwa</string>
+    <string name="setup_sector">Konfiguracja wycinka</string>
+    <string name="setup_confirm">Potwierdzenie</string>
+    <string name="next">Dalej</string>
+    <string name="start_monitoring">Rozpocznij monitoring</string>
+    <string name="use_current_position">Użyj aktualnej pozycji</string>
+    <string name="waiting_for_gps">Oczekiwanie na sygnał GPS\u2026</string>
+    <string name="choose_zone_type">Wybierz typ strefy bezpieczeństwa</string>
+    <string name="simple_circle">Proste koło</string>
+    <string name="simple_circle_desc">Koło wokół kotwicy o stałym promieniu</string>
+    <string name="circle_with_sector">Koło + wycinek</string>
+    <string name="circle_with_sector_desc">Małe koło wokół kotwicy + większy wycinek w kierunku łodzi</string>
+    <string name="set_radius">Ustaw promień bezpieczeństwa</string>
+    <string name="use_calculator">Oblicz z łańcucha</string>
+    <string name="chain_length_m">Długość łańcucha (m)</string>
+    <string name="depth_m">Głębokość (m)</string>
+    <string name="calculated_radius">Obliczony promień: %1$s m (z marginesem 20%%)</string>
+    <string name="radius_label">Promień</string>
+    <string name="radius_inner_circle_hint">To jest promień wewnętrznego koła wokół kotwicy</string>
+    <string name="use_buffer_zone">Strefa buforowa (OSTROŻNOŚĆ)</string>
+    <string name="buffer_zone_desc">Dodaj zewnętrzną strefę buforową. Gdy łódź wejdzie w tę strefę, otrzymasz ostrzeżenie OSTROŻNOŚĆ przed pełnym alarmem.</string>
+    <string name="buffer_radius_label">Promień bufora</string>
+    <string name="buffer_radius_hint">Musi być większy niż promień bezpieczeństwa</string>
+    <string name="scope_ratio_label">Stosunek zakresu (łańcuch : głębokość)</string>
+    <string name="scope_ratio_3">3:1 Spokój</string>
+    <string name="scope_ratio_5">5:1 Umiarkowane</string>
+    <string name="scope_ratio_7">7:1 Standard</string>
+    <string name="scope_ratio_10">10:1 Sztorm</string>
+    <string name="scope_ratio_custom">Ręcznie</string>
+    <string name="chain_auto_filled">Wypełniono automatycznie ze stosunku %1$s:1</string>
+    <string name="sector_configuration">Konfiguracja wycinka</string>
+    <string name="sector_radius">Promień wycinka</string>
+    <string name="sector_half_angle">Pół-kąt</string>
+    <string name="sector_angle_hint">np. 60\u00B0 = 120\u00B0 całkowity wycinek</string>
+    <string name="auto_bearing">Auto namiar z pozycji łodzi</string>
+    <string name="sector_bearing">Namiar wycinka</string>
+    <string name="bearing_hint">0\u00B0 = Północ, 90\u00B0 = Wschód, 180\u00B0 = Południe, 270\u00B0 = Zachód</string>
+    <string name="confirm_setup">Potwierdź ustawienia</string>
+    <string name="anchor_position">Pozycja kotwicy</string>
+    <string name="zone_type_label">Typ strefy</string>
+
+    <!-- Monitor -->
+    <string name="distance_format">Odległość: %1$s m</string>
+    <string name="dismiss">Wycisz</string>
+    <string name="dismiss_alarm">WYCISZ ALARM</string>
+    <string name="simple_view">Widok prosty</string>
+    <string name="map_view">Widok mapy</string>
+    <string name="stop">Stop</string>
+    <string name="stop_monitoring_title">Zatrzymać monitoring?</string>
+    <string name="stop_monitoring_message">Czy na pewno chcesz zatrzymać monitoring kotwicy? To zakończy bieżącą sesję.</string>
+    <string name="bearing_to_anchor">Namiar na kotwicę</string>
+    <string name="cancel">Anuluj</string>
+    <string name="gps_accuracy_format">GPS: \u00B1%1$s m</string>
+    <string name="gps_signal_lost">UTRATA SYGNAŁU GPS</string>
+
+    <!-- History -->
+    <string name="no_history">Brak historii kotwiczenia</string>
+    <string name="duration_format">%1$dg %2$dmin</string>
+    <string name="delete_session_title">Usunąć sesję?</string>
+    <string name="delete_session_message">Sesja kotwiczenia i wszystkie dane trasy zostaną trwale usunięte.</string>
+    <string name="delete">Usuń</string>
+
+    <!-- History Detail -->
+    <string name="session_details">Szczegóły sesji</string>
+    <string name="session_not_found">Nie znaleziono sesji</string>
+    <string name="start_time">Czas rozpoczęcia</string>
+    <string name="end_time">Czas zakończenia</string>
+    <string name="duration">Czas trwania</string>
+    <string name="track_points_count">Punkty trasy</string>
+    <string name="alarms_triggered">Wyzwolone alarmy</string>
+    <string name="export_gpx">Eksportuj GPX</string>
+    <string name="export_gpx_error">Nie udało się wyeksportować pliku GPX</string>
+
+    <!-- Settings -->
+    <string name="distance_unit">Jednostka odległości</string>
+    <string name="depth_unit">Jednostka głębokości</string>
+    <string name="language">Język</string>
+    <string name="gps_interval">Interwał GPS</string>
+    <string name="gps_interval_value">Co %1$d sekund</string>
+    <string name="night_filter">Czerwony filtr nocny</string>
+    <string name="night_filter_desc">Wyświetla całą aplikację wyłącznie w czerwonych tonach, aby chronić widzenie nocne. Zalecane po zmroku.</string>
+    <string name="night_filter_toggle">Włącz tryb czerwonego światła</string>
+    <string name="open_source_notice">Alarm kotwiczny open source dla żeglarzy. Bezpieczeństwo przede wszystkim.</string>
+
+    <!-- Statistics -->
+    <string name="statistics">Statystyki</string>
+    <string name="no_statistics">Brak danych kotwiczenia. Zakończ sesję, aby zobaczyć statystyki.</string>
+    <string name="stat_total_sessions">Łączna liczba sesji</string>
+    <string name="stat_total_hours">Łączny czas kotwiczenia</string>
+    <string name="stat_total_alarms">Łączna liczba alarmów</string>
+    <string name="stat_longest_session">Najdłuższa sesja</string>
+    <string name="stat_average_session">Średnia sesja</string>
+    <string name="stat_max_radius">Największy promień</string>
+    <string name="stat_avg_radius">Średni promień</string>
+
+    <!-- Weather -->
+    <string name="weather_title">Pogoda morska</string>
+    <string name="weather_back">Wstecz</string>
+    <string name="weather_refresh">Odśwież</string>
+    <string name="weather_loading">Ładowanie pogody morskiej\u2026</string>
+    <string name="weather_retry">Ponów</string>
+    <string name="weather_position_format">Pozycja: %1$s, %2$s</string>
+    <string name="weather_last_updated">Ostatnia aktualizacja: %1$s</string>
+    <string name="weather_current_conditions">Aktualne warunki</string>
+    <string name="weather_hourly_forecast">Prognoza godzinowa</string>
+    <string name="weather_combined_waves">Fale łączone</string>
+    <string name="weather_wind_waves">Fale wiatrowe</string>
+    <string name="weather_swell">Fala martwa</string>
+    <string name="weather_ocean_current">Prąd morski</string>
+    <string name="weather_height">Wysokość</string>
+    <string name="weather_direction">Kierunek</string>
+    <string name="weather_period">Okres</string>
+    <string name="weather_velocity">Prędkość</string>
+    <string name="weather_wave_m">fala m</string>
+    <string name="weather_dir">kier</string>
+    <string name="weather_swell_short">fala m.</string>
+    <string name="weather_current_short">prąd</string>
+</resources>

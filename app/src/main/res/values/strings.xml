@@ -1,0 +1,131 @@
+<resources>
+    <string name="app_name">OpenAnchor</string>
+
+    <!-- Home -->
+    <string name="home_subtitle">Anchor alarm for sailors</string>
+    <string name="drop_anchor">Drop Anchor</string>
+    <string name="history">History</string>
+    <string name="settings">Settings</string>
+    <string name="resume_monitoring">Resume Monitoring</string>
+
+    <!-- Setup -->
+    <string name="setup_drop_point">Anchor Position</string>
+    <string name="setup_zone_type">Zone Type</string>
+    <string name="setup_radius">Safe Radius</string>
+    <string name="setup_sector">Sector Configuration</string>
+    <string name="setup_confirm">Confirm Setup</string>
+    <string name="next">Next</string>
+    <string name="start_monitoring">Start Monitoring</string>
+    <string name="use_current_position">Use Current Position</string>
+    <string name="waiting_for_gps">Waiting for GPS signal\u2026</string>
+    <string name="choose_zone_type">Choose Safe Zone Type</string>
+    <string name="simple_circle">Simple Circle</string>
+    <string name="simple_circle_desc">Circle around the anchor with a fixed radius</string>
+    <string name="circle_with_sector">Circle + Sector</string>
+    <string name="circle_with_sector_desc">Small circle around anchor + larger sector in the direction of the boat</string>
+    <string name="set_radius">Set Safe Radius</string>
+    <string name="use_calculator">Calculate from chain</string>
+    <string name="chain_length_m">Chain length (m)</string>
+    <string name="depth_m">Depth (m)</string>
+    <string name="calculated_radius">Calculated radius: %1$s m (incl. 20%% margin)</string>
+    <string name="radius_label">Radius</string>
+    <string name="radius_inner_circle_hint">This is the inner circle radius around the anchor</string>
+    <string name="use_buffer_zone">Buffer zone (CAUTION)</string>
+    <string name="buffer_zone_desc">Add an outer buffer zone. When the boat enters this zone, you get a CAUTION warning before a full alarm.</string>
+    <string name="buffer_radius_label">Buffer radius</string>
+    <string name="buffer_radius_hint">Must be larger than the safe radius</string>
+    <string name="scope_ratio_label">Scope ratio (chain : depth)</string>
+    <string name="scope_ratio_3">3:1 Calm</string>
+    <string name="scope_ratio_5">5:1 Moderate</string>
+    <string name="scope_ratio_7">7:1 Standard</string>
+    <string name="scope_ratio_10">10:1 Storm</string>
+    <string name="scope_ratio_custom">Manual</string>
+    <string name="chain_auto_filled">Auto-filled from %1$s:1 scope ratio</string>
+    <string name="sector_configuration">Sector Configuration</string>
+    <string name="sector_radius">Sector radius</string>
+    <string name="sector_half_angle">Half-angle</string>
+    <string name="sector_angle_hint">e.g. 60\u00B0 = 120\u00B0 total sector</string>
+    <string name="auto_bearing">Auto bearing from boat</string>
+    <string name="sector_bearing">Sector bearing</string>
+    <string name="bearing_hint">0\u00B0 = North, 90\u00B0 = East, 180\u00B0 = South, 270\u00B0 = West</string>
+    <string name="confirm_setup">Confirm Setup</string>
+    <string name="anchor_position">Anchor position</string>
+    <string name="zone_type_label">Zone type</string>
+
+    <!-- Monitor -->
+    <string name="distance_format">Distance: %1$s m</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="dismiss_alarm">DISMISS ALARM</string>
+    <string name="simple_view">Simple View</string>
+    <string name="map_view">Map View</string>
+    <string name="stop">Stop</string>
+    <string name="stop_monitoring_title">Stop Monitoring?</string>
+    <string name="stop_monitoring_message">Are you sure you want to stop anchor monitoring? This will end the current session.</string>
+    <string name="bearing_to_anchor">Bearing to anchor</string>
+    <string name="cancel">Cancel</string>
+    <string name="gps_accuracy_format">GPS: \u00B1%1$s m</string>
+    <string name="gps_signal_lost">GPS SIGNAL LOST</string>
+
+    <!-- History -->
+    <string name="no_history">No anchoring history yet</string>
+    <string name="duration_format">%1$dh %2$dmin</string>
+    <string name="delete_session_title">Delete Session?</string>
+    <string name="delete_session_message">This will permanently delete this anchoring session and all track data.</string>
+    <string name="delete">Delete</string>
+
+    <!-- History Detail -->
+    <string name="session_details">Session Details</string>
+    <string name="session_not_found">Session not found</string>
+    <string name="start_time">Start time</string>
+    <string name="end_time">End time</string>
+    <string name="duration">Duration</string>
+    <string name="track_points_count">Track points</string>
+    <string name="alarms_triggered">Alarms triggered</string>
+    <string name="export_gpx">Export GPX</string>
+    <string name="export_gpx_error">Failed to export GPX file</string>
+
+    <!-- Settings -->
+    <string name="distance_unit">Distance unit</string>
+    <string name="depth_unit">Depth unit</string>
+    <string name="language">Language</string>
+    <string name="gps_interval">GPS interval</string>
+    <string name="gps_interval_value">Every %1$d seconds</string>
+    <string name="night_filter">Red Night Filter</string>
+    <string name="night_filter_desc">Renders the entire app in red tones only to preserve night vision. Recommended for use after dark.</string>
+    <string name="night_filter_toggle">Enable red light mode</string>
+    <string name="open_source_notice">Open source anchor alarm for sailors. Safety first.</string>
+
+    <!-- Statistics -->
+    <string name="statistics">Statistics</string>
+    <string name="no_statistics">No anchoring data yet. Complete a session to see statistics.</string>
+    <string name="stat_total_sessions">Total sessions</string>
+    <string name="stat_total_hours">Total time anchored</string>
+    <string name="stat_total_alarms">Total alarms</string>
+    <string name="stat_longest_session">Longest session</string>
+    <string name="stat_average_session">Average session</string>
+    <string name="stat_max_radius">Largest radius used</string>
+    <string name="stat_avg_radius">Average radius</string>
+
+    <!-- Weather -->
+    <string name="weather_title">Marine Weather</string>
+    <string name="weather_back">Back</string>
+    <string name="weather_refresh">Refresh</string>
+    <string name="weather_loading">Loading marine weather\u2026</string>
+    <string name="weather_retry">Retry</string>
+    <string name="weather_position_format">Position: %1$s, %2$s</string>
+    <string name="weather_last_updated">Last updated: %1$s</string>
+    <string name="weather_current_conditions">Current Conditions</string>
+    <string name="weather_hourly_forecast">Hourly Forecast</string>
+    <string name="weather_combined_waves">Combined Waves</string>
+    <string name="weather_wind_waves">Wind Waves</string>
+    <string name="weather_swell">Swell</string>
+    <string name="weather_ocean_current">Ocean Current</string>
+    <string name="weather_height">Height</string>
+    <string name="weather_direction">Direction</string>
+    <string name="weather_period">Period</string>
+    <string name="weather_velocity">Velocity</string>
+    <string name="weather_wave_m">wave m</string>
+    <string name="weather_dir">dir</string>
+    <string name="weather_swell_short">swell</string>
+    <string name="weather_current_short">curr</string>
+</resources>
