@@ -185,7 +185,7 @@ private fun TimerCard(uiState: CrewWatchUiState) {
                 }
 
                 Text(
-                    text = String.format("%02d:%02d:%02d", hours, minutes, seconds),
+                    text = String.format(java.util.Locale.US, "%02d:%02d:%02d", hours, minutes, seconds),
                     fontSize = 56.sp,
                     fontWeight = FontWeight.Bold,
                     color = timerColor

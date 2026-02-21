@@ -146,7 +146,7 @@ fun PairedDashboardScreen(
                 StatusCard(
                     icon = Icons.Default.GpsFixed,
                     label = stringResource(R.string.paired_gps),
-                    value = if (uiState.gpsAccuracy > 0) "\u00B1${String.format("%.0f", uiState.gpsAccuracy)} m"
+                    value = if (uiState.gpsAccuracy > 0) "\u00B1${String.format(java.util.Locale.US, "%.0f", uiState.gpsAccuracy)} m"
                     else "—",
                     valueColor = when {
                         uiState.gpsAccuracy <= 5f -> SafeGreen
@@ -183,7 +183,7 @@ fun PairedDashboardScreen(
                             StatusCard(
                                 icon = Icons.Default.Speed,
                                 label = "SOG",
-                                value = String.format("%.1f kn", sog),
+                                value = String.format(java.util.Locale.US, "%.1f kn", sog),
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -191,7 +191,7 @@ fun PairedDashboardScreen(
                             StatusCard(
                                 icon = Icons.Default.Explore,
                                 label = "COG",
-                                value = String.format("%.0f\u00B0", cog),
+                                value = String.format(java.util.Locale.US, "%.0f\u00B0", cog),
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -267,7 +267,7 @@ private fun DistanceDisplay(distance: Double, alarmState: AlarmState) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = String.format("%.0f", distance),
+            text = String.format(java.util.Locale.US, "%.0f", distance),
             fontSize = 72.sp,
             fontWeight = FontWeight.Bold,
             color = color
@@ -368,8 +368,8 @@ private fun StatusCard(
     icon: ImageVector,
     label: String,
     value: String,
-    valueColor: Color = MaterialTheme.colorScheme.onSurface,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),

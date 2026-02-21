@@ -60,7 +60,7 @@ class HotspotManager @Inject constructor(
                     val ssid: String?
                     val password: String?
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && reservation?.softApConfiguration != null) {
+                    if (reservation?.softApConfiguration != null) {
                         val sac = reservation.softApConfiguration
                         ssid = sac.ssid
                         password = sac.passphrase

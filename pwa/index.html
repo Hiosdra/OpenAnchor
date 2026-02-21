@@ -2004,6 +2004,8 @@
                 document.getElementById('warning-text').textContent = I18N.t.wsConnLostBody;
                 UI.showModal('warning-modal');
                 lucide.createIcons();
+                this._closeSocket();
+                this._onClose();
             }
         }
 

@@ -138,11 +138,7 @@ class AnchorMonitorService : Service() {
     private fun startMonitoring(sessionId: Long) {
         val notification = buildNotification("Monitoring anchor position...", AlarmState.SAFE)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
-        }
+        startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 
         monitoringJob?.cancel()
         monitoringJob = serviceScope.launch {
@@ -308,11 +304,7 @@ class AnchorMonitorService : Service() {
     private fun startWebSocketServer() {
         val notification = buildNotification("WebSocket server running...", AlarmState.SAFE)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
-        }
+        startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 
         wsServer.start(scope = serviceScope)
         pairedModeManager.startListening(serviceScope)

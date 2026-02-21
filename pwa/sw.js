@@ -25,7 +25,7 @@ self.addEventListener('fetch', event => {
       if (cachedResponse) {
         // Optionally update the cache in the background
         fetch(event.request).then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
+          if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
             return;
           }
           const responseToCache = networkResponse.clone();
@@ -42,7 +42,7 @@ self.addEventListener('fetch', event => {
 
       // Not in cache – fetch from network and cache the response
       return fetch(event.request).then(networkResponse => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
+        if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
           return networkResponse;
         }
 

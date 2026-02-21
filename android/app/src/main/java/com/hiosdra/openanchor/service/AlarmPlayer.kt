@@ -65,12 +65,7 @@ class AlarmPlayer @Inject constructor(
         }
         vibrator?.let {
             val pattern = longArrayOf(0, 500, 200, 500, 200, 1000)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                it.vibrate(VibrationEffect.createWaveform(pattern, 0))
-            } else {
-                @Suppress("DEPRECATION")
-                it.vibrate(pattern, 0)
-            }
+            it.vibrate(VibrationEffect.createWaveform(pattern, 0))
         }
     }
 
