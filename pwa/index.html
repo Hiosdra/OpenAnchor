@@ -544,7 +544,7 @@
                         this.lastKnownChargingState = b.charging;
                         if (b.level <= 0.15 && !b.charging && window.app && window.app.state.isAnchored && !this.batteryWarningShown) {
                             this.batteryWarningShown = true; UI.showModal('battery-modal'); this.playBeep('square');
-                            if (window.app.syncCtrl) window.app.syncCtrl.send('TRIGGER_ALARM', { reason: "LOW_BATTERY", message: "Bateria urządzenia PWA na wyczerpaniu!", severity: "WARNING" });
+                            if (window.app.syncCtrl) window.app.syncCtrl.send('TRIGGER_ALARM', { reason: "LOW_BATTERY", message: "iPad battery critically low!", alarmState: "WARNING" });
                         }
                         if (b.charging) this.batteryWarningShown = false;
                     };
@@ -563,13 +563,15 @@
 
             this.map = L.map(containerId, { zoomControl: false, layers: [this.currentLayer] }).setView([0, 0], 2);
             this.boatMarker = null; this.anchorMarker = null; this.safeZone = null; this.accuracyCircle = null;
+            this.phoneMarker = null; this.phoneAccuracyCircle = null;
             this.trackPolyline = L.polyline([], {color: '#3b82f6', weight: 3, opacity: 0.6, dashArray: '5, 5'}).addTo(this.map);
             this.compassRose = L.layerGroup().addTo(this.map);
 
             const boatSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L20 20L12 17L4 20L12 2Z"/></svg>`;
             this.icons = {
                 boat: L.divIcon({ html: `<div id="boat-icon-el" class="boat-icon-wrapper" style="width: 24px; height: 24px; filter: drop-shadow(0 0 4px rgba(59,130,246,0.8));">${boatSvg}</div>`, className: '', iconSize: [24, 24], iconAnchor: [12, 12] }),
-                anchor: L.divIcon({ html: `<div class="bg-white rounded-full p-1 border-2 border-slate-700 flex items-center justify-center w-8 h-8 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8M5 12H2a10 10 0 0 0 20 0h-3M9 12v2a3 3 0 0 0 6 0v-2M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg></div>`, className: '', iconSize: [32, 32], iconAnchor: [16, 16] })
+                anchor: L.divIcon({ html: `<div class="bg-white rounded-full p-1 border-2 border-slate-700 flex items-center justify-center w-8 h-8 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8M5 12H2a10 10 0 0 0 20 0h-3M9 12v2a3 3 0 0 0 6 0v-2M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg></div>`, className: '', iconSize: [32, 32], iconAnchor: [16, 16] }),
+                phone: L.divIcon({ html: `<div class="bg-purple-600 rounded-full p-1 border-2 border-purple-300 flex items-center justify-center w-7 h-7 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>`, className: '', iconSize: [28, 28], iconAnchor: [14, 14] })
             };
 
             this.map.on('dragstart', () => { if(window.app) window.app.state.mapAutoCenter = false; document.getElementById('center-map-btn').classList.remove('hidden'); });
@@ -634,6 +636,18 @@
         }
 
         fitSafeZone() { if (this.safeZone) this.map.fitBounds(this.safeZone.getBounds(), { padding: [20, 20] }); }
+
+        updatePhoneMarker(pos, accuracy) {
+            if (!this.phoneMarker) {
+                this.phoneMarker = L.marker(pos, { icon: this.icons.phone, zIndexOffset: 900 }).addTo(this.map);
+                this.phoneMarker.bindTooltip('Android', { permanent: false, direction: 'top', offset: [0, -14] });
+                this.phoneAccuracyCircle = L.circle(pos, { radius: accuracy, color: '#a855f7', weight: 1, fillOpacity: 0.08, interactive: false }).addTo(this.map);
+            } else {
+                this.phoneMarker.setLatLng(pos);
+                this.phoneAccuracyCircle.setLatLng(pos);
+                this.phoneAccuracyCircle.setRadius(accuracy);
+            }
+        }
     }
 
     class AIController {
@@ -696,6 +710,8 @@
             this.isConnected = false;
             this.pingInterval = null;
             this.syncInterval = null;
+            this.lastPeerPingTime = null;
+            this.peerConnectionLost = false;
         }
 
         connect(url) {
@@ -715,8 +731,12 @@
             }
         }
 
-        disconnect() {
-            if (this.ws) { this.ws.close(); this.ws = null; }
+        disconnect(reason = 'USER_DISCONNECT') {
+            if (this.ws) {
+                if (this.isConnected) this.send('DISCONNECT', { reason });
+                this.ws.close();
+                this.ws = null;
+            }
             this._onClose();
         }
 
@@ -726,18 +746,47 @@
             this.ws.send(msg);
         }
 
+        sendFullSync() {
+            const s = this.app.state;
+            const payload = {
+                isAnchored: s.isAnchored,
+                anchorPos: s.anchorPos,
+                zoneType: s.sectorEnabled ? 'SECTOR' : 'CIRCLE',
+                radiusMeters: s.radius,
+                units: s.unit
+            };
+            if (s.sectorEnabled) {
+                payload.sector = {
+                    bearingDeg: s.sectorBearing,
+                    halfAngleDeg: s.sectorWidth / 2,
+                    radiusMeters: s.radius * 1.5
+                };
+            }
+            if (s.chainLengthM != null) payload.chainLengthM = s.chainLengthM;
+            if (s.depthM != null) payload.depthM = s.depthM;
+            this.send('FULL_SYNC', payload);
+        }
+
+        checkHeartbeat() {
+            if (!this.isConnected || !this.lastPeerPingTime) return;
+            const elapsed = Date.now() - this.lastPeerPingTime;
+            if (elapsed > 15000 && !this.peerConnectionLost) {
+                this.peerConnectionLost = true;
+                document.getElementById('ws-status-icon').classList.replace('text-green-400', 'text-orange-400');
+                document.getElementById('warning-title').innerHTML = '<i data-lucide="wifi-off" class="text-orange-500"></i> Connection Lost';
+                document.getElementById('warning-text').textContent = 'No heartbeat from cabin alarm for 15+ seconds. Check Wi-Fi connection.';
+                UI.showModal('warning-modal');
+                lucide.createIcons();
+            }
+        }
+
         _onOpen() {
             this.isConnected = true;
+            this.lastPeerPingTime = Date.now();
+            this.peerConnectionLost = false;
             document.getElementById('ws-status-icon').classList.replace('text-slate-600', 'text-green-400');
 
-            this.send('FULL_SYNC', {
-                isAnchored: this.app.state.isAnchored,
-                anchorPos: this.app.state.anchorPos,
-                radiusMeters: this.app.state.radius,
-                sector: { enabled: this.app.state.sectorEnabled, bearing: this.app.state.sectorBearing, width: this.app.state.sectorWidth },
-                units: this.app.state.unit,
-                watchTimerActive: this.app.state.watchActive
-            });
+            this.sendFullSync();
 
             this.pingInterval = setInterval(() => this.send('PING'), 5000);
 
@@ -746,6 +795,7 @@
                     currentPos: this.app.state.currentPos,
                     gpsAccuracy: this.app.state.accuracy,
                     distanceToAnchor: this.app.state.distance,
+                    alarmState: this.app.state.alarmState,
                     sog: this.app.state.sog,
                     cog: this.app.state.cog,
                     batteryLevel: this.app.alertCtrl.lastKnownBatteryLevel || 1.0,
@@ -756,7 +806,10 @@
 
         _onClose() {
             this.isConnected = false;
+            this.lastPeerPingTime = null;
+            this.peerConnectionLost = false;
             document.getElementById('ws-status-icon').classList.replace('text-green-400', 'text-slate-600');
+            document.getElementById('ws-status-icon').classList.replace('text-orange-400', 'text-slate-600');
             clearInterval(this.pingInterval);
             clearInterval(this.syncInterval);
         }
@@ -766,10 +819,35 @@
         _onMessage(event) {
             try {
                 const data = JSON.parse(event.data);
-                if (data.type === 'ACTION_COMMAND' && data.payload.command === 'MUTE_ALARM') {
-                    this.app.alertCtrl.stop();
-                    this.app.alertCtrl.isAlarming = true;
-                    setTimeout(() => this.app.alertCtrl.isAlarming = false, 5000);
+
+                if (data.type === 'PING') {
+                    this.lastPeerPingTime = Date.now();
+                    if (this.peerConnectionLost) {
+                        this.peerConnectionLost = false;
+                        document.getElementById('ws-status-icon').classList.replace('text-orange-400', 'text-green-400');
+                    }
+                    return;
+                }
+
+                if (data.type === 'ACTION_COMMAND') {
+                    const cmd = data.payload.command;
+                    if (cmd === 'MUTE_ALARM') {
+                        // Silence sound but keep monitoring — alarm will re-trigger on next violation
+                        this.app.alertCtrl.stop();
+                        this.app.alertCtrl.isAlarming = true;
+                        setTimeout(() => { this.app.alertCtrl.isAlarming = false; }, 5000);
+                    } else if (cmd === 'DISMISS_ALARM') {
+                        // Silence and reset — alarm won't re-trigger until re-entry + exit
+                        this.app.alertCtrl.stop();
+                        this.app.state.alarmState = 'SAFE';
+                    }
+                }
+
+                if (data.type === 'ANDROID_GPS_REPORT' && data.payload) {
+                    const p = data.payload;
+                    if (p.pos && p.pos.lat != null && p.pos.lng != null) {
+                        this.app.mapCtrl.updatePhoneMarker(L.latLng(p.pos.lat, p.pos.lng), p.accuracy || 0);
+                    }
                 }
             } catch(err) {}
         }
@@ -866,7 +944,9 @@
                 sectorEnabled: false, sectorBearing: 0, sectorWidth: 90,
                 anchorStartTime: null, maxDistanceSwing: 0, maxSogDuringAnchor: 0,
                 watchActive: false, watchEndTime: null, watchMinutes: 10,
-                schedule: JSON.parse(localStorage.getItem('anchor_schedule')) || []
+                schedule: JSON.parse(localStorage.getItem('anchor_schedule')) || [],
+                chainLengthM: null, depthM: null,
+                alarmState: 'SAFE'
             };
 
             this.mapCtrl = new MapController('map');
@@ -886,6 +966,7 @@
         _onTick() {
             this._checkWatchTimer();
             this._checkSchedule();
+            if (this.syncCtrl) this.syncCtrl.checkHeartbeat();
         }
 
         toggleAnchor() {
@@ -906,16 +987,13 @@
             this.mapCtrl.fitSafeZone();
             this.state.mapAutoCenter = true; document.getElementById('center-map-btn').classList.add('hidden');
 
-            if(this.syncCtrl.isConnected) this.syncCtrl.send('FULL_SYNC', {
-                isAnchored: true, anchorPos: this.state.anchorPos, radiusMeters: this.state.radius,
-                sector: { enabled: this.state.sectorEnabled, bearing: this.state.sectorBearing, width: this.state.sectorWidth },
-                units: this.state.unit, watchTimerActive: this.state.watchActive
-            });
+            if(this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
         }
 
         _liftAnchor() {
             this._generateLogbookEntry();
             this.state.isAnchored = false; this.state.anchorPos = null; this.state.distance = 0;
+            this.state.alarmState = 'SAFE';
 
             this.alertCtrl.stop(); this.mapCtrl.clearAnchor();
             this.state.track = [this.state.currentPos]; this.mapCtrl.updateTrack(this.state.track);
@@ -924,7 +1002,9 @@
             UI.setAnchorMode(false);
             this._syncUI();
 
-            if(this.syncCtrl.isConnected) this.syncCtrl.send('FULL_SYNC', { isAnchored: false });
+            if(this.syncCtrl.isConnected) {
+                this.syncCtrl.send('DISCONNECT', { reason: 'SESSION_ENDED' });
+            }
         }
 
         _recalculate() {
@@ -942,7 +1022,7 @@
                     UI.showModal('drag-warning-modal');
                     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                     this.state.dragWarningDismissed = true;
-                    this.syncCtrl.send('TRIGGER_ALARM', { reason: "DRAG_WARNING", message: "Ostrzeżenie: Kotwica może pełznąć!", severity: "WARNING" });
+                    this.syncCtrl.send('TRIGGER_ALARM', { reason: "OUT_OF_ZONE", message: "Possible anchor drag detected!", alarmState: "WARNING" });
                 }
             }
 
@@ -957,8 +1037,11 @@
             }
 
             if (isOut && !this.alertCtrl.isAlarming) {
+                this.state.alarmState = 'ALARM';
                 this.alertCtrl.start(reason, GeoUtils.formatDist(this.state.distance, this.state.unit));
-                this.syncCtrl.send('TRIGGER_ALARM', { reason: "DRAG", message: reason, severity: "CRITICAL" });
+                this.syncCtrl.send('TRIGGER_ALARM', { reason: "OUT_OF_ZONE", message: reason, alarmState: "ALARM" });
+            } else if (!isOut && this.state.alarmState !== 'SAFE') {
+                this.state.alarmState = 'SAFE';
             }
 
             this.mapCtrl.drawSafeZone(this.state.anchorPos, this.state.radius, { enabled: this.state.sectorEnabled, bearing: this.state.sectorBearing, width: this.state.sectorWidth }, isOut);
@@ -1014,7 +1097,7 @@
                 this.alertCtrl.playBeep('sine');
                 if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
                 UI.showModal('watch-alert-modal');
-                this.syncCtrl.send('TRIGGER_ALARM', { reason: "WATCH_TIMER", message: "Czas na wachtę!", severity: "WARNING" });
+                this.syncCtrl.send('TRIGGER_ALARM', { reason: "WATCH_TIMER", message: "Watch timer expired!", alarmState: "WARNING" });
             }
         }
 
@@ -1088,7 +1171,7 @@
             const handleRadius = (val) => {
                 let num = parseInt(val) || 10; if (this.state.unit === 'ft') num = num / GeoUtils.M2FT; if (num < 5) num = 5;
                 this.state.radius = num; UI.updateRadiusControls(GeoUtils.formatDist(num, this.state.unit), this.state.unit); this._recalculate();
-                if(this.syncCtrl.isConnected) this.syncCtrl.send('FULL_SYNC', { radiusMeters: this.state.radius });
+                if(this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
             };
             document.getElementById('radius-slider').addEventListener('input', e => handleRadius(e.target.value)); document.getElementById('radius-number').addEventListener('change', e => handleRadius(e.target.value));
 
@@ -1153,14 +1236,18 @@
             const updateCalc = () => calcRes.textContent = ((parseFloat(calcIn.value) || 0) * (parseFloat(calcRat.value) || 5)).toFixed(0);
             calcIn.addEventListener('input', updateCalc); calcRat.addEventListener('change', updateCalc); document.querySelector('[data-modal="calc-modal"]').addEventListener('click', updateCalc);
             document.getElementById('apply-calc-btn').addEventListener('click', () => {
-                let totalRadius = parseFloat(calcRes.textContent) + 10; if (this.state.unit === 'ft') totalRadius = totalRadius / GeoUtils.M2FT;
+                const chainLength = parseFloat(calcRes.textContent) || 0;
+                const depth = parseFloat(calcIn.value) || 0;
+                this.state.chainLengthM = chainLength;
+                this.state.depthM = depth;
+                let totalRadius = chainLength + 10; if (this.state.unit === 'ft') totalRadius = totalRadius / GeoUtils.M2FT;
                 handleRadius(totalRadius * (this.state.unit === 'ft' ? GeoUtils.M2FT : 1)); UI.hideModal('calc-modal');
             });
 
             document.getElementById('save-sector-btn').addEventListener('click', () => {
                 this.state.sectorEnabled = document.getElementById('sector-enable').checked; this.state.sectorBearing = parseFloat(document.getElementById('sector-bearing').value) || 0; this.state.sectorWidth = parseFloat(document.getElementById('sector-width').value) || 90;
                 UI.hideModal('sector-modal'); this._syncUI(); this._recalculate();
-                if(this.syncCtrl.isConnected) this.syncCtrl.send('FULL_SYNC', { sector: { enabled: this.state.sectorEnabled, bearing: this.state.sectorBearing, width: this.state.sectorWidth } });
+                if(this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
             });
             document.getElementById('sector-enable').addEventListener('change', (e) => document.getElementById('sector-inputs').style.opacity = e.target.checked ? '1' : '0.5');
 
@@ -1168,7 +1255,7 @@
                 const url = document.getElementById('ws-url-input').value.trim();
                 if (url) { this.syncCtrl.connect(url); UI.hideModal('ws-sync-modal'); }
             });
-            document.getElementById('ws-disconnect-btn').addEventListener('click', () => { this.syncCtrl.disconnect(); UI.hideModal('ws-sync-modal'); });
+            document.getElementById('ws-disconnect-btn').addEventListener('click', () => { this.syncCtrl.disconnect('USER_DISCONNECT'); UI.hideModal('ws-sync-modal'); });
 
             const checkAiKey = (action) => { if (this.aiCtrl.apiKey) action(); else { this.aiCtrl.pendingAction = action; document.getElementById('api-key-input').value = this.aiCtrl.apiKey; document.getElementById('clear-api-key-btn').classList.toggle('hidden', !this.aiCtrl.apiKey); UI.showModal('api-key-modal'); } };
             document.getElementById('open-ai-btn').addEventListener('click', () => checkAiKey(() => UI.showModal('ai-modal')));

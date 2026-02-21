@@ -24,12 +24,56 @@ The PWA provides a web-based interface that can be installed on any device and u
 - Sector-based monitoring (limit alarm to specific directions)
 - Offset calculation for stern anchoring
 - Chain length calculator
+- Drag detection with progressive alarm escalation (`SAFE` -> `CAUTION` -> `WARNING` -> `ALARM`)
+- WebSocket pairing with an Android phone for redundant cabin alarm
+- Watch timer and crew schedule management
+- AI-powered anchoring advisor (via Google Gemini API)
+- GPX track export and position sharing
 
 ### PWA Capabilities
 - **Service Worker**: Provides offline caching and background notifications
 - **Web App Manifest**: Makes the app installable on home screen
 - **Responsive Design**: Works on mobile, tablet, and desktop
 - **Browser Notifications**: Local notifications for alarms
+
+## Architecture
+
+Everything is in a single `index.html` file. No framework, no bundler -- vanilla JavaScript with classes:
+
+| Class | Responsibility |
+|---|---|
+| `GeoUtils` | Geodesic math (distance, bearing, sector polygon generation) |
+| `AlertController` | Audio alarms, vibration, wake lock, battery monitoring, notifications |
+| `MapController` | Leaflet map, boat/anchor/phone markers, safe zone rendering |
+| `AIController` | Google Gemini API integration, weather data fetching |
+| `SyncController` | WebSocket client -- protocol v2 communication with Android |
+| `OnboardingController` | First-run tutorial overlay |
+| `AnchorApp` | Main app state, GPS processing, zone checking, event binding |
+| `UI` | Static helper for modals, dashboard, controls |
+
+## Communication Protocol
+
+The PWA communicates with the Android app over WebSocket using protocol v2.
+See the [protocol documentation](../docs/protocol/README.md) for the full specification.
+
+### Messages sent by PWA
+
+| Message | Trigger |
+|---|---|
+| `FULL_SYNC` | On connect, anchor drop, radius/sector change |
+| `STATE_UPDATE` | Every 2 seconds (position, alarmState, battery, SOG/COG) |
+| `TRIGGER_ALARM` | Zone exit, drag detection, low battery, watch timer |
+| `DISCONNECT` | Anchor lifted (`SESSION_ENDED`) or manual unpair (`USER_DISCONNECT`) |
+| `PING` | Every 5 seconds (heartbeat) |
+
+### Messages received by PWA
+
+| Message | Action |
+|---|---|
+| `PING` | Resets heartbeat timeout (15s threshold) |
+| `ACTION_COMMAND` (`MUTE_ALARM`) | Silences alarm, keeps monitoring |
+| `ACTION_COMMAND` (`DISMISS_ALARM`) | Silences alarm and resets alarm state |
+| `ANDROID_GPS_REPORT` | Shows phone position marker on map |
 
 ## Getting Started
 
@@ -51,12 +95,20 @@ npx http-server -p 8000
 
 3. Open your browser and navigate to `http://localhost:8000`
 
+**Note:** HTTPS is required for Geolocation API. When testing locally, localhost over HTTP is treated as a secure context by browsers.
+
 ### Installing as PWA
 
 1. Open the app in a supported browser (Chrome, Edge, Safari on iOS 16.4+)
 2. Look for the "Install" or "Add to Home Screen" option
 3. Follow the prompts to install the app
 4. Launch the app from your home screen or app drawer
+
+### Pairing with Android
+
+To pair with the Android app for redundant cabin alarm:
+1. Tap the "Android" tool button in the PWA
+2. Enter the WebSocket URL from the Android QR code
 
 ## GitHub Pages Deployment
 
@@ -113,10 +165,6 @@ pwa/
 - ✅ Local notifications (Notification API)
 - ✅ Background sync capability (Background Sync API)
 - ✅ App-like experience
-
-## Communication Protocol
-
-For details on how the PWA communicates with the native Android app, see the [protocol documentation](../docs/protocol/README.md).
 
 ## Future Enhancements
 
