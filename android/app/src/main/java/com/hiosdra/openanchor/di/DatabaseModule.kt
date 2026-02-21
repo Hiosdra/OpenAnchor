@@ -3,7 +3,10 @@ package com.hiosdra.openanchor.di
 import android.content.Context
 import androidx.room.Room
 import com.hiosdra.openanchor.data.db.AnchorSessionDao
+import com.hiosdra.openanchor.data.db.LogbookEntryDao
 import com.hiosdra.openanchor.data.db.MIGRATION_1_2
+import com.hiosdra.openanchor.data.db.MIGRATION_2_3
+import com.hiosdra.openanchor.data.db.MIGRATION_3_4
 import com.hiosdra.openanchor.data.db.OpenAnchorDatabase
 import com.hiosdra.openanchor.data.db.TrackPointDao
 import dagger.Module
@@ -25,7 +28,7 @@ object DatabaseModule {
             OpenAnchorDatabase::class.java,
             "openanchor.db"
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
     }
 
@@ -37,5 +40,10 @@ object DatabaseModule {
     @Provides
     fun provideTrackPointDao(db: OpenAnchorDatabase): TrackPointDao {
         return db.trackPointDao()
+    }
+
+    @Provides
+    fun provideLogbookEntryDao(db: OpenAnchorDatabase): LogbookEntryDao {
+        return db.logbookEntryDao()
     }
 }

@@ -56,6 +56,30 @@ class ServiceBinder @Inject constructor(
         service?.dismissAlarm()
     }
 
+    fun muteAlarm() {
+        service?.muteAlarm()
+    }
+
+    /**
+     * Start the WebSocket server for paired mode.
+     * This also starts the foreground service if not already running.
+     */
+    fun startWebSocketServer() {
+        val intent = AnchorMonitorService.startServerIntent(context)
+        context.startForegroundService(intent)
+        context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    }
+
+    /**
+     * Stop the WebSocket server.
+     */
+    fun stopWebSocketServer() {
+        service?.let { svc ->
+            val intent = AnchorMonitorService.stopServerIntent(context)
+            context.startService(intent)
+        }
+    }
+
     fun unbind() {
         if (bound) {
             context.unbindService(connection)

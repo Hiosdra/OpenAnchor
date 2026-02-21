@@ -25,8 +25,8 @@ import com.hiosdra.openanchor.wear.data.WearMonitorState
 // Maritime dark colors (matching phone app)
 private val NavyDark = Color(0xFF0A1628)
 private val SafeGreen = Color(0xFF4CAF50)
-private val CautionOrange = Color(0xFFFF9800)
-private val WarningYellow = Color(0xFFFFC107)
+private val CautionYellow = Color(0xFFFFC107)
+private val WarningOrange = Color(0xFFFF9800)
 private val AlarmRed = Color(0xFFF44336)
 private val TextWhite = Color(0xFFECEFF1)
 private val TextGrey = Color(0xFF90A4AE)
@@ -169,8 +169,8 @@ private fun AlarmStateChip(alarmState: WearAlarmState) {
 private fun alarmStateColor(state: WearAlarmState): Color {
     return when (state) {
         WearAlarmState.SAFE -> SafeGreen
-        WearAlarmState.CAUTION -> CautionOrange
-        WearAlarmState.WARNING -> WarningYellow
+        WearAlarmState.CAUTION -> CautionYellow
+        WearAlarmState.WARNING -> WarningOrange
         WearAlarmState.ALARM -> AlarmRed
     }
 }

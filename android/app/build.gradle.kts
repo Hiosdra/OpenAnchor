@@ -41,6 +41,15 @@ android {
     buildFeatures {
         compose = true
     }
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/INDEX.LIST",
+                "META-INF/io.netty.versions.properties",
+                "META-INF/DEPENDENCIES"
+            )
+        }
+    }
 }
 
 ksp {
@@ -96,6 +105,17 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.gson)
+
+    // Ktor WebSocket Server (Paired mode)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.websockets)
+
+    // QR Code Generation
+    implementation(libs.zxing.core)
+
+    // Gemini AI (Advisor & Logbook)
+    implementation(libs.google.generativeai)
 
     // Test
     testImplementation(libs.junit)

@@ -19,7 +19,8 @@ data class UserPreferences(
     val depthUnit: DepthUnit = DepthUnit.METERS,
     val language: String = "en",
     val gpsIntervalSeconds: Int = 3,
-    val nightFilterEnabled: Boolean = false
+    val nightFilterEnabled: Boolean = false,
+    val geminiApiKey: String? = null
 )
 
 @Singleton
@@ -33,6 +34,7 @@ class PreferencesManager @Inject constructor(
         val LANGUAGE = stringPreferencesKey("language")
         val GPS_INTERVAL = intPreferencesKey("gps_interval_seconds")
         val NIGHT_FILTER = booleanPreferencesKey("night_filter_enabled")
+        val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
     }
 
     val preferences: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
@@ -45,7 +47,8 @@ class PreferencesManager @Inject constructor(
             } ?: DepthUnit.METERS,
             language = prefs[Keys.LANGUAGE] ?: "en",
             gpsIntervalSeconds = prefs[Keys.GPS_INTERVAL] ?: 3,
-            nightFilterEnabled = prefs[Keys.NIGHT_FILTER] ?: false
+            nightFilterEnabled = prefs[Keys.NIGHT_FILTER] ?: false,
+            geminiApiKey = prefs[Keys.GEMINI_API_KEY]
         )
     }
 
@@ -67,5 +70,9 @@ class PreferencesManager @Inject constructor(
 
     suspend fun setNightFilterEnabled(enabled: Boolean) {
         context.dataStore.edit { it[Keys.NIGHT_FILTER] = enabled }
+    }
+
+    suspend fun setGeminiApiKey(key: String) {
+        context.dataStore.edit { it[Keys.GEMINI_API_KEY] = key }
     }
 }

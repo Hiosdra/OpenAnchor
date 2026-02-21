@@ -9,5 +9,7 @@ data class AnchorSession(
     val chainLengthM: Double? = null,
     val depthM: Double? = null,
     val alarmTriggered: Boolean = false,
-    val alarmCount: Int = 0
+    val alarmCount: Int = 0,
+    val maxDistanceMeters: Double = 0.0,
+    val maxSog: Double = 0.0
 )
