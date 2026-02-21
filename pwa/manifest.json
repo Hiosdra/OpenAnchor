@@ -9,16 +9,22 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle fill='%230f172a' cx='50' cy='50' r='50'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%233b82f6'%3E%E2%9A%93%3C/text%3E%3C/svg%3E",
+      "src": "icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle fill='%230f172a' cx='50' cy='50' r='50'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%233b82f6'%3E%E2%9A%93%3C/text%3E%3C/svg%3E",
+      "src": "icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ],
   "categories": ["navigation", "utilities"],
