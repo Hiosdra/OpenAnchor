@@ -23,7 +23,7 @@ Contains the Progressive Web App that provides a web-based interface for OpenAnc
 - Web App Manifest for installability
 - Anchor alarm monitoring with GPS tracking
 - Map visualization with Leaflet
-- Multiple notification methods (audio, vibration, browser notifications)
+- Multiple notification methods (audio, vibration, browser notifications, push notifications)
 
 **Hosted on GitHub Pages:**
 The PWA is automatically deployed to GitHub Pages via GitHub Actions.

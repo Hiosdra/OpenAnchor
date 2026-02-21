@@ -92,6 +92,92 @@ self.addEventListener('notificationclick', event => {
   );
 });
 
+// Push API - handle push events from server
+self.addEventListener('push', event => {
+  console.log('Push event received');
+
+  let notificationData = {
+    title: '🚨 Alert Kotwiczny',
+    body: 'Sprawdź swoją pozycję!',
+    icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle fill=\'%230f172a\' cx=\'50\' cy=\'50\' r=\'50\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'60\' text-anchor=\'middle\' fill=\'%233b82f6\'%3E%E2%9A%93%3C/text%3E%3C/svg%3E',
+    badge: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle fill=\'%230f172a\' cx=\'50\' cy=\'50\' r=\'50\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'60\' text-anchor=\'middle\' fill=\'%233b82f6\'%3E%E2%9A%93%3C/text%3E%3C/svg%3E',
+    vibrate: [500, 200, 500],
+    tag: 'anchor-alarm',
+    requireInteraction: true,
+    data: {
+      url: './'
+    }
+  };
+
+  // Parse push notification payload if available
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      notificationData = {
+        ...notificationData,
+        ...payload
+      };
+    } catch (e) {
+      // If not JSON, use text content as body
+      notificationData.body = event.data.text();
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, {
+      body: notificationData.body,
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      vibrate: notificationData.vibrate,
+      tag: notificationData.tag,
+      requireInteraction: notificationData.requireInteraction,
+      data: notificationData.data
+    })
+  );
+});
+
+// Handle push subscription change
+self.addEventListener('pushsubscriptionchange', event => {
+  console.log('Push subscription changed');
+
+  event.waitUntil(
+    // Resubscribe to push notifications
+    self.registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(
+        // VAPID public key would be provided by the server
+        // This is a placeholder - actual key should come from server configuration
+        'BEl62iUYgUivxIkv69yViEuiBIa-Ib37J8vyGOmL9bDdJzgZLIhC3GHV6RH7VSLi9CRXGpNbH9hE3Cp6xjXPG0M'
+      )
+    }).then(subscription => {
+      // Send new subscription to server
+      return fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(subscription)
+      });
+    })
+  );
+});
+
+// Helper function to convert VAPID key
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 // Background Sync API - sync position data when connection is restored
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-position') {
