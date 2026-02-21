@@ -14,5 +14,17 @@
 .cxx
 local.properties
 
-# Project exclude paths
-/wear/build/
+# Android project
+/android/build/
+/android/app/build/
+/android/wear/build/
+/android/.gradle/
+/android/local.properties
+
+# PWA
+/pwa/node_modules/
+/pwa/dist/
+/pwa/.env.local
+
+# Docs
+*.pdf
