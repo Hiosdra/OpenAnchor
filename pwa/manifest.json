@@ -1,0 +1,27 @@
+{
+  "name": "Alert Kotwiczny (Anchor Alarm)",
+  "short_name": "Alert Kotwiczny",
+  "description": "Progressive Web App for anchor alarm monitoring",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle fill='%230f172a' cx='50' cy='50' r='50'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%233b82f6'>⚓</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle fill='%230f172a' cx='50' cy='50' r='50'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%233b82f6'>⚓</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["navigation", "utilities"],
+  "lang": "pl",
+  "dir": "ltr"
+}
