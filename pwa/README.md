@@ -10,7 +10,7 @@ The PWA provides a web-based interface that can be installed on any device and u
 - **Visual Alarm System**: Map-based visualization with customizable radius
 - **Offline Support**: Service Worker enables offline functionality
 - **Installable**: Can be installed as a standalone app on mobile devices
-- **Multiple Notification Methods**: Audio alarms, vibration, and push notifications
+- **Multiple Notification Methods**: Audio alarms, vibration, and browser notifications
 - **Night Vision Mode**: Special display mode for use at night
 - **AI Assistant**: Integration with AI for weather and navigation assistance
 
@@ -29,7 +29,7 @@ The PWA provides a web-based interface that can be installed on any device and u
 - **Service Worker**: Provides offline caching and background notifications
 - **Web App Manifest**: Makes the app installable on home screen
 - **Responsive Design**: Works on mobile, tablet, and desktop
-- **Push Notifications**: Browser notifications for alarms
+- **Browser Notifications**: Local notifications for alarms
 
 ## Getting Started
 
@@ -97,7 +97,7 @@ pwa/
 - **Service Worker API**: Offline functionality
 - **Geolocation API**: GPS position tracking
 - **Web Audio API**: Alarm sounds
-- **Notification API**: Push notifications
+- **Notification API**: Local notifications
 - **Wake Lock API**: Keep screen on during monitoring
 
 ### Browser Compatibility
@@ -107,11 +107,11 @@ pwa/
 - Opera: Full support
 
 ### PWA Features
-- ✅ Offline support via Service Worker
+- ✅ Offline support via Service Worker with runtime caching
 - ✅ Installable as standalone app
 - ✅ Responsive design
-- ✅ Push notifications
-- ✅ Background sync capability
+- ✅ Local notifications (Notification API)
+- ✅ Background sync capability (Background Sync API)
 - ✅ App-like experience
 
 ## Communication Protocol
@@ -131,10 +131,16 @@ Planned improvements:
 ## Development Notes
 
 ### Service Worker
-The service worker (`sw.js`) caches essential files for offline use. Update the `CACHE_NAME` version when making changes that require cache refresh.
+The service worker (`sw.js`) implements:
+- **Runtime Caching**: CDN assets (Tailwind, Leaflet, etc.) are cached on first use for offline functionality
+- **Stale-While-Revalidate**: Serves cached content immediately while updating in the background
+- **Background Sync**: Syncs position data when connection is restored (requires app integration)
+- **Periodic Sync**: Can periodically check anchor position in the background (Chrome-only feature)
+
+Update the `CACHE_NAME` version when making changes that require cache refresh.
 
 ### Manifest
-The `manifest.json` file currently uses SVG data URLs for icons. For production, consider replacing with proper PNG icons at 192x192 and 512x512 sizes.
+The `manifest.json` file uses properly URL-encoded SVG data URLs for icons. The anchor emoji (⚓) is displayed on a dark background matching the app's theme.
 
 ## Support
 

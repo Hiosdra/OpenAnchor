@@ -23,7 +23,7 @@ Contains the Progressive Web App that provides a web-based interface for OpenAnc
 - Web App Manifest for installability
 - Anchor alarm monitoring with GPS tracking
 - Map visualization with Leaflet
-- Multiple notification methods (audio, vibration, push notifications)
+- Multiple notification methods (audio, vibration, browser notifications)
 
 **Hosted on GitHub Pages:**
 The PWA is automatically deployed to GitHub Pages via GitHub Actions.
@@ -48,14 +48,18 @@ cd android
 ```
 
 ### PWA
-To run the PWA locally:
+To run the PWA locally, you must use a local HTTP server (service workers require HTTP/HTTPS):
 ```bash
 cd pwa
-# Open index.html in a modern web browser
-# Or use a local server like:
+# Using Python 3
 python3 -m http.server 8000
 # Then navigate to http://localhost:8000
+
+# Or using Node.js http-server
+npx http-server -p 8000
 ```
+
+**Note:** Opening `index.html` directly in a browser (`file://` protocol) will not work for PWA features like service workers and offline functionality.
 
 To deploy the PWA to GitHub Pages:
 1. Push changes to the `main` branch
