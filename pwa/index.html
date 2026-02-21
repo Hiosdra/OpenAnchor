@@ -337,7 +337,16 @@
 <div id="api-key-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-[4000] hidden p-4">
     <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.3)]">
         <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="key" class="text-purple-400"></i> Klucz API</h3>
-        <p class="text-slate-300 text-sm mb-4">Podaj darmowy klucz API od Google AI Studio.</p>
+        <p class="text-slate-300 text-sm mb-3">Podaj darmowy klucz API od Google AI Studio.</p>
+        <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700 mb-4">
+            <p class="text-slate-400 text-xs mb-2 font-bold">Jak uzyskać klucz API:</p>
+            <ol class="text-slate-400 text-xs space-y-1 list-decimal list-inside">
+                <li>Otwórz <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 underline">Google AI Studio</a></li>
+                <li>Zaloguj się kontem Google</li>
+                <li>Kliknij "Get API key" lub "Create API key"</li>
+                <li>Skopiuj wygenerowany klucz i wklej poniżej</li>
+            </ol>
+        </div>
         <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 outline-none mb-4 font-mono text-sm">
         <div class="flex gap-3"><button class="modal-close-btn flex-1 bg-slate-700 py-3 rounded-xl font-bold">Anuluj</button><button id="save-api-key-btn" class="flex-1 bg-purple-600 py-3 rounded-xl font-bold text-white">Zapisz</button></div>
         <button id="clear-api-key-btn" class="w-full mt-3 text-xs text-red-400 underline hidden">Usuń zapisany klucz</button>
