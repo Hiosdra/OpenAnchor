@@ -1919,15 +1919,24 @@
             this.syncInterval = null;
             this.lastPeerPingTime = null;
             this.peerConnectionLost = false;
+            this._reconnectTimer = null;
+            this._reconnectAttempts = 0;
+            this._intentionalDisconnect = false;
         }
 
         connect(url) {
-            if (this.ws) this.disconnect();
+            this._intentionalDisconnect = false;
+            this._reconnectAttempts = 0;
+            clearTimeout(this._reconnectTimer);
+            if (this.ws) this._closeSocket();
             this.url = url;
             localStorage.setItem('anchor_ws_url', url);
+            this._doConnect();
+        }
 
+        _doConnect() {
             try {
-                this.ws = new WebSocket(url);
+                this.ws = new WebSocket(this.url);
                 this.ws.onopen = () => this._onOpen();
                 this.ws.onclose = () => this._onClose();
                 this.ws.onerror = (e) => this._onError(e);
@@ -1939,12 +1948,22 @@
         }
 
         disconnect(reason = 'USER_DISCONNECT') {
+            this._intentionalDisconnect = true;
+            clearTimeout(this._reconnectTimer);
+            this._reconnectAttempts = 0;
             if (this.ws) {
                 if (this.isConnected) this.send('DISCONNECT', { reason });
+                this._closeSocket();
+            }
+            this._onClose();
+        }
+
+        _closeSocket() {
+            if (this.ws) {
+                this.ws.onclose = null; // prevent _onClose from firing again
                 this.ws.close();
                 this.ws = null;
             }
-            this._onClose();
         }
 
         send(type, payload = {}) {
@@ -1990,6 +2009,7 @@
 
         _onOpen() {
             this.isConnected = true;
+            this._reconnectAttempts = 0;
             this.lastPeerPingTime = Date.now();
             this.peerConnectionLost = false;
             document.getElementById('ws-status-icon').classList.replace('text-slate-600', 'text-green-400');
@@ -2013,6 +2033,7 @@
         }
 
         _onClose() {
+            const wasConnected = this.isConnected;
             this.isConnected = false;
             this.lastPeerPingTime = null;
             this.peerConnectionLost = false;
@@ -2025,9 +2046,28 @@
             if (driftBanner) driftBanner.classList.add('hidden');
             clearInterval(this.pingInterval);
             clearInterval(this.syncInterval);
+
+            // Auto-reconnect if not intentional disconnect and we have a URL
+            if (!this._intentionalDisconnect && this.url) {
+                this._scheduleReconnect();
+            }
         }
 
         _onError(e) { console.warn("WS Error", e); }
+
+        _scheduleReconnect() {
+            clearTimeout(this._reconnectTimer);
+            // Exponential backoff: 2s, 4s, 8s, 16s, max 30s
+            const delay = Math.min(2000 * Math.pow(2, this._reconnectAttempts), 30000);
+            this._reconnectAttempts++;
+            console.log(`WS: scheduling reconnect #${this._reconnectAttempts} in ${delay}ms`);
+            this._reconnectTimer = setTimeout(() => {
+                if (!this.isConnected && !this._intentionalDisconnect && this.url) {
+                    console.log(`WS: reconnecting to ${this.url}`);
+                    this._doConnect();
+                }
+            }, delay);
+        }
 
         _onMessage(event) {
             try {
@@ -2542,8 +2582,17 @@
                     this.alertCtrl.startForState('WARNING', I18N.t.notifVerifying, distStr);
                     this.syncCtrl.send('TRIGGER_ALARM', { reason: "OUT_OF_ZONE", message: `Position verification in progress (${distStr})`, alarmState: "WARNING" });
                 } else if (newAlarmState === 'CAUTION' && previousAlarmState === 'SAFE') {
-                    // Caution: silent, visual only
-                    this.syncCtrl.send('STATE_UPDATE', { alarmState: 'CAUTION' });
+                    // Caution: silent, visual only — send full STATE_UPDATE (Android requires all fields)
+                    this.syncCtrl.send('STATE_UPDATE', {
+                        currentPos: this.state.currentPos,
+                        gpsAccuracy: this.state.accuracy,
+                        distanceToAnchor: this.state.distance,
+                        alarmState: 'CAUTION',
+                        sog: this.state.sog,
+                        cog: this.state.cog,
+                        batteryLevel: this.alertCtrl.lastKnownBatteryLevel || 1.0,
+                        isCharging: this.alertCtrl.lastKnownChargingState || false
+                    });
                 } else if (newAlarmState === 'SAFE' && (previousAlarmState === 'ALARM' || previousAlarmState === 'WARNING')) {
                     this.alertCtrl.stop();
                 }

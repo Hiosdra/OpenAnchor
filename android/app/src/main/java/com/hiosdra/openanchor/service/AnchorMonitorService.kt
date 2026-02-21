@@ -366,11 +366,18 @@ class AnchorMonitorService : Service() {
         when (event) {
             is PairedModeManager.PairedEvent.EnterPairedMode -> {
                 Log.i(TAG, "Entering paired mode")
+                // Cancel any standalone fallback monitoring that may be running
+                monitoringJob?.cancel()
+                monitoringJob = null
+                // Dismiss connection-loss alarm if active
+                if (alarmPlayer.isPlaying()) alarmPlayer.stopAlarm()
+                alarmEngine.reset()
                 _monitorState.value = _monitorState.value.copy(
                     isActive = true,
                     isPairedMode = true,
                     anchorPosition = event.anchorPosition,
-                    zone = event.zone
+                    zone = event.zone,
+                    alarmState = AlarmState.SAFE
                 )
                 // Start periodic GPS verification
                 startPairedGpsVerification(event.zone, event.anchorPosition)
@@ -454,7 +461,15 @@ class AnchorMonitorService : Service() {
                     alarmState = AlarmState.ALARM
                 )
                 updateNotification("Connection lost with navigation station!", AlarmState.ALARM)
-                // The service keeps running in standalone GPS mode
+                // Cancel paired GPS verification (will be replaced by continuous monitoring)
+                pairedGpsVerificationJob?.cancel()
+                pairedGpsVerificationJob = null
+                // Start continuous standalone GPS monitoring as safety fallback
+                val zone = _monitorState.value.zone
+                val anchorPos = _monitorState.value.anchorPosition
+                if (zone != null && anchorPos != null) {
+                    startStandaloneFallbackMonitoring(zone, anchorPos)
+                }
             }
 
             is PairedModeManager.PairedEvent.SessionEnded -> {
@@ -526,6 +541,44 @@ class AnchorMonitorService : Service() {
                 } catch (e: Exception) {
                     Log.e(TAG, "GPS verification failed", e)
                 }
+            }
+        }
+    }
+
+    /**
+     * Start continuous GPS monitoring as a fallback after heartbeat timeout in paired mode.
+     * Uses the zone received from the last FULL_SYNC to perform standalone zone checks.
+     */
+    private fun startStandaloneFallbackMonitoring(zone: AnchorZone, anchorPosition: Position) {
+        monitoringJob?.cancel()
+        monitoringJob = serviceScope.launch {
+            val intervalMs = preferencesManager.preferences.first().gpsIntervalSeconds * 1000L
+            lastGpsFixTime = System.currentTimeMillis()
+            startGpsWatchdog()
+
+            locationProvider.locationUpdates(intervalMs).collect { position ->
+                // If we're back in paired mode (reconnected), stop standalone processing
+                if (_monitorState.value.isPairedMode) return@collect
+
+                lastGpsFixTime = System.currentTimeMillis()
+                val distance = GeoCalculations.distanceMeters(position, anchorPosition)
+                val zoneResult = GeoCalculations.checkZone(position, zone)
+                val alarmState = alarmEngine.processReading(zoneResult)
+
+                val previousAlarmState = _monitorState.value.alarmState
+                handleAlarmTransition(alarmState, previousAlarmState, _monitorState.value.sessionId ?: -1)
+
+                _monitorState.value = _monitorState.value.copy(
+                    boatPosition = position,
+                    distanceToAnchor = distance,
+                    alarmState = alarmState,
+                    gpsAccuracyMeters = position.accuracy,
+                    gpsSignalLost = false
+                )
+
+                serviceScope.launch { wearDataSender.sendMonitorState(_monitorState.value) }
+                val notifText = "FALLBACK: %.0f m - %s".format(distance, alarmState.name)
+                updateNotification(notifText, alarmState)
             }
         }
     }

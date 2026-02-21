@@ -39,7 +39,8 @@ class ProtocolMessageParser @Inject constructor() {
         return try {
             val root = JsonParser.parseString(json).asJsonObject
             val type = root.get("type")?.asString ?: return null
-            val payloadObj = root.getAsJsonObject("payload")
+            val payloadElement = root.get("payload")
+            val payloadObj = if (payloadElement != null && payloadElement.isJsonObject) payloadElement.asJsonObject else null
 
             when (type) {
                 "FULL_SYNC" -> {
