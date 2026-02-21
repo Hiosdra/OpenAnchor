@@ -1,18 +1,19 @@
 # PWA (Progressive Web App)
 
-This directory contains the Progressive Web App component of OpenAnchor - an anchor alarm monitoring system for boats and yachts.
+This directory contains the iPad/browser anchor alarm PWA -- a single `index.html` file with no build system.
 
 ## Overview
 
-The PWA provides a web-based interface that can be installed on any device and used to monitor anchor drift. It features:
+The PWA runs on an iPad (or any modern browser) and serves as the **master** anchor monitoring device. It can be installed as a Progressive Web App on any device and provides:
 
-- **GPS Tracking**: Real-time position monitoring using device GPS
-- **Visual Alarm System**: Map-based visualization with customizable radius
-- **Offline Support**: Service Worker enables offline functionality
-- **Installable**: Can be installed as a standalone app on mobile devices
-- **Multiple Notification Methods**: Audio alarms, vibration, and browser notifications
-- **Night Vision Mode**: Special display mode for use at night
-- **AI Assistant**: Integration with AI for weather and navigation assistance
+- Real-time GPS tracking via the browser Geolocation API
+- Anchor zone monitoring (circle or sector geometry)
+- Drag detection with progressive alarm escalation (`SAFE` -> `CAUTION` -> `WARNING` -> `ALARM`)
+- WebSocket pairing with an Android phone for redundant cabin alarm
+- Watch timer and crew schedule management
+- AI-powered anchoring advisor (via Google Gemini API)
+- GPX track export and position sharing
+- Night mode for cockpit use
 
 ## Features
 
@@ -24,18 +25,12 @@ The PWA provides a web-based interface that can be installed on any device and u
 - Sector-based monitoring (limit alarm to specific directions)
 - Offset calculation for stern anchoring
 - Chain length calculator
-- Drag detection with progressive alarm escalation (`SAFE` -> `CAUTION` -> `WARNING` -> `ALARM`)
-- WebSocket pairing with an Android phone for redundant cabin alarm
-- Watch timer and crew schedule management
-- AI-powered anchoring advisor (via Google Gemini API)
-- GPX track export and position sharing
 
 ### PWA Capabilities
 - **Service Worker**: Provides offline caching and background notifications
 - **Web App Manifest**: Makes the app installable on home screen
 - **Responsive Design**: Works on mobile, tablet, and desktop
 - **Browser Notifications**: Local notifications for alarms
-
 ## Architecture
 
 Everything is in a single `index.html` file. No framework, no bundler -- vanilla JavaScript with classes:
