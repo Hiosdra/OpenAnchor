@@ -22,6 +22,8 @@ data class MonitorState(
     val peerIsCharging: Boolean? = null,
     val sog: Double? = null,
     val cog: Double? = null,
+    // Client mode fields (this device connects to another Android as client)
+    val isClientMode: Boolean = false,
     // Local battery (Faza 4.4)
     val localBatteryLevel: Int = -1,
     val localBatteryCharging: Boolean = false,

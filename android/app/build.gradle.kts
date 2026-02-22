@@ -108,11 +108,17 @@ dependencies {
 
     // Ktor WebSocket Server (Paired mode)
     implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.websockets)
 
-    // QR Code Generation
+    // QR Code Generation & Scanning
     implementation(libs.zxing.core)
+
+    // CameraX (QR Scanner for client mode)
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
 
     // Gemini AI (Advisor & Logbook)
     implementation(libs.google.generativeai)

@@ -20,6 +20,13 @@ self.addEventListener('install', event => {
 
 // Fetch from cache with runtime caching (cache-first / stale-while-revalidate)
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // Only handle http/https requests – skip chrome-extension:// and other unsupported schemes
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {

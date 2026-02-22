@@ -10,7 +10,7 @@
 
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
 
@@ -3611,6 +3611,7 @@ SAFETY: ...`;
         // ==========================================
         _startQrScanner() {
             if (this._qrScanner) this._stopQrScanner();
+            this._qrScanHandled = false;
 
             try {
                 this._qrScanner = new Html5Qrcode('qr-reader');
@@ -3638,35 +3639,39 @@ SAFETY: ...`;
         }
 
         _onQrScanSuccess(decodedText) {
-            try {
-                const data = JSON.parse(decodedText);
-                if (!data.wsUrl) throw new Error(I18N.t.qrNoUrl);
+            // Guard: ignore callbacks after scanner was already stopped (race condition)
+            if (this._qrScanHandled) return;
 
+            // Try parsing as JSON first (OpenAnchor pairing data)
+            let data = null;
+            try {
+                data = JSON.parse(decodedText);
+            } catch (_) {
+                // Not JSON — will try plain URL below
+            }
+
+            if (data && data.wsUrl) {
+                this._qrScanHandled = true;
                 this._qrScannedData = data;
                 document.getElementById('qr-scan-url').textContent = data.wsUrl + (data.ssid ? ` (WiFi: ${data.ssid})` : '');
-                document.getElementById('qr-scan-result').classList.remove('hidden');
-                document.getElementById('qr-scan-connect').classList.remove('hidden');
-                document.getElementById('qr-scan-error').classList.add('hidden');
-
-                // Stop scanning after success
-                this._stopQrScanner();
-
-                // Vibrate on success
-                if (navigator.vibrate) navigator.vibrate(100);
-            } catch (err) {
-                // Not a valid OpenAnchor QR code — try treating as plain WS URL
-                if (decodedText.startsWith('ws://') || decodedText.startsWith('wss://')) {
-                    this._qrScannedData = { wsUrl: decodedText };
-                    document.getElementById('qr-scan-url').textContent = decodedText;
-                    document.getElementById('qr-scan-result').classList.remove('hidden');
-                    document.getElementById('qr-scan-connect').classList.remove('hidden');
-                    this._stopQrScanner();
-                    if (navigator.vibrate) navigator.vibrate(100);
-                } else {
-                    document.getElementById('qr-scan-error').textContent = I18N.t.qrInvalid;
-                    document.getElementById('qr-scan-error').classList.remove('hidden');
-                }
+            } else if (decodedText.startsWith('ws://') || decodedText.startsWith('wss://')) {
+                // Plain WebSocket URL
+                this._qrScanHandled = true;
+                this._qrScannedData = { wsUrl: decodedText };
+                document.getElementById('qr-scan-url').textContent = decodedText;
+            } else {
+                // Not a valid QR code for this app
+                document.getElementById('qr-scan-error').textContent = I18N.t.qrInvalid;
+                document.getElementById('qr-scan-error').classList.remove('hidden');
+                return;
             }
+
+            // Success — show result, hide error, stop scanner
+            document.getElementById('qr-scan-result').classList.remove('hidden');
+            document.getElementById('qr-scan-connect').classList.remove('hidden');
+            document.getElementById('qr-scan-error').classList.add('hidden');
+            this._stopQrScanner();
+            if (navigator.vibrate) navigator.vibrate(100);
         }
     }
 

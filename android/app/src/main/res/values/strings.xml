@@ -224,4 +224,24 @@
     <string name="drift_detected">Drag detected: %1$s</string>
     <string name="drift_direction">Direction: %1$.0f\u00B0</string>
     <string name="drift_speed">Speed: %1$.1f m/min</string>
+
+    <!-- Client Mode (connect to another Android as server) -->
+    <string name="connect_to_server">Connect to Server</string>
+    <string name="client_scan_title">Scan Server QR Code</string>
+    <string name="client_scan_description">Scan the QR code displayed on the other device running OpenAnchor as server, or enter the server URL manually.</string>
+    <string name="client_manual_url">Server URL</string>
+    <string name="client_camera_permission">Camera permission is required to scan QR codes</string>
+    <string name="client_scanned_title">Server Found</string>
+    <string name="client_connect_wifi_hint">Make sure you are connected to the same WiFi network or the server\'s hotspot before connecting.</string>
+    <string name="client_connect">Connect</string>
+    <string name="client_rescan">Scan Again</string>
+    <string name="client_connecting">Connecting\u2026</string>
+    <string name="client_connected">Connected!</string>
+    <string name="client_connected_hint">Connected to server. Opening dashboard\u2026</string>
+    <string name="client_retry">Try Again</string>
+    <string name="client_dashboard_title">Client Monitor</string>
+    <string name="client_server_gps">Server GPS Verification</string>
+    <string name="client_disconnect_title">Disconnect from Server?</string>
+    <string name="client_disconnect_message">This will stop client mode and disconnect from the server. You will no longer receive monitoring data.</string>
+    <string name="resume_client_mode">Resume Client Mode</string>
 </resources>

@@ -38,7 +38,11 @@ class ProtocolMessageParser @Inject constructor() {
     fun parseInbound(json: String): InboundMessage? {
         return try {
             val root = JsonParser.parseString(json).asJsonObject
-            val type = root.get("type")?.asString ?: return null
+            val type = root.get("type")?.asString
+            if (type == null) {
+                Log.w(TAG, "Inbound message missing 'type' field, dropping: $json")
+                return null
+            }
             val payloadElement = root.get("payload")
             val payloadObj = if (payloadElement != null && payloadElement.isJsonObject) payloadElement.asJsonObject else null
 
@@ -114,6 +118,55 @@ class ProtocolMessageParser @Inject constructor() {
             type = "ACTION_COMMAND",
             timestamp = System.currentTimeMillis(),
             payload = ActionCommandPayload(command = command)
+        ))
+    }
+
+    // --- Client-side outbound messages (Android client → Android server) ---
+
+    /**
+     * Build a FULL_SYNC message to send zone configuration to the server.
+     * Used by client mode (mirrors what PWA sends on connect).
+     */
+    fun buildFullSync(payload: FullSyncPayload): String {
+        return gson.toJson(ProtocolMessage(
+            type = "FULL_SYNC",
+            timestamp = System.currentTimeMillis(),
+            payload = payload
+        ))
+    }
+
+    /**
+     * Build a STATE_UPDATE message with current telemetry.
+     * Sent every 2 seconds by the client (mirrors PWA behavior).
+     */
+    fun buildStateUpdate(payload: StateUpdatePayload): String {
+        return gson.toJson(ProtocolMessage(
+            type = "STATE_UPDATE",
+            timestamp = System.currentTimeMillis(),
+            payload = payload
+        ))
+    }
+
+    /**
+     * Build a TRIGGER_ALARM message.
+     * Sent when client detects zone violation, GPS loss, or low battery.
+     */
+    fun buildTriggerAlarm(payload: TriggerAlarmPayload): String {
+        return gson.toJson(ProtocolMessage(
+            type = "TRIGGER_ALARM",
+            timestamp = System.currentTimeMillis(),
+            payload = payload
+        ))
+    }
+
+    /**
+     * Build a DISCONNECT message for graceful disconnection.
+     */
+    fun buildDisconnect(reason: String): String {
+        return gson.toJson(ProtocolMessage(
+            type = "DISCONNECT",
+            timestamp = System.currentTimeMillis(),
+            payload = DisconnectPayload(reason = reason)
         ))
     }
 

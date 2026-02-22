@@ -3,12 +3,14 @@ package com.hiosdra.openanchor.network
 import android.util.Log
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.cio.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
@@ -32,13 +34,16 @@ class AnchorWebSocketServer @Inject constructor(
         const val DEFAULT_PORT = 8080
         private const val HEARTBEAT_INTERVAL_MS = 5_000L
         private const val HEARTBEAT_TIMEOUT_MS = 15_000L
+        private const val MAX_FRAME_SIZE = 65_536L // 64 KB — protocol messages are small JSON
     }
 
-    private var server: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
+    private val mutex = Mutex()
+    private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
     private var clientSession: WebSocketServerSession? = null
     private var heartbeatJob: Job? = null
     private var heartbeatWatchdogJob: Job? = null
     private var lastPeerPingTime: Long = 0L
+    private var serverScope: CoroutineScope? = null
 
     // Server state flow
     private val _serverState = MutableStateFlow(ServerState())
@@ -77,13 +82,14 @@ class AnchorWebSocketServer @Inject constructor(
             return
         }
 
+        serverScope = scope
+
         try {
-            server = embeddedServer(Netty, port = port) {
+            val newServer = embeddedServer(CIO, port = port, host = "0.0.0.0") {
                 install(WebSockets) {
                     pingPeriod = 15.seconds
                     timeout = 30.seconds
-                    maxFrameSize = Long.MAX_VALUE
-                    masking = false
+                    maxFrameSize = MAX_FRAME_SIZE
                 }
                 routing {
                     webSocket("/") {
@@ -91,14 +97,16 @@ class AnchorWebSocketServer @Inject constructor(
                     }
                 }
             }
+            server = newServer
 
             scope.launch(Dispatchers.IO) {
                 try {
-                    server?.start(wait = false)
+                    newServer.start(wait = false)
                     _serverState.value = _serverState.value.copy(isRunning = true, port = port)
                     Log.i(TAG, "WebSocket server started on port $port")
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to start server", e)
+                    server = null
                     _serverState.value = _serverState.value.copy(isRunning = false)
                 }
             }
@@ -113,37 +121,44 @@ class AnchorWebSocketServer @Inject constructor(
         heartbeatWatchdogJob?.cancel()
         heartbeatWatchdogJob = null
 
-        clientSession?.let { session ->
-            CoroutineScope(Dispatchers.IO).launch {
+        // Close client session synchronously to ensure GOING_AWAY frame is sent
+        // before shutting down the server
+        val session = clientSession
+        clientSession = null
+        if (session != null) {
+            runBlocking(Dispatchers.IO) {
                 try {
                     session.close(CloseReason(CloseReason.Codes.GOING_AWAY, "Server stopping"))
                 } catch (_: Exception) {}
             }
         }
-        clientSession = null
 
         server?.stop(1000, 2000)
         server = null
+        serverScope = null
 
         _serverState.value = ServerState()
         Log.i(TAG, "WebSocket server stopped")
     }
 
     private suspend fun handleClientConnection(session: WebSocketServerSession) {
-        // Only allow one client at a time
-        clientSession?.let { existing ->
-            try {
-                existing.close(CloseReason(CloseReason.Codes.NORMAL, "New client connected"))
-            } catch (_: Exception) {}
+        // Only allow one client at a time — close existing session under lock
+        mutex.withLock {
+            clientSession?.let { existing ->
+                try {
+                    existing.close(CloseReason(CloseReason.Codes.NORMAL, "New client connected"))
+                } catch (_: Exception) {}
+            }
+
+            clientSession = session
+            lastPeerPingTime = System.currentTimeMillis()
         }
 
-        clientSession = session
-        lastPeerPingTime = System.currentTimeMillis()
         _serverState.value = _serverState.value.copy(clientConnected = true)
         _connectionEvents.emit(ConnectionEvent.CLIENT_CONNECTED)
         Log.i(TAG, "PWA client connected")
 
-        // Start heartbeat sender
+        // Start heartbeat using the server scope (not an orphaned scope)
         startHeartbeat(session)
 
         try {
@@ -165,7 +180,12 @@ class AnchorWebSocketServer @Inject constructor(
         } catch (e: Exception) {
             Log.w(TAG, "Client connection error", e)
         } finally {
-            clientSession = null
+            mutex.withLock {
+                // Only clear if this session is still the active one
+                if (clientSession === session) {
+                    clientSession = null
+                }
+            }
             heartbeatJob?.cancel()
             heartbeatWatchdogJob?.cancel()
             _serverState.value = _serverState.value.copy(clientConnected = false)
@@ -178,10 +198,11 @@ class AnchorWebSocketServer @Inject constructor(
         heartbeatJob?.cancel()
         heartbeatWatchdogJob?.cancel()
 
-        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        val scope = serverScope ?: return
 
-        // Send PING every 5s
-        heartbeatJob = scope.launch {
+        // Send PING every 5s (delay first to avoid immediate ping at T=0)
+        heartbeatJob = scope.launch(Dispatchers.IO) {
+            delay(HEARTBEAT_INTERVAL_MS)
             while (isActive) {
                 try {
                     session.send(Frame.Text(parser.buildPing()))
@@ -194,7 +215,8 @@ class AnchorWebSocketServer @Inject constructor(
         }
 
         // Watchdog: check if peer sent PING within 15s
-        heartbeatWatchdogJob = scope.launch {
+        heartbeatWatchdogJob = scope.launch(Dispatchers.IO) {
+            delay(HEARTBEAT_INTERVAL_MS)
             while (isActive) {
                 delay(HEARTBEAT_INTERVAL_MS)
                 val elapsed = System.currentTimeMillis() - lastPeerPingTime
@@ -217,7 +239,7 @@ class AnchorWebSocketServer @Inject constructor(
      */
     suspend fun send(message: String) {
         try {
-            clientSession?.send(Frame.Text(message))
+            mutex.withLock { clientSession }?.send(Frame.Text(message))
         } catch (e: Exception) {
             Log.e(TAG, "Failed to send message", e)
         }

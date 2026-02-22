@@ -3,6 +3,7 @@ package com.hiosdra.openanchor.ui.pairing
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -182,15 +183,14 @@ class QRCodeViewModel @Inject constructor(
     private fun generateQRCode(wsUrl: String): Bitmap? {
         return try {
             val state = _uiState.value
-            // Build JSON payload for the PWA scanner
-            val payload = buildString {
-                append("{")
-                append("\"wsUrl\":\"$wsUrl\"")
-                state.hotspotSsid?.let { append(",\"ssid\":\"$it\"") }
-                state.hotspotPassword?.let { append(",\"password\":\"$it\"") }
-                append(",\"protocol\":\"openanchor-v2\"")
-                append("}")
-            }
+            // Build JSON payload for the PWA scanner using Gson to properly escape values
+            val payloadMap = mutableMapOf<String, String>(
+                "wsUrl" to wsUrl,
+                "protocol" to "openanchor-v2"
+            )
+            state.hotspotSsid?.let { payloadMap["ssid"] = it }
+            state.hotspotPassword?.let { payloadMap["password"] = it }
+            val payload = Gson().toJson(payloadMap)
 
             val writer = QRCodeWriter()
             val hints = mapOf(

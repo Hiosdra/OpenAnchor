@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.hiosdra.openanchor.ui.advisor.AdvisorScreen
+import com.hiosdra.openanchor.ui.client.ClientDashboardScreen
+import com.hiosdra.openanchor.ui.client.ScanQRCodeScreen
 import com.hiosdra.openanchor.ui.crewwatch.CrewWatchScreen
 import com.hiosdra.openanchor.ui.history.HistoryScreen
 import com.hiosdra.openanchor.ui.historydetail.HistoryDetailScreen
@@ -36,11 +38,17 @@ fun OpenAnchorNavHost(
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
                 onOpenStatistics = { navController.navigate(Screen.Statistics.route) },
                 onPairWithTablet = { navController.navigate(Screen.QRCode.route) },
+                onConnectToServer = { navController.navigate(Screen.ScanQRCode.route) },
                 onOpenCrewWatch = { navController.navigate(Screen.CrewWatch.route) },
                 onOpenAdvisor = { navController.navigate(Screen.AIAdvisor.route) },
                 onOpenLogbook = { navController.navigate(Screen.Logbook.route) },
                 onResumeMonitoring = { sessionId ->
                     navController.navigate(Screen.Monitor.createRoute(sessionId)) {
+                        popUpTo(Screen.Home.route) { inclusive = false }
+                    }
+                },
+                onResumeClientMode = {
+                    navController.navigate(Screen.ClientDashboard.route) {
                         popUpTo(Screen.Home.route) { inclusive = false }
                     }
                 }
@@ -139,6 +147,27 @@ fun OpenAnchorNavHost(
 
         composable(Screen.PairedDashboard.route) {
             PairedDashboardScreen(
+                onDisconnected = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.ScanQRCode.route) {
+            ScanQRCodeScreen(
+                onBack = { navController.popBackStack() },
+                onConnected = {
+                    navController.navigate(Screen.ClientDashboard.route) {
+                        popUpTo(Screen.Home.route) { inclusive = false }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.ClientDashboard.route) {
+            ClientDashboardScreen(
                 onDisconnected = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(0) { inclusive = true }
