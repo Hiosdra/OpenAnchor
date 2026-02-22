@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Ktor
+-keep class io.ktor.** { *; }
+-keepclassmembers class io.ktor.** { *; }
+-keepclasseswithmembers class io.ktor.** { *; }
+-dontwarn io.ktor.**
