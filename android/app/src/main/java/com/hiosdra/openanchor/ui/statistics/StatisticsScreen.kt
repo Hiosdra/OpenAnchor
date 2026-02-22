@@ -110,7 +110,7 @@ fun StatisticsScreen(
                     icon = Icons.Default.Star,
                     label = stringResource(R.string.stat_longest_session),
                     value = formatHours(state.longestSessionHours),
-                    color = CautionOrange
+                    color = CautionYellow
                 )
 
                 // Average session
@@ -126,7 +126,7 @@ fun StatisticsScreen(
                     icon = Icons.Default.RadioButtonUnchecked,
                     label = stringResource(R.string.stat_max_radius),
                     value = "%.0f m".format(state.maxRadiusMeters),
-                    color = WarningYellow
+                    color = WarningOrange
                 )
 
                 // Average radius

@@ -65,6 +65,25 @@ class AlarmEngine @Inject constructor() {
         firstViolationTime = null
     }
 
+    /**
+     * Accept an external alarm state from the PWA (paired mode).
+     * Bypasses local zone checking — the PWA is the authority.
+     * @param externalState the alarm state determined by the PWA
+     * @return the alarm state to use (same as input)
+     */
+    fun processExternalAlarm(externalState: AlarmState): AlarmState {
+        return when (externalState) {
+            AlarmState.SAFE, AlarmState.CAUTION -> {
+                reset()
+                externalState
+            }
+            AlarmState.WARNING, AlarmState.ALARM -> {
+                // Mirror the external state without local debouncing
+                externalState
+            }
+        }
+    }
+
     private fun elapsedSinceFirstViolation(): Long {
         return firstViolationTime?.let { System.currentTimeMillis() - it } ?: 0L
     }

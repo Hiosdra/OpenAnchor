@@ -26,5 +26,6 @@ data class TrackPointEntity(
     val accuracy: Float,
     val timestamp: Long,
     val distanceToAnchor: Float,
-    val isAlarm: Boolean = false
+    val isAlarm: Boolean = false,
+    val alarmState: String = "SAFE"
 )

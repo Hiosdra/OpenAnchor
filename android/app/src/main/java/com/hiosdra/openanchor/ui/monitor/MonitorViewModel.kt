@@ -3,10 +3,13 @@ package com.hiosdra.openanchor.ui.monitor
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hiosdra.openanchor.data.compass.CompassProvider
+import com.hiosdra.openanchor.data.repository.AnchorSessionRepository
 import com.hiosdra.openanchor.domain.geometry.GeoCalculations
+import com.hiosdra.openanchor.domain.drift.DriftAnalysis
 import com.hiosdra.openanchor.domain.model.AlarmState
 import com.hiosdra.openanchor.domain.model.AnchorZone
 import com.hiosdra.openanchor.domain.model.Position
+import com.hiosdra.openanchor.domain.model.TrackPoint
 import com.hiosdra.openanchor.service.MonitorState
 import com.hiosdra.openanchor.service.ServiceBinder
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,17 +34,30 @@ data class MonitorUiState(
     val gpsAccuracyMeters: Float = 0f,
     val gpsSignalLost: Boolean = false,
     val compassHeading: Float = 0f,
-    val compassAvailable: Boolean = false
+    val compassAvailable: Boolean = false,
+    val trackPoints: List<TrackPoint> = emptyList(),
+    // Battery (Faza 4.4)
+    val localBatteryLevel: Int = -1,
+    val localBatteryCharging: Boolean = false,
+    val peerBatteryLevel: Double? = null,
+    val peerIsCharging: Boolean? = null,
+    val isPairedMode: Boolean = false,
+    // Drift detection (Faza 4.5)
+    val driftAnalysis: DriftAnalysis? = null
 )
 
 @HiltViewModel
 class MonitorViewModel @Inject constructor(
     private val serviceBinder: ServiceBinder,
-    private val compassProvider: CompassProvider
+    private val compassProvider: CompassProvider,
+    private val repository: AnchorSessionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MonitorUiState())
     val uiState: StateFlow<MonitorUiState> = _uiState.asStateFlow()
+
+    /** Tracks which session ID we're currently observing track points for */
+    private var currentTrackSessionId: Long? = null
 
     init {
         // Start compass updates
@@ -68,10 +84,30 @@ class MonitorViewModel @Inject constructor(
                             alarmState = monitorState.alarmState,
                             bearingToAnchor = calculateBearing(monitorState),
                             gpsAccuracyMeters = monitorState.gpsAccuracyMeters,
-                            gpsSignalLost = monitorState.gpsSignalLost
+                            gpsSignalLost = monitorState.gpsSignalLost,
+                            localBatteryLevel = monitorState.localBatteryLevel,
+                            localBatteryCharging = monitorState.localBatteryCharging,
+                            peerBatteryLevel = monitorState.peerBatteryLevel,
+                            peerIsCharging = monitorState.peerIsCharging,
+                            isPairedMode = monitorState.isPairedMode,
+                            driftAnalysis = monitorState.driftAnalysis
                         )
                     }
+                    // Start observing track points when session ID becomes available
+                    val sessionId = monitorState.sessionId
+                    if (sessionId != null && sessionId != currentTrackSessionId) {
+                        currentTrackSessionId = sessionId
+                        observeTrackPoints(sessionId)
+                    }
                 }
+            }
+        }
+    }
+
+    private fun observeTrackPoints(sessionId: Long) {
+        viewModelScope.launch {
+            repository.observeTrackPoints(sessionId).collect { points ->
+                _uiState.update { it.copy(trackPoints = points) }
             }
         }
     }

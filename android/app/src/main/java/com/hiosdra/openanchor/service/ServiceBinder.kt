@@ -56,6 +56,52 @@ class ServiceBinder @Inject constructor(
         service?.dismissAlarm()
     }
 
+    fun muteAlarm() {
+        service?.muteAlarm()
+    }
+
+    /**
+     * Start the WebSocket server for paired mode.
+     * This also starts the foreground service if not already running.
+     */
+    fun startWebSocketServer() {
+        val intent = AnchorMonitorService.startServerIntent(context)
+        context.startForegroundService(intent)
+        context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    }
+
+    /**
+     * Stop the WebSocket server and unbind from the service.
+     */
+    fun stopWebSocketServer() {
+        if (service != null || bound) {
+            val intent = AnchorMonitorService.stopServerIntent(context)
+            context.startService(intent)
+        }
+        unbind()
+    }
+
+    /**
+     * Start client mode — connect to another Android device as a WebSocket client.
+     * This also starts the foreground service if not already running.
+     */
+    fun startClientMode(wsUrl: String) {
+        val intent = AnchorMonitorService.startClientIntent(context, wsUrl)
+        context.startForegroundService(intent)
+        context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    }
+
+    /**
+     * Stop client mode — disconnect from the server.
+     */
+    fun stopClientMode() {
+        service?.let {
+            val intent = AnchorMonitorService.stopClientIntent(context)
+            context.startService(intent)
+        }
+        unbind()
+    }
+
     fun unbind() {
         if (bound) {
             context.unbindService(connection)

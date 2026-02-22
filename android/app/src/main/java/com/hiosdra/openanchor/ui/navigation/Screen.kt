@@ -15,4 +15,11 @@ sealed class Screen(val route: String) {
     data object Weather : Screen("weather/{latitude}/{longitude}") {
         fun createRoute(latitude: Float, longitude: Float) = "weather/$latitude/$longitude"
     }
+    data object QRCode : Screen("pairing/qrcode")
+    data object PairedDashboard : Screen("paired/dashboard")
+    data object ScanQRCode : Screen("client/scan")
+    data object ClientDashboard : Screen("client/dashboard")
+    data object CrewWatch : Screen("crewwatch")
+    data object AIAdvisor : Screen("ai/advisor")
+    data object Logbook : Screen("ai/logbook")
 }

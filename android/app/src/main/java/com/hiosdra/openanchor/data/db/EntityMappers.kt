@@ -28,7 +28,9 @@ fun AnchorSessionEntity.toDomain(): AnchorSession {
         chainLengthM = chainLengthM,
         depthM = depthM,
         alarmTriggered = alarmTriggered,
-        alarmCount = alarmCount
+        alarmCount = alarmCount,
+        maxDistanceMeters = maxDistanceMeters,
+        maxSog = maxSog
     )
 }
 
@@ -68,7 +70,9 @@ fun AnchorSession.toEntity(): AnchorSessionEntity {
         chainLengthM = chainLengthM,
         depthM = depthM,
         alarmTriggered = alarmTriggered,
-        alarmCount = alarmCount
+        alarmCount = alarmCount,
+        maxDistanceMeters = maxDistanceMeters,
+        maxSog = maxSog
     )
 }
 
@@ -83,7 +87,8 @@ fun TrackPointEntity.toDomain(): TrackPoint {
             timestamp = timestamp
         ),
         distanceToAnchor = distanceToAnchor,
-        isAlarm = isAlarm
+        isAlarm = isAlarm,
+        alarmState = alarmState
     )
 }
 
@@ -96,6 +101,31 @@ fun TrackPoint.toEntity(): TrackPointEntity {
         accuracy = position.accuracy,
         timestamp = position.timestamp,
         distanceToAnchor = distanceToAnchor,
-        isAlarm = isAlarm
+        isAlarm = isAlarm,
+        alarmState = alarmState
+    )
+}
+
+fun LogbookEntryEntity.toDomain(): LogbookEntry {
+    return LogbookEntry(
+        id = id,
+        sessionId = sessionId,
+        createdAt = createdAt,
+        summary = summary,
+        logEntry = logEntry,
+        safetyNote = safetyNote,
+        isAiGenerated = isAiGenerated
+    )
+}
+
+fun LogbookEntry.toEntity(): LogbookEntryEntity {
+    return LogbookEntryEntity(
+        id = id,
+        sessionId = sessionId,
+        createdAt = createdAt,
+        summary = summary,
+        logEntry = logEntry,
+        safetyNote = safetyNote,
+        isAiGenerated = isAiGenerated
     )
 }

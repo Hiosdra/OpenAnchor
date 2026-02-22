@@ -234,7 +234,7 @@ private fun WindWavesCard(current: CurrentWeather) {
                 Icon(
                     Icons.Default.Air,
                     contentDescription = null,
-                    tint = CautionOrange,
+                    tint = CautionYellow,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -359,7 +359,7 @@ private fun WeatherValueItem(
             text = value,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = if (highlight) CautionOrange else MaterialTheme.colorScheme.onSurface
+            color = if (highlight) CautionYellow else MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(
@@ -402,7 +402,7 @@ private fun HourlyForecastCard(item: HourlyForecastItem) {
                     fontWeight = FontWeight.Bold,
                     color = when {
                         (item.waveHeight ?: 0.0) > 2.0 -> AlarmRed
-                        (item.waveHeight ?: 0.0) > 1.5 -> CautionOrange
+                        (item.waveHeight ?: 0.0) > 1.5 -> CautionYellow
                         else -> SafeGreen
                     }
                 )

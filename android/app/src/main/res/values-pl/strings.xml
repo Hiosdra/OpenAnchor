@@ -128,4 +128,43 @@
     <string name="weather_dir">kier</string>
     <string name="weather_swell_short">fala m.</string>
     <string name="weather_current_short">prąd</string>
+
+    <!-- Pairing -->
+    <string name="pair_with_tablet">Sparuj z tabletem</string>
+    <string name="pairing_or">lub</string>
+
+    <!-- Paired Dashboard -->
+    <string name="paired_distance">Odległość</string>
+    <string name="paired_battery">Bateria</string>
+    <string name="paired_gps">GPS</string>
+    <string name="paired_connection">Połączenie</string>
+    <string name="paired_connection_ok">Połączono</string>
+    <string name="paired_connection_lost">Utracono połączenie</string>
+    <string name="paired_disconnect">Rozłącz</string>
+    <string name="peer_battery">Peer: %1$d%%</string>
+
+    <!-- Drift Detection -->
+    <string name="drift_warning">DRYFOWANIE KOTWICY</string>
+    <string name="drift_direction">Kierunek: %1$.0f\u00B0</string>
+    <string name="drift_speed">Prędkość: %1$.1f m/min</string>
+
+    <!-- Client Mode -->
+    <string name="connect_to_server">Połącz z serwerem</string>
+    <string name="client_scan_title">Skanuj kod QR serwera</string>
+    <string name="client_scan_description">Zeskanuj kod QR wyświetlany na drugim urządzeniu z OpenAnchor jako serwer, lub wpisz URL serwera ręcznie.</string>
+    <string name="client_manual_url">URL serwera</string>
+    <string name="client_camera_permission">Wymagane jest uprawnienie do aparatu, aby skanować kody QR</string>
+    <string name="client_scanned_title">Znaleziono serwer</string>
+    <string name="client_connect_wifi_hint">Upewnij się, że jesteś podłączony do tej samej sieci WiFi lub hotspotu serwera przed połączeniem.</string>
+    <string name="client_connect">Połącz</string>
+    <string name="client_rescan">Skanuj ponownie</string>
+    <string name="client_connecting">Łączenie\u2026</string>
+    <string name="client_connected">Połączono!</string>
+    <string name="client_connected_hint">Połączono z serwerem. Otwieranie pulpitu\u2026</string>
+    <string name="client_retry">Spróbuj ponownie</string>
+    <string name="client_dashboard_title">Monitor klienta</string>
+    <string name="client_server_gps">Weryfikacja GPS serwera</string>
+    <string name="client_disconnect_title">Rozłączyć z serwerem?</string>
+    <string name="client_disconnect_message">Spowoduje to zatrzymanie trybu klienta i rozłączenie z serwerem. Nie będziesz już otrzymywać danych monitoringu.</string>
+    <string name="resume_client_mode">Wznów tryb klienta</string>
 </resources>

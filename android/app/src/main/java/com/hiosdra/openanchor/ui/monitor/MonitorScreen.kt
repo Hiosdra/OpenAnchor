@@ -1,7 +1,14 @@
 package com.hiosdra.openanchor.ui.monitor
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,6 +49,7 @@ fun MonitorScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showStopDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(sessionId) {
         viewModel.startMonitoring(sessionId)
@@ -78,17 +87,39 @@ fun MonitorScreen(
                 onToggleView = { viewModel.toggleViewMode() },
                 onStop = { showStopDialog = true },
                 onDismissAlarm = { viewModel.dismissAlarm() },
-                onOpenWeather = onOpenWeather
+                onOpenWeather = onOpenWeather,
+                onSharePosition = { sharePosition(context, uiState) }
             )
             MonitorViewMode.SIMPLE -> SimpleMonitorView(
                 uiState = uiState,
                 onToggleView = { viewModel.toggleViewMode() },
                 onStop = { showStopDialog = true },
                 onDismissAlarm = { viewModel.dismissAlarm() },
-                onOpenWeather = onOpenWeather
+                onOpenWeather = onOpenWeather,
+                onSharePosition = { sharePosition(context, uiState) }
             )
         }
     }
+}
+
+private fun sharePosition(context: Context, uiState: MonitorUiState) {
+    val pos = uiState.boatPosition ?: uiState.anchorPosition ?: return
+    val lat = pos.latitude
+    val lon = pos.longitude
+    val mapsLink = "https://maps.google.com/?q=$lat,$lon"
+    val text = buildString {
+        appendLine("OpenAnchor Position")
+        appendLine("Lat: ${"%.6f".format(lat)}, Lon: ${"%.6f".format(lon)}")
+        appendLine("Distance to anchor: ${"%.0f".format(uiState.distanceToAnchor)} m")
+        appendLine("Status: ${uiState.alarmState.name}")
+        appendLine(mapsLink)
+    }
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, text)
+        type = "text/plain"
+    }
+    context.startActivity(Intent.createChooser(sendIntent, null))
 }
 
 @Composable
@@ -97,7 +128,8 @@ private fun MapMonitorView(
     onToggleView: () -> Unit,
     onStop: () -> Unit,
     onDismissAlarm: () -> Unit,
-    onOpenWeather: (latitude: Float, longitude: Float) -> Unit
+    onOpenWeather: (latitude: Float, longitude: Float) -> Unit,
+    onSharePosition: () -> Unit
 ) {
     val anchorPos = uiState.anchorPosition
     val boatPos = uiState.boatPosition
@@ -105,8 +137,8 @@ private fun MapMonitorView(
     val statusColor by animateColorAsState(
         when (uiState.alarmState) {
             AlarmState.SAFE -> SafeGreen
-            AlarmState.CAUTION -> CautionOrange
-            AlarmState.WARNING -> WarningYellow
+            AlarmState.CAUTION -> CautionYellow
+            AlarmState.WARNING -> WarningOrange
             AlarmState.ALARM -> AlarmRed
         },
         label = "status_color"
@@ -140,8 +172,8 @@ private fun MapMonitorView(
                     }
                     val strokeColor = when (uiState.alarmState) {
                         AlarmState.SAFE -> SafeGreen
-                        AlarmState.CAUTION -> CautionOrange
-                        AlarmState.WARNING -> WarningYellow
+                        AlarmState.CAUTION -> CautionYellow
+                        AlarmState.WARNING -> WarningOrange
                         AlarmState.ALARM -> AlarmRed
                     }
                     add(
@@ -160,7 +192,7 @@ private fun MapMonitorView(
                                 center = anchorGeoPoint,
                                 radiusMeters = bufferR,
                                 fillColor = Color(0x20FF9800),
-                                strokeColor = CautionOrange.copy(alpha = 0.6f),
+                                strokeColor = CautionYellow.copy(alpha = 0.6f),
                                 strokeWidth = 2f
                             )
                         )
@@ -193,13 +225,27 @@ private fun MapMonitorView(
                 )
             } else emptyList()
 
+            // Track polyline: historical positions showing boat movement
+            val trackLine = if (uiState.trackPoints.size >= 2) {
+                val trackGeoPoints = uiState.trackPoints.map { tp ->
+                    GeoPoint(tp.position.latitude, tp.position.longitude)
+                }
+                listOf(
+                    MapPolylineData(
+                        points = trackGeoPoints,
+                        color = Color.Cyan.copy(alpha = 0.6f),
+                        width = 4f
+                    )
+                )
+            } else emptyList()
+
             OsmMapView(
                 modifier = Modifier.fillMaxSize(),
                 centerOn = anchorGeoPoint,
                 zoomLevel = 17.0,
                 markers = markers,
                 circles = circles,
-                polylines = anchorLine
+                polylines = trackLine + anchorLine
             )
         }
 
@@ -242,6 +288,14 @@ private fun MapMonitorView(
                         )
                     }
                     Column(horizontalAlignment = Alignment.End) {
+                        // Battery indicator
+                        BatteryIndicator(
+                            localLevel = uiState.localBatteryLevel,
+                            localCharging = uiState.localBatteryCharging,
+                            peerLevel = uiState.peerBatteryLevel,
+                            peerCharging = uiState.peerIsCharging,
+                            compact = true
+                        )
                         if (uiState.gpsSignalLost) {
                             Text(
                                 text = stringResource(R.string.gps_signal_lost),
@@ -261,6 +315,9 @@ private fun MapMonitorView(
                     }
                 }
             }
+
+            // Drift warning banner
+            DriftWarningBanner(uiState.driftAnalysis)
         }
 
         // Bottom controls
@@ -290,6 +347,13 @@ private fun MapMonitorView(
             }
 
             FloatingActionButton(
+                onClick = onSharePosition,
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                Icon(Icons.Default.Share, contentDescription = stringResource(R.string.share_position))
+            }
+
+            FloatingActionButton(
                 onClick = onStop,
                 containerColor = AlarmRed
             ) {
@@ -305,7 +369,8 @@ private fun SimpleMonitorView(
     onToggleView: () -> Unit,
     onStop: () -> Unit,
     onDismissAlarm: () -> Unit,
-    onOpenWeather: (latitude: Float, longitude: Float) -> Unit
+    onOpenWeather: (latitude: Float, longitude: Float) -> Unit,
+    onSharePosition: () -> Unit
 ) {
     val bgColor by animateColorAsState(
         when (uiState.alarmState) {
@@ -319,8 +384,8 @@ private fun SimpleMonitorView(
 
     val statusColor = when (uiState.alarmState) {
         AlarmState.SAFE -> SafeGreen
-        AlarmState.CAUTION -> CautionOrange
-        AlarmState.WARNING -> WarningYellow
+        AlarmState.CAUTION -> CautionYellow
+        AlarmState.WARNING -> WarningOrange
         AlarmState.ALARM -> AlarmRed
     }
 
@@ -355,12 +420,24 @@ private fun SimpleMonitorView(
                 )
             }
 
+            // Drift warning
+            DriftWarningBanner(uiState.driftAnalysis)
+
             // GPS accuracy
             val accuracyColor = if (uiState.gpsAccuracyMeters > 20f) AlarmRed else TextGrey
             Text(
                 text = stringResource(R.string.gps_accuracy_format, "%.0f".format(uiState.gpsAccuracyMeters)),
                 style = MaterialTheme.typography.bodySmall,
                 color = accuracyColor
+            )
+
+            // Battery indicator
+            BatteryIndicator(
+                localLevel = uiState.localBatteryLevel,
+                localCharging = uiState.localBatteryCharging,
+                peerLevel = uiState.peerBatteryLevel,
+                peerCharging = uiState.peerIsCharging,
+                compact = false
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -443,6 +520,9 @@ private fun SimpleMonitorView(
                 }) {
                     Icon(Icons.Default.Cloud, contentDescription = null, tint = OceanBlue)
                 }
+                OutlinedButton(onClick = onSharePosition) {
+                    Icon(Icons.Default.Share, contentDescription = null, tint = TextGrey)
+                }
                 OutlinedButton(
                     onClick = onStop,
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = AlarmRed)
@@ -450,6 +530,166 @@ private fun SimpleMonitorView(
                     Icon(Icons.Default.Stop, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.stop))
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Battery level indicator for local and optional peer device.
+ */
+@Composable
+private fun BatteryIndicator(
+    localLevel: Int,
+    localCharging: Boolean,
+    peerLevel: Double?,
+    peerCharging: Boolean?,
+    compact: Boolean
+) {
+    if (localLevel < 0) return
+
+    val batteryColor = when {
+        localLevel <= 15 -> AlarmRed
+        localLevel <= 30 -> CautionYellow
+        else -> if (compact) Color.White.copy(alpha = 0.8f) else TextGrey
+    }
+
+    val batteryIcon = when {
+        localCharging -> Icons.Default.BatteryChargingFull
+        localLevel <= 15 -> Icons.Default.BatteryAlert
+        else -> Icons.Default.Battery5Bar
+    }
+
+    if (compact) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                batteryIcon,
+                contentDescription = null,
+                tint = batteryColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(2.dp))
+            Text(
+                text = "$localLevel%",
+                style = MaterialTheme.typography.labelSmall,
+                color = batteryColor
+            )
+            if (peerLevel != null) {
+                Spacer(modifier = Modifier.width(6.dp))
+                val peerColor = when {
+                    peerLevel <= 15 -> AlarmRed
+                    peerLevel <= 30 -> CautionYellow
+                    else -> Color.White.copy(alpha = 0.6f)
+                }
+                Text(
+                    text = "P:${peerLevel.toInt()}%",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = peerColor
+                )
+            }
+        }
+    } else {
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                batteryIcon,
+                contentDescription = null,
+                tint = batteryColor,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = stringResource(R.string.battery_level, localLevel),
+                style = MaterialTheme.typography.bodySmall,
+                color = batteryColor
+            )
+            if (localCharging) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = stringResource(R.string.battery_charging),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = SafeGreen
+                )
+            }
+        }
+        if (peerLevel != null) {
+            val peerColor = when {
+                peerLevel <= 15 -> AlarmRed
+                peerLevel <= 30 -> CautionYellow
+                else -> TextGrey
+            }
+            Text(
+                text = stringResource(R.string.peer_battery, peerLevel.toInt()),
+                style = MaterialTheme.typography.bodySmall,
+                color = peerColor
+            )
+        }
+        if (localLevel <= 15) {
+            Text(
+                text = stringResource(R.string.battery_low),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = AlarmRed
+            )
+        }
+    }
+}
+
+/**
+ * Animated drift/anchor drag warning banner.
+ */
+@Composable
+private fun DriftWarningBanner(
+    driftAnalysis: com.hiosdra.openanchor.domain.drift.DriftAnalysis?
+) {
+    val isDragging = driftAnalysis?.isDragging == true
+
+    AnimatedVisibility(
+        visible = isDragging,
+        enter = slideInVertically() + fadeIn(),
+        exit = slideOutVertically() + fadeOut()
+    ) {
+        if (driftAnalysis != null && driftAnalysis.isDragging) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = AlarmRed.copy(alpha = 0.95f))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.drift_warning),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        driftAnalysis.driftBearingDeg?.let { bearing ->
+                            Text(
+                                text = stringResource(R.string.drift_direction, bearing),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.drift_speed, driftAnalysis.driftSpeedMpm),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.9f)
+                        )
+                    }
                 }
             }
         }

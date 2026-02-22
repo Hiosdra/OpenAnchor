@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation,PluralsCandidate">
     <string name="app_name">OpenAnchor</string>
 
     <!-- Home -->
@@ -128,4 +128,120 @@
     <string name="weather_dir">dir</string>
     <string name="weather_swell_short">swell</string>
     <string name="weather_current_short">curr</string>
+
+    <!-- Pairing -->
+    <string name="pair_with_tablet">Pair with Tablet</string>
+    <string name="pairing_title">Connect to Tablet</string>
+    <string name="pairing_description">Pair your phone with the tablet running OpenAnchor PWA. The tablet becomes the main anchor monitor, and this phone shows a paired dashboard.</string>
+    <string name="pairing_create_hotspot">Create Hotspot</string>
+    <string name="pairing_hotspot_hint">Best for boats without WiFi. Creates a local network between devices.</string>
+    <string name="pairing_or">or</string>
+    <string name="pairing_same_network">Use Same Network</string>
+    <string name="pairing_network_hint">Both devices must be on the same WiFi network (marina WiFi, router, etc.)</string>
+    <string name="pairing_starting_hotspot">Starting hotspot\u2026</string>
+    <string name="pairing_hotspot_ready">Hotspot ready, starting server\u2026</string>
+    <string name="pairing_starting_server">Starting WebSocket server\u2026</string>
+    <string name="pairing_scan_qr">Scan this QR code on the tablet</string>
+    <string name="pairing_scan_qr_hint">Open OpenAnchor on the tablet and use the QR scanner to connect automatically.</string>
+    <string name="pairing_connection_details">Connection Details</string>
+    <string name="pairing_wifi_name">WiFi Name</string>
+    <string name="pairing_wifi_password">Password</string>
+    <string name="pairing_ws_url">Server URL</string>
+    <string name="pairing_server_status">Status</string>
+    <string name="pairing_status_running">Running</string>
+    <string name="pairing_status_stopped">Stopped</string>
+    <string name="pairing_manual_hint">Or enter the Server URL manually in the tablet\'s PWA settings.</string>
+    <string name="pairing_waiting">Waiting for tablet to connect\u2026</string>
+    <string name="pairing_stop">Stop Pairing</string>
+    <string name="pairing_connected">Connected!</string>
+    <string name="pairing_connected_hint">Tablet is now paired. Opening dashboard\u2026</string>
+    <string name="pairing_error">Connection Error</string>
+    <string name="pairing_retry_hotspot">Retry with Hotspot</string>
+    <string name="pairing_retry_network">Retry on Same Network</string>
+    <string name="pairing_qr_content_desc">QR code with connection information</string>
+
+    <!-- Paired Dashboard -->
+    <string name="paired_dashboard">Paired Monitor</string>
+    <string name="paired_tablet_status">Tablet Status</string>
+    <string name="paired_distance">Distance</string>
+    <string name="paired_alarm_state">Alarm</string>
+    <string name="paired_battery">Battery</string>
+    <string name="paired_gps">GPS</string>
+    <string name="paired_connection">Connection</string>
+    <string name="paired_connection_ok">Connected</string>
+    <string name="paired_connection_lost">Connection Lost</string>
+    <string name="paired_not_connected">Not Connected</string>
+    <string name="paired_disconnect">Disconnect</string>
+    <string name="paired_disconnect_title">Disconnect from Tablet?</string>
+    <string name="paired_disconnect_message">This will stop the paired mode. The tablet will continue monitoring independently.</string>
+
+    <!-- Crew Watch -->
+    <string name="crew_watch">Crew Watch</string>
+    <string name="crew_watch_subtitle">Watch schedule and timer</string>
+    <string name="crew_watch_timer">Watch Timer</string>
+    <string name="crew_watch_schedule">Schedule</string>
+    <string name="crew_watch_remaining">Remaining</string>
+    <string name="crew_watch_next">Next Watch</string>
+    <string name="crew_watch_start">Start Watch</string>
+    <string name="crew_watch_stop">Stop Watch</string>
+    <string name="crew_watch_duration">Watch Duration</string>
+    <string name="crew_watch_duration_hours">%1$d hours</string>
+    <string name="crew_watch_crew_member">Crew member</string>
+    <string name="crew_watch_add_crew">Add Crew</string>
+    <string name="crew_watch_remove">Remove</string>
+    <string name="crew_watch_alarm_5min">5 min warning before watch change</string>
+
+    <!-- AI Advisor -->
+    <string name="ai_advisor">AI Advisor</string>
+    <string name="ai_advisor_hint">Ask about anchoring, weather, safety…</string>
+    <string name="ai_advisor_setup_desc">Enter your Gemini API key to use the AI Advisor. Get a free key at ai.google.dev.</string>
+    <string name="ai_api_key">Gemini API Key</string>
+    <string name="ai_save_key">Save Key</string>
+    <string name="ai_key_hint">Paste your Gemini API key here</string>
+    <string name="ai_advisor_welcome">Hello! I\'m your anchoring advisor. Ask me about weather conditions, anchor safety, crew scheduling, or anything related to your current anchorage.</string>
+    <string name="ai_suggested_questions">Suggested questions</string>
+
+    <!-- AI Logbook -->
+    <string name="ai_logbook">AI Logbook</string>
+    <string name="logbook_empty">No logbook entries yet. Generate one from a completed session.</string>
+    <string name="logbook_generate">Generate Entry</string>
+    <string name="logbook_delete_title">Delete Entry?</string>
+    <string name="logbook_delete_message">This will permanently delete this logbook entry.</string>
+    <string name="logbook_pick_session">Select a session to generate a logbook entry</string>
+    <string name="logbook_no_sessions">No completed sessions available</string>
+
+    <!-- Share -->
+    <string name="share_position">Share Position</string>
+
+    <!-- Battery -->
+    <string name="battery_level">Battery: %1$d%%</string>
+    <string name="battery_charging">Charging</string>
+    <string name="battery_low">Low Battery!</string>
+    <string name="peer_battery">Peer: %1$d%%</string>
+
+    <!-- Drift Detection -->
+    <string name="drift_warning">ANCHOR DRAG</string>
+    <string name="drift_detected">Drag detected: %1$s</string>
+    <string name="drift_direction">Direction: %1$.0f\u00B0</string>
+    <string name="drift_speed">Speed: %1$.1f m/min</string>
+
+    <!-- Client Mode (connect to another Android as server) -->
+    <string name="connect_to_server">Connect to Server</string>
+    <string name="client_scan_title">Scan Server QR Code</string>
+    <string name="client_scan_description">Scan the QR code displayed on the other device running OpenAnchor as server, or enter the server URL manually.</string>
+    <string name="client_manual_url">Server URL</string>
+    <string name="client_camera_permission">Camera permission is required to scan QR codes</string>
+    <string name="client_scanned_title">Server Found</string>
+    <string name="client_connect_wifi_hint">Make sure you are connected to the same WiFi network or the server\'s hotspot before connecting.</string>
+    <string name="client_connect">Connect</string>
+    <string name="client_rescan">Scan Again</string>
+    <string name="client_connecting">Connecting\u2026</string>
+    <string name="client_connected">Connected!</string>
+    <string name="client_connected_hint">Connected to server. Opening dashboard\u2026</string>
+    <string name="client_retry">Try Again</string>
+    <string name="client_dashboard_title">Client Monitor</string>
+    <string name="client_server_gps">Server GPS Verification</string>
+    <string name="client_disconnect_title">Disconnect from Server?</string>
+    <string name="client_disconnect_message">This will stop client mode and disconnect from the server. You will no longer receive monitoring data.</string>
+    <string name="resume_client_mode">Resume Client Mode</string>
 </resources>

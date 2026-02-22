@@ -1,4 +1,4 @@
-const CACHE_NAME = 'anchor-alarm-v2';
+const CACHE_NAME = 'anchor-alarm-v3';
 const urlsToCache = [
   './',
   './index.html',
@@ -20,12 +20,19 @@ self.addEventListener('install', event => {
 
 // Fetch from cache with runtime caching (cache-first / stale-while-revalidate)
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // Only handle http/https requests – skip chrome-extension:// and other unsupported schemes
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {
         // Optionally update the cache in the background
         fetch(event.request).then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
+          if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
             return;
           }
           const responseToCache = networkResponse.clone();
@@ -42,7 +49,7 @@ self.addEventListener('fetch', event => {
 
       // Not in cache – fetch from network and cache the response
       return fetch(event.request).then(networkResponse => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
+        if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
           return networkResponse;
         }
 
