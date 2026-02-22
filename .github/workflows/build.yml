@@ -11,6 +11,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-android:
     name: Build Android App
@@ -35,6 +38,9 @@ jobs:
 
       - name: Build Android app (debug)
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Run Android unit tests (debug)
+        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
 
       - name: Build Android app (release)
         run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
@@ -139,14 +145,14 @@ jobs:
 
           echo "manifest.json is valid JSON ✓"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
       - name: Validate service worker syntax
         run: |
           echo "Validating service worker JavaScript syntax..."
-
-          if ! command -v node &> /dev/null; then
-            echo "Node.js not found, installing..."
-            sudo apt-get update && sudo apt-get install -y nodejs
-          fi
 
           # Check for syntax errors
           node --check pwa/sw.js
