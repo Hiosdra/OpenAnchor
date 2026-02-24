@@ -1,10 +1,15 @@
-const CACHE_NAME = 'openanchor-superapp-v1';
+const CACHE_NAME = 'openanchor-superapp-v2';
 const urlsToCache = [
   './',
   './index.html',
-  './anchor.html',
-  './wachtownik.html',
-  './manifest.json'
+  './modules/anchor/',
+  './modules/anchor/index.html',
+  './modules/wachtownik/',
+  './modules/wachtownik/index.html',
+  './manifest.json',
+  './assets/icon-192x192.png',
+  './assets/icon-512x512.png',
+  './assets/icon.svg'
 ];
 
 // Install service worker
