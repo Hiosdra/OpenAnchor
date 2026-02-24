@@ -163,90 +163,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            const path = require('path');
-
-            const screenshotDir = 'screenshots';
-            const files = fs.readdirSync(screenshotDir)
-              .filter(f => f.endsWith('.png'))
-              .sort();
-
-            // Helper: embed viewport screenshot as base64 if small enough
-            function getImageMarkdown(file, maxSizeKB = 400) {
-              const filePath = path.join(screenshotDir, file);
-              const stats = fs.statSync(filePath);
-              const sizeKB = stats.size / 1024;
-              if (file.includes('-viewport.png') && sizeKB < maxSizeKB) {
-                const base64Image = fs.readFileSync(filePath).toString('base64');
-                return { markdown: `![${file}](data:image/png;base64,${base64Image})`, size: base64Image.length, embedded: true };
-              }
-              return { embedded: false, size: 0 };
-            }
-
-            const maxCommentSize = 60000;
-            let totalSize = 0;
-
-            let comment = '## Screenshots PWA / PWA Screenshots\n\n';
-            comment += '<!-- screenshot-bot-marker -->\n\n';
-            comment += 'Automatycznie wygenerowane zrzuty ekranu z tego PR.\n\n';
-
-            // Sections: shell, anchor, wachtownik × mobile/desktop × pl/en
-            const sections = [
-              { id: 'shell',       label: 'Shell (launcher)',        locales: ['pl'] },
-              { id: 'anchor',      label: 'Alert Kotwiczny',         locales: ['pl'] },
-              { id: 'wachtownik',  label: 'Wachtownik',              locales: ['pl', 'en'] }
-            ];
-
-            for (const section of sections) {
-              comment += `### ${section.label}\n\n`;
-
-              for (const locale of section.locales) {
-                const flag = locale === 'pl' ? '🇵🇱' : '🇬🇧';
-                comment += `#### ${flag} ${locale.toUpperCase()}\n\n`;
-
-                for (const vp of ['mobile', 'desktop']) {
-                  comment += `**${vp}**\n\n`;
-                  const vpFile = files.find(f => f.startsWith(`${section.id}-${vp}-${locale}-viewport.png`));
-                  if (vpFile) {
-                    const imgData = getImageMarkdown(vpFile);
-                    if (imgData.embedded && (totalSize + imgData.size) < maxCommentSize) {
-                      comment += imgData.markdown + '\n\n';
-                      totalSize += imgData.size;
-                    } else {
-                      comment += `*Viewport screenshot (zobacz artefakty / see artifacts)*\n\n`;
-                    }
-                  }
-
-                  const sectionFiles = files.filter(f => f.startsWith(`${section.id}-${vp}-${locale}-`));
-                  if (sectionFiles.length > 1) {
-                    comment += '<details>\n<summary>Wszystkie zrzuty / All screenshots</summary>\n\n';
-                    sectionFiles.forEach(f => {
-                      const label = f.replace('.png', '').replace(/_/g, ' ');
-                      comment += `- \`${label}\`\n`;
-                    });
-                    comment += '\n</details>\n\n';
-                  }
-                }
-              }
-            }
-
-            comment += `🔗 [Wszystkie artefakty / All artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n`;
-
-            comment += '<details>\n<summary>Rozmiary plików / File sizes</summary>\n\n';
-            files.forEach(file => {
-              const sizeKB = (fs.statSync(path.join(screenshotDir, file)).size / 1024).toFixed(2);
-              comment += `- \`${file}\`: ${sizeKB} KB\n`;
-            });
-            comment += '\n</details>\n';
-
-            // Fallback if still too large
-            if (comment.length > 65000) {
-              comment = '## Screenshots PWA\n\n<!-- screenshot-bot-marker -->\n\n';
-              comment += 'Zrzuty ekranu zbyt duże do osadzenia. / Screenshots too large to embed.\n\n';
-              comment += `🔗 [Zobacz artefakty / View artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n`;
-            }
-
-            console.log(`Final comment size: ${comment.length} characters`);
+            const comment =
+              '<!-- screenshot-bot-marker -->\n' +
+              'Screenshots are ready. ' +
+              '[View artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})';
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -265,7 +185,6 @@ jobs:
                 comment_id: botComment.id,
                 body: comment
               });
-              console.log('Updated existing screenshot comment');
             } else {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -273,5 +192,4 @@ jobs:
                 issue_number: context.issue.number,
                 body: comment
               });
-              console.log('Created new screenshot comment');
             }
