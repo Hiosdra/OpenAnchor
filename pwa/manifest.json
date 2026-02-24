@@ -1,12 +1,14 @@
 {
-  "name": "Alert Kotwiczny (Anchor Alarm)",
-  "short_name": "Alert Kotwiczny",
-  "description": "Progressive Web App for anchor alarm monitoring",
+  "name": "OpenAnchor - Morska Superapp",
+  "short_name": "OpenAnchor",
+  "description": "Morska superapp - Alert Kotwiczny GPS i Morski Grafik Wacht PRO",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "orientation": "portrait-primary",
+  "orientation": "any",
+  "lang": "pl",
+  "dir": "ltr",
   "icons": [
     {
       "src": "icon-192x192.png",
@@ -28,6 +30,24 @@
     }
   ],
   "categories": ["navigation", "utilities"],
-  "lang": "pl",
-  "dir": "ltr"
+  "shortcuts": [
+    {
+      "name": "Alert Kotwiczny",
+      "short_name": "Alarm",
+      "description": "Uruchom alert kotwiczny GPS",
+      "url": "./anchor.html",
+      "icons": [
+        { "src": "icon-192x192.png", "sizes": "192x192" }
+      ]
+    },
+    {
+      "name": "Grafik Wacht",
+      "short_name": "Wachty",
+      "description": "Otwórz morski grafik wacht",
+      "url": "./wachtownik.html",
+      "icons": [
+        { "src": "icon-192x192.png", "sizes": "192x192" }
+      ]
+    }
+  ]
 }

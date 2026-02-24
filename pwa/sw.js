@@ -1,7 +1,9 @@
-const CACHE_NAME = 'anchor-alarm-v3';
+const CACHE_NAME = 'openanchor-superapp-v1';
 const urlsToCache = [
   './',
   './index.html',
+  './anchor.html',
+  './wachtownik.html',
   './manifest.json'
 ];
 
@@ -10,7 +12,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('OpenAnchor SW: cache opened');
         return cache.addAll(urlsToCache);
       })
   );
@@ -62,7 +64,7 @@ self.addEventListener('fetch', event => {
       }).catch(() => {
         // If this is a navigation request, fall back to the cached app shell
         if (event.request.mode === 'navigate') {
-          return caches.match('./');
+          return caches.match('./index.html') || caches.match('./');
         }
 
         // For other requests, return an empty 503 response
@@ -72,7 +74,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Update service worker
+// Update service worker - clean up old caches
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -80,6 +82,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('OpenAnchor SW: deleting old cache', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -108,20 +111,11 @@ self.addEventListener('sync', event => {
 
 async function syncPositionData() {
   try {
-    // Retrieve any pending position data from IndexedDB or cache
-    // This is a placeholder - actual implementation would need to integrate with the app's data storage
     console.log('Background sync: syncing position data');
-
-    // In a real implementation, this would:
-    // 1. Retrieve stored position data that needs syncing
-    // 2. Send it to a server or sync with connected devices
-    // 3. Clear the sync queue on success
-
-    // For now, we'll just log the sync attempt
     return Promise.resolve();
   } catch (error) {
     console.error('Background sync failed:', error);
-    throw error; // Rethrow to retry sync later
+    throw error;
   }
 }
 
@@ -135,8 +129,6 @@ self.addEventListener('periodicsync', event => {
 async function checkAnchorPosition() {
   try {
     console.log('Periodic sync: checking anchor position');
-    // This would integrate with the geolocation API and alarm logic
-    // For now, it's a placeholder for future implementation
     return Promise.resolve();
   } catch (error) {
     console.error('Periodic sync failed:', error);
