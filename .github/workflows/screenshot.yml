@@ -95,7 +95,15 @@ jobs:
 
                   const context = await browser.newContext({
                     viewport: { width: vp.width, height: vp.height },
-                    locale: locale.code
+                    locale: locale.code,
+                    storageState: {
+                      origins: [{
+                        origin: 'http://localhost:8080',
+                        localStorage: [
+                          { name: 'anchor_onboarding_done', value: 'true' }
+                        ]
+                      }]
+                    }
                   });
                   const page = await context.newPage();
 
