@@ -1,77 +1,58 @@
 # OpenAnchor
 
-OpenAnchor is a multi-platform project consisting of native Android applications and a Progressive Web App (PWA).
+OpenAnchor is a maritime superapp — a PWA hub-and-spoke shell with two modules, plus companion native Android apps.
+
+Live PWA: **https://hiosdra.github.io/OpenAnchor/**
+
+## Modules
+
+| Module | Description |
+|---|---|
+| **Alert Kotwiczny** | Anchor alarm with GPS tracking, map visualisation (Leaflet), audio/vibration/browser notifications, night vision mode |
+| **Wachtownik** | Maritime watch scheduler for yacht crews — generates watch schedules, PDF export, QR sharing (React + Babel, PL/EN) |
 
 ## Project Structure
 
-The repository is organized into the following main directories:
+```
+OpenAnchor/
+├── pwa/                          # Progressive Web App (deployed to GitHub Pages)
+│   ├── index.html                # Shell launcher
+│   ├── manifest.json
+│   ├── sw.js                     # Service Worker (offline cache)
+│   ├── assets/                   # Icons
+│   └── modules/
+│       ├── anchor/index.html     # Alert Kotwiczny
+│       └── wachtownik/index.html # Wachtownik
+├── android/                      # Native Android app + Wear OS companion
+└── docs/                         # Protocol documentation
+```
 
-### `/android` - Native Android Application
-Contains the Android project with mobile and Wear OS applications.
+## Running locally
 
-- **Mobile App** (`android/app/`) - Main Android application
-- **Wear OS App** (`android/wear/`) - Companion Wear OS application
+```bash
+npx http-server ./pwa -p 8080
+# open http://localhost:8080
+```
 
-See [android/README.md](android/README.md) for Android-specific documentation.
+> Opening `index.html` directly via `file://` will not work — service workers require HTTP/HTTPS.
 
-### `/pwa` - Progressive Web App
-Contains the Progressive Web App that provides a web-based interface for OpenAnchor.
+## CI / Deploy
 
-**Features:**
-- Fully functional Progressive Web App with offline support
-- Service Worker for caching and offline functionality
-- Web App Manifest for installability
-- Anchor alarm monitoring with GPS tracking
-- Map visualization with Leaflet
-- Multiple notification methods (audio, vibration, browser notifications)
+| Workflow | Trigger | Action |
+|---|---|---|
+| `deploy-pwa.yml` | push to `master` (`pwa/**`) | Deploy to GitHub Pages |
+| `screenshot.yml` | pull request | Playwright screenshots (mobile + desktop) → artifact + PR comment |
+| `build.yml` | push / PR | Android build |
 
-**Hosted on GitHub Pages:**
-The PWA is automatically deployed to GitHub Pages via GitHub Actions.
+## Android
 
-Access the live PWA at: `https://hiosdra.github.io/OpenAnchor/`
-
-See [pwa/README.md](pwa/README.md) for PWA-specific documentation.
-
-### `/docs` - Documentation
-Contains project documentation, including:
-
-- **Protocol Documentation** (`docs/protocol/`) - Communication protocol between PWA and native Android app
-
-See [docs/protocol/README.md](docs/protocol/README.md) for protocol documentation.
-
-## Getting Started
-
-### Android Application
 ```bash
 cd android
 ./gradlew build
 ```
 
-### PWA
-To run the PWA locally, you must use a local HTTP server (service workers require HTTP/HTTPS):
-```bash
-cd pwa
-# Using Python 3
-python3 -m http.server 8000
-# Then navigate to http://localhost:8000
-
-# Or using Node.js http-server
-npx http-server -p 8000
-```
-
-**Note:** Opening `index.html` directly in a browser (`file://` protocol) will not work for PWA features like service workers and offline functionality.
-
-To deploy the PWA to GitHub Pages:
-1. Push changes to the `main` branch
-2. GitHub Actions will automatically deploy the PWA
-3. Access the live application at `https://hiosdra.github.io/OpenAnchor/`
-
-**Note:** GitHub Pages must be enabled in the repository settings with the source set to "GitHub Actions".
+See [android/README.md](android/README.md) for details.
 
 ## Contributing
 
-_To be implemented_
-
-## License
-
-_To be implemented_
+See [CONTRIBUTING.md](CONTRIBUTING.md).
