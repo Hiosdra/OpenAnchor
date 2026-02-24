@@ -1,0 +1,204 @@
+name: Screenshot PWA
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --save-dev @playwright/test@1.50.1 http-server@14.1.1
+          npx playwright install chromium
+
+      - name: Start HTTP server
+        run: |
+          npx http-server ./pwa -p 8080 &
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8080/index.html > /dev/null; then
+              echo "Server is up."
+              break
+            fi
+            echo "Waiting for server to be ready... ($i/30)"
+            sleep 1
+          done
+          if ! curl -fsS http://localhost:8080/index.html > /dev/null; then
+            echo "Server failed to start on time."
+            exit 1
+          fi
+
+      - name: Take screenshots
+        run: |
+          cat > take-screenshots.js << 'EOF'
+          const { chromium } = require('@playwright/test');
+          const fs = require('fs');
+
+          (async () => {
+            const browser = await chromium.launch();
+
+            if (!fs.existsSync('screenshots')) {
+              fs.mkdirSync('screenshots');
+            }
+
+            const viewports = [
+              { name: 'mobile',   width: 390,  height: 844  },
+              { name: 'desktop',  width: 1920, height: 1080 }
+            ];
+
+            // Pages: shell (PL only), anchor (PL only), wachtownik (PL + EN)
+            const pages = [
+              {
+                id: 'shell',
+                url: 'http://localhost:8080/index.html',
+                locales: [{ code: 'pl-PL', name: 'pl' }],
+                interactions: []
+              },
+              {
+                id: 'anchor',
+                url: 'http://localhost:8080/modules/anchor/index.html',
+                locales: [{ code: 'pl-PL', name: 'pl' }],
+                interactions: []
+              },
+              {
+                id: 'wachtownik',
+                url: 'http://localhost:8080/modules/wachtownik/index.html',
+                locales: [
+                  { code: 'pl-PL', name: 'pl', generateText: 'Generuj' },
+                  { code: 'en-US', name: 'en', generateText: 'Generate' }
+                ],
+                interactions: ['generate']
+              }
+            ];
+
+            for (const vp of viewports) {
+              for (const pg of pages) {
+                for (const locale of pg.locales) {
+                  console.log(`Capturing: ${pg.id} / ${vp.name} / ${locale.name}`);
+
+                  const context = await browser.newContext({
+                    viewport: { width: vp.width, height: vp.height },
+                    locale: locale.code,
+                    storageState: {
+                      origins: [{
+                        origin: 'http://localhost:8080',
+                        localStorage: [
+                          { name: 'anchor_onboarding_done', value: 'true' }
+                        ]
+                      }]
+                    }
+                  });
+                  const page = await context.newPage();
+
+                  await page.goto(pg.url);
+                  await page.waitForTimeout(2000);
+
+                  const prefix = `screenshots/${pg.id}-${vp.name}-${locale.name}`;
+
+                  // Viewport screenshot
+                  await page.screenshot({ path: `${prefix}-viewport.png` });
+
+                  // Full page screenshot
+                  await page.screenshot({ path: `${prefix}-full.png`, fullPage: true });
+
+                  // Wachtownik: switch to EN if needed, then click Generate
+                  if (pg.id === 'wachtownik' && locale.name === 'en') {
+                    try {
+                      // Toggle language to EN — look for a button/link with 'EN' or 'English'
+                      const langToggle = page.locator('button:has-text("EN"), button:has-text("English"), [data-lang="en"]').first();
+                      if (await langToggle.isVisible({ timeout: 2000 })) {
+                        await langToggle.click();
+                        await page.waitForTimeout(800);
+                        await page.screenshot({ path: `${prefix}-viewport-switched.png` });
+                      }
+                    } catch (e) {
+                      console.log(`Language toggle not found for ${locale.name}:`, e.message);
+                    }
+                  }
+
+                  if (pg.interactions.includes('generate') && locale.generateText) {
+                    try {
+                      const generateBtn = page.locator(`button:has-text("${locale.generateText}")`).first();
+                      if (await generateBtn.isVisible({ timeout: 3000 })) {
+                        await generateBtn.click();
+                        await page.waitForTimeout(1500);
+                        await page.screenshot({ path: `${prefix}-generated-viewport.png` });
+                        await page.screenshot({ path: `${prefix}-generated-full.png`, fullPage: true });
+                      }
+                    } catch (e) {
+                      console.log(`Generate button not found for ${pg.id}/${locale.name}:`, e.message);
+                    }
+                  }
+
+                  await context.close();
+                }
+              }
+            }
+
+            await browser.close();
+            console.log('All screenshots taken successfully!');
+          })();
+          EOF
+          node take-screenshots.js
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 30
+
+      - name: Comment on PR with screenshots
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const comment =
+              '<!-- screenshot-bot-marker -->\n' +
+              'Screenshots are ready. ' +
+              '[View artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})';
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('<!-- screenshot-bot-marker -->')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
