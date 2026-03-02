@@ -1532,6 +1532,7 @@
         constructor() {
             this.audioCtx = null;
             this.alarmInterval = null;
+            this.batteryInterval = null;
             this.wakeLock = null;
             this.batteryWarningShown = false;
             this.isAlarming = false;
@@ -1640,9 +1641,15 @@
                         if (b.charging) this.batteryWarningShown = false;
                     };
                     b.addEventListener('levelchange', check); b.addEventListener('chargingchange', check);
-                    setInterval(check, 60000);
+                    this.batteryInterval = setInterval(check, 60000);
                 });
             }
+        }
+
+        cleanup() {
+            clearInterval(this.alarmInterval);
+            clearInterval(this.batteryInterval);
+            this.releaseWakeLock();
         }
     }
 
@@ -2079,6 +2086,12 @@
             try {
                 const data = JSON.parse(event.data);
 
+                // Validate message structure
+                if (!data || typeof data.type !== 'string') {
+                    console.warn('WS: Invalid message structure', data);
+                    return;
+                }
+
                 if (data.type === 'PING') {
                     this.lastPeerPingTime = Date.now();
                     if (this.peerConnectionLost) {
@@ -2089,6 +2102,10 @@
                 }
 
                 if (data.type === 'ACTION_COMMAND') {
+                    if (!data.payload || typeof data.payload.command !== 'string') {
+                        console.warn('WS: Invalid ACTION_COMMAND payload', data);
+                        return;
+                    }
                     const cmd = data.payload.command;
                     if (cmd === 'MUTE_ALARM') {
                         this.app.alertCtrl.stop();
@@ -2104,12 +2121,12 @@
 
                 if (data.type === 'ANDROID_GPS_REPORT' && data.payload) {
                     const p = data.payload;
-                    if (p.pos && p.pos.lat != null && p.pos.lng != null) {
+                    if (p.pos && typeof p.pos.lat === 'number' && typeof p.pos.lng === 'number') {
                         this.app.mapCtrl.updatePhoneMarker(L.latLng(p.pos.lat, p.pos.lng), p.accuracy || 0);
                     }
                     // Peer battery indicator (Faza 5.2)
                     const peerBatEl = document.getElementById('peer-battery');
-                    if (p.batteryLevel != null && peerBatEl) {
+                    if (typeof p.batteryLevel === 'number' && peerBatEl) {
                         peerBatEl.textContent = p.batteryLevel + '%';
                         peerBatEl.classList.remove('hidden');
                         peerBatEl.className = 'text-[10px] ' + (
@@ -2122,15 +2139,17 @@
                     const driftBanner = document.getElementById('peer-drift-banner');
                     const driftText = document.getElementById('peer-drift-text');
                     if (driftBanner && p.driftDetected === true) {
-                        const bearing = p.driftBearingDeg != null ? p.driftBearingDeg.toFixed(0) + '°' : '?';
-                        const speed = p.driftSpeedMps != null ? (p.driftSpeedMps * 60).toFixed(1) + ' m/min' : '?';
+                        const bearing = typeof p.driftBearingDeg === 'number' ? p.driftBearingDeg.toFixed(0) + '°' : '?';
+                        const speed = typeof p.driftSpeedMps === 'number' ? (p.driftSpeedMps * 60).toFixed(1) + ' m/min' : '?';
                         driftText.textContent = I18N.fmt(I18N.t.peerDriftMsg, { bearing: bearing, speed: speed });
                         driftBanner.classList.remove('hidden');
                     } else if (driftBanner) {
                         driftBanner.classList.add('hidden');
                     }
                 }
-            } catch(err) {}
+            } catch(err) {
+                console.error('WS: Failed to parse message:', err);
+            }
         }
     }
 
@@ -2234,7 +2253,7 @@
                 sectorEnabled: false, sectorBearing: 0, sectorWidth: 90,
                 anchorStartTime: null, maxDistanceSwing: 0, maxSogDuringAnchor: 0,
                 watchActive: false, watchEndTime: null, watchMinutes: 10,
-                schedule: JSON.parse(localStorage.getItem('anchor_schedule')) || [],
+                schedule: this._loadSchedule(),
                 chainLengthM: null, depthM: null,
                 alarmState: 'SAFE',
                 sessionId: null, // IndexedDB session id
@@ -2258,6 +2277,9 @@
             this.aiCtrl = new AIController();
             this.syncCtrl = new SyncController(this);
 
+            // Store GPS watch ID for cleanup
+            this.gpsWatchId = null;
+
             UI.init();
             this._bindAppEvents();
             this._initGPS();
@@ -2276,6 +2298,18 @@
                 await this._restoreActiveState();
             } catch (err) {
                 console.error('IndexedDB init failed:', err);
+            }
+        }
+
+        _loadSchedule() {
+            try {
+                const scheduleData = localStorage.getItem('anchor_schedule');
+                if (!scheduleData) return [];
+                const parsed = JSON.parse(scheduleData);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (err) {
+                console.error('Failed to parse schedule from localStorage:', err);
+                return [];
             }
         }
 
@@ -2614,12 +2648,19 @@
 
         _initGPS() {
             if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(
+                this.gpsWatchId = navigator.geolocation.watchPosition(
                     (pos) => this._onPosition(pos),
                     (err) => { document.getElementById('no-signal-overlay').classList.remove('hidden'); if (err.code === 1) { document.getElementById('warning-text').textContent = I18N.t.gpsPermDenied; UI.showModal('warning-modal'); } },
                     { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
                 );
             } else document.getElementById('no-signal-overlay').classList.remove('hidden');
+        }
+
+        _cleanupGPS() {
+            if (this.gpsWatchId !== null) {
+                navigator.geolocation.clearWatch(this.gpsWatchId);
+                this.gpsWatchId = null;
+            }
         }
 
         _onPosition(position) {

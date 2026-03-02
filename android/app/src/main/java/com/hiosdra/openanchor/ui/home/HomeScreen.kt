@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.PhonelinkSetup
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.SyncAlt
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
+import com.hiosdra.openanchor.ui.theme.CautionYellow
 import com.hiosdra.openanchor.ui.theme.OceanBlue
 import com.hiosdra.openanchor.ui.theme.SafeGreen
 
@@ -38,6 +40,7 @@ fun HomeScreen(
     onOpenCrewWatch: () -> Unit,
     onOpenAdvisor: () -> Unit,
     onOpenLogbook: () -> Unit,
+    onOpenExamQuiz: () -> Unit,
     onResumeMonitoring: (Long) -> Unit,
     onResumeClientMode: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
@@ -229,6 +232,23 @@ fun HomeScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Exam Quiz
+            OutlinedButton(
+                onClick = onOpenExamQuiz,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Icon(Icons.Default.School, contentDescription = null, tint = CautionYellow)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.exam_quiz),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
