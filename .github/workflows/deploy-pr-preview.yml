@@ -48,7 +48,13 @@ jobs:
             echo "# PR Previews" > README.md
             git add README.md
             git commit -m "Initialize gh-pages branch"
-            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+            # Set remote URL (works whether remote exists or not)
+            if git remote get-url origin >/dev/null 2>&1; then
+              git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            else
+              git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            fi
 
             # If another workflow run created gh-pages concurrently, align to it instead of failing with a non-fast-forward push
             if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
