@@ -11,6 +11,10 @@ permissions:
   pull-requests: write
   issues: write
 
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
@@ -65,12 +69,14 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const previewUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${prNumber}/`;
 
-            const comment = `<!-- pr-preview-bot-marker -->
-            🚀 **PR Preview Deployed!**
-
-            Preview this PR at: ${previewUrl}
-
-            The preview site will update automatically when you push new commits to this PR.`;
+            const comment = [
+              '<!-- pr-preview-bot-marker -->',
+              '🚀 **PR Preview Deployed!**',
+              '',
+              `Preview this PR at: ${previewUrl}`,
+              '',
+              'The preview site will update automatically when you push new commits to this PR.'
+            ].join('\n');
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -132,10 +138,12 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
 
-            const comment = `<!-- pr-preview-bot-marker -->
-            🧹 **PR Preview Cleaned Up**
-
-            The preview site for this PR has been removed since the PR is now closed.`;
+            const comment = [
+              '<!-- pr-preview-bot-marker -->',
+              '🧹 **PR Preview Cleaned Up**',
+              '',
+              'The preview site for this PR has been removed since the PR is now closed.'
+            ].join('\n');
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,

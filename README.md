@@ -59,6 +59,8 @@ For example:
 
 The preview site updates automatically when new commits are pushed to the PR and is cleaned up when the PR is closed.
 
+**Note:** PR previews are only deployed for pull requests from the same repository, not from forks (for security reasons).
+
 ## Android
 
 ```bash
