@@ -92,6 +92,10 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Deploy preview for PR #${{ github.event.pull_request.number }}"
+
+            # Pull latest changes with rebase to avoid conflicts from concurrent workflow runs
+            git pull --rebase origin gh-pages
+
             git push origin gh-pages
           fi
 
@@ -166,6 +170,10 @@ jobs:
 
             git rm -rf "${PR_NUMBER}"
             git commit -m "Remove preview for closed PR #${PR_NUMBER}"
+
+            # Pull latest changes with rebase to avoid conflicts from concurrent workflow runs
+            git pull --rebase origin gh-pages
+
             git push origin gh-pages
 
             echo "Removed preview for PR #${PR_NUMBER}"
