@@ -1647,8 +1647,9 @@
               const daySlots = [];
               sortedSlots.forEach(slot => {
                 const assigned = [];
-                for (let i = 0; i < slot.reqCrew; i++) {
-                  assigned.push(activeCrew[currentCrewIndex]);
+                for (let i = 0; i < slot.reqCrew && activeCrew.length > 0; i++) {
+                  const member = activeCrew[currentCrewIndex];
+                  if (member) assigned.push(member);
                   currentCrewIndex = (currentCrewIndex + 1) % activeCrew.length;
                 }
                 daySlots.push({ ...slot, assigned });
@@ -1740,8 +1741,11 @@
                     });
                   } else {
                     // Fallback: use round-robin if no optimal candidate found
-                    const fallbackIndex = (globalSlotIndex + i) % activeCrew.length;
-                    assigned.push(activeCrew[fallbackIndex]);
+                    if (activeCrew.length > 0) {
+                      const fallbackIndex = (globalSlotIndex + i) % activeCrew.length;
+                      const fallbackMember = activeCrew[fallbackIndex];
+                      if (fallbackMember) assigned.push(fallbackMember);
+                    }
                   }
                 }
 
@@ -1784,7 +1788,7 @@
             // Analyze each crew member's schedule
             scheduleData.forEach((daySchedule, dayIndex) => {
               daySchedule.slots.forEach((slot, slotIndex) => {
-                slot.assigned.forEach(person => {
+                slot.assigned.filter(p => p != null).forEach(person => {
                   if (!crewWatchHistory[person.id]) {
                     crewWatchHistory[person.id] = {
                       name: person.name,
@@ -2005,7 +2009,7 @@
 
                 const row = [dateStr];
                 daySchedule.slots.forEach(slot => {
-                  const names = slot.assigned.map(p => p.name).join('\\n');
+                  const names = slot.assigned.filter(p => p != null).map(p => p.name).join('\\n');
                   row.push(names || '-');
                 });
                 rows.push(row);
@@ -2041,7 +2045,7 @@
                 doc.setFontSize(12);
                 doc.text(t('heading.crewStatisticsExport', userLocale), 14, finalY);
 
-                const statsRows = crewStats.map(stat => [
+                const statsRows = crewStats.filter(stat => stat && stat.person).map(stat => [
                   stat.person.name,
                   stat.person.role || 'Załoga',
                   stat.watches.toString(),
