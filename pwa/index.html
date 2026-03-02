@@ -625,6 +625,52 @@
             transform: translateX(20px);
         }
 
+        /* Force update button */
+        .force-update-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            white-space: nowrap;
+        }
+
+        .force-update-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .force-update-btn:active {
+            transform: scale(0.98);
+        }
+
+        .force-update-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .force-update-btn svg {
+            animation: none;
+        }
+
+        .force-update-btn.updating svg {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         /* Hidden module */
         .module-hidden {
             display: none !important;
@@ -880,6 +926,20 @@
                     <span class="toggle-slider"></span>
                 </label>
             </div>
+            <div class="settings-item" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem;">
+                <div class="settings-label">
+                    <div class="settings-label-text">Wymuś aktualizację</div>
+                    <div class="settings-label-desc">Sprawdź i zainstaluj najnowszą wersję aplikacji</div>
+                </div>
+                <button id="forceUpdateBtn" class="force-update-btn" onclick="forceUpdate()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                    </svg>
+                    Aktualizuj
+                </button>
+            </div>
         </div>
     </div>
 
@@ -961,6 +1021,84 @@
         window.addEventListener('load', () => {
             initBetaMode();
         });
+
+        // Force update functionality
+        async function forceUpdate() {
+            const btn = document.getElementById('forceUpdateBtn');
+
+            // Disable button and show loading state
+            btn.disabled = true;
+            btn.classList.add('updating');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                </svg>
+                Sprawdzam...
+            `;
+
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+
+                    if (registration) {
+                        // Force update check
+                        await registration.update();
+
+                        // Wait a bit for the update to be detected
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        if (registration.waiting) {
+                            // There's a new service worker waiting
+                            btn.innerHTML = `
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                                    <path d="M21 3v5h-5"/>
+                                </svg>
+                                Instaluję...
+                            `;
+
+                            // Tell the new service worker to skip waiting
+                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+                            // The page will reload when the new SW takes control via controllerchange event
+                        } else {
+                            // No update available - clear caches and reload
+                            btn.innerHTML = `
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                                    <path d="M21 3v5h-5"/>
+                                </svg>
+                                Czyszczę cache...
+                            `;
+
+                            // Clear all caches
+                            const cacheNames = await caches.keys();
+                            await Promise.all(cacheNames.map(name => caches.delete(name)));
+
+                            // Reload the page to get fresh content
+                            window.location.reload(true);
+                        }
+                    } else {
+                        // No service worker registered - just reload
+                        window.location.reload(true);
+                    }
+                } catch (error) {
+                    console.error('Force update error:', error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('updating');
+                    alert('Wystąpił błąd podczas aktualizacji. Spróbuj ponownie.');
+                }
+            } else {
+                // Service workers not supported - just reload
+                window.location.reload(true);
+            }
+        }
 
         // Service worker update handling
         let newWorker;
