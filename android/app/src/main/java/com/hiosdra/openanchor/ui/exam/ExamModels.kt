@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * Exam question categories matching PZŻ JSM exam structure.
- * 8 categories extracted from the official question bank (323 questions).
+ * 8 categories extracted from the official question bank (330 questions).
  */
 enum class ExamCategory(val displayName: String) {
     JACHTY_ZAGLOWE("Jachty Żaglowe Morskie"),
@@ -31,25 +31,15 @@ enum class ExamCategory(val displayName: String) {
 }
 
 /**
- * A single answer option (A, B, C, or D).
- */
-data class AnswerOption(
-    val label: String,  // "A", "B", "C", "D"
-    val text: String,
-)
-
-/**
- * An exam question with ABC(D) answers and an optional image.
+ * An exam question rendered as a JPG image with A/B/C answer buttons.
+ * The question text, options, and any diagrams are all baked into the image.
  */
 data class ExamQuestion(
     val id: Int,
     val category: ExamCategory,
-    val text: String,
-    val answers: List<AnswerOption>,
-    val correctAnswer: String,  // "A", "B", "C", or "D"
-    val imageResId: Int? = null,  // Optional drawable resource for image
-    val imageUrl: String? = null, // Optional URL for image (alternative)
-    val hasImage: Boolean = false, // True if question references an image in the PDF
+    val correctAnswer: String,       // "A", "B", or "C"
+    val answerCount: Int = 3,        // Number of answer options (always 3 for JSM)
+    val imageAsset: String,          // Path inside assets/, e.g. "exam_images/pytanie_001.jpg"
 )
 
 // ============================================================
@@ -63,10 +53,9 @@ data class ExamQuestion(
 data class ExamQuestionJson(
     val id: Int,
     val category: String,
-    val question: String,
-    val options: Map<String, String>,
     @SerializedName("correct_answer") val correctAnswer: String?,
-    @SerializedName("image_filename") val imageFilename: String?,
+    @SerializedName("answer_count") val answerCount: Int,
+    @SerializedName("image_asset") val imageAsset: String,
 ) {
     /**
      * Convert this JSON model to the domain [ExamQuestion] used throughout the app.
@@ -74,12 +63,9 @@ data class ExamQuestionJson(
     fun toDomain(): ExamQuestion = ExamQuestion(
         id = id,
         category = ExamCategory.fromDisplayName(category),
-        text = question,
-        answers = options.map { (label, text) -> AnswerOption(label, text) }
-            .sortedBy { it.label },
         correctAnswer = correctAnswer ?: "A", // fallback if answer unknown
-        hasImage = imageFilename != null,
-        imageUrl = imageFilename,
+        answerCount = answerCount,
+        imageAsset = imageAsset,
     )
 }
 

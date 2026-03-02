@@ -1,7 +1,9 @@
 package com.hiosdra.openanchor.ui.exam
 
+import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,6 +62,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -515,24 +520,19 @@ private fun LearnModeContent(
                 ) {
                     item { Spacer(modifier = Modifier.height(8.dp)) }
 
-                    // Question card
+                    // Question image card
                     item {
-                        QuestionCard(question = question)
+                        QuestionImageCard(question = question)
                     }
 
-                    // Answers
-                    items(question.answers) { answer ->
-                        val state = when {
-                            uiState.selectedAnswer == null -> AnswerState.Default
-                            answer.label == question.correctAnswer -> AnswerState.Correct
-                            answer.label == uiState.selectedAnswer -> AnswerState.Incorrect
-                            else -> AnswerState.Default
-                        }
-                        AnswerOptionCard(
-                            answer = answer,
-                            state = state,
-                            onClick = { onSelectAnswer(answer.label) },
-                            enabled = uiState.selectedAnswer == null,
+                    // Answer buttons A / B / C
+                    item {
+                        AnswerButtonsRow(
+                            answerCount = question.answerCount,
+                            correctAnswer = question.correctAnswer,
+                            selectedAnswer = uiState.selectedAnswer,
+                            onSelectAnswer = onSelectAnswer,
+                            showCorrect = uiState.selectedAnswer != null,
                         )
                     }
 
@@ -719,18 +719,19 @@ private fun ExamModeContent(
                 ) {
                     item { Spacer(modifier = Modifier.height(8.dp)) }
 
-                    // Question
+                    // Question image
                     item {
-                        QuestionCard(question = question)
+                        QuestionImageCard(question = question)
                     }
 
-                    // Answers
-                    items(question.answers) { answer ->
-                        AnswerOptionCard(
-                            answer = answer,
-                            state = if (selectedAnswer == answer.label) AnswerState.Selected else AnswerState.Default,
-                            onClick = { onSelectAnswer(question.id, answer.label) },
-                            enabled = true,
+                    // Answer buttons (exam mode - no correct answer shown)
+                    item {
+                        AnswerButtonsRow(
+                            answerCount = question.answerCount,
+                            correctAnswer = question.correctAnswer,
+                            selectedAnswer = selectedAnswer,
+                            onSelectAnswer = { label -> onSelectAnswer(question.id, label) },
+                            showCorrect = false, // Don't show correct answer during exam
                         )
                     }
 
@@ -1013,17 +1014,17 @@ private fun ResultsContent(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "#${index + 1}",
+                                    text = "#${result.question.id}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = TextGrey,
                                 )
+                                Spacer(modifier = Modifier.weight(1f))
+                                CategoryChip(category = result.question.category)
                             }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = result.question.text,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
                             if (!result.isCorrect) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                // Show the question image in review
+                                QuestionImageCard(question = result.question)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = "${stringResource(R.string.exam_your_answer)}: ${result.userAnswer ?: "-"}  |  ${stringResource(R.string.exam_correct_answer)}: ${result.question.correctAnswer}",
@@ -1220,8 +1221,8 @@ private fun LeitnerOverviewContent(
                         )
                         boxData.forEach { (box, descRes, color) ->
                             val count = uiState.leitnerBoxCounts[box] ?: 0
-                            val total = uiState.leitnerStats.totalQuestions
-                            val fraction = if (total > 0) count.toFloat() / total else 0f
+                            val boxTotal = uiState.leitnerStats.totalQuestions
+                            val fraction = if (boxTotal > 0) count.toFloat() / boxTotal else 0f
 
                             Row(
                                 modifier = Modifier
@@ -1475,21 +1476,17 @@ private fun LeitnerSessionContent(
                     item { Spacer(modifier = Modifier.height(8.dp)) }
 
                     item {
-                        QuestionCard(question = question)
+                        QuestionImageCard(question = question)
                     }
 
-                    items(question.answers) { answer ->
-                        val state = when {
-                            uiState.leitnerSelectedAnswer == null -> AnswerState.Default
-                            answer.label == question.correctAnswer -> AnswerState.Correct
-                            answer.label == uiState.leitnerSelectedAnswer -> AnswerState.Incorrect
-                            else -> AnswerState.Default
-                        }
-                        AnswerOptionCard(
-                            answer = answer,
-                            state = state,
-                            onClick = { onSelectAnswer(answer.label) },
-                            enabled = uiState.leitnerSelectedAnswer == null,
+                    // Answer buttons with correct/incorrect feedback
+                    item {
+                        AnswerButtonsRow(
+                            answerCount = question.answerCount,
+                            correctAnswer = question.correctAnswer,
+                            selectedAnswer = uiState.leitnerSelectedAnswer,
+                            onSelectAnswer = onSelectAnswer,
+                            showCorrect = uiState.leitnerSelectedAnswer != null,
                         )
                     }
 
@@ -1725,15 +1722,31 @@ private fun LeitnerSessionCompleteContent(
 
 enum class AnswerState { Default, Selected, Correct, Incorrect }
 
+/**
+ * Displays the question as a JPG image loaded from assets.
+ */
 @Composable
-private fun QuestionCard(question: ExamQuestion) {
+private fun QuestionImageCard(question: ExamQuestion) {
+    val context = LocalContext.current
+    val bitmap = remember(question.imageAsset) {
+        try {
+            context.assets.open(question.imageAsset).use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)?.asImageBitmap()
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     Card(
-        colors = CardDefaults.cardColors(containerColor = NavySurface),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(4.dp)) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -1744,92 +1757,138 @@ private fun QuestionCard(question: ExamQuestion) {
                     color = TextGrey.copy(alpha = 0.5f),
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = question.text,
-                style = MaterialTheme.typography.bodyLarge,
-                lineHeight = 24.sp,
-            )
-            // Image placeholder - when imageResId or imageUrl is set, display image here
-            // TODO: Add image loading support (Coil for URLs, painterResource for drawables)
+
+            if (bitmap != null) {
+                Image(
+                    bitmap = bitmap,
+                    contentDescription = "Pytanie #${question.id}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.FillWidth,
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "Nie udalo sie zaladowac obrazka",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextGrey,
+                    )
+                }
+            }
         }
     }
 }
 
+/**
+ * Row of A / B / C answer buttons with animated state feedback.
+ */
 @Composable
-private fun AnswerOptionCard(
-    answer: AnswerOption,
+private fun AnswerButtonsRow(
+    answerCount: Int,
+    correctAnswer: String,
+    selectedAnswer: String?,
+    onSelectAnswer: (String) -> Unit,
+    showCorrect: Boolean,
+) {
+    val labels = listOf("A", "B", "C", "D").take(answerCount)
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        labels.forEach { label ->
+            val state = when {
+                selectedAnswer == null -> AnswerState.Default
+                showCorrect && label == correctAnswer -> AnswerState.Correct
+                !showCorrect && label == selectedAnswer -> AnswerState.Selected
+                showCorrect && label == selectedAnswer && label != correctAnswer -> AnswerState.Incorrect
+                else -> AnswerState.Default
+            }
+
+            AnswerButton(
+                label = label,
+                state = state,
+                onClick = { onSelectAnswer(label) },
+                enabled = selectedAnswer == null,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+/**
+ * Single answer button (A, B, or C) with animated color feedback.
+ */
+@Composable
+private fun AnswerButton(
+    label: String,
     state: AnswerState,
     onClick: () -> Unit,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val bgColor by animateColorAsState(
         targetValue = when (state) {
-            AnswerState.Correct -> SafeGreen.copy(alpha = 0.15f)
-            AnswerState.Incorrect -> AlarmRed.copy(alpha = 0.15f)
-            AnswerState.Selected -> CautionYellow.copy(alpha = 0.15f)
-            AnswerState.Default -> NavySurface.copy(alpha = 0.5f)
+            AnswerState.Correct -> SafeGreen.copy(alpha = 0.2f)
+            AnswerState.Incorrect -> AlarmRed.copy(alpha = 0.2f)
+            AnswerState.Selected -> CautionYellow.copy(alpha = 0.2f)
+            AnswerState.Default -> NavySurface
         },
-        label = "answer_bg",
+        label = "answer_btn_bg",
     )
 
     val borderColor by animateColorAsState(
         targetValue = when (state) {
-            AnswerState.Correct -> SafeGreen.copy(alpha = 0.5f)
-            AnswerState.Incorrect -> AlarmRed.copy(alpha = 0.5f)
-            AnswerState.Selected -> CautionYellow.copy(alpha = 0.5f)
-            AnswerState.Default -> Color.White.copy(alpha = 0.08f)
+            AnswerState.Correct -> SafeGreen
+            AnswerState.Incorrect -> AlarmRed
+            AnswerState.Selected -> CautionYellow
+            AnswerState.Default -> Color.White.copy(alpha = 0.15f)
         },
-        label = "answer_border",
+        label = "answer_btn_border",
     )
 
-    val labelBg = when (state) {
-        AnswerState.Correct -> SafeGreen.copy(alpha = 0.3f)
-        AnswerState.Incorrect -> AlarmRed.copy(alpha = 0.3f)
-        AnswerState.Selected -> CautionYellow.copy(alpha = 0.3f)
-        AnswerState.Default -> Color.White.copy(alpha = 0.08f)
+    val contentColor = when (state) {
+        AnswerState.Correct -> SafeGreen
+        AnswerState.Incorrect -> AlarmRed
+        AnswerState.Selected -> CautionYellow
+        AnswerState.Default -> Color.White
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
+    Box(
+        modifier = modifier
+            .height(56.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(bgColor)
-            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(14.dp),
-        verticalAlignment = Alignment.Top,
+            .border(2.dp, borderColor, RoundedCornerShape(16.dp))
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(labelBg),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (state == AnswerState.Correct) {
-                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp), tint = SafeGreen)
-            } else if (state == AnswerState.Incorrect) {
-                Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(18.dp), tint = AlarmRed)
-            } else {
-                Text(
-                    text = answer.label,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = when (state) {
-                        AnswerState.Selected -> CautionYellow
-                        else -> Color.White.copy(alpha = 0.6f)
-                    },
-                )
-            }
+        when (state) {
+            AnswerState.Correct -> Icon(
+                Icons.Default.Check,
+                contentDescription = label,
+                modifier = Modifier.size(28.dp),
+                tint = SafeGreen,
+            )
+            AnswerState.Incorrect -> Icon(
+                Icons.Default.Close,
+                contentDescription = label,
+                modifier = Modifier.size(28.dp),
+                tint = AlarmRed,
+            )
+            else -> Text(
+                text = label,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = contentColor,
+            )
         }
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = answer.text,
-            style = MaterialTheme.typography.bodyMedium,
-            lineHeight = 20.sp,
-            modifier = Modifier.padding(top = 4.dp),
-        )
     }
 }
 
