@@ -1647,8 +1647,9 @@
               const daySlots = [];
               sortedSlots.forEach(slot => {
                 const assigned = [];
-                for (let i = 0; i < slot.reqCrew; i++) {
-                  assigned.push(activeCrew[currentCrewIndex]);
+                for (let i = 0; i < slot.reqCrew && activeCrew.length > 0; i++) {
+                  const member = activeCrew[currentCrewIndex];
+                  if (member) assigned.push(member);
                   currentCrewIndex = (currentCrewIndex + 1) % activeCrew.length;
                 }
                 daySlots.push({ ...slot, assigned });
@@ -1740,8 +1741,11 @@
                     });
                   } else {
                     // Fallback: use round-robin if no optimal candidate found
-                    const fallbackIndex = (globalSlotIndex + i) % activeCrew.length;
-                    assigned.push(activeCrew[fallbackIndex]);
+                    if (activeCrew.length > 0) {
+                      const fallbackIndex = (globalSlotIndex + i) % activeCrew.length;
+                      const fallbackMember = activeCrew[fallbackIndex];
+                      if (fallbackMember) assigned.push(fallbackMember);
+                    }
                   }
                 }
 
@@ -1784,7 +1788,7 @@
             // Analyze each crew member's schedule
             scheduleData.forEach((daySchedule, dayIndex) => {
               daySchedule.slots.forEach((slot, slotIndex) => {
-                slot.assigned.forEach(person => {
+                slot.assigned.filter(p => p != null).forEach(person => {
                   if (!crewWatchHistory[person.id]) {
                     crewWatchHistory[person.id] = {
                       name: person.name,
@@ -1991,45 +1995,69 @@
               doc.setFontSize(10);
               doc.text(`Okres: ${schedule.length} dni (${formattedStartDate} - ${endDate})`, 148, 22, { align: 'center' });
 
-              // Prepare table data
+              // Role labels for display
+              const roleLabels = {
+                captain: t('role.captain', userLocale) || 'Kapitan',
+                officer: t('role.officer', userLocale) || 'Oficer',
+                bosun: t('role.bosun', userLocale) || 'Bosman',
+                sailor: t('role.sailor', userLocale) || 'Marynarz',
+                cook: t('role.cook', userLocale) || 'Kucharz',
+                engineer: t('role.engineer', userLocale) || 'Mechanik'
+              };
+
+              // Prepare table data - use \n (real newline) for cell line breaks in autoTable
               const headers = ['Data'];
               schedule[0]?.slots.forEach(slot => {
-                headers.push(`${slot.start}-${slot.end}\\n(${slot.reqCrew}os)`);
+                headers.push(slot.start + '-' + slot.end + '\n(' + slot.reqCrew + 'os)');
               });
 
               const rows = [];
               schedule.forEach((daySchedule, dayIndex) => {
                 const rowDate = new Date(startDate);
                 rowDate.setDate(rowDate.getDate() + dayIndex);
-                const dateStr = `D${daySchedule.day}\\n${rowDate.toLocaleDateString(userLocale, {day:'2-digit', month:'2-digit'})}`;
+                const dateStr = 'D' + daySchedule.day + '\n' + rowDate.toLocaleDateString(userLocale, {day:'2-digit', month:'2-digit'});
 
                 const row = [dateStr];
                 daySchedule.slots.forEach(slot => {
-                  const names = slot.assigned.map(p => p.name).join('\\n');
+                  const names = slot.assigned.filter(p => p != null).map(p => p.name).join('\n');
                   row.push(names || '-');
                 });
                 rows.push(row);
               });
 
+              // Determine dynamic column width based on number of slots
+              const numSlots = schedule[0]?.slots.length || 6;
+              const tableWidth = 277 - 20; // A4 landscape minus margins
+              const dateColWidth = 22;
+              const slotColWidth = Math.max(25, (tableWidth - dateColWidth) / numSlots);
+
               // Add table
               doc.autoTable({
                 head: [headers],
                 body: rows,
-                startY: 35,
+                startY: 28,
                 theme: 'grid',
                 styles: {
                   fontSize: 7,
-                  cellPadding: 2,
+                  cellPadding: 1.5,
                   halign: 'center',
-                  valign: 'middle'
+                  valign: 'middle',
+                  lineWidth: 0.2,
+                  lineColor: [200, 200, 200],
+                  overflow: 'linebreak'
                 },
                 headStyles: {
                   fillColor: [12, 74, 110],
+                  textColor: [255, 255, 255],
                   fontStyle: 'bold',
-                  fontSize: 8
+                  fontSize: 7,
+                  cellPadding: 2
                 },
                 columnStyles: {
-                  0: { cellWidth: 20, fontStyle: 'bold', fillColor: [241, 245, 249] }
+                  0: { cellWidth: dateColWidth, fontStyle: 'bold', fillColor: [241, 245, 249] }
+                },
+                alternateRowStyles: {
+                  fillColor: [248, 250, 252]
                 },
                 margin: { left: 10, right: 10 }
               });
@@ -2038,28 +2066,62 @@
               if (crewStats.length > 0) {
                 const finalY = doc.lastAutoTable.finalY + 10;
 
-                doc.setFontSize(12);
-                doc.text(t('heading.crewStatisticsExport', userLocale), 14, finalY);
+                // Check if we need a new page
+                if (finalY > 170) {
+                  doc.addPage();
+                  var statsStartY = 15;
+                } else {
+                  var statsStartY = finalY;
+                }
 
-                const statsRows = crewStats.map(stat => [
-                  stat.person.name,
-                  stat.person.role || 'Załoga',
-                  stat.watches.toString(),
-                  `${stat.hours}h`
-                ]);
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text(t('heading.crewStatisticsExport', userLocale), 14, statsStartY);
+
+                // crewStats has structure: { id, name, role, totalHours, hardWatches, ... }
+                const statsHeaders = [
+                  t('label.crewMember', userLocale),
+                  t('common.role', userLocale),
+                  t('label.totalWatches', userLocale),
+                  t('common.hours', userLocale)
+                ];
+
+                const statsRows = crewStats.filter(stat => stat != null).map(stat => {
+                  // Count total watches for this crew member
+                  let watchCount = 0;
+                  if (dashboardData && dashboardData.allSlotsAbsolute) {
+                    dashboardData.allSlotsAbsolute.forEach(slot => {
+                      if (slot.assigned.some(p => p && p.id === stat.id)) {
+                        watchCount++;
+                      }
+                    });
+                  }
+
+                  return [
+                    stat.name || '-',
+                    roleLabels[stat.role] || stat.role || 'Załoga',
+                    watchCount.toString(),
+                    stat.totalHours + 'h'
+                  ];
+                });
 
                 doc.autoTable({
-                  head: [[t('label.crewMember', userLocale), t('common.role', userLocale), t('label.totalWatches', userLocale), t('common.hours', userLocale)]],
+                  head: [statsHeaders],
                   body: statsRows,
-                  startY: finalY + 5,
+                  startY: statsStartY + 5,
                   theme: 'striped',
                   styles: {
                     fontSize: 9,
-                    cellPadding: 3
+                    cellPadding: 3,
+                    overflow: 'linebreak'
                   },
                   headStyles: {
                     fillColor: [12, 74, 110],
+                    textColor: [255, 255, 255],
                     fontStyle: 'bold'
+                  },
+                  alternateRowStyles: {
+                    fillColor: [248, 250, 252]
                   },
                   margin: { left: 14 }
                 });
