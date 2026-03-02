@@ -31,7 +31,7 @@ self.addEventListener('install', event => {
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     // When user clicks update button, activate the new service worker immediately
-    self.skipWaiting();
+    event.waitUntil(self.skipWaiting());
   }
 });
 
