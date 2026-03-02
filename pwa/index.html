@@ -977,13 +977,56 @@
                     const registration = await navigator.serviceWorker.getRegistration();
 
                     if (registration) {
+                        // Check if there's already a waiting service worker
+                        if (registration.waiting) {
+                            // There's a new service worker waiting
+                            btn.innerHTML = `
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                                    <path d="M21 3v5h-5"/>
+                                </svg>
+                                Instaluję...
+                            `;
+
+                            // Tell the new service worker to skip waiting
+                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                            // The page will reload when the new SW takes control via controllerchange event
+                            return;
+                        }
+
                         // Force update check
                         await registration.update();
 
-                        // Wait a bit for the update to be detected
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        // Wait for the new service worker to be installed
+                        const hasUpdate = await new Promise((resolve) => {
+                            const timeout = setTimeout(() => resolve(false), 5000); // 5 second timeout
 
-                        if (registration.waiting) {
+                            const checkUpdate = () => {
+                                if (registration.waiting) {
+                                    clearTimeout(timeout);
+                                    resolve(true);
+                                } else if (registration.installing) {
+                                    registration.installing.addEventListener('statechange', function onStateChange(e) {
+                                        if (e.target.state === 'installed') {
+                                            e.target.removeEventListener('statechange', onStateChange);
+                                            clearTimeout(timeout);
+                                            resolve(true);
+                                        }
+                                    });
+                                } else {
+                                    // No update found after update() call
+                                    clearTimeout(timeout);
+                                    resolve(false);
+                                }
+                            };
+
+                            // Check immediately and also listen for updatefound
+                            checkUpdate();
+                            registration.addEventListener('updatefound', checkUpdate, { once: true });
+                        });
+
+                        if (hasUpdate && registration.waiting) {
                             // There's a new service worker waiting
                             btn.innerHTML = `
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1009,16 +1052,18 @@
                                 Czyszczę cache...
                             `;
 
-                            // Clear all caches
+                            // Clear only this app's caches (those with the openanchor- prefix)
+                            const APP_CACHE_PREFIX = 'openanchor-';
                             const cacheNames = await caches.keys();
-                            await Promise.all(cacheNames.map(name => caches.delete(name)));
+                            const appCacheNames = cacheNames.filter(name => name.startsWith(APP_CACHE_PREFIX));
+                            await Promise.all(appCacheNames.map(name => caches.delete(name)));
 
                             // Reload the page to get fresh content
-                            window.location.reload(true);
+                            window.location.reload();
                         }
                     } else {
                         // No service worker registered - just reload
-                        window.location.reload(true);
+                        window.location.reload();
                     }
                 } catch (error) {
                     console.error('Force update error:', error);
@@ -1029,7 +1074,7 @@
                 }
             } else {
                 // Service workers not supported - just reload
-                window.location.reload(true);
+                window.location.reload();
             }
         }
 
