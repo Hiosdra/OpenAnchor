@@ -312,6 +312,7 @@
         // STORAGE (Learn/Exam progress)
         // ==========================================
         const STORAGE_KEY = 'openanchor_exam_progress';
+        const LEARN_POSITION_KEY = 'openanchor_learn_position';
 
         function loadProgress() {
             try {
@@ -325,6 +326,24 @@
         function saveProgress(progress) {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+            } catch { /* ignore */ }
+        }
+
+        function loadLearnPosition() {
+            try {
+                const data = localStorage.getItem(LEARN_POSITION_KEY);
+                return data ? JSON.parse(data) : { questionId: null, timestamp: 0 };
+            } catch {
+                return { questionId: null, timestamp: 0 };
+            }
+        }
+
+        function saveLearnPosition(questionId) {
+            try {
+                localStorage.setItem(LEARN_POSITION_KEY, JSON.stringify({
+                    questionId,
+                    timestamp: Date.now()
+                }));
             } catch { /* ignore */ }
         }
 
@@ -751,7 +770,6 @@
         function LearnScreen({ questions, progress, onUpdateProgress, onBack }) {
             const [selectedCategories, setSelectedCategories] = useState(Object.values(CATEGORIES).map(c => c.id));
             const [showCategoryFilter, setShowCategoryFilter] = useState(false);
-            const [currentIndex, setCurrentIndex] = useState(0);
             const [selectedAnswer, setSelectedAnswer] = useState(null);
 
             const filteredQuestions = useMemo(() =>
@@ -759,7 +777,24 @@
                 [questions, selectedCategories]
             );
 
+            // Initialize currentIndex with saved position
+            const [currentIndex, setCurrentIndex] = useState(() => {
+                const savedPos = loadLearnPosition();
+                if (savedPos.questionId) {
+                    const index = filteredQuestions.findIndex(q => q.id === savedPos.questionId);
+                    if (index >= 0) return index;
+                }
+                return 0;
+            });
+
             const currentQuestion = filteredQuestions[currentIndex];
+
+            // Save position whenever currentIndex or currentQuestion changes
+            useEffect(() => {
+                if (currentQuestion) {
+                    saveLearnPosition(currentQuestion.id);
+                }
+            }, [currentIndex, currentQuestion]);
 
             const handleAnswer = useCallback((label) => {
                 if (selectedAnswer) return;
@@ -851,15 +886,33 @@
                                 categories={CATEGORIES}
                                 selectedCategories={selectedCategories}
                                 onToggle={(id) => {
-                                    setSelectedCategories(prev =>
-                                        prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
-                                    );
-                                    setCurrentIndex(0);
+                                    const newCategories = selectedCategories.includes(id)
+                                        ? selectedCategories.filter(c => c !== id)
+                                        : [...selectedCategories, id];
+                                    setSelectedCategories(newCategories);
+
+                                    // Try to restore saved position in new filtered list
+                                    const savedPos = loadLearnPosition();
+                                    if (savedPos.questionId) {
+                                        const newFiltered = questions.filter(q => newCategories.includes(q.category));
+                                        const index = newFiltered.findIndex(q => q.id === savedPos.questionId);
+                                        setCurrentIndex(index >= 0 ? index : 0);
+                                    } else {
+                                        setCurrentIndex(0);
+                                    }
                                     setSelectedAnswer(null);
                                 }}
                                 onSelectAll={() => {
                                     setSelectedCategories(Object.values(CATEGORIES).map(c => c.id));
-                                    setCurrentIndex(0);
+
+                                    // Try to restore saved position with all categories
+                                    const savedPos = loadLearnPosition();
+                                    if (savedPos.questionId) {
+                                        const index = questions.findIndex(q => q.id === savedPos.questionId);
+                                        setCurrentIndex(index >= 0 ? index : 0);
+                                    } else {
+                                        setCurrentIndex(0);
+                                    }
                                 }}
                                 onDeselectAll={() => setSelectedCategories([])}
                             />
