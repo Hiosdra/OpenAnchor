@@ -46,16 +46,25 @@
         }
 
         @media print {
-            /* Reset everything */
+            /* Global print reset: force readable black-on-white */
             * {
                 box-shadow: none !important;
+                color: black !important;
             }
             body, html {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: white !important;
-                color: black !important;
                 font-size: 10px !important;
+            }
+            /* Reset all backgrounds to transparent for print, specific elements re-set below */
+            div, span, main, section, article, nav, header, footer {
+                background-color: transparent !important;
+                background-image: none !important;
+            }
+            /* Hide decorative backgrounds */
+            .ocean-bg, .stars {
+                display: none !important;
             }
 
             .print\\:hidden {
@@ -2281,7 +2290,7 @@
           if (!isLoaded) return null;
 
           return (
-            <div className={`min-h-screen font-sans pb-10 transition-colors duration-300 ${isNightMode ? 'bg-black text-red-600' : 'text-slate-100'}`} data-night-mode={isNightMode}>
+            <div className={`min-h-screen font-sans pb-10 transition-colors duration-300 print:text-black print:bg-white ${isNightMode ? 'bg-black text-red-600' : 'text-slate-100'}`} data-night-mode={isNightMode}>
 
               {/* Skip to main content link for keyboard navigation */}
               <a href="#main-content" className="skip-link">
