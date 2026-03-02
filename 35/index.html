@@ -389,17 +389,20 @@
             padding: 1rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 1rem;
             transform: translateY(-100%);
-            transition: transform 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         .update-banner.show {
-            display: flex;
             transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .update-banner-content {
@@ -454,16 +457,11 @@
         .dismiss-btn:hover {
             background: rgba(255, 255, 255, 0.1);
         }
-
-        @keyframes slide-down {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
-        }
     </style>
 </head>
 <body>
     <!-- Update notification banner -->
-    <div id="updateBanner" class="update-banner">
+    <div id="updateBanner" class="update-banner" role="status" aria-live="polite">
         <div class="update-banner-content">
             <div class="update-banner-text">
                 <strong>Nowa wersja dostępna!</strong> Zaktualizuj aplikację, aby korzystać z najnowszych funkcji.
@@ -691,6 +689,7 @@
         let updateBanner = document.getElementById('updateBanner');
         let updateBtn = document.getElementById('updateBtn');
         let dismissBtn = document.getElementById('dismissBtn');
+        let refreshing = false;
 
         // Register service worker with update detection
         if ('serviceWorker' in navigator) {
@@ -701,6 +700,12 @@
                         setInterval(() => {
                             registration.update();
                         }, 60000);
+
+                        // Check if there's already a waiting service worker on page load
+                        if (registration.waiting) {
+                            newWorker = registration.waiting;
+                            showUpdateBanner();
+                        }
 
                         // Listen for updates
                         registration.addEventListener('updatefound', () => {
@@ -719,8 +724,9 @@
 
                 // Listen for controller change (when new SW takes over)
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    // Only reload if we didn't initiate this change
-                    if (!window.updatingServiceWorker) {
+                    // Reload when new SW takes control, but prevent double reload
+                    if (!refreshing) {
+                        refreshing = true;
                         window.location.reload();
                     }
                 });
@@ -738,7 +744,6 @@
         // Update button - reload to activate new service worker
         updateBtn.addEventListener('click', () => {
             if (newWorker) {
-                window.updatingServiceWorker = true;
                 // Tell the new service worker to skip waiting
                 newWorker.postMessage({ type: 'SKIP_WAITING' });
                 // The page will reload when the new SW takes control
