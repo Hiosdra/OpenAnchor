@@ -1,4 +1,4 @@
-const CACHE_NAME = 'openanchor-superapp-v5';
+const CACHE_NAME = 'openanchor-superapp-v6';
 const urlsToCache = [
   './',
   './index.html',
@@ -24,8 +24,15 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
-  // Force the waiting service worker to become the active service worker
-  self.skipWaiting();
+  // Don't force skip waiting - let the page control when to update
+});
+
+// Listen for messages from the page
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    // When user clicks update button, activate the new service worker immediately
+    event.waitUntil(self.skipWaiting());
+  }
 });
 
 // Fetch from cache with runtime caching (cache-first / stale-while-revalidate)

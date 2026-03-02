@@ -377,9 +377,100 @@
         .arrow-bounce {
             animation: arrow-bounce 1.5s ease-in-out infinite;
         }
+
+        /* Update notification banner */
+        .update-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .update-banner.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .update-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .update-banner-text {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .update-btn {
+            padding: 0.5rem 1.25rem;
+            background: white;
+            color: #1e40af;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .update-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .update-btn:active {
+            transform: scale(0.98);
+        }
+
+        .dismiss-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+
+        .dismiss-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
+    <!-- Update notification banner -->
+    <div id="updateBanner" class="update-banner" role="status" aria-live="polite">
+        <div class="update-banner-content">
+            <div class="update-banner-text">
+                <strong>Nowa wersja dostępna!</strong> Zaktualizuj aplikację, aby korzystać z najnowszych funkcji.
+            </div>
+            <button id="updateBtn" class="update-btn">Aktualizuj</button>
+            <button id="dismissBtn" class="dismiss-btn">Później</button>
+        </div>
+    </div>
+
     <!-- Animated background -->
     <div class="ocean-bg">
         <div class="wave wave-1"></div>
@@ -593,12 +684,81 @@
     </footer>
 
     <script>
-        // Register service worker
+        // Service worker update handling
+        let newWorker;
+        let updateBanner = document.getElementById('updateBanner');
+        let updateBtn = document.getElementById('updateBtn');
+        let dismissBtn = document.getElementById('dismissBtn');
+        let refreshing = false;
+
+        // Listen for controller change (when new SW takes over) - must be outside load event
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                // Reload when new SW takes control, but prevent double reload
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
             });
         }
+
+        // Register service worker with update detection
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        // Check for updates periodically (every 60 seconds)
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000);
+
+                        // Check if there's already a waiting service worker on page load
+                        if (registration.waiting) {
+                            newWorker = registration.waiting;
+                            showUpdateBanner();
+                        }
+
+                        // Listen for updates
+                        registration.addEventListener('updatefound', () => {
+                            newWorker = registration.installing;
+
+                            newWorker.addEventListener('statechange', () => {
+                                // When the new service worker is activated and ready
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New service worker available - show update banner
+                                    showUpdateBanner();
+                                }
+                            });
+                        });
+                    })
+                    .catch(() => {});
+            });
+        }
+
+        function showUpdateBanner() {
+            updateBanner.classList.add('show');
+        }
+
+        function hideUpdateBanner() {
+            updateBanner.classList.remove('show');
+        }
+
+        // Update button - reload to activate new service worker
+        updateBtn.addEventListener('click', () => {
+            if (newWorker) {
+                // Tell the new service worker to skip waiting
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                // The page will reload when the new SW takes control
+            } else {
+                // Fallback: just reload
+                window.location.reload();
+            }
+        });
+
+        // Dismiss button - hide banner
+        dismissBtn.addEventListener('click', () => {
+            hideUpdateBanner();
+        });
 
         // Navigate to module
         function openModule(url) {
