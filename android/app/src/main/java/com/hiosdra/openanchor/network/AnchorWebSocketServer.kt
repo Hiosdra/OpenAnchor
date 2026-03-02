@@ -121,18 +121,20 @@ class AnchorWebSocketServer @Inject constructor(
         heartbeatWatchdogJob?.cancel()
         heartbeatWatchdogJob = null
 
-        // Close client session with mutex protection
-        runBlocking {
+        // Grab session under lock, then close it outside to avoid blocking
+        val sessionToClose = runBlocking {
             mutex.withLock {
                 val session = clientSession
                 clientSession = null
-                if (session != null) {
-                    withContext(Dispatchers.IO) {
-                        try {
-                            session.close(CloseReason(CloseReason.Codes.GOING_AWAY, "Server stopping"))
-                        } catch (_: Exception) {}
-                    }
-                }
+                session
+            }
+        }
+
+        if (sessionToClose != null) {
+            runBlocking(Dispatchers.IO) {
+                try {
+                    sessionToClose.close(CloseReason(CloseReason.Codes.GOING_AWAY, "Server stopping"))
+                } catch (_: Exception) {}
             }
         }
 

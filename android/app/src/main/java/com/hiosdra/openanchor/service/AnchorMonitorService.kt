@@ -235,7 +235,9 @@ class AnchorMonitorService : Service() {
                 // Drift detection (Faza 4.5)
                 recentTrackPoints.add(trackPoint)
                 if (recentTrackPoints.size > 30) recentTrackPoints.removeAt(0)
-                val driftAnalysis = driftDetector.analyze(recentTrackPoints, session.anchorPosition)
+                // Create snapshot for thread-safe iteration
+                val trackPointsSnapshot = synchronized(recentTrackPoints) { recentTrackPoints.toList() }
+                val driftAnalysis = driftDetector.analyze(trackPointsSnapshot, session.anchorPosition)
 
                 // Handle alarm
                 val previousAlarmState = _monitorState.value.alarmState
