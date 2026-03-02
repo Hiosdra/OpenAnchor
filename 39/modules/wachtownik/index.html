@@ -2425,7 +2425,7 @@
                 </div>
               )}
 
-              <div className="max-w-7xl mx-auto px-2 sm:px-4 mt-4 sm:mt-6 print:hidden">
+              <div className={`max-w-7xl mx-auto px-2 sm:px-4 mt-4 sm:mt-6 print:hidden ${isNightMode ? '' : 'bg-white/80 backdrop-blur-sm rounded-xl py-2'}`}>
                 <div className={`flex p-1 space-x-0.5 sm:space-x-1 rounded-xl w-full sm:w-max overflow-x-auto ${isNightMode ? 'bg-zinc-900' : 'bg-slate-200'}`}>
                   {!isReadOnly && (
                     <button
