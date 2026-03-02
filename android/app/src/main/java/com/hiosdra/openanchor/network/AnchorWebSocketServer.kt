@@ -205,9 +205,8 @@ class AnchorWebSocketServer @Inject constructor(
 
         val scope = serverScope ?: return
 
-        // Send PING every 5s (delay first to avoid immediate ping at T=0)
+        // Send PING every 5s (immediately on connect, then every 5s)
         heartbeatJob = scope.launch(Dispatchers.IO) {
-            delay(HEARTBEAT_INTERVAL_MS)
             while (isActive) {
                 try {
                     session.send(Frame.Text(parser.buildPing()))
@@ -221,7 +220,6 @@ class AnchorWebSocketServer @Inject constructor(
 
         // Watchdog: check if peer sent PING within 15s
         heartbeatWatchdogJob = scope.launch(Dispatchers.IO) {
-            delay(HEARTBEAT_INTERVAL_MS)
             while (isActive) {
                 delay(HEARTBEAT_INTERVAL_MS)
                 val elapsed = System.currentTimeMillis() - lastPeerPingTime
