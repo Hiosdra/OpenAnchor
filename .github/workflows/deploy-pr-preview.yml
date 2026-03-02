@@ -28,6 +28,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Checkout gh-pages branch
+        id: checkout-ghpages
         uses: actions/checkout@v6
         with:
           ref: gh-pages
@@ -36,7 +37,7 @@ jobs:
 
       - name: Initialize gh-pages if needed
         run: |
-          if [ ! -d "gh-pages-branch/.git" ]; then
+          if [ "${{ steps.checkout-ghpages.outcome }}" != "success" ]; then
             echo "gh-pages branch doesn't exist, creating it..."
             mkdir -p gh-pages-branch
             cd gh-pages-branch
@@ -48,7 +49,16 @@ jobs:
             git add README.md
             git commit -m "Initialize gh-pages branch"
             git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-            git push -u origin gh-pages
+
+            # If another workflow run created gh-pages concurrently, align to it instead of failing with a non-fast-forward push
+            if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+              echo "Remote gh-pages branch already exists, fetching and aligning local branch..."
+              git fetch origin gh-pages
+              git reset --hard origin/gh-pages
+            else
+              echo "Remote gh-pages branch does not exist, creating it..."
+              git push -u origin gh-pages
+            fi
           fi
 
       - name: Deploy to PR subdirectory
@@ -128,6 +138,7 @@ jobs:
 
     steps:
       - name: Checkout gh-pages branch
+        id: checkout-gh-pages
         uses: actions/checkout@v6
         with:
           ref: gh-pages
@@ -137,8 +148,8 @@ jobs:
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
 
-          # Check if gh-pages branch exists
-          if [ ! -d ".git" ]; then
+          # Check if gh-pages branch checkout succeeded
+          if [ "${{ steps.checkout-gh-pages.outcome }}" != "success" ]; then
             echo "gh-pages branch doesn't exist, nothing to clean up"
             exit 0
           fi
