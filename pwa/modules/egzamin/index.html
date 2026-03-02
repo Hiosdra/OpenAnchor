@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Nauka do egzaminu Jachtowy Sternik Morski / Żeglarz Jachtowy - baza pytań egzaminacyjnych PZŻ">
-    <meta name="theme-color" content="#0c4a6e">
+    <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Egzamin ŻJ/JSM">
@@ -17,6 +17,9 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Unified Theme -->
+    <link rel="stylesheet" href="../../styles/theme.css">
 
     <!-- React and ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -65,14 +68,19 @@
         }
 
         .wave-1 {
-            background: radial-gradient(ellipse at center, #f59e0b 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, #3b82f6 0%, transparent 70%);
             animation-duration: 18s;
         }
 
         .wave-2 {
-            background: radial-gradient(ellipse at center, #d97706 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, #0ea5e9 0%, transparent 70%);
             animation-duration: 24s;
             animation-direction: reverse;
+        }
+
+        .wave-3 {
+            background: radial-gradient(ellipse at center, #6366f1 0%, transparent 70%);
+            animation-duration: 30s;
         }
 
         @keyframes wave-spin {
@@ -176,6 +184,7 @@
     <div class="ocean-bg">
         <div class="wave wave-1"></div>
         <div class="wave wave-2"></div>
+        <div class="wave wave-3"></div>
     </div>
     <div class="stars"></div>
 
