@@ -1846,20 +1846,7 @@
                 index === self.findIndex(c => c.message === conflict.message)
               );
 
-              const conflictMessage = `⚠️ Wykryto ${uniqueConflicts.length} potencjalny(ch) konflikt(ów) w grafiku:\n\n` +
-                uniqueConflicts.slice(0, 10).map((c, i) => `${i + 1}. ${c.message}`).join('\n') +
-                (uniqueConflicts.length > 10 ? `\n\n... i ${uniqueConflicts.length - 10} więcej` : '');
-
               console.warn('Schedule conflicts detected:', uniqueConflicts);
-
-              // Show warning but don't block schedule generation
-              setTimeout(() => {
-                if (confirm(conflictMessage + '\n\nCzy chcesz kontynuować mimo konfliktów?')) {
-                  // User accepted the conflicts
-                } else {
-                  // User wants to modify - stay on current view
-                }
-              }, 500);
             }
           };
 
