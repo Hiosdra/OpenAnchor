@@ -38,6 +38,77 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100dvh;
+            overscroll-behavior: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Animated background waves */
+        .ocean-bg {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            border-radius: 45%;
+            opacity: 0.04;
+            animation: wave-spin linear infinite;
+        }
+
+        .wave-1 {
+            background: radial-gradient(ellipse at center, #3b82f6 0%, transparent 70%);
+            animation-duration: 18s;
+        }
+
+        .wave-2 {
+            background: radial-gradient(ellipse at center, #0ea5e9 0%, transparent 70%);
+            animation-duration: 24s;
+            animation-direction: reverse;
+        }
+
+        .wave-3 {
+            background: radial-gradient(ellipse at center, #6366f1 0%, transparent 70%);
+            animation-duration: 30s;
+        }
+
+        @keyframes wave-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .stars {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.2) 0%, transparent 100%),
+                radial-gradient(1px 1px at 40% 30%, rgba(255,255,255,0.15) 0%, transparent 100%),
+                radial-gradient(1px 1px at 55% 75%, rgba(255,255,255,0.25) 0%, transparent 100%),
+                radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.2) 0%, transparent 100%),
+                radial-gradient(1px 1px at 85% 50%, rgba(255,255,255,0.18) 0%, transparent 100%),
+                radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.22) 0%, transparent 100%),
+                radial-gradient(1px 1px at 15% 90%, rgba(255,255,255,0.16) 0%, transparent 100%);
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+
         @page {
             size: A4 landscape;
             margin: 0.5cm;
