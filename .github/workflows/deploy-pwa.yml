@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout master branch
         uses: actions/checkout@v6
+        with:
+          ref: master
 
       - name: Checkout gh-pages branch
         id: checkout-ghpages
@@ -88,5 +90,37 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Deploy PWA from master branch"
-            git push origin gh-pages
+
+            # Fetch latest gh-pages and rebase before pushing, with retries to handle concurrent updates
+            max_attempts=5
+            attempt=1
+            while [ "$attempt" -le "$max_attempts" ]; do
+              echo "Attempt $attempt of $max_attempts to rebase and push gh-pages..."
+
+              # Fetch latest remote gh-pages (if it exists)
+              git fetch origin gh-pages || true
+              if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
+                if ! git rebase origin/gh-pages; then
+                  echo "Rebase failed, aborting and retrying..."
+                  git rebase --abort || true
+                  attempt=$((attempt + 1))
+                  sleep 5
+                  continue
+                fi
+              fi
+
+              if git push origin gh-pages; then
+                echo "Push to gh-pages succeeded."
+                break
+              else
+                echo "Push to gh-pages failed, retrying..."
+                attempt=$((attempt + 1))
+                sleep 5
+              fi
+            done
+
+            if [ "$attempt" -gt "$max_attempts" ]; then
+              echo "Failed to push to gh-pages after $max_attempts attempts."
+              exit 1
+            fi
           fi
