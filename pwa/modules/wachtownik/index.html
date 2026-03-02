@@ -1093,7 +1093,7 @@
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${buttonClassName || (isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700')}`}
+                className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${buttonClassName || (isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-600 border-sky-500 hover:bg-sky-500 text-white')}`}
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
                 aria-controls={menuId.current}
@@ -2374,7 +2374,7 @@
                     </button>
                     <button
                       onClick={toggleLanguage}
-                      className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700'}`}
+                      className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-600 border-sky-500 hover:bg-sky-500 text-white'}`}
                       title={userLocale === 'pl-PL' ? "Switch to English" : "Przełącz na Polski"}
                       aria-label={userLocale === 'pl-PL' ? "Switch to English" : "Przełącz na Polski"}
                     >
@@ -2388,7 +2388,7 @@
                         <button
                           onClick={undo}
                           disabled={!canUndo}
-                          className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${!canUndo ? 'opacity-40 cursor-not-allowed' : ''} ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700'}`}
+                          className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${!canUndo ? 'opacity-40 cursor-not-allowed' : ''} ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-600 border-sky-500 hover:bg-sky-500 text-white'}`}
                           title="Cofnij (Ctrl+Z)"
                           aria-label="Cofnij ostatnią zmianę"
                           aria-disabled={!canUndo}
@@ -2398,7 +2398,7 @@
                         <button
                           onClick={redo}
                           disabled={!canRedo}
-                          className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${!canRedo ? 'opacity-40 cursor-not-allowed' : ''} ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700'}`}
+                          className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${!canRedo ? 'opacity-40 cursor-not-allowed' : ''} ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-600 border-sky-500 hover:bg-sky-500 text-white'}`}
                           title="Ponów (Ctrl+Y)"
                           aria-label="Ponów ostatnią cofniętą zmianę"
                           aria-disabled={!canRedo}
