@@ -2960,7 +2960,7 @@
                 )}
 
                 {activeTab === 'schedule' && isGenerated && schedule.length > 0 && (
-                  <div className={`p-3 sm:p-4 md:p-6 rounded-xl shadow-sm border print:border-none print:shadow-none print:p-0 ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                  <div className={`p-3 sm:p-4 md:p-6 rounded-xl shadow-sm border print:border-none print:shadow-none print:p-0 ${isNightMode ? 'bg-zinc-950 border-red-900 text-red-600' : 'bg-white border-slate-200 text-slate-800'}`}>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 md:mb-6 gap-2">
                       <h2 className="text-lg sm:text-xl md:text-2xl font-bold flex items-center print:text-black">{t('heading.fullSchedule', userLocale)}</h2>
                       <span className={`text-xs italic print:hidden hidden sm:block ${isNightMode ? 'text-red-800' : 'text-slate-400'}`}>
