@@ -1,0 +1,153 @@
+name: Deploy PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    paths:
+      - 'pwa/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+          path: gh-pages-branch
+
+      - name: Deploy to PR subdirectory
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          TARGET_DIR="gh-pages-branch/${PR_NUMBER}"
+
+          # Create or clean the PR subdirectory
+          rm -rf "${TARGET_DIR}"
+          mkdir -p "${TARGET_DIR}"
+
+          # Copy PWA files to the PR subdirectory
+          cp -r pwa/* "${TARGET_DIR}/"
+
+          echo "Deployed PWA to ${TARGET_DIR}"
+
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages-branch
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Deploy preview for PR #${{ github.event.pull_request.number }}"
+            git push origin gh-pages
+          fi
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const previewUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${prNumber}/`;
+
+            const comment = [
+              '<!-- pr-preview-bot-marker -->',
+              '🚀 **PR Preview Deployed!**',
+              '',
+              `Preview this PR at: ${previewUrl}`,
+              '',
+              'The preview site will update automatically when you push new commits to this PR.'
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('<!-- pr-preview-bot-marker -->')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: comment
+              });
+            }
+
+  cleanup-preview:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+
+      - name: Remove PR subdirectory
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+
+          if [ -d "${PR_NUMBER}" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            git rm -rf "${PR_NUMBER}"
+            git commit -m "Remove preview for closed PR #${PR_NUMBER}"
+            git push origin gh-pages
+
+            echo "Removed preview for PR #${PR_NUMBER}"
+          else
+            echo "No preview directory found for PR #${PR_NUMBER}"
+          fi
+
+      - name: Comment on closed PR
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+
+            const comment = [
+              '<!-- pr-preview-bot-marker -->',
+              '🧹 **PR Preview Cleaned Up**',
+              '',
+              'The preview site for this PR has been removed since the PR is now closed.'
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: comment
+            });
