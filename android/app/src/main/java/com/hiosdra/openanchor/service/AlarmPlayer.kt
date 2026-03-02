@@ -44,14 +44,20 @@ class AlarmPlayer @Inject constructor(
                 prepare()
                 start()
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            // Release any partially created MediaPlayer before fallback
+            mediaPlayer?.release()
+            mediaPlayer = null
+
             // Fallback: try system alarm tone
             try {
                 mediaPlayer = MediaPlayer.create(context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
                 mediaPlayer?.isLooping = true
                 mediaPlayer?.start()
-            } catch (_: Exception) {
-                // Last resort - no sound available
+            } catch (e: Exception) {
+                // Last resort - release and cleanup
+                mediaPlayer?.release()
+                mediaPlayer = null
             }
         }
 
