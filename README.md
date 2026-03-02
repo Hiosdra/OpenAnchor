@@ -41,7 +41,7 @@ npx http-server ./pwa -p 8080
 | Workflow | Trigger | Action |
 |---|---|---|
 | `deploy-pwa.yml` | push to `master` (`pwa/**`) | Deploy to GitHub Pages (production) |
-| `deploy-pr-preview.yml` | pull request (`pwa/**`) | Deploy PR preview to `https://hiosdra.github.io/OpenAnchor/<PR#>/` |
+| `deploy-pr-preview.yml` | pull request (`pwa/**`) | Deploy PR preview to `https://hiosdra.github.io/OpenAnchor/<PR-number>/` |
 | `screenshot.yml` | pull request | Playwright screenshots (mobile + desktop) → artifact + PR comment |
 | `build.yml` | push / PR | Android build |
 
