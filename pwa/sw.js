@@ -1,4 +1,4 @@
-const CACHE_NAME = 'openanchor-superapp-v4';
+const CACHE_NAME = 'openanchor-superapp-v5';
 const urlsToCache = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const urlsToCache = [
   './modules/wachtownik/index.html',
   './modules/egzamin/',
   './modules/egzamin/index.html',
+  './modules/egzamin/exam_questions.json',
   './manifest.json',
   './assets/icon-192x192.png',
   './assets/icon-512x512.png',

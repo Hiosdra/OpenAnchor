@@ -28,13 +28,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.NavigateBefore
+import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.NavigateBefore
-import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Timer
@@ -554,7 +554,7 @@ private fun LearnModeContent(
                         enabled = uiState.currentIndex > 0,
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Icon(Icons.Default.NavigateBefore, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Filled.NavigateBefore, contentDescription = null)
                         Text(stringResource(R.string.exam_previous))
                     }
                     Button(
@@ -572,7 +572,7 @@ private fun LearnModeContent(
                                 stringResource(R.string.exam_skip),
                             color = Color.Black,
                         )
-                        Icon(Icons.Default.NavigateNext, contentDescription = null, tint = Color.Black)
+                        Icon(Icons.AutoMirrored.Filled.NavigateNext, contentDescription = null, tint = Color.Black)
                     }
                 }
             }
@@ -793,7 +793,7 @@ private fun ExamModeContent(
                         enabled = uiState.currentIndex > 0,
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Icon(Icons.Default.NavigateBefore, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Filled.NavigateBefore, contentDescription = null)
                         Text(stringResource(R.string.exam_previous))
                     }
 
@@ -807,7 +807,7 @@ private fun ExamModeContent(
                             shape = RoundedCornerShape(12.dp),
                         ) {
                             Text(stringResource(R.string.exam_next), color = Color.Black)
-                            Icon(Icons.Default.NavigateNext, contentDescription = null, tint = Color.Black)
+                            Icon(Icons.AutoMirrored.Filled.NavigateNext, contentDescription = null, tint = Color.Black)
                         }
                     } else {
                         Button(
@@ -1542,7 +1542,7 @@ private fun LeitnerSessionContent(
                             color = Color.White,
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Icon(Icons.Default.NavigateNext, contentDescription = null, tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.NavigateNext, contentDescription = null, tint = Color.White)
                     }
                 }
             } else {
