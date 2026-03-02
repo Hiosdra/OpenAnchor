@@ -3022,8 +3022,9 @@
                     </div>
 
                     {/* Desktop Table View - Now visible on all screen sizes with horizontal scroll */}
-                    <div id="print-schedule-table" className="block print:block overflow-x-auto">
-                      <table className="w-full text-sm text-left border-collapse">
+                    <div className={`rounded-lg p-4 ${isNightMode ? 'bg-black' : 'bg-white shadow-lg'}`}>
+                      <div id="print-schedule-table" className="block print:block overflow-x-auto">
+                        <table className="w-full text-sm text-left border-collapse">
                         <thead className={`print:bg-slate-200 print:text-black ${isNightMode ? 'bg-black border-red-900 text-red-600' : 'bg-sky-900 border-sky-800 text-white'}`}>
                           <tr>
                             <th className={`px-4 py-3 border whitespace-nowrap w-24 sticky-date-column ${isNightMode ? 'border-red-900 bg-black' : 'border-sky-800 bg-sky-900'} print:border-slate-400 print:static`}>Data</th>
@@ -3075,6 +3076,7 @@
                           })}
                         </tbody>
                       </table>
+                    </div>
                     </div>
                   </div>
                 )}
