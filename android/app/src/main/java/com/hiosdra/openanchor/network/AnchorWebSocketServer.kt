@@ -121,15 +121,18 @@ class AnchorWebSocketServer @Inject constructor(
         heartbeatWatchdogJob?.cancel()
         heartbeatWatchdogJob = null
 
-        // Close client session synchronously to ensure GOING_AWAY frame is sent
-        // before shutting down the server
-        val session = clientSession
-        clientSession = null
-        if (session != null) {
-            runBlocking(Dispatchers.IO) {
-                try {
-                    session.close(CloseReason(CloseReason.Codes.GOING_AWAY, "Server stopping"))
-                } catch (_: Exception) {}
+        // Close client session with mutex protection
+        runBlocking {
+            mutex.withLock {
+                val session = clientSession
+                clientSession = null
+                if (session != null) {
+                    withContext(Dispatchers.IO) {
+                        try {
+                            session.close(CloseReason(CloseReason.Codes.GOING_AWAY, "Server stopping"))
+                        } catch (_: Exception) {}
+                    }
+                }
             }
         }
 

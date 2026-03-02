@@ -26,6 +26,7 @@ import com.hiosdra.openanchor.network.PairedModeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.util.Collections
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -112,7 +113,7 @@ class AnchorMonitorService : Service() {
     private var clientEventJob: Job? = null
     private var lastGpsFixTime: Long = System.currentTimeMillis()
     /** Ring buffer of recent track points for drift detection (last 30) */
-    private val recentTrackPoints = mutableListOf<com.hiosdra.openanchor.domain.model.TrackPoint>()
+    private val recentTrackPoints = Collections.synchronizedList(mutableListOf<com.hiosdra.openanchor.domain.model.TrackPoint>())
     private var previousPosition: Position? = null
     private var previousPositionTime: Long = 0L
     private var sessionMaxDistance: Double = 0.0
@@ -730,13 +731,18 @@ class AnchorMonitorService : Service() {
 
                 // Send telemetry to server via ClientModeManager
                 val battery = batteryProvider.getCurrentBatteryState()
+                val batteryLevelPercent = if (battery.level >= 0) {
+                    battery.level.toDouble() / 100.0
+                } else {
+                    null
+                }
                 clientModeManager.updateTelemetry(
                     position = position,
                     distanceToAnchor = distance,
                     alarmState = alarmState,
                     sog = currentSog,
                     cog = currentCog,
-                    batteryLevel = battery.level.toDouble() / 100.0,
+                    batteryLevel = batteryLevelPercent,
                     isCharging = battery.isCharging
                 )
 
