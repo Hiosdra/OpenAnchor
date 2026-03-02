@@ -31,7 +31,17 @@ class MainActivity : ComponentActivity() {
     ) { permissions ->
         val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
         val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        // Permissions are handled - the app will show appropriate UI if not granted
+
+        // Request background location after foreground permissions are granted (Android 10+)
+        if ((fineGranted || coarseGranted) && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            requestBackgroundLocationPermission()
+        }
+    }
+
+    private val backgroundLocationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        // Background location permission handled
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +90,22 @@ class MainActivity : ComponentActivity() {
 
         if (permissionsToRequest.isNotEmpty()) {
             locationPermissionRequest.launch(permissionsToRequest.toTypedArray())
+        } else {
+            // Foreground permissions already granted, request background if needed
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                requestBackgroundLocationPermission()
+            }
+        }
+    }
+
+    private fun requestBackgroundLocationPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            val bgLocation = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            )
+            if (bgLocation != PackageManager.PERMISSION_GRANTED) {
+                backgroundLocationPermissionRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
         }
     }
 }
