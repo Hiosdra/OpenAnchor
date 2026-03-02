@@ -268,7 +268,7 @@
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "question": "Czy jacht o długości powyżej 7 m powinien posiadać znaki dzienne (kule, stożki itp.) zgodnie z MPZZM?",
     "options": {
-      "A": "Tak, trzy kule i stożek....",
+      "A": "Tak, trzy kule i stożek",
       "B": "Tylko jedną kulę i stożek",
       "C": "Jachty nie muszą pokazywać tych sygnałów"
     },
@@ -724,8 +724,8 @@
     "category": "LOCJA",
     "question": "Na kursie zaobserwowano znak jak na rysunku. Jak go mijać i co oznacza ?",
     "options": {
-      "A": "Oś toru wodnego, mijać lewą burtą Takie znaki oznaczają rezerwaty przyrody,",
-      "B": "nie wpływać dalej.",
+      "A": "Oś toru wodnego, mijać lewą burtą",
+      "B": "Takie znaki oznaczają rezerwaty przyrody, nie wpływać dalej.",
       "C": "Minąć nie za blisko, znak to tymczasowa pława wrakowa"
     },
     "correct_answer": "C",
@@ -736,8 +736,8 @@
     "category": "LOCJA",
     "question": "Jaką charakterystykę światła mają pławy oznaczające rozgałęzienia toru wodnego?",
     "options": {
-      "A": "Dowolną, światło czerwone lub zielone Zawsze światło migawkowe czerwone lub",
-      "B": "zielone",
+      "A": "Dowolną, światło czerwone lub zielone",
+      "B": "Zawsze światło migawkowe czerwone lub zielone",
       "C": "Światlo błyskowe grupowe ( 2 + 1 ) czerwone lub zielone"
     },
     "correct_answer": "C",
@@ -748,8 +748,8 @@
     "category": "LOCJA",
     "question": "Czy oznakowanie IALA (kardynalne i boczne) jest inne w regionie \"A\", a inne regionie \"B\"?",
     "options": {
-      "A": "Nie, jest takie same. Oznakowanie kardynalne jest takie same, a",
-      "B": "boczne jest inne",
+      "A": "Nie, jest takie same.",
+      "B": "Oznakowanie kardynalne jest takie same, a boczne jest inne",
       "C": "Zarówno kardynalne jak i boczne jest inne"
     },
     "correct_answer": "B",
@@ -808,9 +808,9 @@
     "category": "LOCJA",
     "question": "Jacht idzie kursem 270°, na kursie zaobserwowano migające + długi blask. Co to światło może oznaczać i jak postepować?",
     "options": {
-      "A": "Północny znak kardynalny, minąć prawą burtą Południowy znak kardynalny minąć prawą",
-      "B": "burtą po sprawdzeniu sytuacji na mapie Wschodni znak kardynalny, sprawdzić",
-      "C": "położenie na mapie i odpowiednio zmienić kurs"
+      "A": "Północny znak kardynalny, minąć prawą burtą",
+      "B": "Południowy znak kardynalny minąć prawą burtą po sprawdzeniu sytuacji na mapie",
+      "C": "Wschodni znak kardynalny, sprawdzić położenie na mapie i odpowiednio zmienić kurs"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -856,9 +856,9 @@
     "category": "LOCJA",
     "question": "Na Zatoce Gdańskiej zaobserwowano jeden ze znaków jak na rysunku. Co oznacza i jak postąpić?",
     "options": {
-      "A": "Akwen zakazany, nie wpływać poza znak Rezerwat przyrodniczy, nie wolno",
-      "B": "kotwiczyć Oś lub poczatek toru wodnego (t.zw. znak",
-      "C": "bezpiecznej wody). Obserwować dalsze znaki toru wodnego i płynąć wg. nich."
+      "A": "Akwen zakazany, nie wpływać poza znak",
+      "B": "Rezerwat przyrodniczy, nie wolno kotwiczyć",
+      "C": "Oś lub poczatek toru wodnego (t.zw. znak bezpiecznej wody). Obserwować dalsze znaki toru wodnego i płynąć wg. nich."
     },
     "correct_answer": "C",
     "image_filename": "pytanie_72.png"
@@ -892,9 +892,9 @@
     "category": "LOCJA",
     "question": "Jacht płynący kursem 170° zaobserwował na kursie pławy jak na rysunku, najpierw pierwszę a dalej w prawo od kursu kolejną.. Jak płynąć aby ominąć niebezpieczeństwo?",
     "options": {
-      "A": "Zmienić kurs w lewo i minąć obie pławy prawą burtą Zmienić kurs w lewo i ominąć pierwszą",
-      "B": "pławę prawą burtą, a drugą pławę lewą burtą Sprawdzić na mapie położenie niebezpieczeństwa. Po upewnieniu się",
-      "C": "zmienić kurs w prawo i minąć obie pławy lewą burtą."
+      "A": "Zmienić kurs w lewo i minąć obie pławy prawą burtą",
+      "B": "Zmienić kurs w lewo i ominąć pierwszą pławę prawą burtą, a drugą pławę lewą burtą",
+      "C": "Sprawdzić na mapie położenie niebezpieczeństwa. Po upewnieniu się zmienić kurs w prawo i minąć obie pławy lewą burtą. METEOROLOGIA"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_75.png"
@@ -940,9 +940,9 @@
     "category": "METEOROLOGIA",
     "question": "Jakie dane zawsze zawarte są w morskim komunikacie pogodowym?",
     "options": {
-      "A": "Tylko prognoza siły i kierunku wiatru Ostrzeżenia, sytuacja baryczna, prognoza",
-      "B": "siły i kierunku wiatru, widzialność, stan morza, opady Prognoza siły i kierunku wiatru, prognoza",
-      "C": "orientacyjna na nastepny okres"
+      "A": "Tylko prognoza siły i kierunku wiatru",
+      "B": "Ostrzeżenia, sytuacja baryczna, prognoza siły i kierunku wiatru, widzialność, stan morza, opady",
+      "C": "Prognoza siły i kierunku wiatru, prognoza orientacyjna na nastepny okres"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -952,9 +952,9 @@
     "category": "METEOROLOGIA",
     "question": "Jakie dane będą nam potrzebne do odbioru komunikatów pogodowych przez radiostację UKF?",
     "options": {
-      "A": "Tylko moment (czas) nadawania i nazwa stacji nadającej Nazwa stacji i jej położenie oraz moment",
-      "B": "(czas) nadawania i kanał roboczy na którym pracuje stacja nadająca Tylko moment (czas) nadawania, bo",
-      "C": "prognozy podawane są wyłącznie na kanale 16"
+      "A": "Tylko moment (czas) nadawania i nazwa stacji nadającej",
+      "B": "Nazwa stacji i jej położenie oraz moment (czas) nadawania i kanał roboczy na którym pracuje stacja nadająca",
+      "C": "Tylko moment (czas) nadawania, bo prognozy podawane są wyłącznie na kanale 16 METEOROLOGIA"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -976,8 +976,8 @@
     "category": "METEOROLOGIA",
     "question": "Na ekranie odbiornika NAVTEX odczytano komunikat jak na rysunku. Jaka jest prognoza, na jaki okres?",
     "options": {
-      "A": "prognoza na 12 godzin, wiatr SW 5 do 6, region Fisher Prognoza na 12 godzin, wiatr SW 5 potem",
-      "B": "6, stan morza umiarkowany, region German ight",
+      "A": "prognoza na 12 godzin, wiatr SW 5 do 6, region Fisher",
+      "B": "Prognoza na 12 godzin, wiatr SW 5 potem 6, stan morza umiarkowany, region German Bight",
       "C": "Prognoza na 12 godzin, wiatr SW 5 do 6, widzialność umiarkowana, stan morza 5 - 6"
     },
     "correct_answer": "A",
@@ -988,8 +988,8 @@
     "category": "METEOROLOGIA",
     "question": "Jakie dane dotyczace ustawień należy wprowadzić do odbiornika NAVTEX aby odbierać komunikaty pogodowe?",
     "options": {
-      "A": "Symbol typu wiadomości i symbol stacji z której chcemy odbierać komunikaty Nic nie trzeba wprowadzać urządzenie",
-      "B": "działa automatycznie",
+      "A": "Symbol typu wiadomości i symbol stacji z której chcemy odbierać komunikaty",
+      "B": "Nic nie trzeba wprowadzać urządzenie działa automatycznie",
       "C": "Wystarczy symbol stacji, komunikaty pogodowe są zawsze odbierane"
     },
     "correct_answer": "A",
@@ -1000,9 +1000,9 @@
     "category": "METEOROLOGIA",
     "question": "W prognozie pogody sformułowanie \"wiatr SW 3 - 4\" oznacza:",
     "options": {
-      "A": "Wiatr południowo-wschodni, umiarkowany Wiatr południowo-zachodni, słaby, 3-4",
-      "B": "węzłów Wiatr południowo-zachodni, umiarkowany,",
-      "C": "3-4 stopni Beauforta"
+      "A": "Wiatr południowo -wschodni, umiarkowany",
+      "B": "Wiatr południowo -zachodni, słaby, 3 -4 węzłów",
+      "C": "Wiatr południowo -zachodni, umiarkowany, 3-4 stopni Beauforta"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -1012,8 +1012,8 @@
     "category": "METEOROLOGIA",
     "question": "W komunikacie meteorologicznym wywieszonym w kapitanacie portu podano: niż nad Bałtykiem 990, przesuwa się na wschód. W jakich jednostkach podane jest ciśnienie i czy jest ono wyższe czy niższe od średniego cisnienia na poziomie morza?",
     "options": {
-      "A": "W barach i jest niższe od średniego W hektopascalach ( HPa) i jest niższe od",
-      "B": "średniego",
+      "A": "W barach i jes t niższe od średniego",
+      "B": "W hektopascalach ( HPa) i jest niższe od średniego",
       "C": "W hektopascalach ( HPa) i jest wyższe od średniego"
     },
     "correct_answer": "B",
@@ -1986,7 +1986,7 @@
     "options": {
       "A": "Tak",
       "B": "Nigdy",
-      "C": "Tak, jest..."
+      "C": "Tak, pod warunkiem, że przebieg izobat jest regularny"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -1996,9 +1996,9 @@
     "category": "NAWIGACJA",
     "question": "Odległość do obiektu o znanej wysokości h (w metrach) i zmierzonym kącie pionowym ş (w minutach) można ustalić ( D w milach morskich ):",
     "options": {
-      "A": "ze wzoru...",
-      "B": "ze wzoru...",
-      "C": "ze wzoru..."
+      "A": "z Tablic Nawigacyjnych lub ze wzoru",
+      "B": "ze wzoru",
+      "C": "ze wzoru D = 2h tg ş"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2008,9 +2008,9 @@
     "category": "NAWIGACJA",
     "question": "Przy pierwszym włączaniu nowo zainstalowanego GPS trzeba:",
     "options": {
-      "A": "Włączyć...",
-      "B": "Włączyć...",
-      "C": "Powiadomić..."
+      "A": "Włączyć zasilanie. Poza tym nie trzeba nic robić, urządzenie będzie działać",
+      "B": "Włączyć zasilanie, używając instrukcji obsługi ustawić podstawowe parametry",
+      "C": "Powinien to wykonać uprawniony serwis"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2020,9 +2020,9 @@
     "category": "NAWIGACJA",
     "question": "Jaka jest różnica pomiędzy mapą rastrową, a papierową ?",
     "options": {
-      "A": "Mapa...",
-      "B": "Żadna...",
-      "C": "Mapy..."
+      "A": "Mapa rastrowa jest dokładniejsza",
+      "B": "W zastosowaniu do nawigacji nie ma żadnej",
+      "C": "Mapy rastrowe sa mniej dokładne"
     },
     "correct_answer": "B",
     "image_filename": "pytanie_169.png"
@@ -2044,9 +2044,9 @@
     "category": "NAWIGACJA",
     "question": "Jacht żegluje w nocy na akwenie z dużą ilością niebezpieczeństw, ale dobrze oznakowanym (pławy, latarnie sektorowe nabieżniki itp.). Jaka nawigacja na takim akwenie jest bezpieczniejsza?",
     "options": {
-      "A": "Wyłącznie...",
-      "B": "Dobra nawigacja lądowa połączona z ploterem...",
-      "C": "Typowa..."
+      "A": "Wyłącznie w oparciu o ploter i GPS",
+      "B": "Dobrze przygotowana nawigacja pilotowa, ploter jako pomoc",
+      "C": "Typowa nawigacja zliczeniowa"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2056,9 +2056,9 @@
     "category": "NAWIGACJA",
     "question": "Kurs jachtu względem wody wynosi 120°, szybkość 5 w, kierunek prądu 300°, szybkość 1 w. Jaka będzie poprawka na prąd i jaki będzie wpływ prądu na szybkość jachtu?",
     "options": {
-      "A": "Poprawka...",
-      "B": "Poprawka...",
-      "C": "Poprawka..."
+      "A": "Poprawka na prąd = 0°, szybkość jachtu względem dna wzrośnie",
+      "B": "Poprawka na prąd = 300°, szybkość jachtu względem dna wzrośnie",
+      "C": "Poprawka na prąd = 0°, szybkość jachtu względem dna zmaleje"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2068,9 +2068,9 @@
     "category": "NAWIGACJA",
     "question": "Przy przeliczaniu namiaru burtowego na namiar kompasowy, (pomiar w systemie okrężnym 0° - 360°) jeśli wynik przekroczy 360°, to:",
     "options": {
-      "A": "Od sumy...",
-      "B": "Od sumy...",
-      "C": "Do sumy..."
+      "A": "Od sumy kąta kursowego i kursu kompasowego należy odjąć 3600",
+      "B": "Od sumy kąta kursowego i kursu kompasowego należy odjąć 1800",
+      "C": "Do sumy kąta kursowego i kursu kompasowego należy dodać 1800"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2080,9 +2080,9 @@
     "category": "NAWIGACJA",
     "question": "Odbiornik nawigacji satelitarnej GPS pokazuje prędkość jachtu (jest tylko jedna opcja). Jaka to prędkość?",
     "options": {
-      "A": "Względem...",
-      "B": "Względem dna...",
-      "C": "Wypadkowa..."
+      "A": "Względem wody",
+      "B": "Względem dna",
+      "C": "Wypadkowa prędkości względem wody i dna"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2092,9 +2092,9 @@
     "category": "NAWIGACJA",
     "question": "Która para lini pozycyjnych da najdokładniejszą pozycję?",
     "options": {
-      "A": "Dwa...",
-      "B": "Nabieżnik i...",
-      "C": "Namiar..."
+      "A": "Dwa namiary na różne obiekty",
+      "B": "Nabieżnik i krąg z kąta poziomego między dwoma obiektami",
+      "C": "Namiar i izobata"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2104,9 +2104,9 @@
     "category": "NAWIGACJA",
     "question": "Na horyzoncie własnie ukazało się zidentyfikowane światło latarni. Czy można określić odległość i w jaki sposób?",
     "options": {
-      "A": "W ogóle...",
-      "B": "Tak, odległość z List of Lights...",
-      "C": "Nie..."
+      "A": "W ogóle jest to niemożliwe",
+      "B": "Tak, trzeba tylko mieć Spis Świateł ( List of Lights)",
+      "C": "Nie, bo nie znamy wysokości latarni"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2116,9 +2116,9 @@
     "category": "NAWIGACJA",
     "question": "Wykonany został namiar kompasowy (Nk). Jak go wykreślić na mapie?",
     "options": {
-      "A": "Przeliczyć...",
-      "B": "Wykreślić...",
-      "C": "Uwzględnić..."
+      "A": "Przeliczyć na namiar rzeczywisty i wykreślić",
+      "B": "Wykreślić Nk zgodnie z wykonanym namiarem",
+      "C": "Uwzględnić deklinację w danym obszarze żeglugi i wykreślić na mapie namiar A Błędne wskazania GPS B Niezgodność systemu opracowania mapy z systemem GPS i nie uwzględnienie poprawek podanych na mapie (szczególnie stare wydania map) C Uszkodzenie anteny GPS"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2128,9 +2128,9 @@
     "category": "NAWIGACJA",
     "question": "Jaki znak ma poprawka na prąd w zależności od kursu jachtu i kierunku prądu",
     "options": {
-      "A": "Prąd z prawej burty...",
-      "B": "Prąd z lewej burty...",
-      "C": "Znak zgodny z poprawką..."
+      "A": "Prąd z lewej burty poprawka \"+\", z prawej burty poprawka \" -\"",
+      "B": "Prąd z lewej burty poprawka \" -\", z prawej burty poprawka \"+\"",
+      "C": "Prąd z lewej burty poprawka \"+\", z prawej burty poprawka \" -\" , ale jeżeli prąd jest zgodny lub przeciwny do kursu to poprawka \"0\""
     },
     "correct_answer": "C",
     "image_filename": "pytanie_178.png"
@@ -2140,9 +2140,9 @@
     "category": "NAWIGACJA",
     "question": "Wykonujemy namiar na latarnię. Czy dla obliczenia namiaru rzeczywistego potrzebny jest odczyt kursu kompasowego w momencie namiaru?",
     "options": {
-      "A": "Tak...",
-      "B": "Nie...",
-      "C": "To zależy..."
+      "A": "Tak, zawsze",
+      "B": "Nie",
+      "C": "To zależy od typu kompasu i namiernika"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2152,9 +2152,9 @@
     "category": "NAWIGACJA",
     "question": "Na jachcie jest echosonda. Co przede wszystkim należy sprawdzić odnośnie wskazań tej sondy?",
     "options": {
-      "A": "Czy...",
-      "B": "Czy odczyt...",
-      "C": "Czy ona..."
+      "A": "Czy czujnik sondy nie jest zabrudzony",
+      "B": "Czy sonda pokazuje głębokość pod kilem, czy od lini wodnej, czy od czujnika",
+      "C": "Czy sonda posiada opcję alarmu i jak jest ona ustawiona"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2164,9 +2164,9 @@
     "category": "NAWIGACJA",
     "question": "Jak prawidłowo powinna być oznakowana sonda ręczna (system przyjety w Polsce)",
     "options": {
-      "A": "Węzeł...",
-      "B": "Węzeł...",
-      "C": "Co 5 m..."
+      "A": "Węzłami co 5 metrów",
+      "B": "Węzłami co 1 m",
+      "C": "Znakami co 1 m i kolorowymi opaskami co 5 m niebieska -czerwona -biała -żólta (niebo -dach -ściana -piach)"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_181.png"
@@ -2176,9 +2176,9 @@
     "category": "NAWIGACJA",
     "question": "Dla jakich kątów przecięcia lini pozycyjnych pozycję można okreslić jako względnie dokładną?",
     "options": {
-      "A": "Kąt bliski 90 stopni...",
-      "B": "Tylko...",
-      "C": "Nie ma to znaczenia..."
+      "A": "Kąt przecięcia od 30° do 150°",
+      "B": "Tylko dla kąta",
+      "C": "Nie ma to znaczenia, ważna jest tylko dokładność wyznaczenia każdej linii pozycyjnej"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2188,9 +2188,9 @@
     "category": "NAWIGACJA",
     "question": "Zliczenie graficzne drogi polega na: (Uwaga skróty: Kąd drogi nad dnem - Kd, Kurs rzeczywisty - Kr, Kurs magnetyczny - Km)",
     "options": {
-      "A": "Wykreślaniu na mapie...",
-      "B": "Wykreślaniu...",
-      "C": "Wykreślaniu..."
+      "A": "Wykreślaniu na mapie Kd i odmierzaniu na tym kursie przebytych odległości",
+      "B": "Wykreślaniu na mapie Kk i odmierzaniu na tym kursie przebytych odległości",
+      "C": "Wykreślaniu na mapie Km i odmierzaniu na tym kursie przebytych odległości"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2200,9 +2200,9 @@
     "category": "NAWIGACJA",
     "question": "Jacht żegluje kursem kompasowym (Kk) jak obliczyć kurs rzeczywisty (Kr)",
     "options": {
-      "A": "Znając...",
-      "B": "Znając dewiację i deklinację...",
-      "C": "Znając..."
+      "A": "Znaleźć w tabeli dewiację (dew) dla Kk i obliczyć Kr ze wzoru Kr = Kk + dew",
+      "B": "Znaleźć w tabeli dewiację (dew) dla Kk i obliczyć Kr ze wzoru Kr = Kk + dekl. magn. + dew",
+      "C": "Znaleźć w tabeli dewiację (dew) dla Kk i obliczyć Kr ze wzoru Kr = Kk - dew - dekl. magn."
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2212,9 +2212,9 @@
     "category": "NAWIGACJA",
     "question": "Czy przy braku prądu na akwenie gdzie żegluje jacht, kurs rzeczywisty = kątowi drogi nad dnem?",
     "options": {
-      "A": "Tak, bo...",
-      "B": "Nigdy, uwzględnić poprawkę na wiatr...",
-      "C": "Tak, ale..."
+      "A": "Tak, bo brak jest znoszenia przez prąd",
+      "B": "Nigdy, bo należy zawsze jeszcze uwzględnić dryf jachtu spowodowany wiatrem",
+      "C": "Tak, ale tylko w przypadku gdy jacht żegluje kursami pełnymi (baksztag, fordewind)"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2224,9 +2224,9 @@
     "category": "NAWIGACJA",
     "question": "Jakimi sposobami można obliczyć poprawkę na prąd przy czynnym uwzględnianiu prądu?",
     "options": {
-      "A": "Tylko w...",
-      "B": "Wykonuj nawigac...",
-      "C": "Analizu spowodo..."
+      "A": "Tylko wykonując obliczenia trygonometryczne",
+      "B": "Wykonując wykres lub z tablic nawigacyjnych",
+      "C": "Analizując już przebytą drogę i dryf jachtu spowodowany wiatrem"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2236,9 +2236,9 @@
     "category": "NAWIGACJA",
     "question": "Jak na mapach generalnych dużych obszarów podawana jest deklinacja magnetyczna?",
     "options": {
-      "A": "W posta...",
-      "B": "przy na...",
-      "C": "W posta roczną..."
+      "A": "W postaci tabliczek z wartością deklinacji",
+      "B": "W postaci informacji zawartych w uwagach przy nagłówku mapy",
+      "C": "W postaci izogon z zaznaczoną zmianą roczną"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_187.png"
@@ -2248,9 +2248,9 @@
     "category": "NAWIGACJA",
     "question": "Dewiacja magnetyczna to:",
     "options": {
-      "A": "spowodo ziemi...",
-      "B": "spowodo jachtu...",
-      "C": "spowodo pola ma..."
+      "A": "Odchylenie igły magnetycznej spowodowane polem magnetycznym ziemi",
+      "B": "Odchylenie igły magnetycznej spowodowane polem magnetycznym jachtu",
+      "C": "Odchylenie igły magnetycznej spowodowane miejscowym anomaliami pola magnetycznego ziemi"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2260,9 +2260,9 @@
     "category": "NAWIGACJA",
     "question": "Dewiację można obliczyć:",
     "options": {
-      "A": "namiaru...",
-      "B": "do okre...",
-      "C": "Przez w magnety..."
+      "A": "Przez porównanie namiaru rzeczywistego i namiaru kompasowego na dany obiekt",
+      "B": "Tylko przy użyciu specjalnych przyrządów do określania dewiacji",
+      "C": "Przez wykonanie pomiarów natężenia pola magnetycznego jachtu"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2272,9 +2272,9 @@
     "category": "NAWIGACJA",
     "question": "Czy dewiacja dla danego jachtu jest wielkościa stałą niezaleznie od jego kursu?",
     "options": {
-      "A": "Tak, je magnety...",
-      "B": "Nie, bo jachtu...",
-      "C": "W zasad magnety..."
+      "A": "Tak, jest zależna tylko od natężenia pola magnetycznego jachtu",
+      "B": "Nie, bo zależy od kursu magnetycznego jachtu i zmienia się ze zmianą kursu",
+      "C": "W zasadzie tak, ale zależy od wielkości pola magnetycznego ziemi"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2284,9 +2284,9 @@
     "category": "NAWIGACJA",
     "question": "Informacja o wartości deklinacji magnetycznej w danym obszarze podawana jest:",
     "options": {
-      "A": "W locj przewo...",
-      "B": "Tyko n...",
-      "C": "Na map..."
+      "A": "W locjach danego akwenu i przewodnikach dla żeglarzy",
+      "B": "Tyko na specjalnych mapach",
+      "C": "Na mapach morskich i na mapach izogon"
     },
     "correct_answer": "B",
     "image_filename": "pytanie_191.png"
@@ -2296,9 +2296,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Na jachcie (bandera polska) mamy komplet map papierowych i innych pomocy nawigacyjnych na rejon żeglugi, nie ma GPS. Czy jest to wystarczające wg. obowiązujących przepisów?",
     "options": {
-      "A": "Tak, b nawiga...",
-      "B": "Nie, b...",
-      "C": "Tak, o osłoni..."
+      "A": "Tak, bo to pozwala na prowadzenie nawigacji",
+      "B": "Nie, bo zawsze wymagany jest GPS",
+      "C": "Tak, o ile będzie to żegluga po wodach osłoniętych"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_192.png"
@@ -2308,9 +2308,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Czarterujemy w Norwegii jacht z zamiarem rejsu do Szkocji i z powrotem? Na jakie sprawy powinniśmy GŁÓWNIE zwrócić uwagę przy załatwianiu czarteru?",
     "options": {
-      "A": "żeglug i na j...",
-      "B": "zbiorn...",
-      "C": "Pod ja jakie..."
+      "A": "Czy jacht jest dopuszczony do takiej żeglugi, czy ma odpowiednie wyposażenie i na jaki akwen ma ubezpieczenie?",
+      "B": "Jakiej mocy ma silnik, jaka jest pojemność zbiorników paliwa",
+      "C": "Pod jaką banderą zarejestrowany jest jacht, jakie ma wyposażenie radiowe"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2320,9 +2320,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Jakie PODSTAWOWE materiały naprawcze dot. armatury poniżej linii wodnej powinny znajdować się na jachcie?",
     "options": {
-      "A": "średni zaburt...",
-      "B": "Kołki wszyst...",
-      "C": "utward ewentu..."
+      "A": "Zapasowe zawory i przewody wszystkich średnic zastosowanych na jachcie przejść zaburtowych.",
+      "B": "Kołki drewniane i opaski zaciskowe do wszystkich średnic przejść zaburtowych",
+      "C": "Zestawy płótna szklanego i żywic z utwardzaczami do laminowania ewentualnych otworów."
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2332,9 +2332,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Na jachcie mamy ploter i komplet map wektorowych na rejon żeglugi. Czy jest to wystarczające wg. obowiązujących przepisów?",
     "options": {
-      "A": "Tak, b nawiga...",
-      "B": "Nie, b papier...",
-      "C": "Tak, o..."
+      "A": "Tak, bo to pozwala na prowadzenie nawigacji",
+      "B": "Nie, bo wymagane są równolegle mapy papierowe",
+      "C": "Tak, o ile mamy dwa odbiorniki GPS"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_195.png"
@@ -2344,9 +2344,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Jacht posiada Kartę Bezp. (bandera polska) na żeglugę oceaniczną. Czy wychodząc na pływanie na Zalew Szczeciński i niemieckie wody osłonięte musimy mieć na pokładzie pełne wyposażenie?",
     "options": {
-      "A": "wyposa zakres...",
-      "B": "To zal obowią...",
-      "C": "rejoni Minist..."
+      "A": "Tak, na jachcie powinno być zawsze wyposażenie odpowiadające max. zakresowi żeglugi",
+      "B": "To zależy od wymagań przepisów obowiązujących w Niemczech",
+      "C": "Nie, wystarczy wyposażenie na żeglugę w rejonie 2 ujęte z zał. nr 1 Rozporządzenia Ministra T. B. i G.M. z 28.02.2012 r."
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2356,9 +2356,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Czy na jachcie w żegludze pełnomorskiej wymagane jest posiadanie sekstantu i chronometru?",
     "options": {
-      "A": "Tak jes...",
-      "B": "oceanic...",
-      "C": "Nie, ta na jach..."
+      "A": "Tak jest to wymagane",
+      "B": "Nie, jest to wymagane tylko w żegludze oceanicznej",
+      "C": "Nie, takie wyposażenie nie jest wymagane na jachtach"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2368,9 +2368,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Na jachcie mamy zainstalowane urządzenie AIS, ale stwierdzono, że nie działa. Czy możemy wyjść w rejs z nienaprawionym urządzeniem?",
     "options": {
-      "A": "Nie, to Nie, bo...",
-      "B": "można p...",
-      "C": "Tak, bo obowiąz..."
+      "A": "Nie, to urządzenie musi być sprawne",
+      "B": "Nie, bo bez tego urządzenia nie będzie można prowadzić prawidłowej nawigacji",
+      "C": "Tak, bo na jachtach urządzenie nie jest obowiązkowe tylko zalecane"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2380,9 +2380,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Dużej fali przybojowej w wejściu do portu przy wietrze od morza do wejścia można spodziewać się:",
     "options": {
-      "A": "Podczas...",
-      "B": "Podczas...",
-      "C": "Nie ma głęboko..."
+      "A": "Podczas przypływu",
+      "B": "Podczas odpływu",
+      "C": "Nie ma to znaczenia decyduje tylko głębokość morza"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2392,9 +2392,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Jacht znajduje się w porcie Ronne na Bornholmie. Planowane jest wejście do portu Kołobrzeg i zakończenie rejsu w 2 dni później w Świnoujściu, wiatr NW 7/9 °B, odebrano prognozę na następne 24 godziny NW 6/4 °B. Jaką decyzje powinien podjąć kapitan biorąc pod uwagę bezpieczeństwo żeglugi?",
     "options": {
-      "A": "Wyjść z zgodnie...",
-      "B": "Wyjść z Kołobrz...",
-      "C": "Pozosta kontynu..."
+      "A": "Wyjść z portu i kontynuować żeglugę zgodnie z pierwotnym planem",
+      "B": "Wyjść z portu, ale zrezygnować z wejścia do Kołobrzegu",
+      "C": "Pozostać w porcie i po osłabnięciu wiatru kontynuować rejs do Świnoujścia"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2404,9 +2404,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Planowany jest rejs z Polski na wody duńskie. Jakie wydawnictwa będą NAJBARDZIEJ przydatne w takim rejsie?",
     "options": {
-      "A": "Publika Charts)...",
-      "B": "Przewod żeglars...",
-      "C": "Polskie Hydrogr..."
+      "A": "Publikacje Admiralicji ( Pilots, List of Lights, Charts)",
+      "B": "Przewodniki z planami portów jachtowych, żeglarskie mapy akwenu",
+      "C": "Polskie wydawnictwa Biura Hydrograficznego Marynarki Wojennej"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2416,9 +2416,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "W jakim wydawnictwie można znaleźć pełną informację o ratownictwie na wodach całego świata?",
     "options": {
-      "A": "Admiral...",
-      "B": "Admiral...",
-      "C": "Nie ma wydawni..."
+      "A": "Admiralty List of Radio Signals vol 5.",
+      "B": "Admiralty Sailing Directions",
+      "C": "Nie ma takiego wydawnictwa, są tylko wydawnictwa poszczególnych krajów"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2428,9 +2428,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Sprawdzenie prawidłowości pracy silnika powinno polegać na:",
     "options": {
-      "A": "Sprawdz uruchom...",
-      "B": "Sprawdz oleju, uruchom...",
-      "C": "Sprawdz chłodzą pozwala chłodze właściw..."
+      "A": "Sprawdzeniu poziomu oleju i kilkakrotnym uruchomienie silnika na krótki czas.",
+      "B": "Sprawdzeniu poziomu płynu chłodzącego, oleju, stanu paliwa w zbiorniku i uruchomienie silnika na 2 - 3 minuty.",
+      "C": "Sprawdzeniu poziomu oleju, płynu chłodzącego i uruchomieniu silnika na czas pozwalający określić prawidłowość chłodzenia, ciśnienia oleju i utrzymania właściwej temperatury."
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2440,9 +2440,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Planując wejście do portu pływowego (postój za śluzą) najkorzystniej będzie planować podejście:",
     "options": {
-      "A": "Ok. porc...",
-      "B": "Ok. porc...",
-      "C": "Blis..."
+      "A": "Ok. 1 godziny przed wysoką wodą w tym porcie",
+      "B": "Ok. 1 godziny po wysokiej wodzie w tym porcie",
+      "C": "Blisko momentu niskiej wody w tym porcie najbezpieczniejsze? nastepne 24 godziny WNW 4 -5. Jak będzie najkorzystniej zaplanować wyjscie?"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2452,9 +2452,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Wejście do portu pływowego ma szerokość 30m, silny prąd pływowy jest równoległy do brzegu. Dane pływów na rysunku. O której godzinie wejście będzie najbezpieczniejsze?",
     "options": {
-      "A": "Międ...",
-      "B": "Międ...",
-      "C": "Mied..."
+      "A": "Między 12.00, a 13.00",
+      "B": "Między 09.00 a 10.00",
+      "C": "Miedzy 15.00 a 16.00"
     },
     "correct_answer": "A",
     "image_filename": "pytanie_205.png"
@@ -2464,9 +2464,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Planowane jest przejście Świnoujście - Karlskrona pod żaglami - w miarę możliwości bez silnika (odl. 130 Mm, KD=30°). Prognoza; wiatr N 6-7, prognoza na nastepne 24 godziny WNW 4-5. Jak będzie najkorzystniej zaplanować wyjscie?",
     "options": {
-      "A": "Wych...",
-      "B": "Odcz...",
-      "C": "Odcz..."
+      "A": "Wychodzić jak najszybciej",
+      "B": "Odczekać z wyjściem kilkanaście godzin",
+      "C": "Odczekać conajmniej 48 godzin"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2476,9 +2476,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Jaką dlugość łańcucha wydać przy kotwiczeniu na głębokości 8 m, (wg. mapy dno jest muliste) ?",
     "options": {
-      "A": "15 m...",
-      "B": "20 m...",
-      "C": "35 m..."
+      "A": "15 m",
+      "B": "20 m",
+      "C": "35 m"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_207.png"
@@ -2488,9 +2488,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Przy dobijaniu do nabrzeża uszkodzono poważnie kosz dziobowy. Jak dalej postępować?",
     "options": {
-      "A": "Spor zdję co d...",
-      "B": "Spor dzie prot Poro orga...",
-      "C": "Spor arma..."
+      "A": "Sporządzić wpis do dziennika, wykonać zdjęcia, porozumieć się z ubezpieczycielem co do zorganizowania naprawy.A.",
+      "B": "Sporządzić protokół awaryjny i wpis do dziennika, wykonać zdjęcia, wysłać protokół do ubezpieczyciela i armatora. Porozumieć się z ubezpieczycielem co do organizacji naprawy.",
+      "C": "Sporządzić wpis do dziennika i powiadomić armatora, zorganizować naprawę."
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2500,9 +2500,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Po zaokrętowaniu załogi przed wyjściem w rejs kapitan powinien w PIERWSZEJ KOLEJNOŚCI:",
     "options": {
-      "A": "Zapo staw cuma mane...",
-      "B": "Zapo rozm sygn bezp...",
-      "C": "Zapo kotw cuma mane mane..."
+      "A": "Zapoznać załogę z obsługą urządzeń do stawiania żagli, pracą odbijaczami i cumami, komendami stosowanymi przy manewrach",
+      "B": "Zapoznać załogę z rolami alarmowymi, rozmieszczeniem sprzętu ratunkowego i sygnalizacyjnego oraz zasadami bezpiecznej pracy na jachcie.",
+      "C": "Zapoznać załogę z obsługą windy kotwicznej, zasadami bezpiecznej pracy cumami, komendami stosowanymi przy manewrach i rozdzielić stanowiska przy manewrach portowych"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2512,9 +2512,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Planowana żegluga ok. 2 doby bez zachodzenia do portu. Jacht odpowiednio wyposażony. Przed wyjściem w rejs NAJWAŻNIEJSZE będzie sprawdzenie:",
     "options": {
-      "A": "Stanu z akumula ratunko sprzętu urządze...",
-      "B": "Stanu z bosmańs stanu o...",
-      "C": "Stanu z silnika steru s..."
+      "A": "Stanu zapasów: wody, paliwa, stanu akumulatorów oraz wyposażenia ratunkowego, stanu urządzeń kotwicznych, sprzętu pirotechnicznego, sprawności urządzeń łączności",
+      "B": "Stanu zapasów: żywności, sprzętu bosmańskiego, paliwa, oleju do silnika oraz stanu odbijaczy i zapasowych cum",
+      "C": "Stanu zapasów: części zapasowych do silnika, wody oraz działania kabestanów i steru strumieniowego"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2524,9 +2524,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Z jakim średnim wydłużeniem drogi jachtu powinniśmy się liczyć przy konieczności halsowania dokładnie pod wiatr (kąt martwy jachtu ok. 120°)?",
     "options": {
-      "A": "ok. 60%...",
-      "B": "ok. 100...",
-      "C": "ok. 40..."
+      "A": "ok. 60% drogi",
+      "B": "ok. 100% drogi",
+      "C": "ok. 40 % drogi"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -2536,9 +2536,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Jacht jednokadłubowy ma długość ok. 12 m. Jaki średni przebieg dobowy można przyjąć dla tego jachtu przy planowaniu rejsu?",
     "options": {
-      "A": "ok. 120...",
-      "B": "ok. 65...",
-      "C": "ok. 200..."
+      "A": "ok. 120 Mm",
+      "B": "ok. 65 Mm",
+      "C": "ok. 200 Mm"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2548,9 +2548,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Planujemy dłuższy przelot oceaniczny ok. 1 tygodnia (np. Dania - Islandia). Na jachcie nie ma urządzeń do odbioru bieżących prognoz czy map pogody. Jakie źródła informacji meteorologicznych zapewnią najpełniejsze zabezpieczenie rejsu?",
     "options": {
-      "A": "Bieżąca wyjścia...",
-      "B": "Miesięc...",
-      "C": "Dane z prognos (wydruk pamięci..."
+      "A": "Bieżąca mapa p ogody uzyskana w porcie wyjścia",
+      "B": "Miesięczna mapy pogody dla tego akwenu",
+      "C": "Dane z systemu GRIB, pobranie prognostycznych map pogody na 7 dni (wydrukowanie ich lub zachowanie w pamięci komputera)"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_213.png"
@@ -2560,9 +2560,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Przed wyjściem w morze poza szkoleniem alarmowym NAJWAŻNIEJSZE będzie zapoznanie załogi:",
     "options": {
-      "A": "Z syste refowan kotwicz...",
-      "B": "Z obsłu zaburto cumowan...",
-      "C": "Z funkc oraz od..."
+      "A": "Z systemem stawiania, zrzucania i refowania żagli, obsługą urządzeń kotwicznych, uruchamianiem silnika",
+      "B": "Z obsługą radiotelefonu, plotera, silnika zaburtowego pontonu, sposobami cumowania",
+      "C": "Z funkcjami i obsługą autopilota i radaru oraz odsalacza wody morskiej"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2572,9 +2572,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Jak należy zaplanować wyposażenie apteczki jachtowej na dłuższy rejs ( ok. 1 miesiąca)",
     "options": {
-      "A": "Nie ma zalecen lekarze...",
-      "B": "Zakupić pomocy)...",
-      "C": "Wystarc..."
+      "A": "Nie ma przepisów w tym zakresie, są tylko zalecenia, najlepiej skonsultować to z lekarzem",
+      "B": "Zakupić typową apteczkę (t.zw. pierwszej pomocy)",
+      "C": "Wystarczy typowa apteczka samochodowa"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2584,9 +2584,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Czy na jachcie o długości 14 m powinny być nożyce do cięcia olinowania (bandera polska)?",
     "options": {
-      "A": "Tak...",
-      "B": "Nie...",
-      "C": "Zależy..."
+      "A": "Tak",
+      "B": "Nie",
+      "C": "Zależy to od średnicy lin olinowania stałego"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2596,9 +2596,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Czy jachty w żegludze pełnomorskiej muszą być wyposażone w radar (bandera polska)?",
     "options": {
-      "A": "Tak, w...",
-      "B": "Nie, j...",
-      "C": "Tak, a m..."
+      "A": "Tak, wszystkie jachty",
+      "B": "Nie, jachty nie muszą mieć radaru",
+      "C": "Tak, ale tylko jachty o LOA większej niż 20 m"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2608,9 +2608,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Kompletujemy załogę na rejs pełnomorski. Czy w składzie załogi musi być osoba posiadająca świadectwo radiooperatora?",
     "options": {
-      "A": "Tak, b...",
-      "B": "Tylko wyposa...",
-      "C": "Nie, b potrze..."
+      "A": "Tak, bo na jachcie musi być radiotelefon UKF",
+      "B": "Tylko w przypadku kiedy jacht jest wyposażony w radiotelefon UKF",
+      "C": "Nie, bo do obsługi radiotelefonu UKF nie potrzebne są żadne uprawnienia"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2620,9 +2620,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Planujemy rejs po południowym Bałtyku. Czy porty: Władysławowo, Łeba, Darłowo możemy traktować jako porty schronienia w przypadku ciężkich warunków meteorologicznych?",
     "options": {
-      "A": "Tak, w...",
-      "B": "Nie, n Zależy wietrz...",
-      "C": "niebez tak..."
+      "A": "Tak, w każdych warunkach",
+      "B": "Nie, niezależnie od kierunku wiatru",
+      "C": "Zależy to od kierunku i siły wiatru, przy wietrze z sektorów N - nie, wchodzenie jest niebezpieczne, przy wietrze z sektorów S - tak"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2632,9 +2632,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Czy wychodząc w rejs powinniśmy na jachcie mieć długą linę holowniczą?",
     "options": {
-      "A": "Tak, w...",
-      "B": "Nie, b...",
-      "C": "Tak, b wymaga..."
+      "A": "Tak, wymagają tego przepisy",
+      "B": "Nie, bo przepisy tego nie wymagają",
+      "C": "Tak, bo dobra praktyka morska tego wymaga niezależnie od przepisów"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -2644,9 +2644,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Planując możliwość skorzystania z portów schronienia na trasie naszego rejsu należy JAKO DECYDUJACE WARUNKI brać pod uwagę:",
     "options": {
-      "A": "Szerok manewr warunk...",
-      "B": "Czy po tankow...",
-      "C": "Czy w napraw..."
+      "A": "Szerokość i głębokość wejścia, możliwości manewrowe w porcie w trudnych warunkach",
+      "B": "Czy port zapewnia odpowiednie usługi, tankowanie paliwa i wody np.",
+      "C": "Czy w porcie jest możliwość wykonania napraw żagli, silnika np."
     },
     "correct_answer": "A",
     "image_filename": null
@@ -2656,9 +2656,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Przygotowując się do rejsu okazało się, że mapy (angielskie) nie są poprawione. Do planowanego wyjścia w morze jest niewiele czasu. Jak najszybciej można dokonać korekty?",
     "options": {
-      "A": "Jedyna je do usługi...",
-      "B": "Postar Notice W Inte...",
-      "C": "Notice i nani..."
+      "A": "Jedyna możliwość to jak najszybciej oddać je do korekty w firmie prowadzącej takie usługi",
+      "B": "Postarać się wypożyczyć ostatnie numery Notices to Mariners i wykonać korektę",
+      "C": "W Internecie wejść na stronę Searchable Notices to Mariners wydrukować poprawki i nanieść je na mapę"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_222.png"
@@ -2668,9 +2668,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Do planowania dłuższego rejsu, porty, czasy przelotów (np. Gdynia - Dublin) najprościej posłużyć się:",
     "options": {
-      "A": "Komple portów...",
-      "B": "Atlase...",
-      "C": "Mapami..."
+      "A": "Kompletem map drogowych i planów portów",
+      "B": "Atlasem map",
+      "C": "Mapami generalnymi"
     },
     "correct_answer": "B",
     "image_filename": "pytanie_223.png"
@@ -2680,9 +2680,9 @@
     "category": "PLANOWANIE REJSÓW",
     "question": "Czy spisy świateł (List of Lights) przed rejsem muszą być bieżąco poprawiane?",
     "options": {
-      "A": "Nie, t corocz...",
-      "B": "Tak, p...",
-      "C": "Tak, p..."
+      "A": "Nie, trzeba się posługiwać aktualnymi corocznymi wydaniami",
+      "B": "Tak, poprawki wydawane są co tydzień",
+      "C": "Tak, poprawki wydawane są co miesiąc"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3316,9 +3316,9 @@
     "category": "RATOWNICTWO",
     "question": "Czy na Zatoce Gdańskiej i Zalewie Szczecińskim działa służba ratownictwa morskiego SAR?",
     "options": {
-      "A": "Tak...",
-      "B": "Nie...",
-      "C": "Nie,..."
+      "A": "Tak, z centrum koordynacyjnym w Gdyni i Stacjami ratownictwa w portach.",
+      "B": "Nie, SAR działa tylko na pełnym morzu",
+      "C": "Nie, działa tam tylko WOPR"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3328,9 +3328,9 @@
     "category": "RATOWNICTWO",
     "question": "Zaobserwowano, że znajdujący się w pobliżu jacht ma podniesiony sygnał jak na rysunku. Co należy zrobić?",
     "options": {
-      "A": "Taki...",
-      "B": "Jacht...",
-      "C": "Jacht..."
+      "A": "Taki sygnał nic nie oznacza, kontynuować swoje pływanie.",
+      "B": "Jacht stoi na mieliźnie, nie podchodzić w pobliże",
+      "C": "Jacht wzywa pomocy, podejść i podjąć odpowiednie działania"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_278.png"
@@ -3340,9 +3340,9 @@
     "category": "RATOWNICTWO",
     "question": "Członek załogi przewrócił się na pokładzie, ma silny ból klatki piersiowej szczególnie przy wdechu. Jak postępować z poszkodowanym?",
     "options": {
-      "A": "Umieść...",
-      "B": "Ułóż...",
-      "C": "Podaj..."
+      "A": "Umieścić go w pozycji półsiedzącej w miejscu najmniej narażonym na kołysanie, założyć okrężna opaskę z szerokiego bandaża na klatkę piersiową, podać środki przeciwbólowe",
+      "B": "Ułożyć go w pozycji bezpiecznej, w miejscu dobrze wentylowanym",
+      "C": "Podawać ciepłe płyny i środki przeciwkaszlowe"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3352,9 +3352,9 @@
     "category": "RATOWNICTWO",
     "question": "Przy pracach konserwacyjnych członek załogi oparzył się kwasem z akumulatora. Jak postępować?",
     "options": {
-      "A": "Nałóż...",
-      "B": "Starannie spłucz wodą...",
-      "C": "Nałóż alkaliczny..."
+      "A": "Nałożyć na miejsce oparzone sterylny opatrunek",
+      "B": "Starannie i długo płukać miejsce oparzone wodą, a następnie roztworem sody oczyszczonej lub mydła. Nałożyć sterylny opatrunek.",
+      "C": "Nałożyć na miejsce oparzone okład alkaliczny np.z mydła"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3364,9 +3364,9 @@
     "category": "RATOWNICTWO",
     "question": "Przy wychodzeniu z jachtu członek załogi doznał urazu stawu skokowego (ból i zasinienie) jak należy postępować?",
     "options": {
-      "A": "Nałóż...",
-      "B": "Unieś...",
-      "C": "Zastosuj..."
+      "A": "Nałożyć ciasny bandaż, trzymać nogę w cieple",
+      "B": "Unieruchomić całą kończynę, wzywać natychmiast pomoc lekarską",
+      "C": "Zastosować zimne oklady przez 15 - 30 minut, unieruchomić staw, podać środki przeciwbólowe"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3376,9 +3376,9 @@
     "category": "RATOWNICTWO",
     "question": "Na jachcie jest ranny członek załogi. Wezwano pomoc. Przyleciał helikopter. Kto kieruje akcją, jakie są obowiązki kapitana?",
     "options": {
-      "A": "Akcją powi...",
-      "B": "Akcją nawi...",
-      "C": "Akcją utrz..."
+      "A": "Akcją kieruje załoga helikloptera, kapitan powinien nawiązać łączność i przygotować jacht, załogę i poszkodowanego",
+      "B": "Akcją kieruje kapitan, który powinien nawiązać łączność z helikopterem i ustalać działania",
+      "C": "Akcją kieruje MRCC, kapitan powinien tylko utrzymać żadany kurs i prędkość jachtu."
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3388,9 +3388,9 @@
     "category": "RATOWNICTWO",
     "question": "Jak powinna być przygotowana załoga i jak działać w przypadku konieczności opuszczenia jachtu?",
     "options": {
-      "A": "Nie...",
-      "B": "Ubrani...",
-      "C": "Ubrani ratunko..."
+      "A": "Nie za ciężkie ubranie, założone pasy ratunkowe, jak najszybciej wejść do tratwy",
+      "B": "Ubrani jak najcieplej, założone pasy ratunkowe, zabrać sprzęt łaczności i sygnalizacyjny, żywność, apteczkę",
+      "C": "Ubrani jak najcieplej, założone pasy ratunkowe, natychmiast po wejsciu do tratwy wzywać pomocy środkami pirotechnicznymi, jeżeli jest ręczny radiotelefon UKF prowadzić ciągły nasłuch na kanale"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3400,9 +3400,9 @@
     "category": "RATOWNICTWO",
     "question": "Jacht znajduje się w zatoce Hano na N od Bornholmu siła wiatru wzrosła do NE 10°B. Jaki wybrać stosunkowo najbezpieczniejszy sposób sztormowania?",
     "options": {
-      "A": "Sztormo...",
-      "B": "Sztormo potrzeb...",
-      "C": "Żagle m..."
+      "A": "Sztormowanie z wiatrem na foku sztormowym, wejscie za Bornholm po stronie zachodniej, ewentualne wejsc ie do portu schronienia.",
+      "B": "Sztormowanie w dryfie bez żagli, w razie potrzeby użycie silnika",
+      "C": "Żagle maksymalnie zarefowane, wspomaganie silnikiem, starać się podejść pod południowe wybrzeże szwedzkie."
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3412,9 +3412,9 @@
     "category": "RATOWNICTWO",
     "question": "Jacht ma dość wysoką burtę. Człowiek w wodzie jest przy burcie, przytomny może wspólpracować. Jak najlepiej wciągnąć go na pokład?",
     "options": {
-      "A": "Dwóch n...",
-      "B": "Podać p...",
-      "C": "Podać m..."
+      "A": "Dwóch najsilniejszych członków załogi wciaga go na pokład na śródokręciu",
+      "B": "Podać pętlę z grubej liny, którą powinien założyc pod pachy, wciągać wolnym fałem",
+      "C": "Podać mu linę, którą powinien na sobie zawiązać i wciagać go tą liną"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3424,9 +3424,9 @@
     "category": "RATOWNICTWO",
     "question": "Najważniejsze czynności przygotowawcze do sztormowaniu na pełnym morzu to:",
     "options": {
-      "A": "Szczeln...",
-      "B": "Przegląd...",
-      "C": "Przygot..."
+      "A": "Szczelne zamknięcie luków, klap itp. sprawdzenie pomp zęzowych, usunięcie z pokładu zbędnego sprzętu, postawienie lub przygotowanie żagli sztormowych",
+      "B": "Przegląd środków pirotechnicznych, sprawdzenie stanu pasów ratunkowych, przygotowanie apteczki.",
+      "C": "Przygotowanie ciepłego posiłku dla załogi, zamknięcie zaworów zaburtowych WC, sprawdzenie stanu baterii przenośnych radiotelefonow UKF,"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3436,9 +3436,9 @@
     "category": "RATOWNICTWO",
     "question": "W jakich sytuacjach sztormowych możemy spodziewać się wzrostu wysokości i nieregularności fali?",
     "options": {
-      "A": "Na wodach...",
-      "B": "Na wodach...",
-      "C": "Na wodach wystę..."
+      "A": "Na wodach pływowych, kiedy prąd pływowy zmieni kierunek na przeciwny do kierunku wiatru",
+      "B": "Na wodach pływowych, kiedy prąd pływowy zmieni kierunek na zgodny z kierunkiem wiatru",
+      "C": "Na wodach pływowych, w okresie bliskim wystąpienia niskiej wody"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3448,9 +3448,9 @@
     "category": "RATOWNICTWO",
     "question": "W jakich sytuacjach sztormowych możemy spodziewać się wzrostu wysokości i nieregularności fali?",
     "options": {
-      "A": "W sytua...",
-      "B": "W sytu otwart...",
-      "C": "W sytu nawiet..."
+      "A": "W sytacji, kiedy następuje szybka zmiana kierunku nadal silnego wiatru do kierunku występujacej fali, np. o 45° - 90°",
+      "B": "W sytuacji wyjścia ze strefy przybrzeżnej na otwarte morze",
+      "C": "W sytuacji zbliżania się do brzegu nawietrznego"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3460,9 +3460,9 @@
     "category": "RATOWNICTWO",
     "question": "W przypadku cięższych warunków atmosferycznych należy unikać żeglugi w obszarach:",
     "options": {
-      "A": "Gdzie...",
-      "B": "Gdzie prądów...",
-      "C": "Gdzie bezpoś..."
+      "A": "Gdzie stałe prądy mają kierunek zgodny z kierunkiem wiatru",
+      "B": "Gdzie występuje wzmocnienie szybkości prądów ( np. przylądki, obszary o silniejszym prądzie itp.)",
+      "C": "Gdzie głebokośc morza jest znaczna, aż do bezpośredniej bliskości lądu"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3472,9 +3472,9 @@
     "category": "RATOWNICTWO",
     "question": "Czy przy sztrandowaniu na polskim wybrzeżu możemy liczyc na pomoc BEZPOŚREDNIO z lądu.",
     "options": {
-      "A": "Nie...",
-      "B": "Nie, a...",
-      "C": "Tak, N ratown..."
+      "A": "Nie",
+      "B": "Nie, ale TYLKO przy pomocy helikoptera jest to ewentualnie możliwe",
+      "C": "Tak, Na polskim wybrzeżu są stacje ratownictwa brzegowego dysponujace odpowiednim sprzętem do ratownictwa z brzegu."
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3484,9 +3484,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jeden z klawiszy radiotelefonu VHF opisany jest jako \"DW\" oznacza to:",
     "options": {
-      "A": "Wybór...",
-      "B": "Wybór i dowo...",
-      "C": "Wybór dowoln..."
+      "A": "Wybór poziomu mocy nadajnka radiotelefonu: 1W lub 25W",
+      "B": "Wybór podwójnego nasłuchu na kanale 16 i dowolnym innym",
+      "C": "Wybór podwójnego nasluchu na dwóch dowolnych kanałach"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3496,9 +3496,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Podczas mgły usłyszano przed dziobem jachtu sygnał \"jeden długi dźwięk\", na jachcie nie ma radaru, sygnał powtarza się. Jak zareagować?",
     "options": {
-      "A": "Zmniej...",
-      "B": "Kontyn...",
-      "C": "Zatrzy..."
+      "A": "Zmniejszyć szybkość, nadawać sygnały mgłowe, ustalić w którą stronę przemieszcza się sygnał, gotowość do manewrów",
+      "B": "Kontynuować kurs i szybkość, to statek przecinający nasz kurs, wkrótce się oddali",
+      "C": "Zatrzymać się, pozostać w dryfie, aż statek się oddali"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3508,9 +3508,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Czy podczas żeglugi we mgle powinno się używać normalnych sygnałów manewrowych np. moje maszyny pracują wstecz \" . . . \"",
     "options": {
-      "A": "Tak...",
-      "B": "Nie...",
-      "C": "To zal..."
+      "A": "Tak",
+      "B": "Nie",
+      "C": "To zależy od akwenu i typu statku"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3520,9 +3520,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Na jaki zasięg radiotelefonu UKF można liczyć przy nawiązywaniu łączności?",
     "options": {
-      "A": "60 -...",
-      "B": "70 -...",
-      "C": "30 -..."
+      "A": "60 - 70 Mm",
+      "B": "70 - 80 Mm",
+      "C": "30 - 40 Mm urządzeniach na fonii?"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3532,9 +3532,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Na jachcie jest radiostacja pośredniofalowa i UKF. Na jakich kanałach/częstotliwościach prowadzi się korespondencję w niebezpieczeństwie na tych urządzeniach na fonii?",
     "options": {
-      "A": "Pośr...",
-      "B": "Pośr...",
-      "C": "Pośr..."
+      "A": "Pośredniofalowa 2187,5 kHz, UKF kanał",
+      "B": "Pośredniofalowa 2182 kHz, UKF kanał",
+      "C": "Pośredniofalowa 2187,5 kHz, UKF kanał"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3544,9 +3544,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Czy po wciśnięciu przycisku \"DISTRESS\" radiotelefon nada sygnał alarmowy?",
     "options": {
-      "A": "Tylk...",
-      "B": "Będz...",
-      "C": "Zaws..."
+      "A": "Tylko raz",
+      "B": "Będzie go powtarzał, jeżeli nie wciśniemy przycisku \"STOP\"",
+      "C": "Zawsze powtórzy sygnał alarmowy trzy razy"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3556,9 +3556,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Na jakim kanale w obszarze A1 może być nadawane wezwanie w niebezpieczeństwie (DSC), a na jakim zawiadomienie w niebezpieczeństwie?",
     "options": {
-      "A": "Wezw...",
-      "B": "kana...",
-      "C": "Wezw..."
+      "A": "Wezwanie(DSC) kanał 70 (automatycznie), zawiadomienie kanał 16 na fonii",
+      "B": "Wezwanie i zawiadomienie zawsze tylko na kanale",
+      "C": "Wezwanie i zawiadomienie zawsze tylko na kanale"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3568,9 +3568,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Na płynącym w pobliżu jachcie jakiś człowiek macha rękami jak na rysunku. Jak zareagować?",
     "options": {
-      "A": "To p...",
-      "B": "To w...",
-      "C": "To o..."
+      "A": "To pozdrowienie, odpowiedzieć podobnie",
+      "B": "To wzywanie pomocy, podejść jak najbliżej, nawiązać łączność",
+      "C": "To ostrzeżenie, idziecie ku niebezpieczeństwu"
     },
     "correct_answer": "B",
     "image_filename": "pytanie_298.png"
@@ -3580,9 +3580,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Przy odbiorze pirotechniki (na rejs pełnomorski) przekazano 8 rakiet czerwonych i pławkę \"pomarańczowy dym\". Czy jest to stan zgodny z przepisami (bandera polska)?",
     "options": {
-      "A": "Tak,...",
-      "B": "Nie...",
-      "C": "Tak,..."
+      "A": "Tak, o ile posiadają ważny atest (datę ważności)",
+      "B": "Nie",
+      "C": "Tak, o ile są w dobrym stanie technicznym"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3592,9 +3592,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jakie dokumenty powinny być na jachcie wyposażonym w radiotelefon UKF.",
     "options": {
-      "A": "Nie...",
-      "B": "Zezw...",
-      "C": "Zezw z cz oper..."
+      "A": "Nie sa potrzebne żadne dokumenty",
+      "B": "Zezwolenie na urządzenie (Licencja) państwa bandery",
+      "C": "Zezwolenie na urządzenie (Licencja), jeden z członków załogi musi mieć świadectwo operatora"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3604,9 +3604,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "W przypadku braku łączności radiowej albo trudności językowych można posłużyć się sygnałami skrótowymi (literowymi) Kodu Sygnałowego. Gdzie znaleźć informacje o takich sygnałach?",
     "options": {
-      "A": "W lo...",
-      "B": "W \"A...",
-      "C": "W ks Sygn..."
+      "A": "W locjach ( cz. ogólna, informacje o danym kraju)",
+      "B": "W \"Admiralty List of Radio Signals\"",
+      "C": "W książce \"Miedzynarodowy Kod Sygnalowy\""
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3616,9 +3616,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Statek idący równolegle z jachtem skierował przed dziób jachtu światło reflektora. Co to oznacza?",
     "options": {
-      "A": "Nie...",
-      "B": "Spo...",
-      "C": "Ost kur..."
+      "A": "Nie wiadomo, może coś zaobserwował na morzu",
+      "B": "Spodziewa się pilota i daje mu znać gdzie jest",
+      "C": "Ostrzeżenie dla jachtu, aby nie zmieniał kursu w stronę statku"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3628,9 +3628,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Statek idący w pobliżu jachtu nadał sygnał: pięć krótkich dźwieków. Co to oznacza?",
     "options": {
-      "A": "Sta...",
-      "B": "Uwa...",
-      "C": "Moj..."
+      "A": "Statek pilotowy pełniący służbę pilotową",
+      "B": "Uwaga! nie rozumiem waszych zamiarów",
+      "C": "Moje maszyny pracują wstecz"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3640,9 +3640,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Czy jachty powinny być wyposażone w dzwon?",
     "options": {
-      "A": "Tak...",
-      "B": "Nie...",
-      "C": "Tak..."
+      "A": "Tak, ale tylko dłuższe od 12 m",
+      "B": "Nie",
+      "C": "Tak, wszystkie"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3652,9 +3652,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Czy jachty powinny mieć gwizdek (ZGODNY Z WYMAGANIAMI) do nadawania sygnałów dźwiękowych?",
     "options": {
-      "A": "Nie...",
-      "B": "Tak...",
-      "C": "Tak mog nor..."
+      "A": "Nie, takie urzadzenia muszą mieć tylko większe statki",
+      "B": "Tak, wszystkie jachty powinny mieć takie urządzenie odpowiadające wymaganiom MPZZM",
+      "C": "Tak, ale tylko dłuższe od 12 m, krótsze mogą mieć urzadzenia nie odpowiadajace normom MPZZM"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3664,9 +3664,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Na kanale 16 nadano komunikat: All stations... x3, Seelonce distress. Chcemy nawiązać łączność z mariną, która pracuje na kanale 69. Czy zgodnie z przepisami możemy to zrobić?",
     "options": {
-      "A": "Nie...",
-      "B": "dot...",
-      "C": "Słu prz 69..."
+      "A": "Nie, bo obowiązuje cisza radiowa",
+      "B": "Nawiązujemy łączność, bo cisza radiowa dotyczy tylko kanału 16",
+      "C": "Słuchać na kanale 16 i jeżeli nastąpi przerwa w korespondencji przejść na kanał 69 i nawiązać łączność."
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3676,9 +3676,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Chcemy nawiązac łączność, ale na kanale 16 słyszymy korespondencję w niebezpieczeństwie, po pewnym czasie usłyszeliśmy komunikat: All stations.. x3, SEELONCE FEENEE. Co to oznacza?",
     "options": {
-      "A": "Zap nie...",
-      "B": "Kon...",
-      "C": "Nal obo..."
+      "A": "Zapowiedź komunikatu dotyczącego niebezpieczeństwa",
+      "B": "Koniec ciszy radiowej",
+      "C": "Należy nadal czekać, cisza radiowa obowiązuje"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3688,9 +3688,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jeden z członków załogi przypadkowo wcisnął przycisk radiotelefonu \"DISTRESS\". Co powinniśmy zrobić?",
     "options": {
-      "A": "Wył...",
-      "B": "Ust z n...",
-      "C": "Wył włą x3 dst..."
+      "A": "Wyłączyć na chwilę radiotelefon, następnie włączyć go i po usłyszeniu stacji brzegowej nadać: Cancel my distress alert.",
+      "B": "Ustawić kanał 16 i słuchać czy ktoś nawiąże z nami korespondencję. Po nawiązaniu łączności nadać: ? nazwa nadjącego do nas x 3: this is ?(nazwa jachtu) x 3, cancel my dstress alert",
+      "C": "Wyłączyć na chwilę radiotelefon, następnie włączyć go i nadać komunikat: All stations? x3 this is ?(nazwa jachtu) x 3, cancel my dstress alert of ?. ( data, godzina)"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3700,9 +3700,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Na kanale 16 zaczęliśmy wywoływać stację brzegową, chcemy zamówić rozmowe telefoniczną. Po chwili usłyszeliśmy komunikat: All stations? x3, Seelonce distress. co to oznacza?",
     "options": {
-      "A": "Stacja...",
-      "B": "Za chw...",
-      "C": "Jest t radiow..."
+      "A": "Stacja brzegowa prosi aby chwilę zaczekać.",
+      "B": "Za chwilę zostanie podane ostrzeżenie nawigacyjne",
+      "C": "Jest to wezwanie do zachowania ciszy radiowej bo prowadzona jest korespondencja ze statkiem w niebezpieczeństwie."
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3712,9 +3712,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jak bezpiecznie użyć czerwonej pochodni ręcznej?",
     "options": {
-      "A": "Zdjąć...",
-      "B": "Trzyma nacisn...",
-      "C": "Zdjąć wylot siebie z inst..."
+      "A": "Zdjąć korek zabezpieczający, pociagnąć linkę spustową i skierować wylot w dół",
+      "B": "Trzymać pochodnię jedną ręką, drugą nacisnąć spust i zapalić pochodnię",
+      "C": "Zdjąć korek zabezpieczający, skierować wylot w górę, trzymać pochodnię z dala od siebie wylotem w górę, uruchomić zgodnie z instrukcją na obudowie"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3724,9 +3724,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Czy od jednostki ratowniczej możemy żądać holowania jachtu?",
     "options": {
-      "A": "Tak, r...",
-      "B": "Nie, r...",
-      "C": "Tak, j tylko niebez decydu..."
+      "A": "Tak, ratownictwo obejmuje ratowanie załogi i jachtu",
+      "B": "Nie, ratownictwo obejmuje tylko ratowanie ludzi",
+      "C": "Tak, jeżeli ratowanie ludzi może odbyć się tylko w ten sposób (np. bardzo poważne niebezpieczeństwo przy ewakuacji, decyduje jednostka ratownicza)"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3736,9 +3736,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jacht znajdujacy się ok. 25 Mm na północ od Ustki nadał sygnał \"May Day\" jakiej pomocy może się spodziewać?",
     "options": {
-      "A": "Po ode MRCC/M...",
-      "B": "Nie wi...",
-      "C": "Należy kapita..."
+      "A": "Po odebraniu sygnału zgłosi się za posrednictwem stacji brzegowej MRCC/MRCK Gdynia lub Świnoujście, które powiadomią o rodzaju pomocy.",
+      "B": "Nie wiadomo, należy oczekiwać helikoptera lub jednostki ratowniczej",
+      "C": "Należy nawiązać łączność z najbliższym kapitanatem portu i uzgodnić rodzaj pomocy"
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3748,9 +3748,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Na jachcie usłyszano korespondencje na kanale 16: May Day, May Day, May Day, this is yacht Regina SPG 1234, my position is ??.., I have fire on board, immediate help necessary, 5 persons on board. Upłynęło kilka minut, nie słychać żadnej korespondencji. Co należy zrobić?",
     "options": {
-      "A": "Nadać...",
-      "B": "Natych...",
-      "C": "Nadać ma odz kontak..."
+      "A": "Nadać komunikat May Day Relay, dalszą akcją zajmie się stacja brzegowa.",
+      "B": "Natychmiast próbować nawiązać kontakt z tą jednostką i płynąć do niej.",
+      "C": "Nadać komunikat May Day Relay, jeżeli nie ma odzewu stacji brzegowej nawiazać kontakt z tą jednostką i plynąć do niej"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3760,9 +3760,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Musimy wzywac pomocy. Jak uruchomic pławkę dymną?",
     "options": {
-      "A": "Wyrz samo...",
-      "B": "Odkr...",
-      "C": "Odkr link..."
+      "A": "Wyrzucić pławkę za burtę uruchomi się samoczynnie.",
+      "B": "Odkręcić korek zabezpieczajacy, pociągnąć linkę załponu, trzymać wysoko w ręku.",
+      "C": "Odkręcić korek zabezpieczajacy, pociągnąć linkę załponu, wrzucić pławkę do wody"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3772,9 +3772,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jak bezpiecznie użyć rakiety spadochronowej?",
     "options": {
-      "A": "Zdją...",
-      "B": "Trzy spus...",
-      "C": "Zdją wylo jach obud..."
+      "A": "Zdjąć korek zabezpieczający, pociagnąć linkę spustową i skierować wylot w górę",
+      "B": "Trzymać rakietę jedną ręką, drugą nacisnąć spust i wystrzelić rakietę w górę",
+      "C": "Zdjąć korek zabezpieczający, skierować wylot w górę celując z dala od takielunku jachtu i wystrzelić rakietę wg. instrukcji na obudowie"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3784,9 +3784,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Czy całą załogę należy przed rejsem zapoznać z obsługą środków pirotechnicznych",
     "options": {
-      "A": "Nie, ofic...",
-      "B": "Nie, obsł...",
-      "C": "Tak, rozk..."
+      "A": "Nie, środki pirotechniczne powinien obsługiwać tylko kapitan lub wyznaczony oficer",
+      "B": "Nie, środki pirotechniczne powinna obsługiwać tylko osoba posiadajaca certyfikat Inywidualnych technik ratunkowych",
+      "C": "Tak, najlepiej przy instruktażu dotyczacym rozkladów alarmowych"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3796,9 +3796,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jak powinny być przechowywane środki pirotechniczne na jachcie?",
     "options": {
-      "A": "Nie...",
-      "B": "W mi zało poje...",
-      "C": "Każd baki..."
+      "A": "Nie jest to istotne, tylko z dala od źródeł ciepła",
+      "B": "W miejscu łatwo dostępnym znanym całej załodze, najlepiej w wodoszczelnym pojemniku",
+      "C": "Każdy rodzaj oddzielnie w szafkach lub bakistach"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3808,9 +3808,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Kanał 16 w łączności radiotelefonicznej słuzy do:",
     "options": {
-      "A": "Tylk nieb...",
-      "B": "Do w nieb bezp...",
-      "C": "Tylk łącz..."
+      "A": "Tylko do korespondencji w niebezpieczeństwie",
+      "B": "Do wywołania, łączności w niebezpieczeństwie, łączności pilnej i bezpieczeństwa",
+      "C": "Tylko do łączności w niebezpieczeństwie, łączności pilnej i bezpieczeństwa"
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3832,9 +3832,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Usłyszano komunikat na kanale 16: Securite, securite, securite, All stations, All stations, All stations, gale warning, working channels. Co nalezy zrobić?",
     "options": {
-      "A": "",
-      "B": "",
-      "C": ""
+      "A": "Pozostać na kanale 16 i czekać na podanie komunikatu.",
+      "B": "Nawiązać łączność ze stacją nadającą komunikat i ustalić kanał do odbioru komunikatu",
+      "C": "Sprawdzić na jakim kanale pracuje najbliższa stacja (np. Admiralty List of Radio Signals tom 3), ustawić ten kanał i słuchać komunikatu"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3844,9 +3844,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Kiedy należy używać procedury SECURITE, a kiedy procedury PAN PAN?",
     "options": {
-      "A": "",
-      "B": "",
-      "C": ""
+      "A": "SECURITE dla wiadomości dot. bezpieczeństwa i ostrzeżeń, PAN PAN dla pilnych wiadomości dotyczących bezpieczeństwa lub niebezpieczeństwa, ale bez wzywania natychmiastowej pomocy.",
+      "B": "SECURITE tylko do ostrzeżeń, PAN PAN dla pilnych wiadomości adresowanych do konkretnych stacji.",
+      "C": "SECURITE dla wiadomości dot. bezpieczeństwa i ostrzeżeń, PAN PAN dla pilnych wiadomości dotyczących tylko pomocy lekarskiej."
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3856,9 +3856,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Kiedy należy używać procedury MAY DAY, a kiedy procedury PAN PAN?",
     "options": {
-      "A": "",
-      "B": "",
-      "C": ""
+      "A": "MAY DAY tylko przy bezpośrednim zagrożeniu życia lub jednostki, PAN PAN jeżeli potrzebna jest pomoc, ale nie natychmiastowa",
+      "B": "MAY DAY tylko przy bezpośrednim zagrożeniu dot. jednostki, PAN PAN jeżeli potrzebna jest pomoc techniczna",
+      "C": "MAY DAY tylko przy bezpośrednim zagrożeniu życia lub jednostki, PAN PAN tylko do ostrzegania innych jednostek."
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3868,9 +3868,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jak należy rozumieć termin: WEZWANIE W NIEBEZPIECZEŃSTWIE I ZAWIADOMIENIE W NIEBEZPIECZEŃSTWIE?",
     "options": {
-      "A": "Wezwanie...",
-      "B": "Oznacza sformuło...",
-      "C": "Wezwanie zawiadom niebezpi..."
+      "A": "Wezwanie to tylko podanie nazwy jednostki i sygnału wywolawczego/MMSI, a zawiadomienie to podanie wszystkich informacji dot. niebezpieczeństwa.",
+      "B": "Oznacza to samo tylko inaczej sformułowane.",
+      "C": "Wezwanie dotyczy naszej jednostki, a zawiadomienie dotyczy innej jednostki w niebezpieczeństwie."
     },
     "correct_answer": "A",
     "image_filename": null
@@ -3880,9 +3880,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Zauważono podniesiony na statku sygnał. Co on oznacza?",
     "options": {
-      "A": "Trzymajcie się...",
-      "B": "Chcę nawiązać...",
-      "C": "Zatrzymajcie..."
+      "A": "Trzymajcie się z daleka ode mnie, manewruję z trudem",
+      "B": "Chcę nawiązać z wami łączność",
+      "C": "Zatrzymać się, natychmiast!!"
     },
     "correct_answer": "B",
     "image_filename": "pytanie_324.png"
@@ -3892,9 +3892,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Zauważono podniesiony na statku sygnał. Co on oznacza?",
     "options": {
-      "A": "Człowiek za burtą...",
-      "B": "Chcę nawiązać...",
-      "C": "Zatrzymajcie..."
+      "A": "Człowiek za burtą",
+      "B": "Chcę nawiązać z wami łączność",
+      "C": "Zatrzymać się natychmiast"
     },
     "correct_answer": "A",
     "image_filename": "pytanie_325.png"
@@ -3904,9 +3904,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Jachtowi grozi zatonięcie, kapitan jachtu zdecydował wezwać pomoc przy pomocy radiotelefonu UKF. Jaką procedurę powinien zastosować?",
     "options": {
-      "A": "Włączyć przycisk MAY DAY...",
-      "B": "nadać wywołanie...",
-      "C": "Włączyć przycisk ( X 3)..."
+      "A": "Włączyć radiotelefon na kanał 16 i nadać MAY DAY ( X 3), this is NAZWA JACHTU i dalej rodzaj niebezpieczenstwa, potrzebną pomoc.",
+      "B": "Włączyć radiotelefon na kanał 16 i wcisnąć przycisk Distress, po chwili nadać MAY DAY ( X 3), this is NAZWA JACHTU, sygnał wywoławczy i/lub MMSI, po usłyszeniu odpowiedzi stacji brzegowej lub statku nadać ponownie MAY DAY, nazwę i sygnał wywolawczy, pozycj ę, rodzaj niebezpieczenstwa, ilość osób, potrzebną pomoc.",
+      "C": "Włączyć radiotelefon na kanał 16 i wcisnąć przycisk Distress, po chwili nadać MAY DAY ( X 3), this is NAZWA JACHTU, sygnał wywoławczy i/lub MMSI, pozycję, rodzaj niebezpieczeństwa, ilość osób, potrzebną pomoc.C."
     },
     "correct_answer": "B",
     "image_filename": null
@@ -3928,9 +3928,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Zauważono podniesiony na statku sygnał. Co on oznacza?",
     "options": {
-      "A": "Trzymajcie się z daleka ode mnie...",
-      "B": "Mam nurka pod wodą...",
-      "C": "Mam pilota na pokładzie..."
+      "A": "Trzymajcie się z daleka ode mnie, manewruję z trudem",
+      "B": "Mam nurka pod wodą, Uwaga!",
+      "C": "Mam pilota na pokładzie"
     },
     "correct_answer": "C",
     "image_filename": "pytanie_328.png"
@@ -3940,9 +3940,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "W nocy na kursie zaobserwowano światło: trzy krótki błyski, trzy długie światła, trzy krótkie błyski, sygnał powtarza się, jaka powinna być reakcja kapitana?",
     "options": {
-      "A": "Ustawić kanał 16 radiotelefonu...",
-      "B": "Natychmiast skierować jacht w kierunku...",
-      "C": "Ustawić kanał 16 radiotelefonu UKF i prowadzić nasłuch. Natychmiast skierować jacht..."
+      "A": "Ustawić kanał 16 radiotelefonu UKF i prowadzić nasłuch",
+      "B": "Natychmiast skierować jacht w kierunku w którym widziano sygnały",
+      "C": "Ustawić kanał 16 radiotelefonu UKF i prowadzić nasłuch. Natychmiast skierować jacht w kierunku w którym widziano sygnały. Nadać May Day Relay jeżeli nie ma reakcji stacji brzegowej"
     },
     "correct_answer": "C",
     "image_filename": null
@@ -3952,9 +3952,9 @@
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "question": "Na pełnym morzu jacht nabiera wody, przecieku nie można opanować. W zasięgu widoczności nie widać żadnych jednostek. Wysłano sygnał Distress (May Day) przy pomocy UKF, brak odpowiedzi. Jak NAJLEPIEJ/NAJBEZPIECZNIEJ dalej postępować?",
     "options": {
-      "A": "Wystrzelić rakiety...",
-      "B": "Uruchomić EPIRB i przygotować się do opuszczenia...",
-      "C": "Tylko czekać na pomoc..."
+      "A": "Wzywać pomocy środkami pirotechnicznymi",
+      "B": "Uruchomić pławę EPIRB, przygotować się do opuszczenia jachtu, nie przełączać/wyłączać UKF",
+      "C": "Tylko wywiesić sygnały optyczne wzywania pomocy. A B C"
     },
     "correct_answer": "B",
     "image_filename": null
