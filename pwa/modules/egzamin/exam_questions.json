@@ -1332,7 +1332,7 @@
   {
     "id": 191,
     "category": "NAWIGACJA",
-    "correct_answer": "B",
+    "correct_answer": "C",
     "answer_count": 3,
     "image_asset": "exam_images/pytanie_191.jpg"
   },
@@ -1346,14 +1346,14 @@
   {
     "id": 193,
     "category": "PLANOWANIE REJSÓW",
-    "correct_answer": "C",
+    "correct_answer": "A",
     "answer_count": 3,
     "image_asset": "exam_images/pytanie_193.jpg"
   },
   {
     "id": 194,
     "category": "PLANOWANIE REJSÓW",
-    "correct_answer": "A",
+    "correct_answer": "C",
     "answer_count": 3,
     "image_asset": "exam_images/pytanie_194.jpg"
   },
@@ -1388,21 +1388,21 @@
   {
     "id": 199,
     "category": "PLANOWANIE REJSÓW",
-    "correct_answer": "C",
+    "correct_answer": "A",
     "answer_count": 3,
     "image_asset": "exam_images/pytanie_199.jpg"
   },
   {
     "id": 200,
     "category": "PLANOWANIE REJSÓW",
-    "correct_answer": "A",
+    "correct_answer": "C",
     "answer_count": 3,
     "image_asset": "exam_images/pytanie_200.jpg"
   },
   {
     "id": 201,
     "category": "PLANOWANIE REJSÓW",
-    "correct_answer": "C",
+    "correct_answer": "A",
     "answer_count": 3,
     "image_asset": "exam_images/pytanie_201.jpg"
   },
@@ -1416,7 +1416,7 @@
   {
     "id": 203,
     "category": "PLANOWANIE REJSÓW",
-    "correct_answer": "A",
+    "correct_answer": "C",
     "answer_count": 3,
     "image_asset": "exam_images/pytanie_203.jpg"
   },
