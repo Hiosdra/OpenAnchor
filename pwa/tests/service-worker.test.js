@@ -226,9 +226,11 @@ describe('Service Worker Core Functionality', () => {
 
       global.fetch.mockRejectedValue(new Error('Network error'));
 
-      const request = new Request('https://example.com/some-page', {
+      // Create a simple request object without mode: 'navigate'
+      const request = {
+        url: 'https://example.com/some-page',
         mode: 'navigate'
-      });
+      };
 
       // Simulate offline fallback logic
       try {
@@ -245,9 +247,11 @@ describe('Service Worker Core Functionality', () => {
       caches.match.mockResolvedValue(undefined);
       global.fetch.mockRejectedValue(new Error('Network error'));
 
-      const request = new Request('https://example.com/api/data', {
+      // Create a simple request object
+      const request = {
+        url: 'https://example.com/api/data',
         mode: 'cors'
-      });
+      };
 
       try {
         await fetch(request);
