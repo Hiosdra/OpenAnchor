@@ -457,6 +457,178 @@
         .dismiss-btn:hover {
             background: rgba(255, 255, 255, 0.1);
         }
+
+        /* Settings button */
+        .settings-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .settings-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Settings modal */
+        .settings-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .settings-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .settings-panel {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            max-width: 400px;
+            width: calc(100% - 2rem);
+            margin: 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .settings-modal.show .settings-panel {
+            transform: scale(1);
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .settings-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .settings-close:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
+
+        .settings-label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .settings-label-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .settings-label-desc {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .toggle-slider:before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-color: #3b82f6;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Hidden module */
+        .module-hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -481,6 +653,13 @@
 
     <!-- App Header -->
     <header class="app-header">
+        <button class="settings-btn" onclick="openSettings()" aria-label="Ustawienia">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m-6 6l-4.2 4.2M23 12h-6m-6 0H1m18.2 5.2l-4.2-4.2m-6-6l-4.2-4.2"/>
+            </svg>
+        </button>
         <img src="assets/icon.svg" alt="OpenAnchor" class="app-logo" onerror="this.style.display='none'">
         <h1 class="app-title">OpenAnchor</h1>
         <p class="app-subtitle">Morska Superapp</p>
@@ -491,7 +670,7 @@
         <div class="modules-grid">
 
             <!-- Module 1: Anchor Alarm -->
-            <div class="module-card card-anchor" onclick="openModule('modules/anchor/index.html')" role="button" tabindex="0"
+            <div id="anchorModule" class="module-card card-anchor" onclick="openModule('modules/anchor/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Alert Kotwiczny"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/anchor/index.html')">
                 <div class="module-card-inner">
@@ -553,7 +732,7 @@
             </div>
 
             <!-- Module 2: Wachtownik -->
-            <div class="module-card card-watch" onclick="openModule('modules/wachtownik/index.html')" role="button" tabindex="0"
+            <div id="wachtownikModule" class="module-card card-watch" onclick="openModule('modules/wachtownik/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Wachtownik"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/wachtownik/index.html')">
                 <div class="module-card-inner">
@@ -678,12 +857,111 @@
         </div>
     </main>
 
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="settings-modal" onclick="closeSettingsOnBackdrop(event)">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <h2 class="settings-title">Ustawienia</h2>
+                <button class="settings-close" onclick="closeSettings()" aria-label="Zamknij">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="settings-item">
+                <div class="settings-label">
+                    <div class="settings-label-text">Wersja Beta</div>
+                    <div class="settings-label-desc">Funkcje eksperymentalne (Wachtownik, Alert Kotwiczny)</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="betaToggle" onchange="toggleBetaMode()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="app-footer">
         OpenAnchor &nbsp;·&nbsp; Morska Superapp &nbsp;·&nbsp; v2.0
     </footer>
 
     <script>
+        // Beta mode management
+        const BETA_MODE_KEY = 'oa_beta_mode';
+
+        // Initialize beta mode on page load
+        function initBetaMode() {
+            const isBetaEnabled = localStorage.getItem(BETA_MODE_KEY) === 'true';
+            const betaToggle = document.getElementById('betaToggle');
+            const anchorModule = document.getElementById('anchorModule');
+            const wachtownikModule = document.getElementById('wachtownikModule');
+
+            // Set toggle state
+            if (betaToggle) {
+                betaToggle.checked = isBetaEnabled;
+            }
+
+            // Show/hide modules based on beta state
+            if (!isBetaEnabled) {
+                if (anchorModule) anchorModule.classList.add('module-hidden');
+                if (wachtownikModule) wachtownikModule.classList.add('module-hidden');
+            } else {
+                if (anchorModule) anchorModule.classList.remove('module-hidden');
+                if (wachtownikModule) wachtownikModule.classList.remove('module-hidden');
+            }
+        }
+
+        // Toggle beta mode
+        function toggleBetaMode() {
+            const betaToggle = document.getElementById('betaToggle');
+            const isBetaEnabled = betaToggle.checked;
+            const anchorModule = document.getElementById('anchorModule');
+            const wachtownikModule = document.getElementById('wachtownikModule');
+
+            // Save preference
+            localStorage.setItem(BETA_MODE_KEY, isBetaEnabled.toString());
+
+            // Show/hide modules
+            if (isBetaEnabled) {
+                if (anchorModule) anchorModule.classList.remove('module-hidden');
+                if (wachtownikModule) wachtownikModule.classList.remove('module-hidden');
+            } else {
+                if (anchorModule) anchorModule.classList.add('module-hidden');
+                if (wachtownikModule) wachtownikModule.classList.add('module-hidden');
+            }
+        }
+
+        // Open settings modal
+        function openSettings() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        // Close settings modal
+        function closeSettings() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        // Close settings when clicking on backdrop
+        function closeSettingsOnBackdrop(event) {
+            if (event.target.id === 'settingsModal') {
+                closeSettings();
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            initBetaMode();
+        });
+
         // Service worker update handling
         let newWorker;
         let updateBanner = document.getElementById('updateBanner');
