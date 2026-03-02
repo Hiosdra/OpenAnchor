@@ -283,12 +283,17 @@
             }
         }
 
-        /* Desktop table sticky column */
+        /* Table sticky column for horizontal scroll */
+        .sticky-date-column {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Desktop-specific sticky column adjustments */
         @media (min-width: 768px) {
             .sticky-date-column {
-                position: sticky;
-                left: 0;
-                z-index: 10;
+                /* Already set above, no additional changes needed */
             }
         }
 
@@ -2968,8 +2973,8 @@
                       </span>
                     </div>
 
-                    {/* Mobile Card View */}
-                    <div className="md:hidden print:hidden space-y-3 sm:space-y-4">
+                    {/* Mobile Card View - Hidden, using table instead */}
+                    <div className="hidden print:hidden space-y-3 sm:space-y-4">
                       {schedule.map((daySchedule, dayIndex) => {
                         const rowDate = new Date(startDate);
                         rowDate.setDate(rowDate.getDate() + dayIndex);
@@ -3021,8 +3026,8 @@
                       })}
                     </div>
 
-                    {/* Desktop Table View */}
-                    <div id="print-schedule-table" className="hidden md:block print:block overflow-x-auto">
+                    {/* Desktop Table View - Now visible on all screen sizes with horizontal scroll */}
+                    <div id="print-schedule-table" className="block print:block overflow-x-auto">
                       <table className="w-full text-sm text-left border-collapse">
                         <thead className={`print:bg-slate-200 print:text-black ${isNightMode ? 'bg-black border-red-900 text-red-600' : 'bg-sky-900 border-sky-800 text-white'}`}>
                           <tr>
