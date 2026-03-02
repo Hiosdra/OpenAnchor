@@ -691,6 +691,17 @@
         let dismissBtn = document.getElementById('dismissBtn');
         let refreshing = false;
 
+        // Listen for controller change (when new SW takes over) - must be outside load event
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                // Reload when new SW takes control, but prevent double reload
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
+        }
+
         // Register service worker with update detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -721,15 +732,6 @@
                         });
                     })
                     .catch(() => {});
-
-                // Listen for controller change (when new SW takes over)
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    // Reload when new SW takes control, but prevent double reload
-                    if (!refreshing) {
-                        refreshing = true;
-                        window.location.reload();
-                    }
-                });
             });
         }
 
