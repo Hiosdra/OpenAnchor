@@ -264,6 +264,22 @@
                 top: 0;
                 z-index: 10;
             }
+
+            /* Improve button spacing on mobile */
+            button {
+                min-height: 44px;
+            }
+
+            /* Better text readability on mobile */
+            body {
+                font-size: 16px;
+            }
+
+            /* Reduce excessive padding on small screens */
+            .max-w-7xl {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
         }
 
         /* Desktop table sticky column */
@@ -2264,17 +2280,17 @@
                 Przejdź do głównej treści
               </a>
 
-              <header className={`p-6 shadow-md print:bg-white print:text-black print:shadow-none print:p-0 print:mb-6 ${isNightMode ? 'bg-zinc-950 border-b border-red-900 text-red-600' : 'bg-sky-900 text-white'}`}>
-                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-                  <div className="flex items-center space-x-3">
+              <header className={`p-4 sm:p-6 shadow-md print:bg-white print:text-black print:shadow-none print:p-0 print:mb-6 ${isNightMode ? 'bg-zinc-950 border-b border-red-900 text-red-600' : 'bg-sky-900 text-white'}`}>
+                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+                  <div className="flex items-center space-x-2 sm:space-x-3">
                     <a href="../../index.html" title="OpenAnchor - Powrót do menu" className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition print:hidden ${isNightMode ? 'text-red-600 hover:bg-red-950/50' : 'text-sky-300 hover:bg-sky-800'}`} style={{textDecoration:'none',flexShrink:0}}>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
-                      <span style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase'}}>Menu</span>
+                      <span className="hidden sm:inline" style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase'}}>Menu</span>
                     </a>
-                    <Icon name="Anchor" className={`w-8 h-8 print:hidden ${isNightMode ? 'text-red-500' : ''}`} />
-                    <h1 className="text-2xl font-bold">Morski Grafik Wacht PRO</h1>
+                    <Icon name="Anchor" className={`w-7 h-7 sm:w-8 sm:h-8 print:hidden ${isNightMode ? 'text-red-500' : ''}`} />
+                    <h1 className="text-lg sm:text-2xl font-bold">Morski Grafik Wacht PRO</h1>
                   </div>
-                  <div className="flex flex-wrap justify-center gap-2 print:hidden">
+                  <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 print:hidden">
                     {/* Settings Group */}
                     <button
                       onClick={() => setIsNightMode(!isNightMode)}
@@ -2408,12 +2424,12 @@
                 </div>
               )}
 
-              <div className="max-w-7xl mx-auto px-4 mt-6 print:hidden">
-                <div className={`flex p-1 space-x-1 rounded-xl w-full sm:w-max ${isNightMode ? 'bg-zinc-900' : 'bg-slate-200'}`}>
+              <div className="max-w-7xl mx-auto px-2 sm:px-4 mt-4 sm:mt-6 print:hidden">
+                <div className={`flex p-1 space-x-0.5 sm:space-x-1 rounded-xl w-full sm:w-max overflow-x-auto ${isNightMode ? 'bg-zinc-900' : 'bg-slate-200'}`}>
                   {!isReadOnly && (
                     <button
                       onClick={() => setActiveTab('setup')}
-                      className={`flex-1 sm:flex-none flex items-center justify-center space-x-2 px-6 py-3 min-h-[44px] rounded-lg text-sm font-bold transition-all ${activeTab === 'setup' ? (isNightMode ? 'bg-black text-red-500 shadow-sm shadow-red-900/20' : 'bg-white text-sky-900 shadow-sm') : (isNightMode ? 'text-red-800 hover:text-red-500 hover:bg-black/50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50')}`}
+                      className={`flex-1 sm:flex-none flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-6 py-3 min-h-[44px] rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'setup' ? (isNightMode ? 'bg-black text-red-500 shadow-sm shadow-red-900/20' : 'bg-white text-sky-900 shadow-sm') : (isNightMode ? 'text-red-800 hover:text-red-500 hover:bg-black/50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50')}`}
                     >
                       <Icon name="Settings" className="w-4 h-4" />
                       <span>{t('tab.setup', userLocale)}</span>
@@ -2422,7 +2438,7 @@
                   <button
                     onClick={() => setActiveTab('schedule')}
                     disabled={!isGenerated}
-                    className={`flex-1 sm:flex-none flex items-center justify-center space-x-2 px-6 py-3 min-h-[44px] rounded-lg text-sm font-bold transition-all ${!isGenerated ? 'opacity-50 cursor-not-allowed' : ''} ${activeTab === 'schedule' ? (isNightMode ? 'bg-black text-red-500 shadow-sm shadow-red-900/20' : 'bg-white text-sky-900 shadow-sm') : (isNightMode ? 'text-red-800 hover:text-red-500 hover:bg-black/50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50')}`}
+                    className={`flex-1 sm:flex-none flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-6 py-3 min-h-[44px] rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${!isGenerated ? 'opacity-50 cursor-not-allowed' : ''} ${activeTab === 'schedule' ? (isNightMode ? 'bg-black text-red-500 shadow-sm shadow-red-900/20' : 'bg-white text-sky-900 shadow-sm') : (isNightMode ? 'text-red-800 hover:text-red-500 hover:bg-black/50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50')}`}
                   >
                     <Icon name="CalendarDays" className="w-4 h-4" />
                     <span>{t('tab.schedule', userLocale)}</span>
@@ -2430,7 +2446,7 @@
                   <button
                     onClick={() => setActiveTab('gantt')}
                     disabled={!isGenerated}
-                    className={`flex-1 sm:flex-none flex items-center justify-center space-x-2 px-6 py-3 min-h-[44px] rounded-lg text-sm font-bold transition-all ${!isGenerated ? 'opacity-50 cursor-not-allowed' : ''} ${activeTab === 'gantt' ? (isNightMode ? 'bg-black text-red-500 shadow-sm shadow-red-900/20' : 'bg-white text-sky-900 shadow-sm') : (isNightMode ? 'text-red-800 hover:text-red-500 hover:bg-black/50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50')}`}
+                    className={`flex-1 sm:flex-none flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-6 py-3 min-h-[44px] rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${!isGenerated ? 'opacity-50 cursor-not-allowed' : ''} ${activeTab === 'gantt' ? (isNightMode ? 'bg-black text-red-500 shadow-sm shadow-red-900/20' : 'bg-white text-sky-900 shadow-sm') : (isNightMode ? 'text-red-800 hover:text-red-500 hover:bg-black/50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50')}`}
                   >
                     <Icon name="BarChart3" className="w-4 h-4" />
                     <span>{t('tab.gantt', userLocale)}</span>
@@ -2438,7 +2454,7 @@
                   <button
                     onClick={() => setActiveTab('analytics')}
                     disabled={!isGenerated}
-                    className={`flex-1 sm:flex-none flex items-center justify-center space-x-2 px-6 py-3 min-h-[44px] rounded-lg text-sm font-bold transition-all ${!isGenerated ? 'opacity-50 cursor-not-allowed' : ''} ${activeTab === 'analytics' ? (isNightMode ? 'bg-black text-red-500 shadow-sm shadow-red-900/20' : 'bg-white text-sky-900 shadow-sm') : (isNightMode ? 'text-red-800 hover:text-red-500 hover:bg-black/50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50')}`}
+                    className={`flex-1 sm:flex-none flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-6 py-3 min-h-[44px] rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${!isGenerated ? 'opacity-50 cursor-not-allowed' : ''} ${activeTab === 'analytics' ? (isNightMode ? 'bg-black text-red-500 shadow-sm shadow-red-900/20' : 'bg-white text-sky-900 shadow-sm') : (isNightMode ? 'text-red-800 hover:text-red-500 hover:bg-black/50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50')}`}
                   >
                     <Icon name="TrendingUp" className="w-4 h-4" />
                     <span>{t('tab.analytics', userLocale)}</span>
@@ -2446,7 +2462,7 @@
                 </div>
               </div>
 
-              <main id="main-content" className="max-w-7xl mx-auto p-4 mt-2 space-y-6">
+              <main id="main-content" className="max-w-7xl mx-auto px-2 sm:px-4 mt-2 space-y-4 sm:space-y-6 pb-8 sm:pb-10">
 
                 {activeTab === 'schedule' && isGenerated && dashboardData && (
                   <div className={`rounded-xl shadow-md overflow-hidden print:hidden border-l-4 ${isNightMode ? 'bg-zinc-950 border-red-800' : 'bg-white border-sky-500'}`}>
@@ -2459,9 +2475,9 @@
                       </div>
                     </div>
 
-                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-3 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-4">
-                        <h3 className={`text-xs uppercase tracking-wider font-semibold ${isNightMode ? 'text-red-800' : 'text-slate-500'}`}>
+                        <h3 className={`text-sm sm:text-xs uppercase tracking-wider font-semibold ${isNightMode ? 'text-red-800' : 'text-slate-500'}`}>
                           Status Rejsu
                         </h3>
                         {dashboardData.status === 'W TRAKCIE' && dashboardData.currentSlot ? (
@@ -2493,7 +2509,7 @@
                       <div className="space-y-6 flex flex-col justify-between">
                         <div>
                           <div className="flex justify-between items-center mb-3">
-                            <h3 className={`text-xs uppercase tracking-wider font-semibold ${isNightMode ? 'text-red-800' : 'text-slate-500'}`}>
+                            <h3 className={`text-sm sm:text-xs uppercase tracking-wider font-semibold ${isNightMode ? 'text-red-800' : 'text-slate-500'}`}>
                               {t('label.upcomingWatch', userLocale)}
                             </h3>
                             <button onClick={toggleNotifications} className={`flex items-center space-x-1 text-xs px-2 py-1 rounded border transition ${notificationsEnabled ? (isNightMode ? 'bg-red-900 text-black border-red-700' : 'bg-emerald-100 text-emerald-800 border-emerald-200') : (isNightMode ? 'border-red-900 text-red-800 hover:text-red-500' : 'border-slate-200 text-slate-500 hover:bg-slate-100')}`}>
@@ -2563,13 +2579,13 @@
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 print:hidden">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 print:hidden">
 
-                      <div className="lg:col-span-4 space-y-6">
-                        <div className={`p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
-                          <div className={`flex items-center space-x-2 mb-4 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
+                      <div className="lg:col-span-4 space-y-4 sm:space-y-6">
+                        <div className={`p-4 sm:p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                          <div className={`flex items-center space-x-2 mb-3 sm:mb-4 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
                             <Icon name="Users" className="w-5 h-5" />
-                            <h2 className="text-lg font-semibold">{t('heading.crewAndRolesWithLimit', userLocale)} ({crew.length}/15)</h2>
+                            <h2 className="text-base sm:text-lg font-semibold">{t('heading.crewAndRolesWithLimit', userLocale)} ({crew.length}/15)</h2>
                           </div>
                           {recommendations.length > 0 && (() => {
                             const activeCrew = crew.filter(c => c.role !== 'cook');
@@ -2692,10 +2708,10 @@
                         </div>
                       </div>
 
-                      <div className={`lg:col-span-8 p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                          <div className={`flex items-center space-x-2 mb-2 sm:mb-0 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
-                            <Icon name="Clock" className="w-5 h-5" /> <h2 className="text-lg font-semibold">{t('heading.watchSystem', userLocale)}</h2>
+                      <div className={`lg:col-span-8 p-4 sm:p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
+                          <div className={`flex items-center space-x-2 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
+                            <Icon name="Clock" className="w-5 h-5" /> <h2 className="text-base sm:text-lg font-semibold">{t('heading.watchSystem', userLocale)}</h2>
                           </div>
                           <button onClick={applyDogWatches} className={`px-3 py-1.5 rounded-md text-xs font-medium transition border ${isNightMode ? 'bg-red-950 border-red-800 text-red-500 hover:bg-red-900' : 'bg-sky-100 text-sky-800 border-sky-200 hover:bg-sky-200'}`}>
                             {t('btn.dogWatches', userLocale)}
@@ -2943,16 +2959,16 @@
                 )}
 
                 {activeTab === 'schedule' && isGenerated && schedule.length > 0 && (
-                  <div className={`p-4 md:p-6 rounded-xl shadow-sm border print:border-none print:shadow-none print:p-0 ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 md:mb-6 gap-2">
-                      <h2 className="text-xl md:text-2xl font-bold flex items-center print:text-black">{t('heading.fullSchedule', userLocale)}</h2>
+                  <div className={`p-3 sm:p-4 md:p-6 rounded-xl shadow-sm border print:border-none print:shadow-none print:p-0 ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 md:mb-6 gap-2">
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-bold flex items-center print:text-black">{t('heading.fullSchedule', userLocale)}</h2>
                       <span className={`text-xs italic print:hidden hidden sm:block ${isNightMode ? 'text-red-800' : 'text-slate-400'}`}>
                         {t('tip.dragDrop', userLocale)}
                       </span>
                     </div>
 
                     {/* Mobile Card View */}
-                    <div className="md:hidden print:hidden space-y-4">
+                    <div className="md:hidden print:hidden space-y-3 sm:space-y-4">
                       {schedule.map((daySchedule, dayIndex) => {
                         const rowDate = new Date(startDate);
                         rowDate.setDate(rowDate.getDate() + dayIndex);
