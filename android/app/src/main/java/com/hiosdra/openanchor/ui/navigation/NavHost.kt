@@ -10,6 +10,7 @@ import com.hiosdra.openanchor.ui.advisor.AdvisorScreen
 import com.hiosdra.openanchor.ui.client.ClientDashboardScreen
 import com.hiosdra.openanchor.ui.client.ScanQRCodeScreen
 import com.hiosdra.openanchor.ui.crewwatch.CrewWatchScreen
+import com.hiosdra.openanchor.ui.exam.ExamQuizScreen
 import com.hiosdra.openanchor.ui.history.HistoryScreen
 import com.hiosdra.openanchor.ui.historydetail.HistoryDetailScreen
 import com.hiosdra.openanchor.ui.home.HomeScreen
@@ -42,6 +43,7 @@ fun OpenAnchorNavHost(
                 onOpenCrewWatch = { navController.navigate(Screen.CrewWatch.route) },
                 onOpenAdvisor = { navController.navigate(Screen.AIAdvisor.route) },
                 onOpenLogbook = { navController.navigate(Screen.Logbook.route) },
+                onOpenExamQuiz = { navController.navigate(Screen.ExamQuiz.route) },
                 onResumeMonitoring = { sessionId ->
                     navController.navigate(Screen.Monitor.createRoute(sessionId)) {
                         popUpTo(Screen.Home.route) { inclusive = false }
@@ -184,6 +186,12 @@ fun OpenAnchorNavHost(
 
         composable(Screen.Logbook.route) {
             LogbookScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.ExamQuiz.route) {
+            ExamQuizScreen(
                 onBack = { navController.popBackStack() }
             )
         }
