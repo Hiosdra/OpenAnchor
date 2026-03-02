@@ -16,6 +16,9 @@
 
     <!-- Tailwind CSS & Plugins -->
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <!-- Unified Theme -->
+    <link rel="stylesheet" href="../../styles/theme.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -27,11 +30,10 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <style>
-        /* === BAZOWE STYLE === */
-        body {
-            -webkit-user-select: none;
-            user-select: none;
-            overscroll-behavior-y: none;
+        /* Module-specific styles only - base styles in theme.css */
+
+        /* Night vision filter for anchor module */
+        body.night-vision {
             transition: filter 0.3s ease;
         }
 
@@ -130,18 +132,23 @@
 </head>
 <body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-hidden" id="app-body">
 
+<!-- Background -->
+<div class="ocean-bg">
+    <div class="wave wave-1"></div>
+    <div class="wave wave-2"></div>
+    <div class="wave wave-3"></div>
+</div>
+<div class="stars"></div>
+
 <!-- === HEADER === -->
-<header class="bg-slate-800 p-3 shadow-md flex justify-between items-center z-20">
-    <div class="flex items-center gap-2">
-        <a href="../../index.html" title="OpenAnchor Superapp" class="flex items-center gap-1.5 text-slate-400 hover:text-slate-200 transition-colors mr-1" style="-webkit-tap-highlight-color:transparent">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="15 18 9 12 15 6"/></svg>
-            <span class="text-[10px] font-bold uppercase tracking-wider hidden xs:inline">Menu</span>
-        </a>
-        <i data-lucide="anchor" class="text-blue-400 w-5 h-5"></i>
-        <h1 class="text-lg font-bold tracking-wide" data-i18n="appTitle">Alert Kotwiczny</h1>
-    </div>
+<header class="oa-header">
+    <a href="../../index.html" title="OpenAnchor Superapp" class="oa-back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Menu</span>
+    </a>
+    <h1 class="oa-header-title" data-i18n="appTitle">Alert Kotwiczny</h1>
     <div class="flex items-center gap-3">
-        <button id="night-mode-btn" class="text-slate-400 hover:text-red-500 transition-colors" data-i18n-title="nightMode" title="Tryb nocny">
+        <button id="night-mode-btn" class="oa-settings-btn" data-i18n-title="nightMode" title="Tryb nocny" aria-label="Tryb nocny">
             <i data-lucide="moon" class="w-5 h-5"></i>
         </button>
         <button id="unit-toggle" class="bg-slate-700 px-3 py-1 rounded text-sm font-bold text-slate-300 border border-slate-600" data-i18n="unitMeters">
