@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Professional maritime watch scheduling application for yacht crews. Generate optimal watch schedules, manage crew, and export to PDF.">
-    <meta name="theme-color" content="#0c4a6e">
+    <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Wachtownik">
@@ -16,6 +16,9 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Unified Theme -->
+    <link rel="stylesheet" href="../../styles/theme.css">
 
     <!-- React and ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -35,6 +38,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <style>
+        /* Module-specific styles only - base styles in theme.css */
+
         @page {
             size: A4 landscape;
             margin: 0.5cm;
@@ -395,6 +400,14 @@
     </style>
 </head>
 <body>
+    <!-- Background -->
+    <div class="ocean-bg">
+        <div class="wave wave-1"></div>
+        <div class="wave wave-2"></div>
+        <div class="wave wave-3"></div>
+    </div>
+    <div class="stars"></div>
+
     <div id="root"></div>
 
     <script type="text/babel">
@@ -1011,7 +1024,7 @@
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${buttonClassName || (isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700')}`}
+                className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${buttonClassName || (isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-600 border-sky-500 hover:bg-sky-500 text-white')}`}
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
                 aria-controls={menuId.current}
@@ -2266,37 +2279,33 @@
           if (!isLoaded) return null;
 
           return (
-            <div className={`min-h-screen font-sans pb-10 transition-colors duration-300 ${isNightMode ? 'bg-black text-red-600' : 'bg-slate-50 text-slate-800'}`} data-night-mode={isNightMode}>
+            <div className={`min-h-screen font-sans pb-10 transition-colors duration-300 ${isNightMode ? 'bg-black text-red-600' : 'text-slate-100'}`} data-night-mode={isNightMode}>
 
               {/* Skip to main content link for keyboard navigation */}
               <a href="#main-content" className="skip-link">
                 Przejdź do głównej treści
               </a>
 
-              <header className={`p-4 sm:p-6 shadow-md print:bg-white print:text-black print:shadow-none print:p-0 print:mb-6 ${isNightMode ? 'bg-zinc-950 border-b border-red-900 text-red-600' : 'bg-sky-900 text-white'}`}>
-                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <a href="../../index.html" title="OpenAnchor - Powrót do menu" aria-label="Powrót do menu" className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition print:hidden ${isNightMode ? 'text-red-600 hover:bg-red-950/50' : 'text-sky-300 hover:bg-sky-800'}`} style={{textDecoration:'none',flexShrink:0}}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
-                      <span className="hidden sm:inline" style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase'}}>Menu</span>
-                    </a>
-                    <Icon name="Anchor" className={`w-7 h-7 sm:w-8 sm:h-8 print:hidden ${isNightMode ? 'text-red-500' : ''}`} />
-                    <h1 className="text-lg sm:text-2xl font-bold">Morski Grafik Wacht PRO</h1>
-                  </div>
-                  <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 print:hidden">
-                    {/* Settings Group */}
-                    <button
-                      onClick={() => setIsNightMode(!isNightMode)}
-                      className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700'}`}
-                      title="Tryb Czerwonego Światła"
-                      aria-label={isNightMode ? "Wyłącz tryb nocny" : "Włącz tryb nocny"}
-                      aria-pressed={isNightMode}
-                    >
-                      <Icon name={isNightMode ? "Sun" : "Moon"} className="w-5 h-5" aria-hidden="true" />
+              <header className={`oa-header print:bg-white print:text-black print:shadow-none print:p-0 print:mb-6 ${isNightMode ? 'bg-zinc-950/90 border-b border-red-900/20' : ''}`}>
+                <a href="../../index.html" title="OpenAnchor - Powrót do menu" aria-label="Powrót do menu" className="oa-back-btn print:hidden">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  <span>Menu</span>
+                </a>
+                <h1 className="oa-header-title">Morski Grafik Wacht PRO</h1>
+                <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 print:hidden">
+                  {/* Settings Group */}
+                  <button
+                    onClick={() => setIsNightMode(!isNightMode)}
+                    className="oa-settings-btn"
+                    title="Tryb Czerwonego Światła"
+                    aria-label={isNightMode ? "Wyłącz tryb nocny" : "Włącz tryb nocny"}
+                    aria-pressed={isNightMode}
+                  >
+                    <Icon name={isNightMode ? "Sun" : "Moon"} className="w-5 h-5" aria-hidden="true" />
                     </button>
                     <button
                       onClick={toggleLanguage}
-                      className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700'}`}
+                      className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-600 border-sky-500 hover:bg-sky-500 text-white'}`}
                       title={userLocale === 'pl-PL' ? "Switch to English" : "Przełącz na Polski"}
                       aria-label={userLocale === 'pl-PL' ? "Switch to English" : "Przełącz na Polski"}
                     >
@@ -2310,7 +2319,7 @@
                         <button
                           onClick={undo}
                           disabled={!canUndo}
-                          className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${!canUndo ? 'opacity-40 cursor-not-allowed' : ''} ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700'}`}
+                          className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${!canUndo ? 'opacity-40 cursor-not-allowed' : ''} ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-600 border-sky-500 hover:bg-sky-500 text-white'}`}
                           title="Cofnij (Ctrl+Z)"
                           aria-label="Cofnij ostatnią zmianę"
                           aria-disabled={!canUndo}
@@ -2320,7 +2329,7 @@
                         <button
                           onClick={redo}
                           disabled={!canRedo}
-                          className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${!canRedo ? 'opacity-40 cursor-not-allowed' : ''} ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-800 border-sky-700 hover:bg-sky-700'}`}
+                          className={`flex items-center space-x-2 px-3 py-2.5 min-h-[44px] rounded-lg transition border ${!canRedo ? 'opacity-40 cursor-not-allowed' : ''} ${isNightMode ? 'border-red-800 hover:bg-red-950 text-red-500' : 'bg-sky-600 border-sky-500 hover:bg-sky-500 text-white'}`}
                           title="Ponów (Ctrl+Y)"
                           aria-label="Ponów ostatnią cofniętą zmianę"
                           aria-disabled={!canRedo}
@@ -2391,7 +2400,6 @@
                       />
                     </Dropdown>
                   </div>
-                </div>
               </header>
 
               {/* Toast notification for user feedback */}
@@ -2417,7 +2425,7 @@
                 </div>
               )}
 
-              <div className="max-w-7xl mx-auto px-2 sm:px-4 mt-4 sm:mt-6 print:hidden">
+              <div className={`max-w-7xl mx-auto px-2 sm:px-4 mt-4 sm:mt-6 print:hidden ${isNightMode ? '' : 'bg-white/80 backdrop-blur-sm rounded-xl py-2'}`}>
                 <div className={`flex p-1 space-x-0.5 sm:space-x-1 rounded-xl w-full sm:w-max overflow-x-auto ${isNightMode ? 'bg-zinc-900' : 'bg-slate-200'}`}>
                   {!isReadOnly && (
                     <button
@@ -2952,7 +2960,7 @@
                 )}
 
                 {activeTab === 'schedule' && isGenerated && schedule.length > 0 && (
-                  <div className={`p-3 sm:p-4 md:p-6 rounded-xl shadow-sm border print:border-none print:shadow-none print:p-0 ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                  <div className={`p-3 sm:p-4 md:p-6 rounded-xl shadow-sm border print:border-none print:shadow-none print:p-0 ${isNightMode ? 'bg-zinc-950 border-red-900 text-red-600' : 'bg-white border-slate-200 text-slate-800'}`}>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 md:mb-6 gap-2">
                       <h2 className="text-lg sm:text-xl md:text-2xl font-bold flex items-center print:text-black">{t('heading.fullSchedule', userLocale)}</h2>
                       <span className={`text-xs italic print:hidden hidden sm:block ${isNightMode ? 'text-red-800' : 'text-slate-400'}`}>
@@ -3014,8 +3022,9 @@
                     </div>
 
                     {/* Desktop Table View - Now visible on all screen sizes with horizontal scroll */}
-                    <div id="print-schedule-table" className="block print:block overflow-x-auto">
-                      <table className="w-full text-sm text-left border-collapse">
+                    <div className={`rounded-lg p-4 print:p-0 print:shadow-none print:rounded-none print:bg-transparent ${isNightMode ? 'bg-black text-red-600' : 'bg-white text-slate-800 shadow-lg'}`}>
+                      <div id="print-schedule-table" className="block print:block overflow-x-auto">
+                        <table className="w-full text-sm text-left border-collapse">
                         <thead className={`print:bg-slate-200 print:text-black ${isNightMode ? 'bg-black border-red-900 text-red-600' : 'bg-sky-900 border-sky-800 text-white'}`}>
                           <tr>
                             <th className={`px-4 py-3 border whitespace-nowrap w-24 sticky-date-column ${isNightMode ? 'border-red-900 bg-black' : 'border-sky-800 bg-sky-900'} print:border-slate-400 print:static`}>Data</th>
@@ -3067,6 +3076,7 @@
                           })}
                         </tbody>
                       </table>
+                    </div>
                     </div>
                   </div>
                 )}
