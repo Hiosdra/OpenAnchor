@@ -3,7 +3,6 @@ package com.hiosdra.openanchor.service
 import com.hiosdra.openanchor.domain.geometry.ZoneCheckResult
 import com.hiosdra.openanchor.domain.model.AlarmState
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import org.junit.After

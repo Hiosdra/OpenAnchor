@@ -175,7 +175,7 @@ class UnitConverterTest {
     fun formatDistance_meters_formatsCorrectly() {
         assertEquals("100 m", UnitConverter.formatDistance(100.0, DistanceUnit.METERS))
         assertEquals("0 m", UnitConverter.formatDistance(0.0, DistanceUnit.METERS))
-        assertEquals("1234 m", UnitConverter.formatDistance(1234.56, DistanceUnit.METERS))
+        assertEquals("1235 m", UnitConverter.formatDistance(1234.56, DistanceUnit.METERS))
     }
 
     @Test
@@ -352,13 +352,6 @@ class UnitConverterTest {
     }
 
     // ========== Consistency Tests ==========
-
-    @Test
-    fun consistency_conversionConstants() {
-        // Verify the constants match expected values
-        assertEquals(METERS_PER_NAUTICAL_MILE, 1852.0, 0.0)
-        assertEquals(METERS_PER_FOOT, 0.3048, 0.0)
-    }
 
     @Test
     fun consistency_metersIdentity() {

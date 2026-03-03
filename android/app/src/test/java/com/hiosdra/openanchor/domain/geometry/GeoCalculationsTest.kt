@@ -4,7 +4,6 @@ import com.hiosdra.openanchor.domain.model.AnchorZone
 import com.hiosdra.openanchor.domain.model.Position
 import org.junit.Test
 import org.junit.Assert.*
-import kotlin.math.abs
 
 /**
  * Comprehensive tests for GeoCalculations - geographic calculations for anchor monitoring.

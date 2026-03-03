@@ -126,9 +126,7 @@ dependencies {
     // Test
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
-    testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.truth)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.mockk.android)
