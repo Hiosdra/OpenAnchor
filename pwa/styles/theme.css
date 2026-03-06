@@ -13,6 +13,9 @@ body {
     font-family: system-ui, -apple-system, sans-serif;
     min-height: 100dvh;
     overscroll-behavior: none;
+    /* Safe area insets for notched phones */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 /* Disable text selection on UI elements */
@@ -130,9 +133,11 @@ div:not(.oa-header):not(.oa-back-btn) {
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding: 0.75rem 1rem;
+    padding-top: max(0.75rem, env(safe-area-inset-top));
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.5rem;
 }
 
 .oa-header-title {
@@ -141,6 +146,10 @@ div:not(.oa-header):not(.oa-back-btn) {
     color: #f1f5f9;
     flex: 1;
     text-align: center;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* === BACK BUTTON === */
@@ -220,6 +229,7 @@ div:not(.oa-header):not(.oa-back-btn) {
     max-width: 1280px;
     margin: 0 auto;
     padding: 1rem;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
 /* === BUTTONS === */
