@@ -19,10 +19,12 @@ class AlarmEngine @Inject constructor() {
     private var firstViolationTime: Long? = null
 
     val currentState: AlarmState
-        get() = when {
-            violationCount >= 3 && elapsedSinceFirstViolation() >= 3000L -> AlarmState.ALARM
-            violationCount > 0 -> AlarmState.WARNING
-            else -> AlarmState.SAFE
+        get() = synchronized(this) {
+            when {
+                violationCount >= 3 && elapsedSinceFirstViolation() >= 3000L -> AlarmState.ALARM
+                violationCount > 0 -> AlarmState.WARNING
+                else -> AlarmState.SAFE
+            }
         }
 
     /**
@@ -30,6 +32,7 @@ class AlarmEngine @Inject constructor() {
      * @param zoneResult the result of checking position against the zone
      * @return the new alarm state after processing
      */
+    @Synchronized
     fun processReading(zoneResult: ZoneCheckResult): AlarmState {
         return when (zoneResult) {
             ZoneCheckResult.INSIDE -> {
@@ -56,10 +59,12 @@ class AlarmEngine @Inject constructor() {
      * @param isInsideZone whether the current position is inside the safe zone
      * @return the new alarm state after processing
      */
+    @Synchronized
     fun processReading(isInsideZone: Boolean): AlarmState {
         return processReading(if (isInsideZone) ZoneCheckResult.INSIDE else ZoneCheckResult.OUTSIDE)
     }
 
+    @Synchronized
     fun reset() {
         violationCount = 0
         firstViolationTime = null
@@ -71,6 +76,7 @@ class AlarmEngine @Inject constructor() {
      * @param externalState the alarm state determined by the PWA
      * @return the alarm state to use (same as input)
      */
+    @Synchronized
     fun processExternalAlarm(externalState: AlarmState): AlarmState {
         return when (externalState) {
             AlarmState.SAFE, AlarmState.CAUTION -> {

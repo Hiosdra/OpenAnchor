@@ -881,10 +881,11 @@ class AnchorMonitorService : Service() {
             _monitorState.value = MonitorState()
             // Notify watch that monitoring stopped
             wearDataSender.clearMonitorState()
-        }
 
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
+            // Stop foreground service AFTER DB write completes
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+        }
     }
 
     fun dismissAlarm() {

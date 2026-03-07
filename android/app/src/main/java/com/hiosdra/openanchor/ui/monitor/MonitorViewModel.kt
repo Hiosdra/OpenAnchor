@@ -13,6 +13,7 @@ import com.hiosdra.openanchor.domain.model.TrackPoint
 import com.hiosdra.openanchor.service.MonitorState
 import com.hiosdra.openanchor.service.ServiceBinder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -58,6 +59,8 @@ class MonitorViewModel @Inject constructor(
 
     /** Tracks which session ID we're currently observing track points for */
     private var currentTrackSessionId: Long? = null
+    /** Job for the current track points collection, cancelled when session changes */
+    private var trackPointsJob: Job? = null
 
     init {
         // Start compass updates
@@ -105,7 +108,8 @@ class MonitorViewModel @Inject constructor(
     }
 
     private fun observeTrackPoints(sessionId: Long) {
-        viewModelScope.launch {
+        trackPointsJob?.cancel()
+        trackPointsJob = viewModelScope.launch {
             repository.observeTrackPoints(sessionId).collect { points ->
                 _uiState.update { it.copy(trackPoints = points) }
             }

@@ -1889,7 +1889,8 @@
             if (!draggedItem) return;
 
             const { dayIdx: sDay, slotIdx: sSlot, pIdx: sPIdx } = draggedItem;
-            const newSchedule = [...schedule];
+            // Deep clone to avoid mutating React state in-place
+            const newSchedule = JSON.parse(JSON.stringify(schedule));
 
             const personA = newSchedule[sDay].slots[sSlot].assigned[sPIdx];
             const personB = newSchedule[targetDayIdx].slots[targetSlotIdx].assigned[targetPIdx];
@@ -1919,14 +1920,14 @@
                   if (startHour >= 0 && startHour <= 5) hardWatches++;
                 }
               });
-              return { ...c, totalHours: (totalMinutes / 60).toFixed(1), hardWatches };
+              return { ...c, totalHours: Math.round((totalMinutes / 60) * 10) / 10, hardWatches };
             });
           }, [schedule, crew, dashboardData, isGenerated]);
 
           const downloadICS = (person) => {
             if (!dashboardData) return;
 
-            let ics = "BEGIN:VCALENDAR\\nVERSION:2.0\\nPRODID:-//Morski Grafik Wacht//PL\\n";
+            let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Morski Grafik Wacht//PL\r\n";
 
             const formatDT = (d) => {
               const pad = (n) => n<10 ? '0'+n : n;
@@ -1935,15 +1936,15 @@
 
             dashboardData.allSlotsAbsolute.forEach(slot => {
               if (slot.assigned.some(p => p.id === person.id)) {
-                 ics += "BEGIN:VEVENT\\n";
-                 ics += `SUMMARY:Wachta (${slot.start}-${slot.end})\\n`;
-                 ics += `DTSTART:${formatDT(slot.absoluteStart)}\\n`;
-                 ics += `DTEND:${formatDT(slot.absoluteEnd)}\\n`;
+                 ics += "BEGIN:VEVENT\r\n";
+                 ics += `SUMMARY:Wachta (${slot.start}-${slot.end})\r\n`;
+                 ics += `DTSTART:${formatDT(slot.absoluteStart)}\r\n`;
+                 ics += `DTEND:${formatDT(slot.absoluteEnd)}\r\n`;
 
                  const others = slot.assigned.filter(p => p.id !== person.id).map(p=>p.name).join(', ');
                  const desc = others ? `Wachta razem z: ${others}` : 'Wachta solo';
-                 ics += `DESCRIPTION:${desc}\\n`;
-                 ics += "END:VEVENT\\n";
+                 ics += `DESCRIPTION:${desc}\r\n`;
+                 ics += "END:VEVENT\r\n";
               }
             });
             ics += "END:VCALENDAR";
