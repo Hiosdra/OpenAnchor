@@ -19,7 +19,7 @@ export function loadProgress() {
   } catch (e) {
     console.error('Failed to load exam progress:', e);
   }
-  return { answered: {}, stats: {} };
+  return { answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } };
 }
 
 /**
@@ -36,13 +36,14 @@ export function saveProgress(progress) {
 
 /**
  * Load learn mode position from localStorage
- * @returns {number|null} Question index or null
+ * @returns {Object|null} Position object {questionId, timestamp} or null
  */
 export function loadLearnPosition() {
   try {
     const stored = localStorage.getItem(LEARN_POSITION_KEY);
     if (stored) {
-      return parseInt(stored, 10);
+      const parsed = JSON.parse(stored);
+      return parsed;
     }
   } catch (e) {
     console.error('Failed to load learn position:', e);
@@ -52,11 +53,14 @@ export function loadLearnPosition() {
 
 /**
  * Save learn mode position to localStorage
- * @param {number} position - Question index
+ * @param {string} questionId - Question ID
  */
-export function saveLearnPosition(position) {
+export function saveLearnPosition(questionId) {
   try {
-    localStorage.setItem(LEARN_POSITION_KEY, position.toString());
+    localStorage.setItem(LEARN_POSITION_KEY, JSON.stringify({
+      questionId,
+      timestamp: Date.now()
+    }));
   } catch (e) {
     console.error('Failed to save learn position:', e);
   }
