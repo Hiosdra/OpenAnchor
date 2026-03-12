@@ -2,7 +2,7 @@ package com.hiosdra.openanchor.service
 
 import com.hiosdra.openanchor.domain.geometry.ZoneCheckResult
 import com.hiosdra.openanchor.domain.model.AlarmState
-import com.hiosdra.openanchor.domain.time.Clock
+import java.time.Clock
 import javax.inject.Inject
 
 /**
@@ -47,7 +47,7 @@ class AlarmEngine @Inject constructor(
             ZoneCheckResult.OUTSIDE -> {
                 violationCount++
                 if (firstViolationTime == null) {
-                    firstViolationTime = clock.currentTimeMillis()
+                    firstViolationTime = clock.millis()
                 }
                 currentState
             }
@@ -88,6 +88,6 @@ class AlarmEngine @Inject constructor(
     }
 
     private fun elapsedSinceFirstViolation(): Long {
-        return firstViolationTime?.let { clock.currentTimeMillis() - it } ?: 0L
+        return firstViolationTime?.let { clock.millis() - it } ?: 0L
     }
 }

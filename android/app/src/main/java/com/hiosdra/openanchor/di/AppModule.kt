@@ -1,18 +1,17 @@
 package com.hiosdra.openanchor.di
 
-import com.hiosdra.openanchor.domain.time.Clock
-import com.hiosdra.openanchor.domain.time.SystemClock
-import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.time.Clock
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AppModule {
+object AppModule {
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindClock(systemClock: SystemClock): Clock
+    fun provideClock(): Clock = Clock.systemDefaultZone()
 }

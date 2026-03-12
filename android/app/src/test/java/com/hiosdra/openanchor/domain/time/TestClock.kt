@@ -1,13 +1,26 @@
 package com.hiosdra.openanchor.domain.time
 
-class TestClock(private var time: Long = 0L) : Clock {
-    override fun currentTimeMillis(): Long = time
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 
-    fun setTime(millis: Long) {
-        time = millis
+/**
+ * A mutable Clock implementation for testing that allows controlling time.
+ * Extends java.time.Clock to be compatible with standard Java time APIs.
+ */
+class TestClock(private var millis: Long = 0L) : Clock() {
+
+    override fun instant(): Instant = Instant.ofEpochMilli(millis)
+
+    override fun getZone(): ZoneId = ZoneId.systemDefault()
+
+    override fun withZone(zone: ZoneId): Clock = this
+
+    fun setTime(newMillis: Long) {
+        millis = newMillis
     }
 
-    fun advanceTime(millis: Long) {
-        time += millis
+    fun advanceTime(deltaMillis: Long) {
+        millis += deltaMillis
     }
 }

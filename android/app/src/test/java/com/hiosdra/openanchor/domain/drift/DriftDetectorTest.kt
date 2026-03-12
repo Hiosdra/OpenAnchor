@@ -36,7 +36,7 @@ class DriftDetectorTest {
 
         return TrackPoint(
             sessionId = 1,
-            position = Position(lat, lng, timestamp = testClock.currentTimeMillis() - timeOffsetMs),
+            position = Position(lat, lng, timestamp = testClock.millis() - timeOffsetMs),
             distanceToAnchor = distanceMeters
         )
     }
