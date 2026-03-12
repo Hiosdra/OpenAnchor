@@ -3,6 +3,7 @@ package com.hiosdra.openanchor.domain.drift
 import com.hiosdra.openanchor.domain.geometry.GeoCalculations
 import com.hiosdra.openanchor.domain.model.Position
 import com.hiosdra.openanchor.domain.model.TrackPoint
+import com.hiosdra.openanchor.domain.time.Clock
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.cos
@@ -34,7 +35,9 @@ data class DriftAnalysis(
  *
  * Requires at least 5 track points within the last 5 minutes.
  */
-class DriftDetector @Inject constructor() {
+class DriftDetector @Inject constructor(
+    private val clock: Clock
+) {
 
     companion object {
         /** Minimum track points needed for analysis */
@@ -65,7 +68,7 @@ class DriftDetector @Inject constructor() {
             return DriftAnalysis(description = "Not enough data (${recentPoints.size}/$MIN_POINTS points)")
         }
 
-        val now = System.currentTimeMillis()
+        val now = clock.currentTimeMillis()
         // Filter to recent window
         val windowPoints = recentPoints.filter { (now - it.position.timestamp) <= MAX_WINDOW_MS }
         if (windowPoints.size < MIN_POINTS) {

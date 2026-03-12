@@ -2,10 +2,7 @@ package com.hiosdra.openanchor.service
 
 import com.hiosdra.openanchor.domain.geometry.ZoneCheckResult
 import com.hiosdra.openanchor.domain.model.AlarmState
-import io.mockk.every
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
-import org.junit.After
+import com.hiosdra.openanchor.domain.time.TestClock
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
@@ -16,25 +13,16 @@ import org.junit.Assert.*
 class AlarmEngineTest {
 
     private lateinit var alarmEngine: AlarmEngine
-    private var currentTime = 0L
+    private lateinit var testClock: TestClock
 
     @Before
     fun setup() {
-        alarmEngine = AlarmEngine()
-        currentTime = 1000000L // Start at some arbitrary time
-
-        // Mock System.currentTimeMillis()
-        mockkStatic(System::class)
-        every { System.currentTimeMillis() } answers { currentTime }
-    }
-
-    @After
-    fun tearDown() {
-        unmockkStatic(System::class)
+        testClock = TestClock(1000000L) // Start at some arbitrary time
+        alarmEngine = AlarmEngine(testClock)
     }
 
     private fun advanceTime(millis: Long) {
-        currentTime += millis
+        testClock.advanceTime(millis)
     }
 
     // ========== Initial State ==========

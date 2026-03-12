@@ -2,6 +2,7 @@ package com.hiosdra.openanchor.service
 
 import com.hiosdra.openanchor.domain.geometry.ZoneCheckResult
 import com.hiosdra.openanchor.domain.model.AlarmState
+import com.hiosdra.openanchor.domain.time.Clock
 import javax.inject.Inject
 
 /**
@@ -13,7 +14,9 @@ import javax.inject.Inject
  * - WARNING: Outside all zones, violation building (< 3 readings or < 3 seconds)
  * - ALARM: 3+ consecutive readings AND 3+ seconds outside all zones
  */
-class AlarmEngine @Inject constructor() {
+class AlarmEngine @Inject constructor(
+    private val clock: Clock
+) {
 
     private var violationCount: Int = 0
     private var firstViolationTime: Long? = null
@@ -44,7 +47,7 @@ class AlarmEngine @Inject constructor() {
             ZoneCheckResult.OUTSIDE -> {
                 violationCount++
                 if (firstViolationTime == null) {
-                    firstViolationTime = System.currentTimeMillis()
+                    firstViolationTime = clock.currentTimeMillis()
                 }
                 currentState
             }
@@ -85,6 +88,6 @@ class AlarmEngine @Inject constructor() {
     }
 
     private fun elapsedSinceFirstViolation(): Long {
-        return firstViolationTime?.let { System.currentTimeMillis() - it } ?: 0L
+        return firstViolationTime?.let { clock.currentTimeMillis() - it } ?: 0L
     }
 }

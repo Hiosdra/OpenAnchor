@@ -2,10 +2,7 @@ package com.hiosdra.openanchor.domain.drift
 
 import com.hiosdra.openanchor.domain.model.Position
 import com.hiosdra.openanchor.domain.model.TrackPoint
-import io.mockk.every
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
-import org.junit.After
+import com.hiosdra.openanchor.domain.time.TestClock
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
@@ -16,26 +13,17 @@ import org.junit.Assert.*
 class DriftDetectorTest {
 
     private lateinit var driftDetector: DriftDetector
+    private lateinit var testClock: TestClock
     private val anchorPosition = Position(43.7384, 7.4246) // Nice, France
-    private var currentTime = 0L
 
     @Before
     fun setup() {
-        driftDetector = DriftDetector()
-        currentTime = 1000000L
-
-        // Mock System.currentTimeMillis()
-        mockkStatic(System::class)
-        every { System.currentTimeMillis() } answers { currentTime }
-    }
-
-    @After
-    fun tearDown() {
-        unmockkStatic(System::class)
+        testClock = TestClock(1000000L)
+        driftDetector = DriftDetector(testClock)
     }
 
     private fun advanceTime(millis: Long) {
-        currentTime += millis
+        testClock.advanceTime(millis)
     }
 
     private fun createTrackPoint(
@@ -48,7 +36,7 @@ class DriftDetectorTest {
 
         return TrackPoint(
             sessionId = 1,
-            position = Position(lat, lng, timestamp = currentTime - timeOffsetMs),
+            position = Position(lat, lng, timestamp = testClock.currentTimeMillis() - timeOffsetMs),
             distanceToAnchor = distanceMeters
         )
     }
