@@ -22,7 +22,7 @@ describe('Exam Storage - Progress Management', () => {
   describe('loadProgress / saveProgress', () => {
     it('should return empty progress when nothing is stored', () => {
       const progress = loadProgress();
-      expect(progress).toEqual({ answered: {}, stats: {} });
+      expect(progress).toEqual({ answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } });
     });
 
     it('should save and load progress correctly', () => {
@@ -43,7 +43,7 @@ describe('Exam Storage - Progress Management', () => {
     it('should handle JSON parse errors gracefully', () => {
       localStorage.setItem(EXAM_PROGRESS_KEY, 'invalid json');
       const progress = loadProgress();
-      expect(progress).toEqual({ answered: {}, stats: {} });
+      expect(progress).toEqual({ answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } });
     });
   });
 
@@ -53,22 +53,31 @@ describe('Exam Storage - Progress Management', () => {
       expect(position).toBeNull();
     });
 
-    it('should save and load position correctly', () => {
-      saveLearnPosition(42);
+    it('should save and load position correctly as JSON object', () => {
+      const questionId = 'q42';
+      saveLearnPosition(questionId);
       const loaded = loadLearnPosition();
-      expect(loaded).toBe(42);
-    });
 
-    it('should handle zero position', () => {
-      saveLearnPosition(0);
-      const loaded = loadLearnPosition();
-      expect(loaded).toBe(0);
+      expect(loaded).not.toBeNull();
+      expect(loaded).toHaveProperty('questionId', questionId);
+      expect(loaded).toHaveProperty('timestamp');
+      expect(typeof loaded.timestamp).toBe('number');
     });
 
     it('should handle parse errors gracefully', () => {
-      localStorage.setItem(LEARN_POSITION_KEY, 'not a number');
+      localStorage.setItem(LEARN_POSITION_KEY, 'invalid json');
       const position = loadLearnPosition();
-      expect(isNaN(position)).toBe(true);
+      expect(position).toBeNull();
+    });
+
+    it('should store timestamp when saving position', () => {
+      const before = Date.now();
+      saveLearnPosition('q1');
+      const loaded = loadLearnPosition();
+      const after = Date.now();
+
+      expect(loaded.timestamp).toBeGreaterThanOrEqual(before);
+      expect(loaded.timestamp).toBeLessThanOrEqual(after);
     });
   });
 

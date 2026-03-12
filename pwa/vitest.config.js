@@ -7,9 +7,9 @@ export default defineConfig({
     setupFiles: ['./tests/setup.js'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      include: ['js/**/*.js', 'tests/**/*.test.js'],
-      exclude: ['node_modules/**', 'tests/setup.js']
+      reporter: ['text', 'json', 'html', 'json-summary'],
+      include: ['js/**/*.js'],
+      exclude: ['node_modules/**', 'tests/**']
     }
   }
 });

@@ -72,7 +72,13 @@ export function calculateChainLength(depth, ratio = 3) {
 export function calculateSwingRadius(depth, chainLength) {
   // Simplified calculation: assumes chain forms a catenary
   // Real swing radius depends on chain weight, wind, current
-  const scope = chainLength / depth;
+
+  // If chain is shorter than depth, horizontal distance would be negative/NaN
+  // In this case, use the chain length directly as the swing radius
+  if (chainLength <= depth) {
+    return chainLength * 0.8;
+  }
+
   const horizontalDistance = Math.sqrt(Math.pow(chainLength, 2) - Math.pow(depth, 2));
   return Math.max(horizontalDistance, chainLength * 0.8);
 }
