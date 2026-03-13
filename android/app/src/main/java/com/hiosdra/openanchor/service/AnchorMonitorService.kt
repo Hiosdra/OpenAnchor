@@ -862,29 +862,31 @@ class AnchorMonitorService : Service() {
         }
 
         serviceScope.launch {
-            val sessionId = _monitorState.value.sessionId
-            if (sessionId != null) {
-                val session = repository.getSessionById(sessionId)
-                session?.let {
-                    repository.updateSession(it.copy(
-                        endTime = System.currentTimeMillis(),
-                        maxDistanceMeters = sessionMaxDistance,
-                        maxSog = sessionMaxSog
-                    ))
+            try {
+                val sessionId = _monitorState.value.sessionId
+                if (sessionId != null) {
+                    val session = repository.getSessionById(sessionId)
+                    session?.let {
+                        repository.updateSession(it.copy(
+                            endTime = System.currentTimeMillis(),
+                            maxDistanceMeters = sessionMaxDistance,
+                            maxSog = sessionMaxSog
+                        ))
+                    }
                 }
+                // Reset tracking variables
+                previousPosition = null
+                previousPositionTime = 0L
+                sessionMaxDistance = 0.0
+                sessionMaxSog = 0.0
+                _monitorState.value = MonitorState()
+                // Notify watch that monitoring stopped
+                wearDataSender.clearMonitorState()
+            } finally {
+                // Guarantee service stops even if DB/wear operations fail
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
             }
-            // Reset tracking variables
-            previousPosition = null
-            previousPositionTime = 0L
-            sessionMaxDistance = 0.0
-            sessionMaxSog = 0.0
-            _monitorState.value = MonitorState()
-            // Notify watch that monitoring stopped
-            wearDataSender.clearMonitorState()
-
-            // Stop foreground service AFTER DB write completes
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
         }
     }
 
