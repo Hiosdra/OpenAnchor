@@ -357,8 +357,8 @@ class DriftDetectorTest {
     @Test
     fun analyze_manyPoints_handlesCorrectly() {
         val points = (0..20).map { i ->
-            createTrackPoint(45.0, 40f + i * 2f, i * 500L)
-        }.reversed()
+            createTrackPoint(45.0, 40f + i * 2f, (20 - i) * 500L)
+        }
 
         val result = driftDetector.analyze(points, anchorPosition)
 

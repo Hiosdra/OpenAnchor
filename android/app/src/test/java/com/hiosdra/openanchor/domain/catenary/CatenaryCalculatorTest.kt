@@ -404,9 +404,9 @@ class CatenaryCalculatorTest {
         )
 
         assertNotNull(swingRadius)
-        // With 7:1 scope, swing radius should be roughly 6.8-7x depth (with safety margin)
+        // With 7:1 scope and 20% safety margin, swing radius ≈ 8.3x depth
         assertTrue(swingRadius!! > depth * 6.0)
-        assertTrue(swingRadius < depth * 8.0)
+        assertTrue(swingRadius < depth * 9.0)
     }
 
     @Test

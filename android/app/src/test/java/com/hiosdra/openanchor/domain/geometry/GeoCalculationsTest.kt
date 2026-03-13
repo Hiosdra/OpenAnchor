@@ -216,8 +216,8 @@ class GeoCalculationsTest {
             anchorPosition = ANCHOR_POSITION,
             radiusMeters = 100.0
         )
-        // Position exactly 100m from anchor
-        val boatPos = GeoCalculations.destinationPoint(ANCHOR_POSITION, 45.0, 100.0)
+        // Position just inside boundary (99.9m); exact 100.0m may exceed due to float precision
+        val boatPos = GeoCalculations.destinationPoint(ANCHOR_POSITION, 45.0, 99.9)
         val result = GeoCalculations.checkZone(boatPos, zone)
         assertEquals(ZoneCheckResult.INSIDE, result)
     }

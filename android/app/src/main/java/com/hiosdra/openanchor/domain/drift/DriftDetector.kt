@@ -136,7 +136,7 @@ class DriftDetector @Inject constructor(
             isDragging = true,
             driftBearingDeg = meanBearing,
             driftSpeedMpm = driftSpeedMpm,
-            consistentReadings = maxConsecutive + 1,
+            consistentReadings = maxConsecutive,
             description = "Anchor drag detected! Direction: %.0f°, Speed: %.1f m/min".format(
                 meanBearing, driftSpeedMpm
             )
