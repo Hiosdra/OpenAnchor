@@ -2,6 +2,7 @@ package com.hiosdra.openanchor.service
 
 import com.hiosdra.openanchor.domain.geometry.ZoneCheckResult
 import com.hiosdra.openanchor.domain.model.AlarmState
+import java.time.Clock
 import javax.inject.Inject
 
 /**
@@ -13,19 +14,16 @@ import javax.inject.Inject
  * - WARNING: Outside all zones, violation building (< 3 readings or < 3 seconds)
  * - ALARM: 3+ consecutive readings AND 3+ seconds outside all zones
  */
-class AlarmEngine @Inject constructor() {
+class AlarmEngine @Inject constructor(
+    private val clock: Clock
+) {
 
     private var violationCount: Int = 0
     private var firstViolationTime: Long? = null
+    private var _currentState: AlarmState = AlarmState.SAFE
 
     val currentState: AlarmState
-        get() = synchronized(this) {
-            when {
-                violationCount >= 3 && elapsedSinceFirstViolation() >= 3000L -> AlarmState.ALARM
-                violationCount > 0 -> AlarmState.WARNING
-                else -> AlarmState.SAFE
-            }
-        }
+        get() = _currentState
 
     /**
      * Process a new GPS reading with multi-level zone support.
@@ -37,20 +35,31 @@ class AlarmEngine @Inject constructor() {
         return when (zoneResult) {
             ZoneCheckResult.INSIDE -> {
                 reset()
-                AlarmState.SAFE
+                _currentState
             }
             ZoneCheckResult.BUFFER -> {
-                // In buffer zone: reset violation count but report CAUTION
-                reset()
-                AlarmState.CAUTION
+                // In buffer zone: reset violation count but set state to CAUTION
+                violationCount = 0
+                firstViolationTime = null
+                _currentState = AlarmState.CAUTION
+                _currentState
             }
             ZoneCheckResult.OUTSIDE -> {
                 violationCount++
                 if (firstViolationTime == null) {
-                    firstViolationTime = System.currentTimeMillis()
+                    firstViolationTime = clock.millis()
                 }
-                currentState
+                updateState()
+                _currentState
             }
+        }
+    }
+
+    private fun updateState() {
+        _currentState = when {
+            violationCount >= 3 && elapsedSinceFirstViolation() >= 3000L -> AlarmState.ALARM
+            violationCount > 0 -> AlarmState.WARNING
+            else -> AlarmState.SAFE
         }
     }
 
@@ -68,6 +77,7 @@ class AlarmEngine @Inject constructor() {
     fun reset() {
         violationCount = 0
         firstViolationTime = null
+        _currentState = AlarmState.SAFE
     }
 
     /**
@@ -78,6 +88,7 @@ class AlarmEngine @Inject constructor() {
      */
     @Synchronized
     fun processExternalAlarm(externalState: AlarmState): AlarmState {
+        _currentState = externalState
         return when (externalState) {
             AlarmState.SAFE, AlarmState.CAUTION -> {
                 reset()
@@ -91,6 +102,6 @@ class AlarmEngine @Inject constructor() {
     }
 
     private fun elapsedSinceFirstViolation(): Long {
-        return firstViolationTime?.let { System.currentTimeMillis() - it } ?: 0L
+        return firstViolationTime?.let { clock.millis() - it } ?: 0L
     }
 }

@@ -20,6 +20,8 @@ local.properties
 /pwa/node_modules/
 /pwa/dist/
 /pwa/.env.local
+/pwa/coverage/
+/pwa/.vitest/
 
 # Docs
 *.pdf
