@@ -28,11 +28,15 @@ class StatisticsScreenTest {
     }
 
     private fun navigateToStatistics() {
-        composeTestRule.waitForText("OpenAnchor")
-        composeTestRule
-            .onNode(hasScrollToNodeAction())
-            .performScrollToNode(hasText("Statistics", substring = true))
-        composeTestRule.waitForText("Statistics").performClick()
+        composeTestRule.waitForText("OpenAnchor", timeoutMs = 10_000)
+        try {
+            composeTestRule
+                .onNode(hasScrollToNodeAction())
+                .performScrollToNode(hasText("Statistics", substring = true))
+        } catch (_: Exception) {
+            // Scroll may not be needed if Statistics is already visible
+        }
+        composeTestRule.waitForText("Statistics", timeoutMs = 5_000).performClick()
         composeTestRule.waitForIdle()
     }
 
@@ -73,7 +77,7 @@ class StatisticsScreenTest {
     @Test
     fun statisticsScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("OpenAnchor", timeoutMs = 5_000)
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 }
