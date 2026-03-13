@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,6 +21,12 @@ class StatisticsScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+        navigateToStatistics()
+    }
+
     private fun navigateToStatistics() {
         composeTestRule.waitForText("OpenAnchor")
         composeTestRule
@@ -33,7 +40,6 @@ class StatisticsScreenTest {
 
     @Test
     fun statisticsScreen_navigateFromHome() {
-        navigateToStatistics()
         composeTestRule.assertTextDisplayed("Statistics")
     }
 
@@ -41,13 +47,11 @@ class StatisticsScreenTest {
 
     @Test
     fun statisticsScreen_displaysTitle() {
-        navigateToStatistics()
         composeTestRule.assertTextDisplayed("Statistics")
     }
 
     @Test
     fun statisticsScreen_hasBackButton() {
-        navigateToStatistics()
         composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
     }
 
@@ -55,13 +59,11 @@ class StatisticsScreenTest {
 
     @Test
     fun statisticsScreen_showsEmptyState() {
-        navigateToStatistics()
         composeTestRule.assertTextDisplayed("No anchoring data yet")
     }
 
     @Test
     fun statisticsScreen_emptyState_noStatCards() {
-        navigateToStatistics()
         composeTestRule.onNodeWithText("Total sessions").assertDoesNotExist()
         composeTestRule.onNodeWithText("Total time anchored").assertDoesNotExist()
     }
@@ -70,7 +72,6 @@ class StatisticsScreenTest {
 
     @Test
     fun statisticsScreen_backNavigatesToHome() {
-        navigateToStatistics()
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         composeTestRule.waitForText("OpenAnchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")

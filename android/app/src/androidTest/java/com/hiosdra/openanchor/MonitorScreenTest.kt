@@ -10,6 +10,7 @@ import com.hiosdra.openanchor.helpers.assertTextDisplayed
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,32 +25,20 @@ class MonitorScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+        navigateToSetup()
+    }
+
     private fun navigateToSetup() {
         composeTestRule.waitForText("Drop Anchor").performClick()
     }
 
     @Test
     fun setupScreen_isReachable() {
-        navigateToSetup()
         // Verify we left the home screen and setup loaded without crash
-        composeTestRule.waitForText("Drop Anchor", timeoutMs = 5_000)
+        composeTestRule.waitForText("Anchor Position", timeoutMs = 5_000)
     }
 
-    @Test
-    fun homeScreen_showsDropAnchorButton() {
-        composeTestRule.waitForText("OpenAnchor")
-        composeTestRule.assertTextDisplayed("Drop Anchor")
-    }
-
-    @Test
-    fun homeScreen_dropAnchorNavigatesAway() {
-        composeTestRule.waitForText("OpenAnchor")
-        composeTestRule.onNodeWithText("Drop Anchor", substring = true).performClick()
-        // Verify navigation occurred (we should no longer see the full home screen)
-        composeTestRule.waitUntil(5_000) {
-            composeTestRule.onAllNodes(
-                androidx.compose.ui.test.hasText("No anchoring history yet")
-            ).fetchSemanticsNodes().isEmpty()
-        }
-    }
 }

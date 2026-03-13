@@ -11,6 +11,7 @@ import com.hiosdra.openanchor.helpers.assertTextDisplayed
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +25,11 @@ class NavigationTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+    }
 
     // ── Helpers ──────────────────────────────────────────────────────
 

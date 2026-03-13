@@ -18,3 +18,12 @@ export const GEO = {
   gdyniaHarbor: { latitude: 54.5189, longitude: 18.5305 },
   gdanskPort: { latitude: 54.3520, longitude: 18.6466 },
 } as const;
+
+/** Polish UI strings used across anchor module tests */
+export const ANCHOR_STRINGS = {
+  dropAnchor: 'Rzuć Kotwicę',
+  searching: 'Szukam...',
+  sector: 'SEKTOR',
+  meters: 'METRY',
+  behind: 'Z tyłu',
+} as const;
