@@ -1,0 +1,52 @@
+name: PWA E2E Tests
+
+on:
+  pull_request:
+    paths:
+      - 'pwa/**'
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'pwa/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: PWA Playwright Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./pwa
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: pwa/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npx playwright test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: playwright-report
+          path: pwa/e2e-results/
+          retention-days: 30
