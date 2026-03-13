@@ -1,0 +1,111 @@
+package com.hiosdra.openanchor
+
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.hiosdra.openanchor.helpers.*
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
+class CrewWatchScreenTest {
+
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    private fun navigateToCrewWatch() {
+        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule
+            .onNode(hasScrollToNodeAction())
+            .performScrollToNode(hasText("Crew Watch", substring = true))
+        composeTestRule.waitForText("Crew Watch").performClick()
+        composeTestRule.waitForText("Watch schedule and timer")
+    }
+
+    @Test
+    fun crewWatchScreen_displaysTitle() {
+        navigateToCrewWatch()
+        composeTestRule.assertTextDisplayed("Crew Watch")
+    }
+
+    @Test
+    fun crewWatchScreen_showsSubtitle() {
+        navigateToCrewWatch()
+        composeTestRule.assertTextDisplayed("Watch schedule and timer")
+    }
+
+    @Test
+    fun crewWatchScreen_showsScheduleHeader() {
+        navigateToCrewWatch()
+        composeTestRule.assertTextDisplayed("Schedule")
+    }
+
+    @Test
+    fun crewWatchScreen_showsDurationSelector() {
+        navigateToCrewWatch()
+        composeTestRule.assertTextDisplayed("Watch Duration")
+    }
+
+    @Test
+    fun crewWatchScreen_showsDurationOptions() {
+        navigateToCrewWatch()
+        composeTestRule.assertTextDisplayed("1 hours")
+        composeTestRule.assertTextDisplayed("2 hours")
+        composeTestRule.assertTextDisplayed("3 hours")
+        composeTestRule.assertTextDisplayed("4 hours")
+        composeTestRule.assertTextDisplayed("6 hours")
+    }
+
+    @Test
+    fun crewWatchScreen_showsAlarmHint() {
+        navigateToCrewWatch()
+        composeTestRule.assertTextDisplayed("5 min warning before watch change")
+    }
+
+    @Test
+    fun crewWatchScreen_showsStartButton() {
+        navigateToCrewWatch()
+        composeTestRule.assertTextDisplayed("Start Watch")
+    }
+
+    @Test
+    fun crewWatchScreen_startButtonDisabledWithNoCrew() {
+        navigateToCrewWatch()
+        composeTestRule.onNodeWithText("Start Watch").assertIsNotEnabled()
+    }
+
+    @Test
+    fun crewWatchScreen_showsCrewMemberInput() {
+        navigateToCrewWatch()
+        composeTestRule.onNodeWithText("Crew member").performScrollTo()
+        composeTestRule.assertTextDisplayed("Crew member")
+    }
+
+    @Test
+    fun crewWatchScreen_hasAddCrewButton() {
+        navigateToCrewWatch()
+        composeTestRule.onNodeWithContentDescription("Add Crew").performScrollTo()
+        composeTestRule.onNodeWithContentDescription("Add Crew").assertIsDisplayed()
+    }
+
+    @Test
+    fun crewWatchScreen_hasBackButton() {
+        navigateToCrewWatch()
+        composeTestRule.onNodeWithContentDescription("Cancel").assertIsDisplayed()
+    }
+
+    @Test
+    fun crewWatchScreen_backNavigatesToHome() {
+        navigateToCrewWatch()
+        composeTestRule.onNodeWithContentDescription("Cancel").performClick()
+        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.assertTextDisplayed("OpenAnchor")
+    }
+}
