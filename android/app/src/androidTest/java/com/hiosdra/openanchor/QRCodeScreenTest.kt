@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,6 +21,12 @@ class QRCodeScreenTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+        navigateToQRCodeScreen()
+    }
 
     // ── Helpers ──────────────────────────────────────────────────────
 
@@ -41,7 +48,6 @@ class QRCodeScreenTest {
 
     @Test
     fun qrCodeScreen_displaysWithoutCrash() {
-        navigateToQRCodeScreen()
         composeTestRule.assertTextDisplayed("Pair with Tablet")
     }
 
@@ -49,7 +55,6 @@ class QRCodeScreenTest {
 
     @Test
     fun qrCodeScreen_titleVisible() {
-        navigateToQRCodeScreen()
         // TopAppBar title
         composeTestRule.assertTextDisplayed("Pair with Tablet")
         // Idle state title
@@ -60,25 +65,21 @@ class QRCodeScreenTest {
 
     @Test
     fun qrCodeScreen_idleState_showsPairingDescription() {
-        navigateToQRCodeScreen()
         composeTestRule.assertTextDisplayed("Pair your phone with the tablet")
     }
 
     @Test
     fun qrCodeScreen_idleState_showsHotspotButton() {
-        navigateToQRCodeScreen()
         composeTestRule.assertTextDisplayed("Create Hotspot")
     }
 
     @Test
     fun qrCodeScreen_idleState_showsSameNetworkButton() {
-        navigateToQRCodeScreen()
         composeTestRule.assertTextDisplayed("Use Same Network")
     }
 
     @Test
     fun qrCodeScreen_idleState_showsOrDivider() {
-        navigateToQRCodeScreen()
         composeTestRule.assertTextDisplayed("or")
     }
 
@@ -86,7 +87,6 @@ class QRCodeScreenTest {
 
     @Test
     fun qrCodeScreen_backNavigation_returnsToHome() {
-        navigateToQRCodeScreen()
         Espresso.pressBack()
         composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
@@ -94,7 +94,6 @@ class QRCodeScreenTest {
 
     @Test
     fun qrCodeScreen_backButton_returnsToHome() {
-        navigateToQRCodeScreen()
         composeTestRule.onNodeWithContentDescription("Cancel").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)

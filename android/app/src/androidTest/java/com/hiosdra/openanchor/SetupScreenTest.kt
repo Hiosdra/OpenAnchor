@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +26,12 @@ class SetupScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+        navigateToSetup()
+    }
+
     private fun navigateToSetup() {
         composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().performClick()
         composeTestRule.waitForText("Anchor Position")
@@ -34,7 +41,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_opensOnDropAnchor() {
-        navigateToSetup()
         composeTestRule.onNodeWithText("Anchor Position").assertIsDisplayed()
     }
 
@@ -42,7 +48,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_step1_useCurrentPositionVisible() {
-        navigateToSetup()
         composeTestRule.onNodeWithText("Use Current Position").performScrollTo().assertIsDisplayed()
     }
 
@@ -50,7 +55,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_step2_zoneTypeHeadingVisible() {
-        navigateToSetup()
         composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
         composeTestRule.waitForText("Choose Safe Zone Type")
         composeTestRule.onNodeWithText("Choose Safe Zone Type").assertIsDisplayed()
@@ -58,7 +62,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_step2_simpleCircleOptionVisible() {
-        navigateToSetup()
         composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
         composeTestRule.waitForText("Simple Circle")
         composeTestRule.onNodeWithText("Simple Circle").assertIsDisplayed()
@@ -66,7 +69,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_step2_circleWithSectorOptionVisible() {
-        navigateToSetup()
         composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
         composeTestRule.waitForText("Circle + Sector")
         composeTestRule.onNodeWithText("Circle + Sector").assertIsDisplayed()
@@ -74,7 +76,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_step2_canSelectSimpleCircle() {
-        navigateToSetup()
         composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
         composeTestRule.waitForText("Simple Circle")
         composeTestRule.onNodeWithText("Simple Circle").performClick()
@@ -83,7 +84,6 @@ class SetupScreenTest {
     // --- 4. Radius Configuration (Step 3) ---
 
     private fun navigateToRadiusStep() {
-        navigateToSetup()
         // Step 1 → Step 2
         composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
         composeTestRule.waitForText("Choose Safe Zone Type")
@@ -137,7 +137,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_nextButtonNavigatesBetweenSteps() {
-        navigateToSetup()
         // Step 1 → Step 2
         composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
         composeTestRule.waitForText("Choose Safe Zone Type")
@@ -146,7 +145,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_backArrowReturnsToPreviousStep() {
-        navigateToSetup()
         // Step 1 → Step 2
         composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
         composeTestRule.waitForText("Choose Safe Zone Type")
@@ -158,7 +156,6 @@ class SetupScreenTest {
 
     @Test
     fun setup_backFromStep1ReturnsToHome() {
-        navigateToSetup()
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         composeTestRule.waitForText("OpenAnchor")
         composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().assertIsDisplayed()

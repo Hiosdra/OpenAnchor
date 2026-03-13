@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,6 +23,12 @@ class WeatherScreenTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+        navigateToWeather()
+    }
 
     // Weather screen requires latitude/longitude route parameters and is accessed
     // from Monitor screen's Weather FAB, not directly from Home.
@@ -42,7 +49,6 @@ class WeatherScreenTest {
 
     @Test
     fun weatherScreen_displaysTitle() {
-        navigateToWeather()
         composeTestRule.waitForText("Marine Weather", timeoutMs = 10_000)
         composeTestRule.assertTextDisplayed("Marine Weather")
     }
@@ -51,7 +57,6 @@ class WeatherScreenTest {
 
     @Test
     fun weatherScreen_hasBackButton() {
-        navigateToWeather()
         composeTestRule.waitForText("Marine Weather", timeoutMs = 10_000)
         composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
     }
@@ -60,7 +65,6 @@ class WeatherScreenTest {
 
     @Test
     fun weatherScreen_showsLoadingOrContent() {
-        navigateToWeather()
         composeTestRule.waitForText("Marine Weather", timeoutMs = 10_000)
         val hasLoading = composeTestRule
             .onAllNodesWithText("Loading marine weather", substring = true)
@@ -80,7 +84,6 @@ class WeatherScreenTest {
 
     @Test
     fun weatherScreen_hasRefreshButton() {
-        navigateToWeather()
         composeTestRule.waitForText("Marine Weather", timeoutMs = 10_000)
         composeTestRule.onNodeWithContentDescription("Refresh").assertIsDisplayed()
     }
@@ -89,7 +92,6 @@ class WeatherScreenTest {
 
     @Test
     fun weatherScreen_showsPositionWhenLoaded() {
-        navigateToWeather()
         composeTestRule.waitForText("Marine Weather", timeoutMs = 10_000)
         // Wait for loading to finish
         try {
@@ -120,7 +122,6 @@ class WeatherScreenTest {
 
     @Test
     fun weatherScreen_backNavigatesAway() {
-        navigateToWeather()
         composeTestRule.waitForText("Marine Weather", timeoutMs = 10_000)
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         composeTestRule.waitForIdle()
