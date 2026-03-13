@@ -20,13 +20,10 @@ class AlarmEngine @Inject constructor(
 
     private var violationCount: Int = 0
     private var firstViolationTime: Long? = null
+    private var _currentState: AlarmState = AlarmState.SAFE
 
     val currentState: AlarmState
-        get() = when {
-            violationCount >= 3 && elapsedSinceFirstViolation() >= 3000L -> AlarmState.ALARM
-            violationCount > 0 -> AlarmState.WARNING
-            else -> AlarmState.SAFE
-        }
+        get() = _currentState
 
     /**
      * Process a new GPS reading with multi-level zone support.
@@ -37,20 +34,31 @@ class AlarmEngine @Inject constructor(
         return when (zoneResult) {
             ZoneCheckResult.INSIDE -> {
                 reset()
-                AlarmState.SAFE
+                _currentState
             }
             ZoneCheckResult.BUFFER -> {
-                // In buffer zone: reset violation count but report CAUTION
-                reset()
-                AlarmState.CAUTION
+                // In buffer zone: reset violation count but set state to CAUTION
+                violationCount = 0
+                firstViolationTime = null
+                _currentState = AlarmState.CAUTION
+                _currentState
             }
             ZoneCheckResult.OUTSIDE -> {
                 violationCount++
                 if (firstViolationTime == null) {
                     firstViolationTime = clock.millis()
                 }
-                currentState
+                updateState()
+                _currentState
             }
+        }
+    }
+
+    private fun updateState() {
+        _currentState = when {
+            violationCount >= 3 && elapsedSinceFirstViolation() >= 3000L -> AlarmState.ALARM
+            violationCount > 0 -> AlarmState.WARNING
+            else -> AlarmState.SAFE
         }
     }
 
@@ -66,6 +74,7 @@ class AlarmEngine @Inject constructor(
     fun reset() {
         violationCount = 0
         firstViolationTime = null
+        _currentState = AlarmState.SAFE
     }
 
     /**
@@ -75,6 +84,7 @@ class AlarmEngine @Inject constructor(
      * @return the alarm state to use (same as input)
      */
     fun processExternalAlarm(externalState: AlarmState): AlarmState {
+        _currentState = externalState
         return when (externalState) {
             AlarmState.SAFE, AlarmState.CAUTION -> {
                 reset()
