@@ -1,0 +1,166 @@
+package com.hiosdra.openanchor
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.hiosdra.openanchor.helpers.waitForText
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
+class SetupScreenTest {
+
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    private fun navigateToSetup() {
+        composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().performClick()
+        composeTestRule.waitForText("Anchor Position")
+    }
+
+    // --- 1. Setup Opens on Drop Anchor ---
+
+    @Test
+    fun setup_opensOnDropAnchor() {
+        navigateToSetup()
+        composeTestRule.onNodeWithText("Anchor Position").assertIsDisplayed()
+    }
+
+    // --- 2. Step 1: GPS Position ---
+
+    @Test
+    fun setup_step1_useCurrentPositionVisible() {
+        navigateToSetup()
+        composeTestRule.onNodeWithText("Use Current Position").performScrollTo().assertIsDisplayed()
+    }
+
+    // --- 3. Zone Type Selection (Step 2) ---
+
+    @Test
+    fun setup_step2_zoneTypeHeadingVisible() {
+        navigateToSetup()
+        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.waitForText("Choose Safe Zone Type")
+        composeTestRule.onNodeWithText("Choose Safe Zone Type").assertIsDisplayed()
+    }
+
+    @Test
+    fun setup_step2_simpleCircleOptionVisible() {
+        navigateToSetup()
+        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.waitForText("Simple Circle")
+        composeTestRule.onNodeWithText("Simple Circle").assertIsDisplayed()
+    }
+
+    @Test
+    fun setup_step2_circleWithSectorOptionVisible() {
+        navigateToSetup()
+        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.waitForText("Circle + Sector")
+        composeTestRule.onNodeWithText("Circle + Sector").assertIsDisplayed()
+    }
+
+    @Test
+    fun setup_step2_canSelectSimpleCircle() {
+        navigateToSetup()
+        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.waitForText("Simple Circle")
+        composeTestRule.onNodeWithText("Simple Circle").performClick()
+    }
+
+    // --- 4. Radius Configuration (Step 3) ---
+
+    private fun navigateToRadiusStep() {
+        navigateToSetup()
+        // Step 1 → Step 2
+        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.waitForText("Choose Safe Zone Type")
+        // Select Simple Circle and advance
+        composeTestRule.onNodeWithText("Simple Circle").performClick()
+        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.waitForText("Set Safe Radius")
+    }
+
+    @Test
+    fun setup_step3_radiusHeadingVisible() {
+        navigateToRadiusStep()
+        composeTestRule.onNodeWithText("Set Safe Radius").assertIsDisplayed()
+    }
+
+    @Test
+    fun setup_step3_calculateFromChainSwitchVisible() {
+        navigateToRadiusStep()
+        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun setup_step3_radiusInputVisible() {
+        navigateToRadiusStep()
+        composeTestRule.onNodeWithText("Radius").performScrollTo().assertIsDisplayed()
+    }
+
+    // --- 5. Chain Calculator ---
+
+    @Test
+    fun setup_step3_chainCalculator_depthInputAppears() {
+        navigateToRadiusStep()
+        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo().performClick()
+        composeTestRule.waitForText("Depth (m)")
+        composeTestRule.onNodeWithText("Depth (m)").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun setup_step3_chainCalculator_scopeRatioChipsVisible() {
+        navigateToRadiusStep()
+        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo().performClick()
+        composeTestRule.waitForText("3:1 Calm")
+        composeTestRule.onNodeWithText("3:1 Calm").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("5:1 Moderate").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("7:1 Standard").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("10:1 Storm").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Manual").performScrollTo().assertIsDisplayed()
+    }
+
+    // --- 6. Setup Navigation ---
+
+    @Test
+    fun setup_nextButtonNavigatesBetweenSteps() {
+        navigateToSetup()
+        // Step 1 → Step 2
+        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.waitForText("Choose Safe Zone Type")
+        composeTestRule.onNodeWithText("Choose Safe Zone Type").assertIsDisplayed()
+    }
+
+    @Test
+    fun setup_backArrowReturnsToPreviousStep() {
+        navigateToSetup()
+        // Step 1 → Step 2
+        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.waitForText("Choose Safe Zone Type")
+        // Step 2 → Step 1
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForText("Anchor Position")
+        composeTestRule.onNodeWithText("Anchor Position").assertIsDisplayed()
+    }
+
+    @Test
+    fun setup_backFromStep1ReturnsToHome() {
+        navigateToSetup()
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().assertIsDisplayed()
+    }
+}
