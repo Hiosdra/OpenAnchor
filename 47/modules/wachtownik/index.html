@@ -1947,7 +1947,7 @@
                  ics += "END:VEVENT\r\n";
               }
             });
-            ics += "END:VCALENDAR";
+            ics += "END:VCALENDAR\r\n";
 
             const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
             const url = URL.createObjectURL(blob);

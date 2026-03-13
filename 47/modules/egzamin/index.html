@@ -72,7 +72,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 1rem; /* fallback for browsers without safe-area support */
             padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
             cursor: zoom-out;
         }
@@ -737,6 +737,7 @@
 
                 const isCorrect = label === currentQuestion.correctAnswer;
                 const newProgress = { ...progress };
+                newProgress.answered = { ...progress.answered };
                 // Adjust stats if question was already answered before (re-visit)
                 const previousAnswer = newProgress.answered[currentQuestion.id];
                 newProgress.stats = { ...newProgress.stats };
@@ -947,6 +948,7 @@
                 onFinish(results, EXAM_TIME_MINUTES * 60 - timeLeft);
             };
 
+            // Intentionally omitting handleFinishExam from deps — fire-once effect when exam ends
             useEffect(() => {
                 if (isFinished) {
                     handleFinishExam();
@@ -1308,6 +1310,7 @@
             sessionIncorrectRef.current = sessionIncorrect;
             leitnerStateRef.current = currentLeitnerState;
 
+            // Intentionally omitting onComplete from deps — fire-once effect; refs ensure fresh values
             useEffect(() => {
                 if (isSessionComplete) {
                     onComplete(sessionCorrectRef.current, sessionIncorrectRef.current, leitnerStateRef.current);
