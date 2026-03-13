@@ -9,12 +9,6 @@ const waitForApp = async (page: import('@playwright/test').Page) => {
     const root = document.getElementById('root');
     return root && root.children.length > 0;
   });
-  // Disable pointer events on decorative fixed overlays that intercept clicks
-  await page.evaluate(() => {
-    document.querySelectorAll('.stars, .ocean-bg').forEach(el => {
-      (el as HTMLElement).style.pointerEvents = 'none';
-    });
-  });
 };
 
 /** Scroll element to viewport center (avoids sticky header occlusion) then click */

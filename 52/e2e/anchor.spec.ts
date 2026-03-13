@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { MODULES, STORAGE_KEYS } from './helpers.js';
+import { MODULES, STORAGE_KEYS, ANCHOR_STRINGS } from './helpers.js';
 import type { Page } from '@playwright/test';
 
 const ANCHOR_URL = MODULES.anchor;
@@ -30,7 +30,7 @@ test.describe('Anchor — Page Load & Initial State', () => {
 
   test('main button shows "Rzuć Kotwicę"', async ({ page }) => {
     await gotoAnchor(page);
-    await expect(page.locator('#main-btn-text')).toHaveText('Rzuć Kotwicę');
+    await expect(page.locator('#main-btn-text')).toHaveText(ANCHOR_STRINGS.dropAnchor);
   });
 
   test('main button is initially disabled', async ({ page }) => {
@@ -40,7 +40,7 @@ test.describe('Anchor — Page Load & Initial State', () => {
 
   test('GPS status shows searching state', async ({ page }) => {
     await gotoAnchor(page);
-    await expect(page.locator('#gps-status-text')).toHaveText('Szukam...');
+    await expect(page.locator('#gps-status-text')).toHaveText(ANCHOR_STRINGS.searching);
   });
 
   test('alarm bar is hidden initially', async ({ page }) => {
@@ -105,7 +105,7 @@ test.describe('Anchor — Geolocation & GPS', () => {
 
     // Drop anchor
     await page.locator('#main-btn').click();
-    await expect(page.locator('#main-btn-text')).not.toHaveText('Rzuć Kotwicę', { timeout: 5_000 });
+    await expect(page.locator('#main-btn-text')).not.toHaveText(ANCHOR_STRINGS.dropAnchor, { timeout: 5_000 });
 
     // Trigger a new GPS position update so _recalculate → _syncUI updates the dashboard
     await context.setGeolocation({ latitude: 54.5190, longitude: 18.5306, accuracy: 5 });
@@ -341,7 +341,7 @@ test.describe('Anchor — Sector Configuration', () => {
     await page.locator('#save-sector-btn').click();
 
     await expect(page.locator('#sector-badge')).toBeVisible();
-    await expect(page.locator('#sector-badge')).toHaveText('SEKTOR');
+    await expect(page.locator('#sector-badge')).toHaveText(ANCHOR_STRINGS.sector);
   });
 
   test('sector modal closes with close button', async ({ page, mockGeolocation }) => {
@@ -390,7 +390,7 @@ test.describe('Anchor — Unit Toggle', () => {
   test('unit toggle shows METRY by default', async ({ page, mockGeolocation }) => {
     await mockGeolocation();
     await gotoAnchor(page);
-    await expect(page.locator('#unit-toggle')).toContainText('METRY');
+    await expect(page.locator('#unit-toggle')).toContainText(ANCHOR_STRINGS.meters);
   });
 
   test('unit toggle switches text on click', async ({ page, mockGeolocation }) => {
@@ -399,7 +399,7 @@ test.describe('Anchor — Unit Toggle', () => {
     await expect(page.locator('#main-btn')).toBeEnabled({ timeout: 10_000 });
 
     await page.locator('#unit-toggle').click();
-    await expect(page.locator('#unit-toggle')).not.toContainText('METRY');
+    await expect(page.locator('#unit-toggle')).not.toContainText(ANCHOR_STRINGS.meters);
   });
 
   test('unit toggle cycles back on second click', async ({ page, mockGeolocation }) => {
@@ -408,10 +408,10 @@ test.describe('Anchor — Unit Toggle', () => {
     await expect(page.locator('#main-btn')).toBeEnabled({ timeout: 10_000 });
 
     await page.locator('#unit-toggle').click();
-    await expect(page.locator('#unit-toggle')).not.toContainText('METRY');
+    await expect(page.locator('#unit-toggle')).not.toContainText(ANCHOR_STRINGS.meters);
 
     await page.locator('#unit-toggle').click();
-    await expect(page.locator('#unit-toggle')).toContainText('METRY');
+    await expect(page.locator('#unit-toggle')).toContainText(ANCHOR_STRINGS.meters);
   });
 });
 
@@ -535,10 +535,10 @@ test.describe('Anchor — Language Toggle', () => {
   test('language toggle changes UI language', async ({ page, mockGeolocation }) => {
     await mockGeolocation();
     await gotoAnchor(page);
-    await expect(page.locator('#main-btn-text')).toHaveText('Rzuć Kotwicę');
+    await expect(page.locator('#main-btn-text')).toHaveText(ANCHOR_STRINGS.dropAnchor);
 
     await page.locator('#lang-toggle').click();
-    await expect(page.locator('#main-btn-text')).not.toHaveText('Rzuć Kotwicę', { timeout: 3_000 });
+    await expect(page.locator('#main-btn-text')).not.toHaveText(ANCHOR_STRINGS.dropAnchor, { timeout: 3_000 });
   });
 });
 
@@ -678,7 +678,7 @@ test.describe('Anchor — Offset Modal', () => {
     await gotoAnchor(page);
     await expect(page.locator('#main-btn')).toBeEnabled({ timeout: 10_000 });
     await page.locator('#main-btn').click();
-    await expect(page.locator('#main-btn-text')).not.toHaveText('Rzuć Kotwicę', { timeout: 5_000 });
+    await expect(page.locator('#main-btn-text')).not.toHaveText(ANCHOR_STRINGS.dropAnchor, { timeout: 5_000 });
   }
 
   test('offset button is enabled after anchor drop', async ({ page, context }) => {
@@ -710,7 +710,7 @@ test.describe('Anchor — Offset Modal', () => {
     await expect(bearing).toHaveValue('180');
   });
 
-  test('"Z tyłu" button sets bearing', async ({ page, context }) => {
+  test(`"${ANCHOR_STRINGS.behind}" button sets bearing`, async ({ page, context }) => {
     await dropAnchor(page, context);
     await expect(page.locator('#offset-btn')).toBeEnabled({ timeout: 5_000 });
     await page.locator('#offset-btn').click();

@@ -59,6 +59,7 @@ div:not(.oa-header):not(.oa-back-btn) {
     inset: 0;
     overflow: hidden;
     z-index: 0;
+    pointer-events: none;
 }
 
 .wave {
