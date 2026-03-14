@@ -54,7 +54,7 @@ jobs:
           retention-days: 30
 
       - name: Publish Android test report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always()
         with:
           name: Android Unit Tests
