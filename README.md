@@ -1,6 +1,6 @@
 # OpenAnchor
 
-OpenAnchor is a maritime superapp — a PWA hub-and-spoke shell with two modules, plus companion native Android apps.
+OpenAnchor is a maritime superapp — a PWA hub-and-spoke shell with three modules, plus companion native Android apps and Wear OS support.
 
 Live PWA: **https://hiosdra.github.io/OpenAnchor/**
 
@@ -8,8 +8,9 @@ Live PWA: **https://hiosdra.github.io/OpenAnchor/**
 
 | Module | Description |
 |---|---|
-| **Alert Kotwiczny** | Anchor alarm with GPS tracking, map visualisation (Leaflet), audio/vibration/browser notifications, night vision mode |
+| **Alert Kotwiczny** | Anchor alarm with GPS tracking, map visualisation (Leaflet), audio/vibration/browser notifications, night vision mode, WebSocket pairing with Android for redundant cabin alarm |
 | **Wachtownik** | Maritime watch scheduler for yacht crews — generates watch schedules, PDF export, QR sharing (React + Babel, PL/EN) |
+| **Egzamin** | Maritime examination module (ŻJ/JSM) with question bank, image support, and interactive quiz functionality |
 
 ## Project Structure
 
@@ -19,12 +20,21 @@ OpenAnchor/
 │   ├── index.html                # Shell launcher
 │   ├── manifest.json
 │   ├── sw.js                     # Service Worker (offline cache)
+│   ├── js/                       # Testable JavaScript modules
+│   ├── tests/                    # Vitest test suite (149 tests, 96.52% coverage)
 │   ├── assets/                   # Icons
 │   └── modules/
 │       ├── anchor/index.html     # Alert Kotwiczny
-│       └── wachtownik/index.html # Wachtownik
+│       ├── wachtownik/index.html # Wachtownik
+│       └── egzamin/              # Egzamin (exam module)
+│           ├── index.html
+│           ├── exam_questions.json
+│           └── exam_images/
 ├── android/                      # Native Android app + Wear OS companion
+│   ├── app/                      # Main mobile application (Jetpack Compose)
+│   └── wear/                     # Wear OS companion app
 └── docs/                         # Protocol documentation
+    └── protocol/                 # WebSocket protocol v2 specification
 ```
 
 ## Running locally
@@ -63,12 +73,53 @@ The preview site updates automatically when new commits are pushed to the PR and
 
 ## Android
 
+The Android app provides native mobile functionality with advanced features:
+
+### Key Features
+- **Standalone Mode**: Independent GPS monitoring with local alarms
+- **Paired Mode**: Master-slave architecture with iPad PWA via WebSocket
+- **Client Mode**: Android-to-Android WiFi-based redundancy
+- **Wear OS Integration**: Companion app for smartwatches
+- **Drift Detection**: Advanced drift analysis (Faza 4.5)
+- **Battery Awareness**: Low battery warnings between paired devices
+- **Offline Operation**: Full functionality without internet connection
+- **Crew Watch Management**: Watch schedule generation and tracking
+- **AI Advisor**: Anchoring recommendations powered by AI
+
+### Building
+
 ```bash
 cd android
 ./gradlew build
 ```
 
-See [android/README.md](android/README.md) for details.
+### Running
+
+```bash
+cd android
+./gradlew installDebug
+```
+
+See [android/README.md](android/README.md) for detailed architecture and features.
+
+## Testing
+
+### PWA Tests
+```bash
+cd pwa
+npm install
+npm test                # Run unit tests (Vitest)
+npm run test:coverage   # Generate coverage report
+```
+
+### Android Tests
+```bash
+cd android
+./gradlew test                      # Run unit tests
+./gradlew assembleDebugAndroidTest  # Build instrumented tests
+```
+
+See [pwa/tests/README.md](pwa/tests/README.md) for PWA test documentation.
 
 ## Contributing
 
