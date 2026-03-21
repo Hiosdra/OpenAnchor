@@ -883,13 +883,14 @@
 
     <script type="module">
         // Import dashboard functions from module
-        import { initBetaMode, toggleBetaMode, openSettings, closeSettings, closeSettingsOnBackdrop } from './js/dashboard.js';
+        import { initBetaMode, toggleBetaMode, openSettings, closeSettings, closeSettingsOnBackdrop, openModule } from './js/dashboard.js';
 
         // Expose functions to global scope for onclick handlers
         window.toggleBetaMode = toggleBetaMode;
         window.openSettings = openSettings;
         window.closeSettings = closeSettings;
         window.closeSettingsOnBackdrop = closeSettingsOnBackdrop;
+        window.openModule = openModule;
 
         // Initialize on page load
         window.addEventListener('load', () => {
@@ -1097,11 +1098,6 @@
         dismissBtn.addEventListener('click', () => {
             hideUpdateBanner();
         });
-
-        // Navigate to module
-        function openModule(url) {
-            window.location.href = url;
-        }
 
         // Handle keyboard for cards
         document.querySelectorAll('.module-card').forEach(card => {
