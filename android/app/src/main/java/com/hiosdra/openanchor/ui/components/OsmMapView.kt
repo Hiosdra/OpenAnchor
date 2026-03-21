@@ -19,6 +19,7 @@ import kotlin.math.cos
 
 /**
  * Data class for a map marker.
+ * Note: onDrag callback is excluded from equals/hashCode to prevent defeating differential updates.
  */
 data class MapMarker(
     val position: GeoPoint,
@@ -26,7 +27,30 @@ data class MapMarker(
     val snippet: String = "",
     val draggable: Boolean = false,
     val onDrag: ((GeoPoint) -> Unit)? = null
-)
+) {
+    // Custom equals/hashCode that excludes onDrag lambda
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MapMarker
+
+        if (position != other.position) return false
+        if (title != other.title) return false
+        if (snippet != other.snippet) return false
+        if (draggable != other.draggable) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = position.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + snippet.hashCode()
+        result = 31 * result + draggable.hashCode()
+        return result
+    }
+}
 
 /**
  * Data class for a circle overlay.
@@ -72,10 +96,13 @@ fun OsmMapView(
     val context = LocalContext.current
     val mapViewRef = remember { mutableStateOf<MapView?>(null) }
 
-    // Remember previous overlay data to enable differential updates
-    val previousCircles = remember { mutableStateOf(emptyList<MapCircle>()) }
-    val previousPolylines = remember { mutableStateOf(emptyList<MapPolylineData>()) }
-    val previousMarkers = remember { mutableStateOf(emptyList<MapMarker>()) }
+    // Simple non-Compose holder for previous overlay data to avoid triggering recompositions
+    class OverlayState<T>(var value: List<T>)
+
+    // Remember previous overlay data to enable differential updates without using Compose state
+    val previousCircles = remember { OverlayState(emptyList<MapCircle>()) }
+    val previousPolylines = remember { OverlayState(emptyList<MapPolylineData>()) }
+    val previousMarkers = remember { OverlayState(emptyList<MapMarker>()) }
 
     AndroidView(
         modifier = modifier,

@@ -854,7 +854,9 @@ class AnchorMonitorService : Service() {
         clientStateUpdateJob = null
         clientEventJob?.cancel()
         clientEventJob = null
-        recentTrackPoints.clear()
+        synchronized(recentTrackPoints) {
+            recentTrackPoints.clear()
+        }
         alarmEngine.reset()
         alarmPlayer.stopAlarm()
 

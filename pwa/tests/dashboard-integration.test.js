@@ -19,45 +19,40 @@ describe('Dashboard - Global Function Exposure (Regression)', () => {
   });
 
   describe('Required global functions for onclick handlers', () => {
-    it('should have openModule available globally', () => {
+    it('should have openModule available globally', async () => {
       // Simulate what index.html does
-      import('../js/dashboard.js').then(({ openModule }) => {
-        window.openModule = openModule;
-        expect(window.openModule).toBeDefined();
-        expect(typeof window.openModule).toBe('function');
-      });
+      const { openModule } = await import('../js/dashboard.js');
+      window.openModule = openModule;
+      expect(window.openModule).toBeDefined();
+      expect(typeof window.openModule).toBe('function');
     });
 
-    it('should have toggleBetaMode available globally', () => {
-      import('../js/dashboard.js').then(({ toggleBetaMode }) => {
-        window.toggleBetaMode = toggleBetaMode;
-        expect(window.toggleBetaMode).toBeDefined();
-        expect(typeof window.toggleBetaMode).toBe('function');
-      });
+    it('should have toggleBetaMode available globally', async () => {
+      const { toggleBetaMode } = await import('../js/dashboard.js');
+      window.toggleBetaMode = toggleBetaMode;
+      expect(window.toggleBetaMode).toBeDefined();
+      expect(typeof window.toggleBetaMode).toBe('function');
     });
 
-    it('should have openSettings available globally', () => {
-      import('../js/dashboard.js').then(({ openSettings }) => {
-        window.openSettings = openSettings;
-        expect(window.openSettings).toBeDefined();
-        expect(typeof window.openSettings).toBe('function');
-      });
+    it('should have openSettings available globally', async () => {
+      const { openSettings } = await import('../js/dashboard.js');
+      window.openSettings = openSettings;
+      expect(window.openSettings).toBeDefined();
+      expect(typeof window.openSettings).toBe('function');
     });
 
-    it('should have closeSettings available globally', () => {
-      import('../js/dashboard.js').then(({ closeSettings }) => {
-        window.closeSettings = closeSettings;
-        expect(window.closeSettings).toBeDefined();
-        expect(typeof window.closeSettings).toBe('function');
-      });
+    it('should have closeSettings available globally', async () => {
+      const { closeSettings } = await import('../js/dashboard.js');
+      window.closeSettings = closeSettings;
+      expect(window.closeSettings).toBeDefined();
+      expect(typeof window.closeSettings).toBe('function');
     });
 
-    it('should have closeSettingsOnBackdrop available globally', () => {
-      import('../js/dashboard.js').then(({ closeSettingsOnBackdrop }) => {
-        window.closeSettingsOnBackdrop = closeSettingsOnBackdrop;
-        expect(window.closeSettingsOnBackdrop).toBeDefined();
-        expect(typeof window.closeSettingsOnBackdrop).toBe('function');
-      });
+    it('should have closeSettingsOnBackdrop available globally', async () => {
+      const { closeSettingsOnBackdrop } = await import('../js/dashboard.js');
+      window.closeSettingsOnBackdrop = closeSettingsOnBackdrop;
+      expect(window.closeSettingsOnBackdrop).toBeDefined();
+      expect(typeof window.closeSettingsOnBackdrop).toBe('function');
     });
   });
 
