@@ -52,7 +52,6 @@ jobs:
             android/app/build/test-results/testDebugUnitTest/*.xml
             android/app/build/reports/tests/testDebugUnitTest/
           retention-days: 30
-          archive: false
 
       - name: Publish Android test report
         uses: dorny/test-reporter@v2
@@ -207,7 +206,6 @@ jobs:
           name: pwa
           path: pwa/
           retention-days: 30
-          archive: false
 
   test-pwa:
     name: Test PWA
@@ -242,7 +240,6 @@ jobs:
           name: pwa-coverage
           path: pwa/coverage/
           retention-days: 30
-          archive: false
 
       - name: Display coverage summary
         run: |

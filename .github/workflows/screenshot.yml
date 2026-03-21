@@ -165,7 +165,6 @@ jobs:
           name: screenshots
           path: screenshots/
           retention-days: 30
-          archive: false
 
       - name: Comment on PR with screenshots
         if: github.event.pull_request.head.repo.full_name == github.repository
