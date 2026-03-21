@@ -381,11 +381,11 @@ class DomainModelsTest {
             anchorPosition = position,
             zone = zone,
             startTime = 1000000000000L,
-            endTime = 1000000086400L // 24 hours later
+            endTime = 1000086400000L // 24 hours later
         )
 
         val duration = session.endTime!! - session.startTime
-        assertEquals(86400L, duration) // 24 hours in milliseconds
+        assertEquals(86_400_000L, duration) // 24 hours in milliseconds
     }
 
     @Test

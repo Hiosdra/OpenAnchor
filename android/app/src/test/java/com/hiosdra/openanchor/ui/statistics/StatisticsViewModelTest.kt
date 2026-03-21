@@ -25,13 +25,11 @@ class StatisticsViewModelTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: AnchorSessionRepository
     private lateinit var viewModel: StatisticsViewModel
 
     @Before
     fun setup() {
-        Dispatchers.setMain(testDispatcher)
         repository = mockk(relaxed = true)
     }
 
@@ -46,6 +44,7 @@ class StatisticsViewModelTest {
 
     @Test
     fun `initial state is loading`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         coEvery { repository.getCompletedSessionCount() } returns 0
         coEvery { repository.getTotalAlarmCount() } returns 0
         coEvery { repository.getTotalAnchoredMillis() } returns 0
@@ -65,6 +64,7 @@ class StatisticsViewModelTest {
 
     @Test
     fun `loadStatistics fetches all repository data`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         coEvery { repository.getCompletedSessionCount() } returns 10
         coEvery { repository.getTotalAlarmCount() } returns 5
         coEvery { repository.getTotalAnchoredMillis() } returns 3_600_000
@@ -87,6 +87,7 @@ class StatisticsViewModelTest {
 
     @Test
     fun `loadStatistics updates state with fetched data`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         coEvery { repository.getCompletedSessionCount() } returns 15
         coEvery { repository.getTotalAlarmCount() } returns 8
         coEvery { repository.getTotalAnchoredMillis() } returns 0
@@ -109,6 +110,7 @@ class StatisticsViewModelTest {
 
     @Test
     fun `loadStatistics converts millis to hours correctly`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         coEvery { repository.getCompletedSessionCount() } returns 0
         coEvery { repository.getTotalAlarmCount() } returns 0
         coEvery { repository.getTotalAnchoredMillis() } returns 7_200_000 // 2 hours
@@ -131,6 +133,7 @@ class StatisticsViewModelTest {
 
     @Test
     fun `loadStatistics sets radius values correctly`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         coEvery { repository.getCompletedSessionCount() } returns 0
         coEvery { repository.getTotalAlarmCount() } returns 0
         coEvery { repository.getTotalAnchoredMillis() } returns 0
@@ -152,6 +155,7 @@ class StatisticsViewModelTest {
 
     @Test
     fun `loadStatistics handles zero values`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         coEvery { repository.getCompletedSessionCount() } returns 0
         coEvery { repository.getTotalAlarmCount() } returns 0
         coEvery { repository.getTotalAnchoredMillis() } returns 0
@@ -179,6 +183,7 @@ class StatisticsViewModelTest {
 
     @Test
     fun `state emits loading then loaded`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         coEvery { repository.getCompletedSessionCount() } returns 5
         coEvery { repository.getTotalAlarmCount() } returns 2
         coEvery { repository.getTotalAnchoredMillis() } returns 3_600_000
@@ -206,6 +211,7 @@ class StatisticsViewModelTest {
 
     @Test
     fun `realistic statistics scenario`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         coEvery { repository.getCompletedSessionCount() } returns 20
         coEvery { repository.getTotalAlarmCount() } returns 3
         coEvery { repository.getTotalAnchoredMillis() } returns 180_000_000 // 50 hours

@@ -9,15 +9,10 @@ import com.hiosdra.openanchor.domain.model.DistanceUnit
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -29,23 +24,21 @@ class SettingsViewModelTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    private val testDispatcher = StandardTestDispatcher()
     private lateinit var preferencesManager: PreferencesManager
     private lateinit var preferencesFlow: MutableStateFlow<UserPreferences>
     private lateinit var viewModel: SettingsViewModel
 
     @Before
     fun setup() {
-        Dispatchers.setMain(testDispatcher)
-        preferencesManager = mockk(relaxed = true)
         preferencesFlow = MutableStateFlow(UserPreferences())
-
-        coEvery { preferencesManager.preferences } returns preferencesFlow
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
+        preferencesManager = mockk {
+            coEvery { preferences } returns preferencesFlow
+            coEvery { setDistanceUnit(any()) } returns Unit
+            coEvery { setDepthUnit(any()) } returns Unit
+            coEvery { setLanguage(any()) } returns Unit
+            coEvery { setGpsInterval(any()) } returns Unit
+            coEvery { setNightFilterEnabled(any()) } returns Unit
+        }
     }
 
     private fun createViewModel(): SettingsViewModel {

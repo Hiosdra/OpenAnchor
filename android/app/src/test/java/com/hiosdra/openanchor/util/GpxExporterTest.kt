@@ -417,7 +417,7 @@ class GpxExporterTest {
         GpxExporter.export(session, trackPoints, output)
 
         val gpx = output.toString("UTF-8")
-        assertTrue(gpx.contains("<hdop>12.5</hdop>") || gpx.contains("<hdop>12.4</hdop>"))
+        assertTrue(gpx.contains("<hdop>12.5</hdop>"))
     }
 
     @Test
