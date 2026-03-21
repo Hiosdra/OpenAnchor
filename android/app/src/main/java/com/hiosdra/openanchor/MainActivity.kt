@@ -8,10 +8,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.hiosdra.openanchor.data.preferences.PreferencesManager
@@ -26,6 +32,11 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var preferencesManager: PreferencesManager
 
+    private var showLocationPermissionDialog by mutableStateOf(false)
+    private var showBackgroundLocationDialog by mutableStateOf(false)
+    private var showNotificationsDialog by mutableStateOf(false)
+    private var permissionsToRequest = mutableListOf<String>()
+
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -34,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
         // Request background location after foreground permissions are granted (Android 10+)
         if ((fineGranted || coarseGranted) && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            requestBackgroundLocationPermission()
+            showBackgroundLocationExplanation()
         }
     }
 
@@ -47,7 +58,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        requestLocationPermissions()
+        checkAndRequestPermissions()
 
         setContent {
             val prefs by preferencesManager.preferences.collectAsState(
@@ -58,12 +69,63 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     val navController = rememberNavController()
                     OpenAnchorNavHost(navController = navController)
+
+                    // Location Permission Explanation Dialog
+                    if (showLocationPermissionDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showLocationPermissionDialog = false },
+                            title = { Text(stringResource(R.string.permissions_location_title)) },
+                            text = { Text(stringResource(R.string.permissions_location_message)) },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    showLocationPermissionDialog = false
+                                    locationPermissionRequest.launch(permissionsToRequest.toTypedArray())
+                                }) {
+                                    Text(stringResource(R.string.permissions_continue))
+                                }
+                            }
+                        )
+                    }
+
+                    // Background Location Permission Explanation Dialog
+                    if (showBackgroundLocationDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showBackgroundLocationDialog = false },
+                            title = { Text(stringResource(R.string.permissions_background_location_title)) },
+                            text = { Text(stringResource(R.string.permissions_background_location_message)) },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    showBackgroundLocationDialog = false
+                                    requestBackgroundLocationPermission()
+                                }) {
+                                    Text(stringResource(R.string.permissions_continue))
+                                }
+                            }
+                        )
+                    }
+
+                    // Notifications Permission Explanation Dialog
+                    if (showNotificationsDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showNotificationsDialog = false },
+                            title = { Text(stringResource(R.string.permissions_notifications_title)) },
+                            text = { Text(stringResource(R.string.permissions_notifications_message)) },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    showNotificationsDialog = false
+                                    locationPermissionRequest.launch(permissionsToRequest.toTypedArray())
+                                }) {
+                                    Text(stringResource(R.string.permissions_continue))
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun requestLocationPermissions() {
+    private fun checkAndRequestPermissions() {
         val fineLocation = ContextCompat.checkSelfPermission(
             this, Manifest.permission.ACCESS_FINE_LOCATION
         )
@@ -71,7 +133,7 @@ class MainActivity : ComponentActivity() {
             this, Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        val permissionsToRequest = mutableListOf<String>()
+        permissionsToRequest.clear()
         if (fineLocation != PackageManager.PERMISSION_GRANTED) {
             permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
         }
@@ -79,21 +141,43 @@ class MainActivity : ComponentActivity() {
             permissionsToRequest.add(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
 
+        // Check if notifications permission is needed (Android 13+)
+        var needsNotifications = false
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             val notifPermission = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.POST_NOTIFICATIONS
             )
             if (notifPermission != PackageManager.PERMISSION_GRANTED) {
                 permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
+                needsNotifications = true
             }
         }
 
+        // Show appropriate explanation dialog
         if (permissionsToRequest.isNotEmpty()) {
-            locationPermissionRequest.launch(permissionsToRequest.toTypedArray())
+            // If we need notifications along with location, show notifications dialog first
+            if (needsNotifications && permissionsToRequest.size > 1) {
+                showNotificationsDialog = true
+            } else if (needsNotifications) {
+                showNotificationsDialog = true
+            } else {
+                showLocationPermissionDialog = true
+            }
         } else {
-            // Foreground permissions already granted, request background if needed
+            // Foreground permissions already granted, check background if needed
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                requestBackgroundLocationPermission()
+                showBackgroundLocationExplanation()
+            }
+        }
+    }
+
+    private fun showBackgroundLocationExplanation() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            val bgLocation = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            )
+            if (bgLocation != PackageManager.PERMISSION_GRANTED) {
+                showBackgroundLocationDialog = true
             }
         }
     }

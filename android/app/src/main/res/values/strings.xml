@@ -316,4 +316,14 @@
     <string name="leitner_continue">Continue Session</string>
     <string name="leitner_finish_session">Finish Session</string>
     <string name="leitner_remaining">%1$d remaining</string>
+
+    <!-- Permissions -->
+    <string name="permissions_required_title">Permissions Required</string>
+    <string name="permissions_continue">Continue</string>
+    <string name="permissions_location_title">Location Permission</string>
+    <string name="permissions_location_message">OpenAnchor needs access to your location to:\n\n• Monitor your position relative to the anchor\n• Calculate distance from the anchor point\n• Detect if your boat drifts outside the safe zone\n• Alert you if anchor dragging is detected\n\nThis is the core functionality of the anchor alarm system.</string>
+    <string name="permissions_background_location_title">Background Location</string>
+    <string name="permissions_background_location_message">OpenAnchor needs background location access to:\n\n• Continue monitoring your position when the app is minimized\n• Alert you if the boat drifts while you\'re asleep or using other apps\n• Ensure the anchor alarm works 24/7 for your safety\n\nThis permission is essential for reliable anchor monitoring.</string>
+    <string name="permissions_notifications_title">Notifications Permission</string>
+    <string name="permissions_notifications_message">OpenAnchor needs notification permission to:\n\n• Show persistent notification during anchor monitoring\n• Alert you immediately if anchor drag is detected\n• Display distance and GPS status updates\n• Provide warnings when entering the buffer zone\n\nNotifications are critical for anchor alarm safety.</string>
 </resources>
