@@ -40,6 +40,7 @@ android {
         }
     }
     testOptions {
+        unitTests.isIncludeAndroidResources = true
         unitTests.isReturnDefaultValues = true
         unitTests.all {
             it.configure<JacocoTaskExtension> {
@@ -138,6 +139,8 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.turbine)
     testImplementation(libs.androidx.arch.core.testing)
@@ -171,16 +174,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/Manifest*.*",
         "**/*Test*.*",
         "android/**/*.*",
-        "**/ui/**",
-        "**/MainActivity*.*",
-        "**/OpenAnchorApp*.*",
-        "**/service/**",
-        "**/network/AnchorWebSocket*.*",
-        "**/network/HotspotManager*.*",
-        "**/data/location/**",
-        "**/data/compass/**",
-        "**/data/battery/**",
-        "**/data/ai/**",
         "**/*_Hilt*.class",
         "**/Hilt_*.class",
         "**/*_Factory.class",
