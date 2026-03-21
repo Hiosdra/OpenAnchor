@@ -14,7 +14,6 @@ on:
 permissions:
   contents: read
   checks: write
-  pull-requests: write
 
 jobs:
   build-android-debug:
@@ -102,9 +101,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run Android unit tests (debug)
-        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
-
       - name: Generate coverage report
         run: ./gradlew :app:jacocoTestReport --no-daemon --stacktrace
 
@@ -123,9 +119,7 @@ jobs:
         if: always()
         with:
           name: android-coverage
-          path: |
-            android/app/build/reports/jacoco/jacocoTestReport/
-            android/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          path: android/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
           retention-days: 30
 
       - name: Publish Android test report
@@ -315,7 +309,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: pwa-coverage
-          path: pwa/coverage/
+          path: pwa/coverage/coverage-summary.json
           retention-days: 30
 
       - name: Display coverage summary
@@ -341,6 +335,7 @@ jobs:
     needs: [test-android, test-pwa]
     if: github.event_name == 'pull_request'
     permissions:
+      contents: read
       pull-requests: write
 
     steps:
@@ -397,7 +392,6 @@ jobs:
           # Android Coverage
           echo "### Android Coverage" >> coverage-comment.md
           if [ -f "android-coverage/jacocoTestReport.xml" ]; then
-            # Parse JaCoCo XML for coverage info
             python3 << 'EOF'
           import xml.etree.ElementTree as ET
           import os
@@ -406,9 +400,9 @@ jobs:
               tree = ET.parse('android-coverage/jacocoTestReport.xml')
               root = tree.getroot()
 
-              # Find the root counter elements
+              # Parse only root-level counters (report totals)
               counters = {}
-              for counter in root.findall(".//counter"):
+              for counter in root.findall("./counter"):
                   type_name = counter.get('type')
                   missed = int(counter.get('missed', 0))
                   covered = int(counter.get('covered', 0))
