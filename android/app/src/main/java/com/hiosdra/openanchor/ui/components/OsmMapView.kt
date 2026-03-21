@@ -72,6 +72,11 @@ fun OsmMapView(
     val context = LocalContext.current
     val mapViewRef = remember { mutableStateOf<MapView?>(null) }
 
+    // Remember previous overlay data to enable differential updates
+    val previousCircles = remember { mutableStateOf(emptyList<MapCircle>()) }
+    val previousPolylines = remember { mutableStateOf(emptyList<MapPolylineData>()) }
+    val previousMarkers = remember { mutableStateOf(emptyList<MapMarker>()) }
+
     AndroidView(
         modifier = modifier,
         factory = { ctx ->
@@ -94,48 +99,60 @@ fun OsmMapView(
             }
         },
         update = { mapView ->
-            // Clear non-tile overlays and re-add
-            mapView.overlays.removeAll { it !is org.osmdroid.views.overlay.TilesOverlay }
+            // Only update overlays if data actually changed
+            val circlesChanged = circles != previousCircles.value
+            val polylinesChanged = polylines != previousPolylines.value
+            val markersChanged = markers != previousMarkers.value
 
-            // Add circle overlays
-            circles.forEach { circle ->
-                mapView.overlays.add(CircleOverlay(circle))
-            }
+            if (circlesChanged || polylinesChanged || markersChanged) {
+                // Clear non-tile overlays and re-add
+                mapView.overlays.removeAll { it !is org.osmdroid.views.overlay.TilesOverlay }
 
-            // Add polylines
-            polylines.forEach { polyData ->
-                if (polyData.points.isNotEmpty()) {
-                    val polyline = Polyline(mapView).apply {
-                        setPoints(polyData.points)
-                        outlinePaint.color = polyData.color.toArgb()
-                        outlinePaint.strokeWidth = polyData.width
-                    }
-                    mapView.overlays.add(polyline)
+                // Add circle overlays
+                circles.forEach { circle ->
+                    mapView.overlays.add(CircleOverlay(circle))
                 }
-            }
 
-            // Add markers
-            markers.forEach { markerData ->
-                val marker = Marker(mapView).apply {
-                    position = markerData.position
-                    title = markerData.title
-                    snippet = markerData.snippet
-                    isDraggable = markerData.draggable
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    if (markerData.draggable && markerData.onDrag != null) {
-                        setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
-                            override fun onMarkerDrag(marker: Marker) {}
-                            override fun onMarkerDragEnd(marker: Marker) {
-                                markerData.onDrag.invoke(marker.position)
-                            }
-                            override fun onMarkerDragStart(marker: Marker) {}
-                        })
+                // Add polylines
+                polylines.forEach { polyData ->
+                    if (polyData.points.isNotEmpty()) {
+                        val polyline = Polyline(mapView).apply {
+                            setPoints(polyData.points)
+                            outlinePaint.color = polyData.color.toArgb()
+                            outlinePaint.strokeWidth = polyData.width
+                        }
+                        mapView.overlays.add(polyline)
                     }
                 }
-                mapView.overlays.add(marker)
-            }
 
-            mapView.invalidate()
+                // Add markers
+                markers.forEach { markerData ->
+                    val marker = Marker(mapView).apply {
+                        position = markerData.position
+                        title = markerData.title
+                        snippet = markerData.snippet
+                        isDraggable = markerData.draggable
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        if (markerData.draggable && markerData.onDrag != null) {
+                            setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
+                                override fun onMarkerDrag(marker: Marker) {}
+                                override fun onMarkerDragEnd(marker: Marker) {
+                                    markerData.onDrag.invoke(marker.position)
+                                }
+                                override fun onMarkerDragStart(marker: Marker) {}
+                            })
+                        }
+                    }
+                    mapView.overlays.add(marker)
+                }
+
+                mapView.invalidate()
+
+                // Update remembered values
+                previousCircles.value = circles
+                previousPolylines.value = polylines
+                previousMarkers.value = markers
+            }
         }
     )
 

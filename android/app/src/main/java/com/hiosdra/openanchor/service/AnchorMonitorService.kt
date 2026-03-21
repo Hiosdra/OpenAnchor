@@ -113,7 +113,7 @@ class AnchorMonitorService : Service() {
     private var clientEventJob: Job? = null
     private var lastGpsFixTime: Long = System.currentTimeMillis()
     /** Ring buffer of recent track points for drift detection (last 30) */
-    private val recentTrackPoints = Collections.synchronizedList(mutableListOf<com.hiosdra.openanchor.domain.model.TrackPoint>())
+    private val recentTrackPoints = ArrayDeque<com.hiosdra.openanchor.domain.model.TrackPoint>(30)
     private var previousPosition: Position? = null
     private var previousPositionTime: Long = 0L
     private var sessionMaxDistance: Double = 0.0
@@ -233,8 +233,10 @@ class AnchorMonitorService : Service() {
                 repository.insertTrackPoint(trackPoint)
 
                 // Drift detection (Faza 4.5)
-                recentTrackPoints.add(trackPoint)
-                if (recentTrackPoints.size > 30) recentTrackPoints.removeAt(0)
+                synchronized(recentTrackPoints) {
+                    recentTrackPoints.add(trackPoint)
+                    if (recentTrackPoints.size > 30) recentTrackPoints.removeFirst()
+                }
                 // Create snapshot for thread-safe iteration
                 val trackPointsSnapshot = synchronized(recentTrackPoints) { recentTrackPoints.toList() }
                 val driftAnalysis = driftDetector.analyze(trackPointsSnapshot, session.anchorPosition)

@@ -1101,10 +1101,10 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
-                        // Check for updates periodically (every 60 seconds)
+                        // Check for updates periodically (every 5 minutes)
                         setInterval(() => {
                             registration.update();
-                        }, 60000);
+                        }, 300000);
 
                         // Check if there's already a waiting service worker on page load
                         if (registration.waiting) {
