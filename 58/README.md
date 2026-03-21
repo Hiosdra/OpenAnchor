@@ -10,7 +10,7 @@ The PWA runs on any modern browser (iPad, desktop, mobile) and serves as a compr
 - **Wachtownik**: Crew watch scheduler with PDF export and QR sharing
 - **Egzamin**: Maritime examination module with interactive quizzes
 
-All modules are installable as Progressive Web Apps on any device with offline support, local notifications, and app-like experience.
+All modules are installable as Progressive Web Apps on any device with offline support and an app-like experience. The Anchor Alarm and Wachtownik modules support local notifications.
 
 ## Modules
 

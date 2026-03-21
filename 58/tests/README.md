@@ -104,7 +104,7 @@ pwa/
 - ✅ Course Over Ground (COG)
 - ✅ GPS coordinate validation
 
-**Total: 135+ comprehensive tests**
+**Total: 149 comprehensive tests**
 
 ## Code Architecture
 
@@ -184,6 +184,7 @@ describe('My Module', () => {
 ✅ Tests are integrated with the PWA
 ✅ Unit tests run with Vitest
 ✅ 149 tests with 96.52% code coverage
+✅ CI/CD workflow runs tests automatically on PRs (`.github/workflows/build.yml`)
 
 ## Future Enhancements
 
@@ -195,7 +196,7 @@ Potential improvements for the test suite:
 4. Add performance benchmarks
 5. Add integration tests for WebSocket protocol
 6. Add accessibility testing with axe-core
-7. Add CI/CD workflow to run tests automatically on PRs
+7. Enhance CI workflow for tests (e.g., parallelization, flaky test detection, stricter coverage thresholds)
 
 ## Notes
 
