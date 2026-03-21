@@ -76,6 +76,7 @@ class MonitorViewModel @Inject constructor(
         // Observe service instance and collect monitor state when connected
         viewModelScope.launch {
             serviceBinder.serviceInstance.filterNotNull().collectLatest { service ->
+                // StateFlow already deduplicates values, no need for distinctUntilChanged()
                 service.monitorState.collect { monitorState ->
                     _uiState.update { ui ->
                         ui.copy(
