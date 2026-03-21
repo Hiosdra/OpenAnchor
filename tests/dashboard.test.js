@@ -57,20 +57,22 @@ describe('Dashboard - Beta Mode Management', () => {
 
   describe('initBetaMode', () => {
     beforeEach(() => {
+      // Modules start with module-hidden class to prevent flash on load
       document.body.innerHTML = `
         <input type="checkbox" id="betaToggle" />
-        <div id="anchorModule"></div>
-        <div id="wachtownikModule"></div>
+        <div id="anchorModule" class="module-hidden"></div>
+        <div id="wachtownikModule" class="module-hidden"></div>
       `;
     });
 
-    it('should hide modules when beta mode is disabled', () => {
+    it('should keep modules hidden when beta mode is disabled', () => {
       setBetaMode(false);
       initBetaMode();
 
       const anchor = document.getElementById('anchorModule');
       const wachtownik = document.getElementById('wachtownikModule');
 
+      // Modules should remain hidden (initBetaMode doesn't remove the class)
       expect(anchor.classList.contains('module-hidden')).toBe(true);
       expect(wachtownik.classList.contains('module-hidden')).toBe(true);
     });
@@ -82,6 +84,7 @@ describe('Dashboard - Beta Mode Management', () => {
       const anchor = document.getElementById('anchorModule');
       const wachtownik = document.getElementById('wachtownikModule');
 
+      // Modules should be visible (initBetaMode removes the hidden class)
       expect(anchor.classList.contains('module-hidden')).toBe(false);
       expect(wachtownik.classList.contains('module-hidden')).toBe(false);
     });
