@@ -70,6 +70,7 @@ div:not(.oa-header):not(.oa-back-btn) {
     border-radius: 45%;
     opacity: 0.04;
     animation: wave-spin linear infinite;
+    will-change: transform;
 }
 
 .wave-1 {
@@ -399,6 +400,7 @@ div:not(.oa-header):not(.oa-back-btn) {
 
 .oa-pulse {
     animation: pulse 1.5s ease-in-out infinite;
+    will-change: opacity;
 }
 
 @keyframes arrow-bounce {
@@ -408,6 +410,7 @@ div:not(.oa-header):not(.oa-back-btn) {
 
 .oa-arrow-bounce {
     animation: arrow-bounce 1.5s ease-in-out infinite;
+    will-change: transform;
 }
 
 /* === UTILITY CLASSES === */
