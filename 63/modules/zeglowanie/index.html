@@ -320,7 +320,7 @@
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                     <path d="M3 3v5h5"/>
                 </svg>
-                Wyczyść listę
+                Wyczyść obecną listę
             </button>
         </div>
     </main>
@@ -396,7 +396,7 @@
             });
 
             // Save selected cruise type
-            localStorage.setItem('selected-cruise-type', cruiseType);
+            localStorage.setItem('zeglowanie_selected_cruise_type', cruiseType);
 
             // Render the checklist
             renderChecklist();
@@ -470,7 +470,7 @@
 
         // Reset checklist
         function resetChecklist() {
-            if (confirm('Czy na pewno chcesz wyczyścić całą listę?')) {
+            if (confirm('Czy na pewno chcesz wyczyścić obecną listę?')) {
                 document.querySelectorAll('.checklist-item').forEach(item => {
                     const itemId = item.dataset.item;
                     const cruiseType = item.dataset.cruiseType;
@@ -486,7 +486,7 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Load saved cruise type or default to baltic-autumn
-            const savedCruiseType = localStorage.getItem('selected-cruise-type') || 'baltic-autumn';
+            const savedCruiseType = localStorage.getItem('zeglowanie_selected_cruise_type') || 'baltic-autumn';
             currentCruiseType = savedCruiseType;
 
             // Update button states
