@@ -57,6 +57,7 @@
             border-radius: 0.5rem;
             border: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.2s ease;
+            cursor: pointer;
         }
 
         .checklist-item:hover {
@@ -74,6 +75,9 @@
             cursor: pointer;
             background: rgba(15, 23, 42, 0.6);
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .checklist-checkbox.checked {
@@ -84,9 +88,6 @@
         .checklist-checkbox.checked::after {
             content: '✓';
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-weight: bold;
             font-size: 0.875rem;
         }
@@ -205,6 +206,52 @@
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             border-radius: 0.5rem;
         }
+
+        /* Cruise type selector */
+        .cruise-selector {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .cruise-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.4);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .cruise-btn:hover {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .cruise-btn.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.2));
+            border-color: #3b82f6;
+            color: #93c5fd;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .cruise-btn-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .cruise-btn-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -233,6 +280,18 @@
 
     <!-- Main Content -->
     <main class="content">
+        <!-- Cruise Type Selector -->
+        <div class="cruise-selector">
+            <button class="cruise-btn active" data-cruise="baltic-autumn" onclick="switchCruiseType('baltic-autumn')">
+                <div class="cruise-btn-title">🍂 Bałtyk</div>
+                <div class="cruise-btn-subtitle">Rejs jesienny</div>
+            </button>
+            <button class="cruise-btn" data-cruise="croatia-summer" onclick="switchCruiseType('croatia-summer')">
+                <div class="cruise-btn-title">☀️ Chorwacja</div>
+                <div class="cruise-btn-subtitle">Rejs wakacyjny</div>
+            </button>
+        </div>
+
         <!-- Packing List Section -->
         <div class="section-card">
             <h2 class="section-title">
@@ -252,105 +311,7 @@
             </div>
 
             <ul class="checklist" id="packingList">
-                <!-- Documents -->
-                <li class="checklist-item" data-item="ekuz">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>EKUZ</strong> (Europejska Karta Ubezpieczenia Zdrowotnego)</div>
-                </li>
-                <li class="checklist-item" data-item="paszport">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Paszport</strong> jeżeli masz</div>
-                </li>
-                <li class="checklist-item" data-item="dowod">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Dowód osobisty</strong></div>
-                </li>
-
-                <!-- Clothing -->
-                <li class="checklist-item" data-item="bluza">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Bluza</strong> (ciepła, warstwowa)</div>
-                </li>
-                <li class="checklist-item" data-item="kurta">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Kurtka wodoodporna</strong></div>
-                </li>
-                <li class="checklist-item" data-item="bielizna">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Bielizna</strong> (na każdy dzień + zapas)</div>
-                </li>
-                <li class="checklist-item" data-item="koszulki">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Koszulki</strong> (kilka sztuk)</div>
-                </li>
-                <li class="checklist-item" data-item="spodnie">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Długie spodnie</strong>, najlepiej wodoodporne</div>
-                </li>
-                <li class="checklist-item" data-item="termoaktywna">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Bielizna termoaktywna</strong></div>
-                </li>
-                <li class="checklist-item" data-item="czapka">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Czapka!</strong> (ochrona przed słońcem i wiatrem)</div>
-                </li>
-
-                <!-- Footwear -->
-                <li class="checklist-item" data-item="buty">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Buty niefarbujące od spodu</strong> z zasłoniętymi palcami</div>
-                </li>
-                <li class="checklist-item" data-item="kalosze">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Kalosze</strong> jeżeli masz</div>
-                </li>
-                <li class="checklist-item" data-item="klapki">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Klapki do kąpieli</strong></div>
-                </li>
-
-                <!-- Personal Items -->
-                <li class="checklist-item" data-item="recznik">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Ręcznik</strong>, najlepiej szybkoschnący</div>
-                </li>
-                <li class="checklist-item" data-item="kosmetyki">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Kosmetyki</strong>, fajnie jak BIO, ale nie jest to konieczne</div>
-                </li>
-                <li class="checklist-item" data-item="krem-uv">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Krem UV</strong> (wysoki filtr!)</div>
-                </li>
-
-                <!-- Electronics & Utilities -->
-                <li class="checklist-item" data-item="latarka">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Latarka</strong>, najlepiej czołówka</div>
-                </li>
-                <li class="checklist-item" data-item="ladowarka">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Ładowarka z gniazdkiem europejskim</strong></div>
-                </li>
-                <li class="checklist-item" data-item="rozdzielacz">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Kradziejka prądu (rozdzielacz)</strong> - w kabinach zazwyczaj 1 gniazdko na 2 osoby</div>
-                </li>
-                <li class="checklist-item" data-item="powerbank">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Powerbank</strong></div>
-                </li>
-                <li class="checklist-item" data-item="kable">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Kable do ładowania</strong> (USB-C, Lightning, itp.)</div>
-                </li>
-
-                <!-- Medicine -->
-                <li class="checklist-item" data-item="choroba-morska">
-                    <div class="checklist-checkbox"></div>
-                    <div class="checklist-text"><strong>Coś na chorobę morską</strong> jeżeli podlegasz (Aviomarin, opaski, itp.)</div>
-                </li>
+                <!-- Items will be dynamically generated -->
             </ul>
 
             <button class="reset-btn" onclick="resetChecklist()">
@@ -365,12 +326,135 @@
     </main>
 
     <script>
+        // Packing lists for different cruise types
+        const packingLists = {
+            'baltic-autumn': [
+                { id: 'ekuz', text: '<strong>EKUZ</strong> (Europejska Karta Ubezpieczenia Zdrowotnego)' },
+                { id: 'paszport', text: '<strong>Paszport</strong> jeżeli masz' },
+                { id: 'dowod', text: '<strong>Dowód osobisty</strong>' },
+                { id: 'bluza', text: '<strong>Bluza</strong> (ciepła, warstwowa)' },
+                { id: 'kurta', text: '<strong>Kurtka wodoodporna</strong>' },
+                { id: 'bielizna', text: '<strong>Bielizna</strong> (na każdy dzień + zapas)' },
+                { id: 'koszulki', text: '<strong>Koszulki</strong> (kilka sztuk)' },
+                { id: 'spodnie', text: '<strong>Długie spodnie</strong>, najlepiej wodoodporne' },
+                { id: 'termoaktywna', text: '<strong>Bielizna termoaktywna</strong>' },
+                { id: 'czapka', text: '<strong>Czapka!</strong> (ochrona przed słońcem i wiatrem)' },
+                { id: 'buty', text: '<strong>Buty niefarbujące od spodu</strong> z zasłoniętymi palcami' },
+                { id: 'kalosze', text: '<strong>Kalosze</strong> jeżeli masz' },
+                { id: 'klapki', text: '<strong>Klapki do kąpieli</strong>' },
+                { id: 'recznik', text: '<strong>Ręcznik</strong>, najlepiej szybkoschnący' },
+                { id: 'kosmetyki', text: '<strong>Kosmetyki</strong>, fajnie jak BIO, ale nie jest to konieczne' },
+                { id: 'krem-uv', text: '<strong>Krem UV</strong> (wysoki filtr!)' },
+                { id: 'latarka', text: '<strong>Latarka</strong>, najlepiej czołówka' },
+                { id: 'ladowarka', text: '<strong>Ładowarka z gniazdkiem europejskim</strong>' },
+                { id: 'rozdzielacz', text: '<strong>Kradziejka prądu (rozdzielacz)</strong> - w kabinach zazwyczaj 1 gniazdko na 2 osoby' },
+                { id: 'powerbank', text: '<strong>Powerbank</strong>' },
+                { id: 'kable', text: '<strong>Kable do ładowania</strong> (USB-C, Lightning, itp.)' },
+                { id: 'choroba-morska', text: '<strong>Coś na chorobę morską</strong> jeżeli podlegasz (Aviomarin, opaski, itp.)' }
+            ],
+            'croatia-summer': [
+                { id: 'ekuz', text: '<strong>EKUZ</strong>, paszport, dowód osobisty' },
+                { id: 'patent', text: '<strong>Patent</strong> jeżeli masz' },
+                { id: 'bluzy', text: '<strong>Dwie bluzy</strong>' },
+                { id: 'kurta', text: '<strong>Kurtka wodoodporna</strong>' },
+                { id: 'bielizna', text: '<strong>Bielizna</strong>' },
+                { id: 'koszulki', text: '<strong>Koszulki</strong>' },
+                { id: 'spodenki', text: '<strong>Krótkie i długie spodenki</strong>' },
+                { id: 'kostium', text: '<strong>Kostium do pływania</strong> (a nawet x2 jednak będzie dobre słoneczko)' },
+                { id: 'czapka', text: '<strong>Czapka!</strong>' },
+                { id: 'okulary', text: '<strong>Okulary przeciwsłoneczne</strong> (nie zastępują czapki)' },
+                { id: 'rekawiczki', text: '<strong>Rękawiczki</strong> jeżeli ktoś preferuje, ale koniecznie nie rowerowe, na morzu opcjonalne' },
+                { id: 'buty', text: '<strong>Buty niefarbujące od spodu</strong> z zasłoniętymi palcami' },
+                { id: 'klapki', text: '<strong>Klapki do kąpieli</strong>' },
+                { id: 'recznik', text: '<strong>Ręcznik</strong>, najlepiej szybkoschnący' },
+                { id: 'kosmetyki', text: '<strong>Kosmetyki</strong>, fajnie jak BIO, ale nie jest to konieczne' },
+                { id: 'proszek', text: '<strong>Proszek do prania</strong> (opcjonalnie, ja piorę rzeczy w trakcie, aby mniej brać)' },
+                { id: 'krem-uv', text: '<strong>Krem UV</strong>' },
+                { id: 'latarka', text: '<strong>Latarka</strong>, najlepiej czołówka' },
+                { id: 'ladowarka', text: '<strong>Ładowarka z gniazdkiem europejskim</strong>' },
+                { id: 'rozdzielacz', text: '<strong>Kradziejka prądu (rozdzielacz)</strong> (w kabinach jest zazwyczaj po 1 gniazdku na 2 osoby)' },
+                { id: 'powerbank', text: '<strong>Powerbank</strong> (nie codziennie będzie prąd do ładowania)' },
+                { id: 'kable', text: '<strong>Kable do ładowania</strong>' },
+                { id: 'ubranie-wierzch', text: '<strong>W porcie i restauracjach</strong> trzeba być nie tylko w kostiumie kąpielowym, więc coś sensownego na wierzch 😀' },
+                { id: 'rekawice-budowlane', text: '<strong>2 pary rękawic budowlanych</strong> na ekipę' }
+            ]
+        };
+
+        let currentCruiseType = 'baltic-autumn';
+
+        // Switch cruise type
+        function switchCruiseType(cruiseType) {
+            currentCruiseType = cruiseType;
+
+            // Update button states
+            document.querySelectorAll('.cruise-btn').forEach(btn => {
+                if (btn.dataset.cruise === cruiseType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Save selected cruise type
+            localStorage.setItem('selected-cruise-type', cruiseType);
+
+            // Render the checklist
+            renderChecklist();
+        }
+
+        // Render checklist based on current cruise type
+        function renderChecklist() {
+            const listContainer = document.getElementById('packingList');
+            listContainer.innerHTML = '';
+
+            const items = packingLists[currentCruiseType];
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'checklist-item';
+                li.dataset.item = item.id;
+                li.dataset.cruiseType = currentCruiseType;
+
+                const checkbox = document.createElement('div');
+                checkbox.className = 'checklist-checkbox';
+
+                const text = document.createElement('div');
+                text.className = 'checklist-text';
+                text.innerHTML = item.text;
+
+                li.appendChild(checkbox);
+                li.appendChild(text);
+                listContainer.appendChild(li);
+            });
+
+            // Load saved state
+            loadChecklistState();
+
+            // Add event listeners to new items
+            attachChecklistListeners();
+        }
+
+        // Attach event listeners to checklist items
+        function attachChecklistListeners() {
+            document.querySelectorAll('.checklist-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const itemId = this.dataset.item;
+                    const cruiseType = this.dataset.cruiseType;
+                    const checkbox = this.querySelector('.checklist-checkbox');
+                    const isChecked = this.classList.toggle('checked');
+                    checkbox.classList.toggle('checked');
+                    saveChecklistState(itemId, cruiseType, isChecked);
+                });
+            });
+        }
+
         // Load checked items from localStorage
         function loadChecklistState() {
-            const items = document.querySelectorAll('.checklist-item');
-            items.forEach(item => {
+            document.querySelectorAll('.checklist-item').forEach(item => {
                 const itemId = item.dataset.item;
-                const isChecked = localStorage.getItem(`sailing-checklist-${itemId}`) === 'true';
+                const cruiseType = item.dataset.cruiseType;
+                const storageKey = `sailing-${cruiseType}-${itemId}`;
+                const isChecked = localStorage.getItem(storageKey) === 'true';
+
                 if (isChecked) {
                     item.classList.add('checked');
                     item.querySelector('.checklist-checkbox').classList.add('checked');
@@ -379,36 +463,43 @@
         }
 
         // Save checked state to localStorage
-        function saveChecklistState(itemId, isChecked) {
-            localStorage.setItem(`sailing-checklist-${itemId}`, isChecked);
+        function saveChecklistState(itemId, cruiseType, isChecked) {
+            const storageKey = `sailing-${cruiseType}-${itemId}`;
+            localStorage.setItem(storageKey, isChecked);
         }
-
-        // Toggle checklist item
-        document.querySelectorAll('.checklist-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const itemId = item.dataset.item;
-                const checkbox = item.querySelector('.checklist-checkbox');
-                const isChecked = item.classList.toggle('checked');
-                checkbox.classList.toggle('checked');
-                saveChecklistState(itemId, isChecked);
-            });
-        });
 
         // Reset checklist
         function resetChecklist() {
             if (confirm('Czy na pewno chcesz wyczyścić całą listę?')) {
                 document.querySelectorAll('.checklist-item').forEach(item => {
                     const itemId = item.dataset.item;
+                    const cruiseType = item.dataset.cruiseType;
+                    const storageKey = `sailing-${cruiseType}-${itemId}`;
+
                     item.classList.remove('checked');
                     item.querySelector('.checklist-checkbox').classList.remove('checked');
-                    localStorage.removeItem(`sailing-checklist-${itemId}`);
+                    localStorage.removeItem(storageKey);
                 });
             }
         }
 
         // Initialize on page load
-        window.addEventListener('load', () => {
-            loadChecklistState();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved cruise type or default to baltic-autumn
+            const savedCruiseType = localStorage.getItem('selected-cruise-type') || 'baltic-autumn';
+            currentCruiseType = savedCruiseType;
+
+            // Update button states
+            document.querySelectorAll('.cruise-btn').forEach(btn => {
+                if (btn.dataset.cruise === savedCruiseType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Render initial checklist
+            renderChecklist();
         });
     </script>
 </body>
