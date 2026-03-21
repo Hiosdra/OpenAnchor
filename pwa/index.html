@@ -132,43 +132,6 @@
             box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
         }
 
-        /* Badge */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            padding: 0.2rem 0.6rem;
-            border-radius: 999px;
-        }
-
-        .badge-anchor {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .badge-watch {
-            background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-
-        .badge-exam {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-
-        .badge-sailing {
-            background: rgba(14, 165, 233, 0.15);
-            color: #38bdf8;
-            border: 1px solid rgba(14, 165, 233, 0.2);
-        }
-
         /* Feature list */
         .feature-item {
             display: flex;
@@ -681,7 +644,7 @@
     <main class="content">
         <div class="modules-grid">
 
-            <!-- Module 1: Anchor Alarm -->
+            <!-- Anchor Alarm -->
             <div id="anchorModule" class="module-card card-anchor module-hidden" onclick="openModule('modules/anchor/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Alert Kotwiczny"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/anchor/index.html')">
@@ -696,14 +659,10 @@
                                 <path d="M5 12H2a10 10 0 0 0 20 0h-3"/>
                             </svg>
                         </div>
-                        <!-- Title & badge -->
+                        <!-- Title -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Alert Kotwiczny</h2>
-                                <span class="badge badge-anchor">
-                                    <span style="width:6px;height:6px;border-radius:50%;background:#60a5fa;display:inline-block"></span>
-                                    Moduł 1
-                                </span>
                             </div>
                             <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Alarm kotwiczny GPS &amp; monitoring</p>
                         </div>
@@ -743,7 +702,7 @@
                 </div>
             </div>
 
-            <!-- Module 2: Wachtownik -->
+            <!-- Wachtownik -->
             <div id="wachtownikModule" class="module-card card-watch module-hidden" onclick="openModule('modules/wachtownik/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Wachtownik"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/wachtownik/index.html')">
@@ -757,14 +716,10 @@
                                 <polyline points="12 6 12 12 16 14"/>
                             </svg>
                         </div>
-                        <!-- Title & badge -->
+                        <!-- Title -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Wachtownik</h2>
-                                <span class="badge badge-watch">
-                                    <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block"></span>
-                                    Moduł 2
-                                </span>
                             </div>
                             <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Morski grafik wacht PRO</p>
                         </div>
@@ -804,7 +759,7 @@
                 </div>
             </div>
 
-            <!-- Module 3: Egzamin ŻJ/JSM -->
+            <!-- Egzamin ŻJ/JSM -->
             <div class="module-card card-exam" onclick="openModule('modules/egzamin/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Egzamin ŻJ/JSM"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/egzamin/index.html')">
@@ -819,14 +774,10 @@
                                 <path d="M8 7h8M8 11h6"/>
                             </svg>
                         </div>
-                        <!-- Title & badge -->
+                        <!-- Title -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Egzamin ŻJ / JSM</h2>
-                                <span class="badge badge-exam">
-                                    <span style="width:6px;height:6px;border-radius:50%;background:#fbbf24;display:inline-block"></span>
-                                    Moduł 3
-                                </span>
                             </div>
                             <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Nauka do egzaminu PZŻ</p>
                         </div>
@@ -866,7 +817,7 @@
                 </div>
             </div>
 
-            <!-- Module 4: Sailing Info -->
+            <!-- Sailing Info -->
             <div class="module-card card-sailing" onclick="openModule('modules/zeglowanie/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Żeglowanie - Informacje"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/zeglowanie/index.html')">
@@ -882,14 +833,10 @@
                                 <path d="M18 14v6"/>
                             </svg>
                         </div>
-                        <!-- Title & badge -->
+                        <!-- Title -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Żeglowanie</h2>
-                                <span class="badge badge-sailing">
-                                    <span style="width:6px;height:6px;border-radius:50%;background:#38bdf8;display:inline-block"></span>
-                                    Moduł 4
-                                </span>
                             </div>
                             <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Informacje i porady dla żeglarzy</p>
                         </div>
