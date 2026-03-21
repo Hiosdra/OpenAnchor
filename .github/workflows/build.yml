@@ -298,9 +298,9 @@ jobs:
              [ "${{ needs.validate-pwa.result }}" != "success" ] || \
              [ "${{ needs.test-pwa.result }}" != "success" ]; then
             echo ""
-            echo "❌ One or more builds failed"
+            echo "❌ One or more jobs failed"
             exit 1
           fi
 
           echo ""
-          echo "✅ All builds successful!"
+          echo "✅ All jobs successful!"
