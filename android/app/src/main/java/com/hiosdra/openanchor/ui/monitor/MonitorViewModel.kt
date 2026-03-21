@@ -76,35 +76,34 @@ class MonitorViewModel @Inject constructor(
         // Observe service instance and collect monitor state when connected
         viewModelScope.launch {
             serviceBinder.serviceInstance.filterNotNull().collectLatest { service ->
-                service.monitorState
-                    .distinctUntilChanged()
-                    .collect { monitorState ->
-                        _uiState.update { ui ->
-                            ui.copy(
-                                isActive = monitorState.isActive,
-                                anchorPosition = monitorState.anchorPosition,
-                                boatPosition = monitorState.boatPosition,
-                                zone = monitorState.zone,
-                                distanceToAnchor = monitorState.distanceToAnchor,
-                                alarmState = monitorState.alarmState,
-                                bearingToAnchor = calculateBearing(monitorState),
-                                gpsAccuracyMeters = monitorState.gpsAccuracyMeters,
-                                gpsSignalLost = monitorState.gpsSignalLost,
-                                localBatteryLevel = monitorState.localBatteryLevel,
-                                localBatteryCharging = monitorState.localBatteryCharging,
-                                peerBatteryLevel = monitorState.peerBatteryLevel,
-                                peerIsCharging = monitorState.peerIsCharging,
-                                isPairedMode = monitorState.isPairedMode,
-                                driftAnalysis = monitorState.driftAnalysis
-                            )
-                        }
-                        // Start observing track points when session ID becomes available
-                        val sessionId = monitorState.sessionId
-                        if (sessionId != null && sessionId != currentTrackSessionId) {
-                            currentTrackSessionId = sessionId
-                            observeTrackPoints(sessionId)
-                        }
+                // StateFlow already deduplicates values, no need for distinctUntilChanged()
+                service.monitorState.collect { monitorState ->
+                    _uiState.update { ui ->
+                        ui.copy(
+                            isActive = monitorState.isActive,
+                            anchorPosition = monitorState.anchorPosition,
+                            boatPosition = monitorState.boatPosition,
+                            zone = monitorState.zone,
+                            distanceToAnchor = monitorState.distanceToAnchor,
+                            alarmState = monitorState.alarmState,
+                            bearingToAnchor = calculateBearing(monitorState),
+                            gpsAccuracyMeters = monitorState.gpsAccuracyMeters,
+                            gpsSignalLost = monitorState.gpsSignalLost,
+                            localBatteryLevel = monitorState.localBatteryLevel,
+                            localBatteryCharging = monitorState.localBatteryCharging,
+                            peerBatteryLevel = monitorState.peerBatteryLevel,
+                            peerIsCharging = monitorState.peerIsCharging,
+                            isPairedMode = monitorState.isPairedMode,
+                            driftAnalysis = monitorState.driftAnalysis
+                        )
                     }
+                    // Start observing track points when session ID becomes available
+                    val sessionId = monitorState.sessionId
+                    if (sessionId != null && sessionId != currentTrackSessionId) {
+                        currentTrackSessionId = sessionId
+                        observeTrackPoints(sessionId)
+                    }
+                }
             }
         }
     }
