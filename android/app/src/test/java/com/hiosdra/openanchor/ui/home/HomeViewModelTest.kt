@@ -70,10 +70,10 @@ class HomeViewModelTest {
         )
         every { repository.observeActiveSession() } returns flowOf(session)
         val viewModel = HomeViewModel(repository, wsClient)
-        advanceUntilIdle()
 
         viewModel.activeSession.test {
-            val result = awaitItem()
+            advanceUntilIdle()
+            val result = expectMostRecentItem()
             assertNotNull(result)
             assertEquals(1L, result!!.id)
             cancel()
@@ -85,10 +85,11 @@ class HomeViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         every { repository.observeActiveSession() } returns flowOf(null)
         val viewModel = HomeViewModel(repository, wsClient)
-        advanceUntilIdle()
 
         viewModel.isClientModeActive.test {
-            assertFalse(awaitItem())
+            advanceUntilIdle()
+            val result = expectMostRecentItem()
+            assertFalse(result)
             cancel()
         }
     }
@@ -99,10 +100,11 @@ class HomeViewModelTest {
         every { repository.observeActiveSession() } returns flowOf(null)
         clientStateFlow.value = AnchorWebSocketClient.ClientState(isConnected = true)
         val viewModel = HomeViewModel(repository, wsClient)
-        advanceUntilIdle()
 
         viewModel.isClientModeActive.test {
-            assertTrue(awaitItem())
+            advanceUntilIdle()
+            val result = expectMostRecentItem()
+            assertTrue(result)
             cancel()
         }
     }
@@ -113,10 +115,11 @@ class HomeViewModelTest {
         every { repository.observeActiveSession() } returns flowOf(null)
         clientStateFlow.value = AnchorWebSocketClient.ClientState(isConnecting = true)
         val viewModel = HomeViewModel(repository, wsClient)
-        advanceUntilIdle()
 
         viewModel.isClientModeActive.test {
-            assertTrue(awaitItem())
+            advanceUntilIdle()
+            val result = expectMostRecentItem()
+            assertTrue(result)
             cancel()
         }
     }

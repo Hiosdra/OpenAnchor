@@ -188,8 +188,9 @@ class SetupViewModelTest {
         viewModel = createViewModel()
         advanceUntilIdle()
 
-        viewModel.setDepth("10")
+        // Set CUSTOM first before setting depth - so auto-fill never triggers
         viewModel.setScopeRatio(ScopeRatio.CUSTOM)
+        viewModel.setDepth("10")
 
         viewModel.state.test {
             val state = awaitItem()

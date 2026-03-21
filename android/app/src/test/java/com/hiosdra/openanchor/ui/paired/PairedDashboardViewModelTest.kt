@@ -79,7 +79,8 @@ class PairedDashboardViewModelTest {
         advanceUntilIdle()
 
         viewModel.uiState.test {
-            assertTrue(awaitItem().showDisconnectDialog)
+            advanceUntilIdle()
+            assertTrue(expectMostRecentItem().showDisconnectDialog)
             cancel()
         }
     }
@@ -95,7 +96,8 @@ class PairedDashboardViewModelTest {
         advanceUntilIdle()
 
         viewModel.uiState.test {
-            assertFalse(awaitItem().showDisconnectDialog)
+            advanceUntilIdle()
+            assertFalse(expectMostRecentItem().showDisconnectDialog)
             cancel()
         }
     }

@@ -49,10 +49,10 @@ class CrewWatchViewModelTest {
     fun `initial state is not running`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         val viewModel = CrewWatchViewModel(crewWatchManager)
-        advanceUntilIdle()
 
         viewModel.uiState.test {
-            val state = awaitItem()
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
             assertFalse(state.isRunning)
             assertTrue(state.crewMembers.isEmpty())
             assertEquals(4, state.watchDurationHours)
@@ -71,10 +71,10 @@ class CrewWatchViewModelTest {
             totalWatchChanges = 2
         )
         val viewModel = CrewWatchViewModel(crewWatchManager)
-        advanceUntilIdle()
 
         viewModel.uiState.test {
-            val state = awaitItem()
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
             assertTrue(state.isRunning)
             assertEquals(listOf("Alice", "Bob"), state.crewMembers)
             assertEquals("Alice", state.currentCrewMember)
@@ -97,7 +97,8 @@ class CrewWatchViewModelTest {
         verify { crewWatchManager.addCrewMember("Charlie") }
 
         viewModel.uiState.test {
-            assertEquals("", awaitItem().newMemberName)
+            advanceUntilIdle()
+            assertEquals("", expectMostRecentItem().newMemberName)
             cancel()
         }
     }
@@ -192,7 +193,8 @@ class CrewWatchViewModelTest {
         advanceUntilIdle()
 
         viewModel.uiState.test {
-            assertEquals("Dave", awaitItem().newMemberName)
+            advanceUntilIdle()
+            assertEquals("Dave", expectMostRecentItem().newMemberName)
             cancel()
         }
     }

@@ -52,10 +52,10 @@ class HistoryViewModelTest {
         coEvery { repository.observeAllSessions() } returns flowOf(sessions)
 
         val viewModel = HistoryViewModel(repository)
-        advanceUntilIdle()
 
         viewModel.sessions.test {
-            val result = awaitItem()
+            advanceUntilIdle()
+            val result = expectMostRecentItem()
             assertEquals(2, result.size)
             assertTrue(result.all { it.endTime != null })
             cancel()
@@ -69,10 +69,11 @@ class HistoryViewModelTest {
         coEvery { repository.observeAllSessions() } returns flowOf(sessions)
 
         val viewModel = HistoryViewModel(repository)
-        advanceUntilIdle()
 
         viewModel.sessions.test {
-            assertTrue(awaitItem().isEmpty())
+            advanceUntilIdle()
+            val result = expectMostRecentItem()
+            assertTrue(result.isEmpty())
             cancel()
         }
     }
