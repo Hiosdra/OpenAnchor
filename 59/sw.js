@@ -51,6 +51,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Only cache GET requests - Cache API doesn't support other methods
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {
