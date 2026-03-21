@@ -1,39 +1,75 @@
 # PWA (Progressive Web App)
 
-This directory contains the iPad/browser anchor alarm PWA -- a single `index.html` file with no build system.
+This directory contains the OpenAnchor Progressive Web App — a hub-and-spoke maritime superapp with three specialized modules, built with vanilla JavaScript and no build system.
 
 ## Overview
 
-The PWA runs on an iPad (or any modern browser) and serves as the **master** anchor monitoring device. It can be installed as a Progressive Web App on any device and provides:
+The PWA runs on any modern browser (iPad, desktop, mobile) and serves as a comprehensive maritime toolkit. It provides:
 
-- Real-time GPS tracking via the browser Geolocation API
+- **Alert Kotwiczny**: Anchor alarm with GPS tracking, zone monitoring, and WebSocket pairing
+- **Wachtownik**: Crew watch scheduler with PDF export and QR sharing
+- **Egzamin**: Maritime examination module with interactive quizzes
+
+All modules are installable as Progressive Web Apps on any device with offline support, local notifications, and app-like experience.
+
+## Modules
+
+### 1. Alert Kotwiczny (Anchor Alarm)
+**Location:** `modules/anchor/index.html`
+
+The anchor alarm module serves as the **master** anchor monitoring device when paired with Android, or works standalone.
+
+**Features:**
+- Real-time GPS tracking via browser Geolocation API
 - Anchor zone monitoring (circle or sector geometry)
-- Drag detection with progressive alarm escalation (`SAFE` -> `CAUTION` -> `WARNING` -> `ALARM`)
-- WebSocket pairing with an Android phone for redundant cabin alarm
-- Watch timer and crew schedule management
-- AI-powered anchoring advisor (via Google Gemini API)
-- GPX track export and position sharing
-- Night mode for cockpit use
-
-## Features
-
-### Core Functionality
-- Set anchor position and monitoring radius
-- Real-time GPS position tracking
+- Drag detection with progressive alarm escalation (`SAFE` → `CAUTION` → `WARNING` → `ALARM`)
+- WebSocket pairing with Android phone for redundant cabin alarm
 - Visual and audio alarms when drifting outside safe zone
+- Map visualization using Leaflet.js
 - Track history with GPX export
 - Sector-based monitoring (limit alarm to specific directions)
 - Offset calculation for stern anchoring
 - Chain length calculator
+- AI-powered anchoring advisor (via Google Gemini API)
+- Night vision mode for cockpit use
+- Battery monitoring and reporting to paired Android device
+- Speed over ground (SOG) and course over ground (COG) display
+- Wake lock to keep screen on during monitoring
 
-### PWA Capabilities
-- **Service Worker**: Provides offline caching and background notifications
-- **Web App Manifest**: Makes the app installable on home screen
-- **Responsive Design**: Works on mobile, tablet, and desktop
-- **Browser Notifications**: Local notifications for alarms
+### 2. Wachtownik (Watch Scheduler)
+**Location:** `modules/wachtownik/index.html`
+
+Maritime watch scheduler for yacht crews with bilingual support (Polish/English).
+
+**Features:**
+- Crew rotation management
+- Automatic watch schedule generation
+- PDF export functionality
+- QR code sharing for schedules
+- State persistence via localStorage
+- URL-based schedule sharing
+- Built with React + Babel
+
+### 3. Egzamin (Maritime Exam)
+**Location:** `modules/egzamin/`
+
+Interactive maritime examination module for Polish yacht sailor certifications (ŻJ/JSM).
+
+**Features:**
+- Question bank with images (`exam_questions.json`)
+- Interactive quiz with image support
+- Progress tracking and statistics
+- Leitner spaced repetition system
+- Learn mode with position persistence
+- Category-based filtering
+- localStorage persistence
+- Responsive mobile layout
+
 ## Architecture
 
-Everything is in a single `index.html` file. No framework, no bundler -- vanilla JavaScript with classes:
+### Alert Kotwiczny (Anchor Module)
+
+Everything is in a single `modules/anchor/index.html` file. No framework, no bundler — vanilla JavaScript with classes:
 
 | Class | Responsibility |
 |---|---|
@@ -45,6 +81,26 @@ Everything is in a single `index.html` file. No framework, no bundler -- vanilla
 | `OnboardingController` | First-run tutorial overlay |
 | `AnchorApp` | Main app state, GPS processing, zone checking, event binding |
 | `UI` | Static helper for modals, dashboard, controls |
+
+### PWA Shell
+
+The main `index.html` serves as a hub-and-spoke launcher with:
+- Module navigation cards with gradient styling
+- Service Worker integration (`sw.js`) for offline support
+- Web App Manifest for installability
+- Responsive design for mobile, tablet, desktop
+- Beta mode toggle for experimental features
+
+### Testable Modules
+
+Business logic has been refactored into testable ES6 modules in the `js/` directory:
+- `dashboard.js` - Beta mode & settings management
+- `sw-utils.js` - Service Worker utilities
+- `exam-storage.js` - Exam progress & localStorage
+- `leitner.js` - Spaced repetition algorithm
+- `anchor-utils.js` - GPS calculations & alarm logic
+
+These modules are tested with Vitest (149 tests, 96.52% coverage). See [tests/README.md](tests/README.md).
 
 ## Communication Protocol
 
@@ -128,17 +184,35 @@ The PWA is automatically deployed to GitHub Pages using GitHub Actions.
 
 ```
 pwa/
-├── index.html          # Main application file (single-page app)
+├── index.html          # Shell launcher (hub-and-spoke)
 ├── manifest.json       # PWA manifest for installability
 ├── sw.js              # Service Worker for offline support
-└── README.md          # This file
+├── js/                # Testable JavaScript modules
+│   ├── dashboard.js
+│   ├── sw-utils.js
+│   ├── exam-storage.js
+│   ├── leitner.js
+│   └── anchor-utils.js
+├── tests/             # Vitest test suite
+│   └── *.test.js      # 149 tests, 96.52% coverage
+├── assets/            # Icons and images
+└── modules/           # Three specialized modules
+    ├── anchor/
+    │   └── index.html # Alert Kotwiczny (anchor alarm)
+    ├── wachtownik/
+    │   └── index.html # Watch scheduler (React + Babel)
+    └── egzamin/       # Maritime exam module
+        ├── index.html
+        ├── exam_questions.json
+        └── exam_images/
 ```
 
 ## Technical Details
 
 ### Technologies Used
-- **Leaflet.js**: Map visualization and GPS tracking
-- **Tailwind CSS**: Styling and responsive design
+- **Leaflet.js**: Map visualization and GPS tracking (Alert Kotwiczny)
+- **React + Babel**: UI framework (Wachtownik)
+- **Tailwind CSS**: Styling and responsive design (all modules)
 - **Lucide Icons**: Icon library
 - **Marked.js**: Markdown rendering for AI responses
 - **Service Worker API**: Offline functionality
@@ -146,6 +220,11 @@ pwa/
 - **Web Audio API**: Alarm sounds
 - **Notification API**: Local notifications
 - **Wake Lock API**: Keep screen on during monitoring
+- **WebSocket API**: Real-time communication with Android
+
+### Testing
+- **Vitest**: Unit tests (149 tests, 96.52% coverage)
+- **happy-dom**: DOM simulation for testing
 
 ### Browser Compatibility
 - Chrome/Edge: Full support
@@ -155,11 +234,21 @@ pwa/
 
 ### PWA Features
 - ✅ Offline support via Service Worker with runtime caching
-- ✅ Installable as standalone app
-- ✅ Responsive design
+- ✅ Installable as standalone app on mobile, tablet, desktop
+- ✅ Responsive design across all devices
 - ✅ Local notifications (Notification API)
 - ✅ Background sync capability (Background Sync API)
-- ✅ App-like experience
+- ✅ App-like experience with full-screen mode
+- ✅ Wake lock support to prevent screen dimming
+- ✅ WebSocket communication for real-time pairing
+
+## Data Synchronization
+
+The Egzamin module maintains synchronized exam question data between PWA and Android:
+- **PWA**: `modules/egzamin/exam_questions.json`
+- **Android**: `android/app/src/main/assets/exam_questions.json`
+
+Both files must be kept in sync when updating the question bank.
 
 ## Future Enhancements
 
@@ -175,15 +264,38 @@ Planned improvements:
 
 ### Service Worker
 The service worker (`sw.js`) implements:
-- **Runtime Caching**: CDN assets (Tailwind, Leaflet, etc.) are cached on first use for offline functionality
+- **Runtime Caching**: CDN assets (Tailwind, Leaflet, React, etc.) are cached on first use for offline functionality
 - **Stale-While-Revalidate**: Serves cached content immediately while updating in the background
-- **Background Sync**: Syncs position data when connection is restored (requires app integration)
-- **Periodic Sync**: Can periodically check anchor position in the background (Chrome-only feature)
-
-Update the `CACHE_NAME` version when making changes that require cache refresh.
+- **Cache Versioning**: Update the `CACHE_NAME` version when making changes that require cache refresh
+- **Offline Fallback**: Graceful degradation when network is unavailable
 
 ### Manifest
 The `manifest.json` file uses properly URL-encoded SVG data URLs for icons. The anchor emoji (⚓) is displayed on a dark background matching the app's theme.
+
+### Adding a New Module
+
+To add a new module to the PWA:
+
+1. Create a new directory in `modules/<module-name>/`
+2. Create `modules/<module-name>/index.html` with your module content
+3. Add a "← Menu" button linking back to `../../index.html`
+4. Update `pwa/index.html` to add a navigation card for your module
+5. Update `sw.js` cache list with any assets your module needs
+6. (Optional) Add shortcuts in `manifest.json`
+7. (Optional) Add unit tests in `tests/<module-name>.test.js` for business logic
+
+## Testing
+
+### Unit Tests
+```bash
+cd pwa
+npm install
+npm test                # Run all tests
+npm run test:ui         # Run tests with UI
+npm run test:coverage   # Generate coverage report
+```
+
+See [tests/README.md](tests/README.md) for detailed test documentation.
 
 ## Support
 
