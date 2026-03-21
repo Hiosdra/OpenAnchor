@@ -198,7 +198,7 @@ See [../docs/protocol/README.md](../docs/protocol/README.md) for the full specif
 ### Prerequisites
 - Android Studio Hedgehog or later
 - JDK 17
-- Android SDK API 34
+- Android SDK API 36
 
 ### Build Commands
 
@@ -223,8 +223,7 @@ cd android
 # Install debug build
 ./gradlew installDebug
 
-# Install and run
-./gradlew installDebug
+# Launch app (optional - can also launch from device)
 adb shell am start -n com.hiosdra.openanchor/.MainActivity
 ```
 
@@ -258,8 +257,6 @@ adb shell am start -n com.hiosdra.openanchor/.MainActivity
 
 ### Instrumented Tests
 
-The app uses Hilt for dependency injection in tests with a custom `HiltTestRunner`.
-
 ```bash
 # Build test APK
 ./gradlew assembleDebugAndroidTest
@@ -268,15 +265,12 @@ The app uses Hilt for dependency injection in tests with a custom `HiltTestRunne
 ./gradlew connectedAndroidTest
 ```
 
-**Custom Test Runner:**
-- Location: `app/src/androidTest/java/com/hiosdra/openanchor/HiltTestRunner.kt`
-- Configured in `app/build.gradle.kts:20`
+The app uses the standard `AndroidJUnitRunner` for instrumented tests.
 
 ### Test Infrastructure
 
-- **Unit Tests**: JUnit, Mockito, `java.time.Clock` for time operations
-- **Instrumented Tests**: Compose UI Testing, Hilt, HiltTestRunner
-- **Test Clock**: `TestClock` extends `java.time.Clock` for deterministic time testing
+- **Unit Tests**: JUnit, MockK, `java.time.Clock` for time operations
+- **Instrumented Tests**: Compose UI Testing, AndroidJUnitRunner
 
 ## Data Synchronization
 
@@ -379,8 +373,7 @@ If alarms are silent:
 The Android app is built automatically in GitHub Actions:
 
 - **Workflow**: `.github/workflows/build.yml`
-- **Triggers**: Push to main, pull requests
-- **E2E Tests**: `.github/workflows/e2e-android.yml`
+- **Triggers**: `push` and `pull_request` on `main` and `master` branches
 
 ## Contributing
 
