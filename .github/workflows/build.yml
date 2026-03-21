@@ -71,6 +71,7 @@ jobs:
           name: android-app-debug
           path: android/app/build/outputs/apk/debug/*.apk
           retention-days: 30
+          archive: false
 
       - name: Upload Android APK (release)
         uses: actions/upload-artifact@v7
@@ -78,6 +79,7 @@ jobs:
           name: android-app-release
           path: android/app/build/outputs/apk/release/*.apk
           retention-days: 30
+          archive: false
 
   build-wear:
     name: Build Wear OS App
@@ -112,6 +114,7 @@ jobs:
           name: wear-app-debug
           path: android/wear/build/outputs/apk/debug/*.apk
           retention-days: 30
+          archive: false
 
       - name: Upload Wear OS APK (release)
         uses: actions/upload-artifact@v7
@@ -119,6 +122,7 @@ jobs:
           name: wear-app-release
           path: android/wear/build/outputs/apk/release/*.apk
           retention-days: 30
+          archive: false
 
   validate-pwa:
     name: Validate PWA
