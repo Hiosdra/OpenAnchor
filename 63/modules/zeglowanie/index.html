@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Informacje o żeglarstwie - przygotowanie do rejsu, co spakować">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Żeglowanie">
+
+    <title>Żeglowanie - Informacje i Porady</title>
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="../../assets/icon.svg">
+    <link rel="apple-touch-icon" href="../../assets/icon-192x192.png">
+    <link rel="manifest" href="../../manifest.json">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Unified Theme -->
+    <link rel="stylesheet" href="../../styles/theme.css">
+
+    <style>
+        /* Module-specific styles */
+        .section-card {
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.3) 0%, rgba(15, 40, 64, 0.2) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #93c5fd;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 0.25rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        .checklist-checkbox.checked {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-color: #3b82f6;
+        }
+
+        .checklist-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+
+        .checklist-text {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .checklist-item.checked .checklist-text {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .important-note {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .important-note strong {
+            color: #fbbf24;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: scale(1.05);
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .header {
+            text-align: center;
+            padding: 5rem 1rem 2rem;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f1f5f9 30%, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem 3rem;
+        }
+
+        .reset-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 0.5rem;
+            color: #f87171;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .reset-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .reset-btn:active {
+            transform: scale(0.98);
+        }
+
+        .category-icon {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="ocean-bg">
+        <div class="wave wave-1"></div>
+        <div class="wave wave-2"></div>
+        <div class="wave wave-3"></div>
+    </div>
+    <div class="stars"></div>
+
+    <!-- Back button -->
+    <button class="back-btn" onclick="window.location.href='../../index.html'" aria-label="Wróć do menu głównego">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+        </svg>
+    </button>
+
+    <!-- Header -->
+    <header class="header">
+        <h1 class="header-title">Informacje o Żeglarstwie</h1>
+        <p class="header-subtitle">Przygotowanie do rejsu morskiego</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Packing List Section -->
+        <div class="section-card">
+            <h2 class="section-title">
+                <span class="category-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                    </svg>
+                </span>
+                Co spakować na rejs?
+            </h2>
+
+            <div class="important-note">
+                <strong>⚓ Ważne:</strong> Wszystko spakowane w miękką, składaną do płaskiego torbę/plecak - na łódce nie ma miejsca gdzie trzymać twarde lub trzymające kształt torby.
+            </div>
+
+            <ul class="checklist" id="packingList">
+                <!-- Documents -->
+                <li class="checklist-item" data-item="ekuz">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>EKUZ</strong> (Europejska Karta Ubezpieczenia Zdrowotnego)</div>
+                </li>
+                <li class="checklist-item" data-item="paszport">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Paszport</strong> jeżeli masz</div>
+                </li>
+                <li class="checklist-item" data-item="dowod">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Dowód osobisty</strong></div>
+                </li>
+
+                <!-- Clothing -->
+                <li class="checklist-item" data-item="bluza">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Bluza</strong> (ciepła, warstwowa)</div>
+                </li>
+                <li class="checklist-item" data-item="kurta">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Kurtka wodoodporna</strong></div>
+                </li>
+                <li class="checklist-item" data-item="bielizna">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Bielizna</strong> (na każdy dzień + zapas)</div>
+                </li>
+                <li class="checklist-item" data-item="koszulki">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Koszulki</strong> (kilka sztuk)</div>
+                </li>
+                <li class="checklist-item" data-item="spodnie">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Długie spodnie</strong>, najlepiej wodoodporne</div>
+                </li>
+                <li class="checklist-item" data-item="termoaktywna">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Bielizna termoaktywna</strong></div>
+                </li>
+                <li class="checklist-item" data-item="czapka">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Czapka!</strong> (ochrona przed słońcem i wiatrem)</div>
+                </li>
+
+                <!-- Footwear -->
+                <li class="checklist-item" data-item="buty">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Buty niefarbujące od spodu</strong> z zasłoniętymi palcami</div>
+                </li>
+                <li class="checklist-item" data-item="kalosze">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Kalosze</strong> jeżeli masz</div>
+                </li>
+                <li class="checklist-item" data-item="klapki">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Klapki do kąpieli</strong></div>
+                </li>
+
+                <!-- Personal Items -->
+                <li class="checklist-item" data-item="recznik">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Ręcznik</strong>, najlepiej szybkoschnący</div>
+                </li>
+                <li class="checklist-item" data-item="kosmetyki">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Kosmetyki</strong>, fajnie jak BIO, ale nie jest to konieczne</div>
+                </li>
+                <li class="checklist-item" data-item="krem-uv">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Krem UV</strong> (wysoki filtr!)</div>
+                </li>
+
+                <!-- Electronics & Utilities -->
+                <li class="checklist-item" data-item="latarka">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Latarka</strong>, najlepiej czołówka</div>
+                </li>
+                <li class="checklist-item" data-item="ladowarka">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Ładowarka z gniazdkiem europejskim</strong></div>
+                </li>
+                <li class="checklist-item" data-item="rozdzielacz">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Kradziejka prądu (rozdzielacz)</strong> - w kabinach zazwyczaj 1 gniazdko na 2 osoby</div>
+                </li>
+                <li class="checklist-item" data-item="powerbank">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Powerbank</strong></div>
+                </li>
+                <li class="checklist-item" data-item="kable">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Kable do ładowania</strong> (USB-C, Lightning, itp.)</div>
+                </li>
+
+                <!-- Medicine -->
+                <li class="checklist-item" data-item="choroba-morska">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Coś na chorobę morską</strong> jeżeli podlegasz (Aviomarin, opaski, itp.)</div>
+                </li>
+            </ul>
+
+            <button class="reset-btn" onclick="resetChecklist()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                </svg>
+                Wyczyść listę
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // Load checked items from localStorage
+        function loadChecklistState() {
+            const items = document.querySelectorAll('.checklist-item');
+            items.forEach(item => {
+                const itemId = item.dataset.item;
+                const isChecked = localStorage.getItem(`sailing-checklist-${itemId}`) === 'true';
+                if (isChecked) {
+                    item.classList.add('checked');
+                    item.querySelector('.checklist-checkbox').classList.add('checked');
+                }
+            });
+        }
+
+        // Save checked state to localStorage
+        function saveChecklistState(itemId, isChecked) {
+            localStorage.setItem(`sailing-checklist-${itemId}`, isChecked);
+        }
+
+        // Toggle checklist item
+        document.querySelectorAll('.checklist-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const itemId = item.dataset.item;
+                const checkbox = item.querySelector('.checklist-checkbox');
+                const isChecked = item.classList.toggle('checked');
+                checkbox.classList.toggle('checked');
+                saveChecklistState(itemId, isChecked);
+            });
+        });
+
+        // Reset checklist
+        function resetChecklist() {
+            if (confirm('Czy na pewno chcesz wyczyścić całą listę?')) {
+                document.querySelectorAll('.checklist-item').forEach(item => {
+                    const itemId = item.dataset.item;
+                    item.classList.remove('checked');
+                    item.querySelector('.checklist-checkbox').classList.remove('checked');
+                    localStorage.removeItem(`sailing-checklist-${itemId}`);
+                });
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            loadChecklistState();
+        });
+    </script>
+</body>
+</html>
