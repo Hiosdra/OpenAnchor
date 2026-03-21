@@ -128,7 +128,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-hidden" id="app-body">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans overflow-y-auto" id="app-body">
 
 <!-- === HEADER === -->
 <header class="bg-slate-800 p-2 sm:p-3 shadow-md flex justify-between items-center z-20">
@@ -189,7 +189,7 @@
 </div>
 
 <!-- === MAP WIDGET === -->
-<div id="map" class="flex-grow w-full relative">
+<div id="map" class="flex-grow w-full relative min-h-[300px]">
     <div id="no-signal-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm z-[1000]">
         <i data-lucide="map-pin-off" class="w-10 h-10 text-slate-500 mb-2"></i>
         <p class="text-slate-400 text-sm font-medium" data-i18n="noGpsSignal">Brak sygnału GPS</p>
