@@ -282,7 +282,7 @@ To add a new module to the PWA:
 4. Update `pwa/index.html` to add a navigation card for your module
 5. Update `sw.js` cache list with any assets your module needs
 6. (Optional) Add shortcuts in `manifest.json`
-7. (Optional) Add unit tests in `tests/<module-name>.test.js` for business logic
+7. Add unit tests in `tests/<module-name>.test.js` for business logic
 
 ## Testing
 

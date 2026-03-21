@@ -55,7 +55,7 @@ npm run test:coverage    # Generate coverage report
 2. Add a card in `pwa/index.html` pointing to `./modules/<name>/`.
 3. Add a `← Menu` button linking back to `../../index.html`.
 4. Update the SW cache list and `manifest.json` shortcuts.
-5. (Optional) Add unit tests in `pwa/tests/<name>.test.js` for business logic.
+5. Add unit tests in `pwa/tests/<name>.test.js` for business logic.
 
 ## Android (`/android`)
 
