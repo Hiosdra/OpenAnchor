@@ -43,8 +43,32 @@ class MainActivity : ComponentActivity() {
         val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
         val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
 
+        // Also check current permission state, since this launcher may be used without requesting location
+        val fineGrantedNow = fineGranted || ContextCompat.checkSelfPermission(
+            this@MainActivity,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        val coarseGrantedNow = coarseGranted || ContextCompat.checkSelfPermission(
+            this@MainActivity,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        // After location permissions, check if we need notifications (Android 13+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            val notifPermission = ContextCompat.checkSelfPermission(
+                this@MainActivity,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+            if (notifPermission != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.clear()
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
+                showNotificationsDialog = true
+                return@registerForActivityResult
+            }
+        }
+
         // Request background location after foreground permissions are granted (Android 10+)
-        if ((fineGranted || coarseGranted) && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+        if ((fineGrantedNow || coarseGrantedNow) && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             showBackgroundLocationExplanation()
         }
     }
@@ -83,6 +107,11 @@ class MainActivity : ComponentActivity() {
                                 }) {
                                     Text(stringResource(R.string.permissions_continue))
                                 }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showLocationPermissionDialog = false }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
                             }
                         )
                     }
@@ -99,6 +128,11 @@ class MainActivity : ComponentActivity() {
                                     requestBackgroundLocationPermission()
                                 }) {
                                     Text(stringResource(R.string.permissions_continue))
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showBackgroundLocationDialog = false }) {
+                                    Text(stringResource(R.string.cancel))
                                 }
                             }
                         )
@@ -117,6 +151,11 @@ class MainActivity : ComponentActivity() {
                                 }) {
                                     Text(stringResource(R.string.permissions_continue))
                                 }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showNotificationsDialog = false }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
                             }
                         )
                     }
@@ -134,6 +173,9 @@ class MainActivity : ComponentActivity() {
         )
 
         permissionsToRequest.clear()
+        val needsLocation = fineLocation != PackageManager.PERMISSION_GRANTED ||
+                           coarseLocation != PackageManager.PERMISSION_GRANTED
+
         if (fineLocation != PackageManager.PERMISSION_GRANTED) {
             permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
         }
@@ -148,23 +190,20 @@ class MainActivity : ComponentActivity() {
                 this, Manifest.permission.POST_NOTIFICATIONS
             )
             if (notifPermission != PackageManager.PERMISSION_GRANTED) {
-                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
                 needsNotifications = true
             }
         }
 
-        // Show appropriate explanation dialog
-        if (permissionsToRequest.isNotEmpty()) {
-            // If we need notifications along with location, show notifications dialog first
-            if (needsNotifications && permissionsToRequest.size > 1) {
-                showNotificationsDialog = true
-            } else if (needsNotifications) {
-                showNotificationsDialog = true
-            } else {
-                showLocationPermissionDialog = true
-            }
+        // Show appropriate explanation dialog - prioritize location since it's core functionality
+        if (needsLocation) {
+            // Show location dialog first if location is needed
+            showLocationPermissionDialog = true
+        } else if (needsNotifications) {
+            // Only show notifications dialog if location is already granted
+            permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
+            showNotificationsDialog = true
         } else {
-            // Foreground permissions already granted, check background if needed
+            // All foreground permissions already granted, check background if needed
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
                 showBackgroundLocationExplanation()
             }
