@@ -180,22 +180,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/*Component.class",
         "**/*Component$*.class",
         "**/*_ComponentImpl.class",
-        "**/*_ComponentImpl$*.class",
-        // Compose-generated singletons (similar to R.class)
-        "**/ComposableSingletons$*.class",
-        "**/ComposableSingletons.class",
-        // Compose Screen UI files (tested via UI/instrumented tests)
-        "**/*ScreenKt.class",
-        "**/*ScreenKt$*.class",
-        // Navigation host wiring (UI setup code)
-        "**/NavHostKt.class",
-        "**/NavHostKt$*.class",
-        // UI theming and components (not business logic)
-        "**/ui/theme/**",
-        "**/ui/components/**",
-        // Android entry point
-        "**/MainActivity.class",
-        "**/MainActivity$*.class"
+        "**/*_ComponentImpl$*.class"
     )
 
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
