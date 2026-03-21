@@ -252,6 +252,89 @@
             font-size: 0.8rem;
             opacity: 0.7;
         }
+
+        /* Section navigation */
+        .section-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            padding: 0.5rem;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 1rem;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .section-nav-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 0.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .section-nav-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .section-nav-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #93c5fd;
+        }
+
+        .section-nav-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Content sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .placeholder-section {
+            background: rgba(30, 58, 95, 0.2);
+            border: 2px dashed rgba(59, 130, 246, 0.3);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .placeholder-section-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .placeholder-section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .placeholder-section-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -280,7 +363,45 @@
 
     <!-- Main Content -->
     <main class="content">
-        <!-- Cruise Type Selector -->
+        <!-- Section Navigation -->
+        <nav class="section-nav">
+            <button class="section-nav-btn active" data-section="packing" onclick="switchSection('packing')">
+                <svg class="section-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                </svg>
+                <span>Pakowanie</span>
+            </button>
+            <button class="section-nav-btn" data-section="shopping" onclick="switchSection('shopping')">
+                <svg class="section-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                <span>Zakupy</span>
+            </button>
+            <button class="section-nav-btn" data-section="briefing" onclick="switchSection('briefing')">
+                <svg class="section-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span>Briefing</span>
+            </button>
+            <button class="section-nav-btn" data-section="checklists" onclick="switchSection('checklists')">
+                <svg class="section-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                <span>Checklisty</span>
+            </button>
+            <button class="section-nav-btn" data-section="knowledge" onclick="switchSection('knowledge')">
+                <svg class="section-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                <span>Wiedza</span>
+            </button>
+        </nav>
+
+        <!-- Packing Section -->
+        <div id="section-packing" class="content-section active">
+            <!-- Cruise Type Selector -->
         <div class="cruise-selector">
             <button class="cruise-btn active" data-cruise="baltic-autumn" onclick="switchCruiseType('baltic-autumn')">
                 <div class="cruise-btn-title">🍂 Bałtyk</div>
@@ -323,9 +444,91 @@
                 Wyczyść obecną listę
             </button>
         </div>
+        </div>
+        <!-- End Packing Section -->
+
+        <!-- Shopping Section -->
+        <div id="section-shopping" class="content-section">
+            <div class="placeholder-section">
+                <div class="placeholder-section-icon">🛒</div>
+                <h3 class="placeholder-section-title">Lista Zakupów i Pomysły na Dania</h3>
+                <p class="placeholder-section-text">
+                    Tutaj będzie można dodać listę zakupów na rejs oraz pomysły na posiłki.<br>
+                    Sekcja dostępna w przyszłości.
+                </p>
+            </div>
+        </div>
+
+        <!-- Briefing Section -->
+        <div id="section-briefing" class="content-section">
+            <div class="placeholder-section">
+                <div class="placeholder-section-icon">👥</div>
+                <h3 class="placeholder-section-title">Briefing dla Nowej Załogi</h3>
+                <p class="placeholder-section-text">
+                    Tutaj będzie można znaleźć informacje dla nowej załogi:<br>
+                    zasady bezpieczeństwa, organizacja życia na łodzi, itp.<br>
+                    Sekcja dostępna w przyszłości.
+                </p>
+            </div>
+        </div>
+
+        <!-- Checklists Section -->
+        <div id="section-checklists" class="content-section">
+            <div class="placeholder-section">
+                <div class="placeholder-section-icon">✅</div>
+                <h3 class="placeholder-section-title">Checklisty Żeglarskie</h3>
+                <p class="placeholder-section-text">
+                    Tutaj będą checklisty dla różnych sytuacji:<br>
+                    wejście do portu, wyjście z portu, zawijanie żagli, cumowanie, itp.<br>
+                    Sekcja dostępna w przyszłości.
+                </p>
+            </div>
+        </div>
+
+        <!-- Knowledge Section -->
+        <div id="section-knowledge" class="content-section">
+            <div class="placeholder-section">
+                <div class="placeholder-section-icon">📚</div>
+                <h3 class="placeholder-section-title">Wiedza Żeglarska</h3>
+                <p class="placeholder-section-text">
+                    Tutaj będą informacje żeglarskie:<br>
+                    instrukcje wiązania węzłów, podstawy nawigacji, meteorologia, itp.<br>
+                    Sekcja dostępna w przyszłości.
+                </p>
+            </div>
+        </div>
     </main>
 
     <script>
+        // Current section
+        let currentSection = 'packing';
+
+        // Switch between content sections
+        function switchSection(section) {
+            currentSection = section;
+
+            // Update navigation buttons
+            document.querySelectorAll('.section-nav-btn').forEach(btn => {
+                if (btn.dataset.section === section) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update content sections
+            document.querySelectorAll('.content-section').forEach(sec => {
+                if (sec.id === `section-${section}`) {
+                    sec.classList.add('active');
+                } else {
+                    sec.classList.remove('active');
+                }
+            });
+
+            // Save selected section
+            localStorage.setItem('zeglowanie_selected_section', section);
+        }
+
         // Packing lists for different cruise types
         const packingLists = {
             'baltic-autumn': [
@@ -485,6 +688,28 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Load saved section or default to packing
+            const savedSection = localStorage.getItem('zeglowanie_selected_section') || 'packing';
+            currentSection = savedSection;
+
+            // Update section navigation buttons
+            document.querySelectorAll('.section-nav-btn').forEach(btn => {
+                if (btn.dataset.section === savedSection) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update content sections
+            document.querySelectorAll('.content-section').forEach(sec => {
+                if (sec.id === `section-${savedSection}`) {
+                    sec.classList.add('active');
+                } else {
+                    sec.classList.remove('active');
+                }
+            });
+
             // Load saved cruise type or default to baltic-autumn
             const savedCruiseType = localStorage.getItem('zeglowanie_selected_cruise_type') || 'baltic-autumn';
             currentCruiseType = savedCruiseType;
