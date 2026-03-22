@@ -99,7 +99,7 @@ test.describe('PWA Manifest', () => {
   });
 
   test('manifest contains required PWA fields', async ({ page }) => {
-    await page.goto(MODULES.dashboard, { waitUntil: 'domcontentloaded' });
+    await page.goto(MODULES.dashboard, { waitUntil: 'networkidle' });
 
     const manifest = await page.evaluate(async () => {
       const link = document.querySelector('link[rel="manifest"]');

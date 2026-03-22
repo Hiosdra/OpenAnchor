@@ -6,7 +6,8 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
-    onNodeWithText(text, substring = true, ignoreCase = true)
+    onAllNodesWithText(text, substring = true, ignoreCase = true)
+        .onFirst()
         .assertIsDisplayed()
 }
 
@@ -19,7 +20,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
             .fetchSemanticsNodes()
             .isNotEmpty()
     }
-    return onNodeWithText(text, substring = true, ignoreCase = true)
+    return onAllNodesWithText(text, substring = true, ignoreCase = true).onFirst()
 }
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForTag(
