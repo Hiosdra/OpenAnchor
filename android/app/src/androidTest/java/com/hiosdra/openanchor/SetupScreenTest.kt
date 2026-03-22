@@ -16,6 +16,7 @@ import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,14 +59,11 @@ class SetupScreenTest {
 
     // --- 2. Step 1: GPS Position ---
 
+    @Ignore("GPS not available on CI emulator — Use Current Position never appears")
     @Test
     fun setup_step1_useCurrentPositionVisible() {
-        try {
-            composeTestRule.waitForText("Use Current Position", timeoutMs = 3_000)
-            composeTestRule.onNodeWithText("Use Current Position").assertIsDisplayed()
-        } catch (_: Exception) {
-            // GPS not available on CI emulator — test passes as not applicable
-        }
+        composeTestRule.waitForText("Use Current Position", timeoutMs = 3_000)
+        composeTestRule.onNodeWithText("Use Current Position").assertIsDisplayed()
     }
 
     // --- 3. Zone Type Selection (Step 2) ---
