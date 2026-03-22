@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.hiosdra.openanchor.helpers.tryPerformScrollTo
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -56,35 +57,35 @@ class SetupScreenTest {
 
     @Test
     fun setup_step1_useCurrentPositionVisible() {
-        composeTestRule.onNodeWithText("Use Current Position").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Use Current Position").tryPerformScrollTo().assertIsDisplayed()
     }
 
     // --- 3. Zone Type Selection (Step 2) ---
 
     @Test
     fun setup_step2_zoneTypeHeadingVisible() {
-        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Next").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Choose Safe Zone Type")
         composeTestRule.onNodeWithText("Choose Safe Zone Type").assertIsDisplayed()
     }
 
     @Test
     fun setup_step2_simpleCircleOptionVisible() {
-        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Next").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Simple Circle")
         composeTestRule.onNodeWithText("Simple Circle").assertIsDisplayed()
     }
 
     @Test
     fun setup_step2_circleWithSectorOptionVisible() {
-        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Next").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Circle + Sector")
         composeTestRule.onNodeWithText("Circle + Sector").assertIsDisplayed()
     }
 
     @Test
     fun setup_step2_canSelectSimpleCircle() {
-        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Next").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Simple Circle")
         composeTestRule.onNodeWithText("Simple Circle").performClick()
     }
@@ -93,11 +94,11 @@ class SetupScreenTest {
 
     private fun navigateToRadiusStep() {
         // Step 1 → Step 2
-        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Next").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Choose Safe Zone Type")
         // Select Simple Circle and advance
         composeTestRule.onNodeWithText("Simple Circle").performClick()
-        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Next").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Set Safe Radius")
     }
 
@@ -110,13 +111,13 @@ class SetupScreenTest {
     @Test
     fun setup_step3_calculateFromChainSwitchVisible() {
         navigateToRadiusStep()
-        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Calculate from chain").tryPerformScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun setup_step3_radiusInputVisible() {
         navigateToRadiusStep()
-        composeTestRule.onNodeWithText("Radius").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Radius").tryPerformScrollTo().assertIsDisplayed()
     }
 
     // --- 5. Chain Calculator ---
@@ -124,21 +125,21 @@ class SetupScreenTest {
     @Test
     fun setup_step3_chainCalculator_depthInputAppears() {
         navigateToRadiusStep()
-        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Calculate from chain").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Depth (m)")
-        composeTestRule.onNodeWithText("Depth (m)").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Depth (m)").tryPerformScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun setup_step3_chainCalculator_scopeRatioChipsVisible() {
         navigateToRadiusStep()
-        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Calculate from chain").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("3:1 Calm")
-        composeTestRule.onNodeWithText("3:1 Calm").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("5:1 Moderate").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("7:1 Standard").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("10:1 Storm").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("Manual").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("3:1 Calm").tryPerformScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("5:1 Moderate").tryPerformScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("7:1 Standard").tryPerformScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("10:1 Storm").tryPerformScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Manual").tryPerformScrollTo().assertIsDisplayed()
     }
 
     // --- 6. Setup Navigation ---
@@ -146,7 +147,7 @@ class SetupScreenTest {
     @Test
     fun setup_nextButtonNavigatesBetweenSteps() {
         // Step 1 → Step 2
-        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Next").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Choose Safe Zone Type")
         composeTestRule.onNodeWithText("Choose Safe Zone Type").assertIsDisplayed()
     }
@@ -154,7 +155,7 @@ class SetupScreenTest {
     @Test
     fun setup_backArrowReturnsToPreviousStep() {
         // Step 1 → Step 2
-        composeTestRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Next").tryPerformScrollTo().performClick()
         composeTestRule.waitForText("Choose Safe Zone Type")
         // Step 2 → Step 1
         composeTestRule.onNodeWithContentDescription("Back").performClick()

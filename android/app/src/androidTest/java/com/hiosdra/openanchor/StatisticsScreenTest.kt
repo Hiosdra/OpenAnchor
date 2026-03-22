@@ -83,7 +83,7 @@ class StatisticsScreenTest {
     @Test
     fun statisticsScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor", timeoutMs = 5_000)
-        composeTestRule.assertTextDisplayed("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor", timeoutMs = 5_000)
+        composeTestRule.onNodeWithText("Drop Anchor").assertIsDisplayed()
     }
 }
