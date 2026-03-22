@@ -46,7 +46,10 @@ test.describe('Service Worker', () => {
     await waitForSW(page);
 
     const cachedUrls = await page.evaluate(async () => {
-      const cache = await caches.open('openanchor-superapp-v6');
+      const cacheNames = await caches.keys();
+      const cacheName = cacheNames.find(n => n.startsWith('openanchor-superapp-v'));
+      if (!cacheName) return [];
+      const cache = await caches.open(cacheName);
       const keys = await cache.keys();
       return keys.map((r) => new URL(r.url).pathname);
     });
