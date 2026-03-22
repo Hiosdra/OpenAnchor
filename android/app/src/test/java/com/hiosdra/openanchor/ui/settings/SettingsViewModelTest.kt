@@ -9,10 +9,15 @@ import com.hiosdra.openanchor.domain.model.DistanceUnit
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -24,12 +29,14 @@ class SettingsViewModelTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
+    private val testDispatcher = StandardTestDispatcher()
     private lateinit var preferencesManager: PreferencesManager
     private lateinit var preferencesFlow: MutableStateFlow<UserPreferences>
     private lateinit var viewModel: SettingsViewModel
 
     @Before
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
         preferencesFlow = MutableStateFlow(UserPreferences())
         preferencesManager = mockk {
             coEvery { preferences } returns preferencesFlow
@@ -43,6 +50,11 @@ class SettingsViewModelTest {
 
     private fun createViewModel(): SettingsViewModel {
         return SettingsViewModel(preferencesManager)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test

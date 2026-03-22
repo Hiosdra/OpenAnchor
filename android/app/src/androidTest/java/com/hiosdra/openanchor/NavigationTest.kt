@@ -1,6 +1,7 @@
 package com.hiosdra.openanchor
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -83,8 +84,9 @@ class NavigationTest {
 
     @Test
     fun navigateToSettings() {
-        scrollToAndClick("Settings")
-        composeTestRule.waitForText("Settings")
+        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.onNodeWithContentDescription("Settings").performClick()
+        composeTestRule.waitForText("Language", timeoutMs = 5_000)
     }
 
     // ── 5. Navigate to Statistics ────────────────────────────────────
@@ -139,8 +141,9 @@ class NavigationTest {
 
     @Test
     fun backFromSettings_returnsHome() {
-        scrollToAndClick("Settings")
-        composeTestRule.waitForText("Settings")
+        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.onNodeWithContentDescription("Settings").performClick()
+        composeTestRule.waitForText("Language", timeoutMs = 5_000)
         navigateBack()
         composeTestRule.waitForText("Drop Anchor")
     }

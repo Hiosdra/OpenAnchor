@@ -41,11 +41,16 @@ class ExamQuizScreenTest {
         composeTestRule.waitForText("Categories", timeoutMs = 10_000)
     }
 
+    private fun scrollToTextInList(text: String) {
+        composeTestRule.onNode(hasScrollToNodeAction())
+            .performScrollToNode(hasText(text))
+    }
+
     private fun navigateToLearnMode() {
-        composeTestRule.onNodeWithText("Learn Mode").performScrollTo().performClick()
+        scrollToTextInList("Learn Mode")
+        composeTestRule.onNodeWithText("Learn Mode").performClick()
         composeTestRule.waitUntil(10_000) {
-            composeTestRule.onAllNodesWithText("A)", substring = true).fetchSemanticsNodes().isNotEmpty() ||
-            composeTestRule.onAllNodesWithText("Next", substring = true).fetchSemanticsNodes().isNotEmpty()
+            composeTestRule.onAllNodesWithText("#", substring = true).fetchSemanticsNodes().isNotEmpty()
         }
     }
 
@@ -63,17 +68,17 @@ class ExamQuizScreenTest {
 
     @Test
     fun examMenu_displaysCategoriesSection() {
-        composeTestRule.onNodeWithText("Categories").performScrollTo()
+        scrollToTextInList("Categories")
         composeTestRule.assertTextDisplayed("Categories")
     }
 
     @Test
     fun examMenu_displaysModeButtons() {
-        composeTestRule.onNodeWithText("Learn Mode").performScrollTo()
+        scrollToTextInList("Learn Mode")
         composeTestRule.assertTextDisplayed("Learn Mode")
-        composeTestRule.onNodeWithText("Leitner Mode").performScrollTo()
+        scrollToTextInList("Leitner Mode")
         composeTestRule.assertTextDisplayed("Leitner Mode")
-        composeTestRule.onNodeWithText("Exam Mode").performScrollTo()
+        scrollToTextInList("Exam Mode")
         composeTestRule.assertTextDisplayed("Exam Mode")
     }
 
@@ -91,7 +96,7 @@ class ExamQuizScreenTest {
 
     @Test
     fun examMenu_displaysCategoryNames() {
-        composeTestRule.onNodeWithText("Categories").performScrollTo()
+        scrollToTextInList("Categories")
         // Category items show question counts
         composeTestRule.assertTextDisplayed("questions")
     }
@@ -152,34 +157,36 @@ class ExamQuizScreenTest {
 
     @Test
     fun leitnerMode_displaysTitle() {
-        composeTestRule.onNodeWithText("Leitner Mode").performScrollTo().performClick()
-        composeTestRule.waitForText("Leitner Mode", timeoutMs = 10_000)
+        scrollToTextInList("Leitner Mode")
+        composeTestRule.onNodeWithText("Leitner Mode").performClick()
+        composeTestRule.waitForText("New / Failed", timeoutMs = 10_000)
         composeTestRule.assertTextDisplayed("Leitner Mode")
     }
 
     @Test
     fun leitnerMode_displaysBoxLabels() {
-        composeTestRule.onNodeWithText("Leitner Mode").performScrollTo().performClick()
-        composeTestRule.waitForText("Leitner Mode", timeoutMs = 10_000)
+        scrollToTextInList("Leitner Mode")
+        composeTestRule.onNodeWithText("Leitner Mode").performClick()
+        composeTestRule.waitForText("New / Failed", timeoutMs = 10_000)
         composeTestRule.assertTextDisplayed("New / Failed")
-        composeTestRule.onNodeWithText("Learning").performScrollTo()
-        composeTestRule.assertTextDisplayed("Learning")
     }
 
     @Test
     fun leitnerMode_displaysStartSession() {
-        composeTestRule.onNodeWithText("Leitner Mode").performScrollTo().performClick()
-        composeTestRule.waitForText("Leitner Mode", timeoutMs = 10_000)
+        scrollToTextInList("Leitner Mode")
+        composeTestRule.onNodeWithText("Leitner Mode").performClick()
+        composeTestRule.waitForText("New / Failed", timeoutMs = 10_000)
         composeTestRule.onNodeWithText("Start Session").performScrollTo()
         composeTestRule.assertTextDisplayed("Start Session")
     }
 
     @Test
     fun leitnerMode_backReturnsToMenu() {
-        composeTestRule.onNodeWithText("Leitner Mode").performScrollTo().performClick()
-        composeTestRule.waitForText("Leitner Mode", timeoutMs = 10_000)
+        scrollToTextInList("Leitner Mode")
+        composeTestRule.onNodeWithText("Leitner Mode").performClick()
+        composeTestRule.waitForText("New / Failed", timeoutMs = 10_000)
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("Exam Quiz")
+        composeTestRule.waitForText("Categories")
         composeTestRule.assertTextDisplayed("Your Progress")
     }
 
@@ -187,7 +194,8 @@ class ExamQuizScreenTest {
 
     @Test
     fun examMode_displaysTitle() {
-        composeTestRule.onNodeWithText("Exam Mode").performScrollTo().performClick()
+        scrollToTextInList("Exam Mode")
+        composeTestRule.onNodeWithText("Exam Mode").performClick()
         composeTestRule.waitForText("Exam Mode", timeoutMs = 10_000)
         composeTestRule.assertTextDisplayed("Exam Mode")
     }

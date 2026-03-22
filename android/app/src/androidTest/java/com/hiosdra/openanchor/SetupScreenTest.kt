@@ -2,7 +2,9 @@ package com.hiosdra.openanchor
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -132,21 +134,23 @@ class SetupScreenTest {
     @Test
     fun setup_step3_chainCalculator_depthInputAppears() {
         navigateToRadiusStep()
-        composeTestRule.onNodeWithText("Calculate from chain").tryPerformScrollTo().performClick()
+        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo()
+        composeTestRule.onAllNodes(isToggleable()).onFirst().performClick()
         composeTestRule.waitForText("Depth (m)")
-        composeTestRule.onNodeWithText("Depth (m)").tryPerformScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Depth (m)").performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun setup_step3_chainCalculator_scopeRatioChipsVisible() {
         navigateToRadiusStep()
-        composeTestRule.onNodeWithText("Calculate from chain").tryPerformScrollTo().performClick()
+        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo()
+        composeTestRule.onAllNodes(isToggleable()).onFirst().performClick()
         composeTestRule.waitForText("3:1 Calm")
-        composeTestRule.onNodeWithText("3:1 Calm").tryPerformScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("5:1 Moderate").tryPerformScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("7:1 Standard").tryPerformScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("10:1 Storm").tryPerformScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("Manual").tryPerformScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("3:1 Calm").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("5:1 Moderate").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("7:1 Standard").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("10:1 Storm").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Manual").performScrollTo().assertIsDisplayed()
     }
 
     // --- 6. Setup Navigation ---
