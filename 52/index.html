@@ -91,6 +91,16 @@
             box-shadow: 0 12px 40px rgba(245, 158, 11, 0.2), 0 4px 12px rgba(0,0,0,0.5);
         }
 
+        /* Sailing Info card */
+        .card-sailing {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2840 50%, #0a1628 100%);
+            box-shadow: 0 8px 32px rgba(96, 165, 250, 0.12), 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .card-sailing:hover {
+            box-shadow: 0 12px 40px rgba(96, 165, 250, 0.2), 0 4px 12px rgba(0,0,0,0.5);
+        }
+
         /* Icon container */
         .module-icon {
             width: 64px;
@@ -117,35 +127,9 @@
             box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
         }
 
-        /* Badge */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            padding: 0.2rem 0.6rem;
-            border-radius: 999px;
-        }
-
-        .badge-anchor {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .badge-watch {
-            background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-
-        .badge-exam {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.2);
+        .icon-sailing {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
         }
 
         /* Feature list */
@@ -182,6 +166,14 @@
             flex-shrink: 0;
         }
 
+        .feature-dot-sailing {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #38bdf8;
+            flex-shrink: 0;
+        }
+
         /* Launch button */
         .launch-btn {
             display: flex;
@@ -205,6 +197,10 @@
 
         .launch-btn-exam {
             color: #fcd34d;
+        }
+
+        .launch-btn-sailing {
+            color: #7dd3fc;
         }
 
         /* Divider line in button */
@@ -648,8 +644,8 @@
     <main class="content">
         <div class="modules-grid">
 
-            <!-- Module 1: Anchor Alarm -->
-            <div id="anchorModule" class="module-card card-anchor" onclick="openModule('modules/anchor/index.html')" role="button" tabindex="0"
+            <!-- Anchor Alarm -->
+            <div id="anchorModule" class="module-card card-anchor module-hidden" onclick="openModule('modules/anchor/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Alert Kotwiczny"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/anchor/index.html')">
                 <div class="module-card-inner">
@@ -663,14 +659,10 @@
                                 <path d="M5 12H2a10 10 0 0 0 20 0h-3"/>
                             </svg>
                         </div>
-                        <!-- Title & badge -->
+                        <!-- Title -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Alert Kotwiczny</h2>
-                                <span class="badge badge-anchor">
-                                    <span style="width:6px;height:6px;border-radius:50%;background:#60a5fa;display:inline-block"></span>
-                                    Moduł 1
-                                </span>
                             </div>
                             <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Alarm kotwiczny GPS &amp; monitoring</p>
                         </div>
@@ -710,8 +702,8 @@
                 </div>
             </div>
 
-            <!-- Module 2: Wachtownik -->
-            <div id="wachtownikModule" class="module-card card-watch" onclick="openModule('modules/wachtownik/index.html')" role="button" tabindex="0"
+            <!-- Wachtownik -->
+            <div id="wachtownikModule" class="module-card card-watch module-hidden" onclick="openModule('modules/wachtownik/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Wachtownik"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/wachtownik/index.html')">
                 <div class="module-card-inner">
@@ -724,14 +716,10 @@
                                 <polyline points="12 6 12 12 16 14"/>
                             </svg>
                         </div>
-                        <!-- Title & badge -->
+                        <!-- Title -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Wachtownik</h2>
-                                <span class="badge badge-watch">
-                                    <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block"></span>
-                                    Moduł 2
-                                </span>
                             </div>
                             <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Morski grafik wacht PRO</p>
                         </div>
@@ -771,7 +759,7 @@
                 </div>
             </div>
 
-            <!-- Module 3: Egzamin ŻJ/JSM -->
+            <!-- Egzamin ŻJ/JSM -->
             <div class="module-card card-exam" onclick="openModule('modules/egzamin/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Egzamin ŻJ/JSM"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/egzamin/index.html')">
@@ -786,14 +774,10 @@
                                 <path d="M8 7h8M8 11h6"/>
                             </svg>
                         </div>
-                        <!-- Title & badge -->
+                        <!-- Title -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Egzamin ŻJ / JSM</h2>
-                                <span class="badge badge-exam">
-                                    <span style="width:6px;height:6px;border-radius:50%;background:#fbbf24;display:inline-block"></span>
-                                    Moduł 3
-                                </span>
                             </div>
                             <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Nauka do egzaminu PZŻ</p>
                         </div>
@@ -821,6 +805,65 @@
 
                     <!-- Launch button -->
                     <div class="launch-btn launch-btn-exam">
+                        <span class="launch-divider"></span>
+                        <span>Uruchom</span>
+                        <svg class="arrow-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                             width="16" height="16">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sailing Info -->
+            <div class="module-card card-sailing" onclick="openModule('modules/zeglowanie/index.html')" role="button" tabindex="0"
+                 aria-label="Otwórz Żeglowanie - Informacje"
+                 onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/zeglowanie/index.html')">
+                <div class="module-card-inner">
+                    <div class="flex items-start gap-4">
+                        <!-- Icon -->
+                        <div class="module-icon icon-sailing flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                                <path d="M2 20h20"/>
+                                <path d="M6 20V6"/>
+                                <path d="M6 6l6 6 6-6"/>
+                                <path d="M18 14v6"/>
+                            </svg>
+                        </div>
+                        <!-- Title -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Żeglowanie</h2>
+                            </div>
+                            <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Informacje i porady dla żeglarzy</p>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div style="margin-top:1rem">
+                        <div class="feature-item">
+                            <span class="feature-dot-sailing"></span>
+                            <span>Lista rzeczy do spakowania</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-sailing"></span>
+                            <span>Interaktywna checklist z zapisem</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-sailing"></span>
+                            <span>Przygotowanie do rejsu morskiego</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-sailing"></span>
+                            <span>Praktyczne porady żeglarskie</span>
+                        </div>
+                    </div>
+
+                    <!-- Launch button -->
+                    <div class="launch-btn launch-btn-sailing">
                         <span class="launch-divider"></span>
                         <span>Uruchom</span>
                         <svg class="arrow-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -881,74 +924,16 @@
         OpenAnchor &nbsp;·&nbsp; Morska Superapp &nbsp;·&nbsp; v2.0
     </footer>
 
-    <script>
-        // Beta mode management
-        const BETA_MODE_KEY = 'oa_beta_mode';
+    <script type="module">
+        // Import dashboard functions from module
+        import { initBetaMode, toggleBetaMode, openSettings, closeSettings, closeSettingsOnBackdrop, openModule } from './js/dashboard.js';
 
-        // Initialize beta mode on page load
-        function initBetaMode() {
-            const isBetaEnabled = localStorage.getItem(BETA_MODE_KEY) === 'true';
-            const betaToggle = document.getElementById('betaToggle');
-            const anchorModule = document.getElementById('anchorModule');
-            const wachtownikModule = document.getElementById('wachtownikModule');
-
-            // Set toggle state
-            if (betaToggle) {
-                betaToggle.checked = isBetaEnabled;
-            }
-
-            // Show/hide modules based on beta state
-            if (!isBetaEnabled) {
-                if (anchorModule) anchorModule.classList.add('module-hidden');
-                if (wachtownikModule) wachtownikModule.classList.add('module-hidden');
-            } else {
-                if (anchorModule) anchorModule.classList.remove('module-hidden');
-                if (wachtownikModule) wachtownikModule.classList.remove('module-hidden');
-            }
-        }
-
-        // Toggle beta mode
-        function toggleBetaMode() {
-            const betaToggle = document.getElementById('betaToggle');
-            const isBetaEnabled = betaToggle.checked;
-            const anchorModule = document.getElementById('anchorModule');
-            const wachtownikModule = document.getElementById('wachtownikModule');
-
-            // Save preference
-            localStorage.setItem(BETA_MODE_KEY, isBetaEnabled.toString());
-
-            // Show/hide modules
-            if (isBetaEnabled) {
-                if (anchorModule) anchorModule.classList.remove('module-hidden');
-                if (wachtownikModule) wachtownikModule.classList.remove('module-hidden');
-            } else {
-                if (anchorModule) anchorModule.classList.add('module-hidden');
-                if (wachtownikModule) wachtownikModule.classList.add('module-hidden');
-            }
-        }
-
-        // Open settings modal
-        function openSettings() {
-            const modal = document.getElementById('settingsModal');
-            if (modal) {
-                modal.classList.add('show');
-            }
-        }
-
-        // Close settings modal
-        function closeSettings() {
-            const modal = document.getElementById('settingsModal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
-
-        // Close settings when clicking on backdrop
-        function closeSettingsOnBackdrop(event) {
-            if (event.target.id === 'settingsModal') {
-                closeSettings();
-            }
-        }
+        // Expose functions to global scope for onclick handlers
+        window.toggleBetaMode = toggleBetaMode;
+        window.openSettings = openSettings;
+        window.closeSettings = closeSettings;
+        window.closeSettingsOnBackdrop = closeSettingsOnBackdrop;
+        window.openModule = openModule;
 
         // Initialize on page load
         window.addEventListener('load', () => {
@@ -1078,6 +1063,9 @@
             }
         }
 
+        // Expose forceUpdate to global scope
+        window.forceUpdate = forceUpdate;
+
         // Service worker update handling
         let newWorker;
         let updateBanner = document.getElementById('updateBanner');
@@ -1101,10 +1089,10 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
-                        // Check for updates periodically (every 60 seconds)
+                        // Check for updates periodically (every 5 minutes)
                         setInterval(() => {
                             registration.update();
-                        }, 60000);
+                        }, 300000);
 
                         // Check if there's already a waiting service worker on page load
                         if (registration.waiting) {
@@ -1153,11 +1141,6 @@
         dismissBtn.addEventListener('click', () => {
             hideUpdateBanner();
         });
-
-        // Navigate to module
-        function openModule(url) {
-            window.location.href = url;
-        }
 
         // Handle keyboard for cards
         document.querySelectorAll('.module-card').forEach(card => {

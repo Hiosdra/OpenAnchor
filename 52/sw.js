@@ -1,4 +1,4 @@
-const CACHE_NAME = 'openanchor-superapp-v6';
+const CACHE_NAME = 'openanchor-superapp-v7';
 const urlsToCache = [
   './',
   './index.html',
@@ -9,6 +9,8 @@ const urlsToCache = [
   './modules/egzamin/',
   './modules/egzamin/index.html',
   './modules/egzamin/exam_questions.json',
+  './modules/zeglowanie/',
+  './modules/zeglowanie/index.html',
   './manifest.json',
   './assets/icon-192x192.png',
   './assets/icon-512x512.png',
@@ -44,21 +46,38 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Skip CDN resources - let browser cache handle them
+  if (url.hostname.includes('cdn.tailwindcss.com') ||
+      url.hostname.includes('cdn.jsdelivr.net') ||
+      url.hostname.includes('unpkg.com')) {
+    return;
+  }
+
+  // Only cache GET requests - Cache API doesn't support other methods
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {
-        // Optionally update the cache in the background
-        fetch(event.request).then(networkResponse => {
-          if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
-            return;
-          }
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseToCache);
+        // Only update cache for non-static assets (skip images, fonts, etc.)
+        const isStaticAsset = /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|ico)$/i.test(url.pathname);
+
+        if (!isStaticAsset) {
+          // Optionally update the cache in the background for HTML/JS/CSS
+          fetch(event.request).then(networkResponse => {
+            if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
+              return;
+            }
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          }).catch(() => {
+            // Ignore network errors during background update
           });
-        }).catch(() => {
-          // Ignore network errors during background update
-        });
+        }
 
         // Serve the cached response immediately
         return cachedResponse;

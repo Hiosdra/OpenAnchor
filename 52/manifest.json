@@ -1,7 +1,7 @@
 {
   "name": "OpenAnchor - Morska Superapp",
   "short_name": "OpenAnchor",
-  "description": "Morska superapp - Alert Kotwiczny GPS, Morski Grafik Wacht PRO i Egzamin ŻJ/JSM",
+  "description": "Morska superapp - Alert Kotwiczny GPS, Morski Grafik Wacht PRO, Egzamin ŻJ/JSM i Informacje o Żeglarstwie",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
@@ -54,6 +54,15 @@
       "short_name": "Egzamin",
       "description": "Nauka do egzaminu żeglarskiego PZŻ",
       "url": "./modules/egzamin/",
+      "icons": [
+        { "src": "assets/icon-192x192.png", "sizes": "192x192" }
+      ]
+    },
+    {
+      "name": "Żeglowanie",
+      "short_name": "Żeglowanie",
+      "description": "Informacje i porady dla żeglarzy",
+      "url": "./modules/zeglowanie/",
       "icons": [
         { "src": "assets/icon-192x192.png", "sizes": "192x192" }
       ]

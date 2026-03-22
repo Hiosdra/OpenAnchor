@@ -23,6 +23,7 @@ export function setBetaMode(enabled) {
 /**
  * Initialize beta mode on page load
  * Updates DOM elements based on stored beta mode preference
+ * Note: Beta modules start with 'module-hidden' class in HTML to prevent flash
  */
 export function initBetaMode() {
   const isBetaEnabled = isBetaModeEnabled();
@@ -35,11 +36,9 @@ export function initBetaMode() {
     betaToggle.checked = isBetaEnabled;
   }
 
-  // Show/hide modules based on beta state
-  if (!isBetaEnabled) {
-    if (anchorModule) anchorModule.classList.add('module-hidden');
-    if (wachtownikModule) wachtownikModule.classList.add('module-hidden');
-  } else {
+  // Only remove hidden class if beta is enabled
+  // Modules are hidden by default in HTML to prevent flash on load
+  if (isBetaEnabled) {
     if (anchorModule) anchorModule.classList.remove('module-hidden');
     if (wachtownikModule) wachtownikModule.classList.remove('module-hidden');
   }
