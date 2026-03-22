@@ -25,7 +25,8 @@ class HistoryDetailScreenTest {
     @get:Rule(order = 2)
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 
     @Before
@@ -36,9 +37,7 @@ class HistoryDetailScreenTest {
 
     private fun navigateToHistory() {
         composeTestRule.waitForText("OpenAnchor")
-        composeTestRule
-            .onNode(hasScrollToNodeAction())
-            .performScrollToNode(hasText("History", substring = true))
+        composeTestRule.onNodeWithText("History", substring = true).performScrollTo()
         composeTestRule.waitForText("History").performClick()
         composeTestRule.waitForText("No anchoring history yet")
     }

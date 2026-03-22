@@ -1,10 +1,9 @@
 package com.hiosdra.openanchor
 
-import androidx.compose.ui.test.hasScrollToNodeAction
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
@@ -30,7 +29,8 @@ class NavigationTest {
     @get:Rule(order = 2)
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 
     @Before
@@ -41,9 +41,7 @@ class NavigationTest {
     // ── Helpers ──────────────────────────────────────────────────────
 
     private fun scrollToAndClick(text: String) {
-        composeTestRule
-            .onNode(hasScrollToNodeAction())
-            .performScrollToNode(hasText(text, substring = true))
+        composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
         composeTestRule.waitForIdle()

@@ -26,7 +26,8 @@ class PairingScreensTest {
     @get:Rule(order = 2)
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 
     @Before
@@ -37,9 +38,7 @@ class PairingScreensTest {
     // ── Helpers ──────────────────────────────────────────────────────
 
     private fun scrollToAndClick(text: String) {
-        composeTestRule
-            .onNode(hasScrollToNodeAction())
-            .performScrollToNode(hasText(text, substring = true))
+        composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
         composeTestRule.waitForIdle()

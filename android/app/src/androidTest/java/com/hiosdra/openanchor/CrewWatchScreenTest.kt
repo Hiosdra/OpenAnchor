@@ -25,7 +25,8 @@ class CrewWatchScreenTest {
     @get:Rule(order = 2)
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 
     @Before
@@ -36,9 +37,7 @@ class CrewWatchScreenTest {
 
     private fun navigateToCrewWatch() {
         composeTestRule.waitForText("OpenAnchor")
-        composeTestRule
-            .onNode(hasScrollToNodeAction())
-            .performScrollToNode(hasText("Crew Watch", substring = true))
+        composeTestRule.onNodeWithText("Crew Watch", substring = true).performScrollTo()
         composeTestRule.waitForText("Crew Watch").performClick()
         composeTestRule.waitForText("Watch schedule and timer")
     }

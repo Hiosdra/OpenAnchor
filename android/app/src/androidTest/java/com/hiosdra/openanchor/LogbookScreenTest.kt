@@ -25,7 +25,8 @@ class LogbookScreenTest {
     @get:Rule(order = 2)
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 
     @Before
@@ -36,9 +37,7 @@ class LogbookScreenTest {
 
     private fun navigateToLogbook() {
         composeTestRule.waitForText("OpenAnchor")
-        composeTestRule
-            .onNode(hasScrollToNodeAction())
-            .performScrollToNode(hasText("AI Logbook", substring = true))
+        composeTestRule.onNodeWithText("AI Logbook", substring = true).performScrollTo()
         composeTestRule.waitForText("AI Logbook").performClick()
         composeTestRule.waitForText("AI Logbook", timeoutMs = 5_000)
     }

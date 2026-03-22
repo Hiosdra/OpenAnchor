@@ -25,7 +25,8 @@ class StatisticsScreenTest {
     @get:Rule(order = 2)
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 
     @Before
@@ -37,9 +38,7 @@ class StatisticsScreenTest {
     private fun navigateToStatistics() {
         composeTestRule.waitForText("OpenAnchor", timeoutMs = 10_000)
         try {
-            composeTestRule
-                .onNode(hasScrollToNodeAction())
-                .performScrollToNode(hasText("Statistics", substring = true))
+            composeTestRule.onNodeWithText("Statistics", substring = true).performScrollTo()
         } catch (_: Exception) {
             // Scroll may not be needed if Statistics is already visible
         }
