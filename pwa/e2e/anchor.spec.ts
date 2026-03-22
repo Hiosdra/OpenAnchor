@@ -50,7 +50,7 @@ test.describe('Anchor — Page Load & Initial State', () => {
 
   test('tool buttons grid is visible', async ({ page }) => {
     await gotoAnchor(page);
-    const toolGrid = page.locator('.grid.grid-cols-4.gap-2');
+    const toolGrid = page.locator('.grid.grid-cols-4.max-w-md');
     await expect(toolGrid).toBeVisible();
 
     await expect(page.locator('button[data-modal="calc-modal"]')).toBeVisible();
@@ -58,9 +58,11 @@ test.describe('Anchor — Page Load & Initial State', () => {
     await expect(page.locator('button[data-modal="watch-setup-modal"]')).toBeVisible();
     await expect(page.locator('#open-weather-btn')).toBeVisible();
     await expect(page.locator('#simple-monitor-btn')).toBeVisible();
+    await expect(page.locator('button[data-modal="ws-sync-modal"]')).toBeVisible();
     await expect(page.locator('#open-history-btn')).toBeVisible();
     await expect(page.locator('#open-ai-btn')).toBeVisible();
     await expect(page.locator('#share-pos-btn')).toBeVisible();
+    await expect(page.locator('#open-qr-scan-btn')).toBeVisible();
   });
 
   test('no signal overlay is visible without GPS', async ({ page }) => {

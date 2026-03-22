@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import androidx.test.rule.GrantPermissionRule
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -20,6 +21,12 @@ class HistoryDetailScreenTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @get:Rule(order = 2)
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
+    )
 
     @Before
     fun setUp() {

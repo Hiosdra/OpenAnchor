@@ -28,6 +28,7 @@ generativeai = "0.9.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
+androidTestRules = "1.6.1"
 ksp = "2.3.6"
 mockk = "1.14.9"
 coroutinesTest = "1.10.2"
@@ -115,6 +116,7 @@ google-generativeai = { group = "com.google.ai.client.generativeai", name = "gen
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidTestRules" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
