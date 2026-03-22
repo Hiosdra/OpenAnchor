@@ -176,7 +176,7 @@ class ExamQuizScreenTest {
         scrollToTextInList("Leitner Mode")
         composeTestRule.onNodeWithText("Leitner Mode").performClick()
         composeTestRule.waitForText("New / Failed", timeoutMs = 10_000)
-        composeTestRule.onNodeWithText("Start Session").performScrollTo()
+        scrollToTextInList("Start Session")
         composeTestRule.assertTextDisplayed("Start Session")
     }
 

@@ -8,11 +8,13 @@ import com.hiosdra.openanchor.helpers.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
 
+@Ignore("Requires camera hardware not available on CI emulator")
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class PairingScreensTest {
