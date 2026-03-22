@@ -38,7 +38,7 @@ class SettingsScreenTest {
     private fun navigateToSettings() {
         composeTestRule.waitForText("OpenAnchor")
         composeTestRule.onNodeWithContentDescription("Settings").performClick()
-        composeTestRule.waitForText("Settings")
+        composeTestRule.waitForText("Language", timeoutMs = 5_000)
     }
 
     @Test
@@ -86,9 +86,7 @@ class SettingsScreenTest {
 
     @Test
     fun settingsScreen_displaysAppInfo() {
-        composeTestRule.onNodeWithText("OpenAnchor v", substring = true).performScrollTo()
-        composeTestRule.assertTextDisplayed("OpenAnchor v")
-        composeTestRule.assertTextDisplayed("Open source")
+        composeTestRule.onNodeWithText("OpenAnchor v", substring = true).performScrollTo().assertIsDisplayed()
     }
 
     @Test

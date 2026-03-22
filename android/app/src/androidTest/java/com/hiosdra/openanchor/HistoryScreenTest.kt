@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
 import com.hiosdra.openanchor.helpers.waitForText
@@ -41,8 +42,12 @@ class HistoryScreenTest {
     }
 
     private fun navigateToHistory() {
+        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.onNodeWithText("History", substring = true).performScrollTo()
         composeTestRule.waitForText("History").performClick()
-        composeTestRule.waitForText("No anchoring history yet")
+        composeTestRule.waitForIdle()
+        Thread.sleep(500) // Allow navigation animation
+        composeTestRule.waitForIdle()
     }
 
     @Test

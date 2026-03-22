@@ -41,9 +41,12 @@ class NavigationTest {
     // ── Helpers ──────────────────────────────────────────────────────
 
     private fun scrollToAndClick(text: String) {
+        composeTestRule.waitForText("OpenAnchor")
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
+        composeTestRule.waitForIdle()
+        Thread.sleep(500)
         composeTestRule.waitForIdle()
     }
 

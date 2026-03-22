@@ -38,12 +38,15 @@ class ExamQuizScreenTest {
     private fun navigateToExamQuiz() {
         composeTestRule.waitForText("OpenAnchor")
         composeTestRule.onNodeWithText("Exam Quiz").performScrollTo().performClick()
-        composeTestRule.waitForText("Exam Quiz", timeoutMs = 10_000)
+        composeTestRule.waitForText("Categories", timeoutMs = 10_000)
     }
 
     private fun navigateToLearnMode() {
         composeTestRule.onNodeWithText("Learn Mode").performScrollTo().performClick()
-        composeTestRule.waitForText("Learn Mode", timeoutMs = 10_000)
+        composeTestRule.waitUntil(10_000) {
+            composeTestRule.onAllNodesWithText("A)", substring = true).fetchSemanticsNodes().isNotEmpty() ||
+            composeTestRule.onAllNodesWithText("Next", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
     }
 
     // --- Menu tests ---

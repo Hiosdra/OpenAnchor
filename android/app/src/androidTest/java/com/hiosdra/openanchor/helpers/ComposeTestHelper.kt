@@ -8,18 +8,16 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
     val nodes = onAllNodesWithText(text, substring = true, ignoreCase = true)
     val count = nodes.fetchSemanticsNodes().size
-    check(count > 0) { "No nodes found with text containing '$text'" }
-    var anyDisplayed = false
+    if (count == 0) throw AssertionError("No nodes found with text containing '$text'")
     for (i in 0 until count) {
         try {
             nodes[i].assertIsDisplayed()
-            anyDisplayed = true
-            break
+            return  // At least one is displayed, success
         } catch (_: AssertionError) {
             continue
         }
     }
-    check(anyDisplayed) { "Found $count nodes with text '$text' but none are displayed" }
+    throw AssertionError("Found $count nodes with text '$text' but none are displayed")
 }
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForText(
