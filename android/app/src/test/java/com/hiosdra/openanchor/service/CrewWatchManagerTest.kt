@@ -252,11 +252,11 @@ class CrewWatchManagerTest {
         val eventDeferred = async {
             manager.events.first { it is CrewWatchManager.CrewWatchEvent.WatchStopped }
         }
-        delay(50) // let collector subscribe
+        yield() // let collector subscribe
 
         manager.stopWatch()
 
-        val event = withTimeout(2000) { eventDeferred.await() }
+        val event = eventDeferred.await()
         assertTrue(event is CrewWatchManager.CrewWatchEvent.WatchStopped)
     }
 
@@ -271,16 +271,25 @@ class CrewWatchManagerTest {
     // --- removeCrewMember index adjustment ---
 
     @Test
-    fun `removeCrewMember adjusts index when it exceeds new list size`() {
+    fun `removeCrewMember adjusts index when it exceeds new list size`() = runBlocking {
         manager.setCrewMembers(listOf("Alice", "Bob", "Charlie"))
-        // Simulate currentWatchIndex at last position via state
-        val stateField = CrewWatchManager::class.java.getDeclaredField("_state")
-        stateField.isAccessible = true
-        @Suppress("UNCHECKED_CAST")
-        val stateFlow = stateField.get(manager) as kotlinx.coroutines.flow.MutableStateFlow<CrewWatchManager.CrewWatchState>
-        stateFlow.value = stateFlow.value.copy(currentWatchIndex = 2)
+        manager.startWatch()
+
+        // Rotate to last position (index 2) using rotateWatch
+        val rotateWatch = manager.javaClass.getDeclaredMethod(
+            "rotateWatch", kotlin.coroutines.Continuation::class.java
+        )
+        rotateWatch.isAccessible = true
+        val completion = object : kotlin.coroutines.Continuation<Unit> {
+            override val context = coroutineContext
+            override fun resumeWith(result: Result<Unit>) { result.getOrThrow() }
+        }
+        repeat(2) { rotateWatch.invoke(manager, completion) }
+        assertEquals(2, manager.state.value.currentWatchIndex)
 
         manager.removeCrewMember(2) // remove Charlie, index 2 is now out of bounds
+        manager.stopWatch()
+
         val state = manager.state.value
         assertEquals(listOf("Alice", "Bob"), state.crewMembers)
         assertTrue(state.currentWatchIndex < state.crewMembers.size)
