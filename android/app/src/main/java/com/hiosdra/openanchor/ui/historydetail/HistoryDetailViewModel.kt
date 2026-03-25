@@ -27,7 +27,23 @@ data class HistoryDetailState(
     val gpxExportUri: Uri? = null,
     val gpxExportFilename: String? = null,
     val exportError: Boolean = false,
-    val exportSuccess: Boolean = false
+    val exportSuccess: Boolean = false,
+    // Per-session analytics
+    val analytics: SessionAnalytics? = null
+)
+
+data class SessionAnalytics(
+    val totalDurationMs: Long,
+    val maxDriftMeters: Float,
+    val alarmCount: Int,
+    val averageAccuracy: Float,
+    val alarmEvents: List<AlarmEvent>
+)
+
+data class AlarmEvent(
+    val timestampMs: Long,
+    val distanceMeters: Float,
+    val alarmState: String
 )
 
 @HiltViewModel
@@ -46,12 +62,39 @@ class HistoryDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val session = repository.getSessionById(sessionId)
             val points = repository.getTrackPointsOnce(sessionId)
+            val analytics = if (session != null && points.isNotEmpty()) {
+                computeAnalytics(session, points)
+            } else null
             _state.value = HistoryDetailState(
                 session = session,
                 trackPoints = points,
-                isLoading = false
+                isLoading = false,
+                analytics = analytics
             )
         }
+    }
+
+    private fun computeAnalytics(session: AnchorSession, points: List<TrackPoint>): SessionAnalytics {
+        val totalDuration = (session.endTime ?: System.currentTimeMillis()) - session.startTime
+        val maxDrift = points.maxOfOrNull { it.distanceToAnchor } ?: 0f
+        val alarmCount = session.alarmCount
+        val averageAccuracy = if (points.isNotEmpty()) {
+            points.map { it.position.accuracy }.average().toFloat()
+        } else 0f
+        val alarmEvents = points.filter { it.isAlarm }.map { point ->
+            AlarmEvent(
+                timestampMs = point.position.timestamp,
+                distanceMeters = point.distanceToAnchor,
+                alarmState = point.alarmState
+            )
+        }
+        return SessionAnalytics(
+            totalDurationMs = totalDuration,
+            maxDriftMeters = maxDrift,
+            alarmCount = alarmCount,
+            averageAccuracy = averageAccuracy,
+            alarmEvents = alarmEvents
+        )
     }
 
     fun exportGpx() {

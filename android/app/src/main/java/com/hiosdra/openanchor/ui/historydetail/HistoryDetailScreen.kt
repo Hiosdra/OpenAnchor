@@ -211,6 +211,63 @@ fun HistoryDetailScreen(
                         InfoRow(stringResource(R.string.track_points_count), "${state.trackPoints.size}")
                         InfoRow(stringResource(R.string.alarms_triggered), "${session.alarmCount}")
 
+                        // Session analytics
+                        state.analytics?.let { analytics ->
+                            Spacer(modifier = Modifier.height(8.dp))
+                            HorizontalDivider()
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Analytics",
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            InfoRow("Max drift", "%.1f m".format(analytics.maxDriftMeters))
+                            InfoRow("Avg GPS accuracy", "%.1f m".format(analytics.averageAccuracy))
+
+                            // Alarm timeline
+                            if (analytics.alarmEvents.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                HorizontalDivider()
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Alarm Timeline",
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                                analytics.alarmEvents.take(20).forEach { event ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 2.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = timeFormat.format(Date(event.timestampMs)),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = AlarmRed
+                                        )
+                                        Text(
+                                            text = "%.1f m".format(event.distanceMeters),
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                        Text(
+                                            text = event.alarmState,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = AlarmRed
+                                        )
+                                    }
+                                }
+                                if (analytics.alarmEvents.size > 20) {
+                                    Text(
+                                        text = "… and ${analytics.alarmEvents.size - 20} more",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // GPX Export button
