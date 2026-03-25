@@ -2,6 +2,8 @@ package com.hiosdra.openanchor.service
 
 import com.hiosdra.openanchor.domain.geometry.ZoneCheckResult
 import com.hiosdra.openanchor.domain.model.AlarmState
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.Clock
 import javax.inject.Inject
 
@@ -13,10 +15,13 @@ import javax.inject.Inject
  * - CAUTION: In the buffer zone (between primary and buffer radius)
  * - WARNING: Outside all zones, violation building (< 3 readings or < 3 seconds)
  * - ALARM: 3+ consecutive readings AND 3+ seconds outside all zones
+ *
+ * Thread safety: Uses kotlinx.coroutines Mutex for coroutine-safe state access.
  */
 class AlarmEngine @Inject constructor(
     private val clock: Clock
 ) {
+    private val mutex = Mutex()
 
     private var violationCount: Int = 0
     private var firstViolationTime: Long? = null
@@ -30,15 +35,13 @@ class AlarmEngine @Inject constructor(
      * @param zoneResult the result of checking position against the zone
      * @return the new alarm state after processing
      */
-    @Synchronized
-    fun processReading(zoneResult: ZoneCheckResult): AlarmState {
-        return when (zoneResult) {
+    suspend fun processReading(zoneResult: ZoneCheckResult): AlarmState = mutex.withLock {
+        when (zoneResult) {
             ZoneCheckResult.INSIDE -> {
-                reset()
+                resetInternal()
                 _currentState
             }
             ZoneCheckResult.BUFFER -> {
-                // In buffer zone: reset violation count but set state to CAUTION
                 violationCount = 0
                 firstViolationTime = null
                 _currentState = AlarmState.CAUTION
@@ -68,13 +71,15 @@ class AlarmEngine @Inject constructor(
      * @param isInsideZone whether the current position is inside the safe zone
      * @return the new alarm state after processing
      */
-    @Synchronized
-    fun processReading(isInsideZone: Boolean): AlarmState {
+    suspend fun processReading(isInsideZone: Boolean): AlarmState {
         return processReading(if (isInsideZone) ZoneCheckResult.INSIDE else ZoneCheckResult.OUTSIDE)
     }
 
-    @Synchronized
-    fun reset() {
+    suspend fun reset() = mutex.withLock {
+        resetInternal()
+    }
+
+    private fun resetInternal() {
         violationCount = 0
         firstViolationTime = null
         _currentState = AlarmState.SAFE
@@ -86,16 +91,14 @@ class AlarmEngine @Inject constructor(
      * @param externalState the alarm state determined by the PWA
      * @return the alarm state to use (same as input)
      */
-    @Synchronized
-    fun processExternalAlarm(externalState: AlarmState): AlarmState {
+    suspend fun processExternalAlarm(externalState: AlarmState): AlarmState = mutex.withLock {
         _currentState = externalState
-        return when (externalState) {
+        when (externalState) {
             AlarmState.SAFE, AlarmState.CAUTION -> {
-                reset()
+                resetInternal()
                 externalState
             }
             AlarmState.WARNING, AlarmState.ALARM -> {
-                // Mirror the external state without local debouncing
                 externalState
             }
         }

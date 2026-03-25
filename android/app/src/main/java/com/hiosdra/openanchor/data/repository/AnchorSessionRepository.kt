@@ -19,74 +19,74 @@ import javax.inject.Singleton
 class AnchorSessionRepository @Inject constructor(
     private val sessionDao: AnchorSessionDao,
     private val trackPointDao: TrackPointDao
-) {
+) : IAnchorSessionRepository {
     // ── Session queries ─────────────────────────────────────────────
 
-    fun observeAllSessions(): Flow<List<AnchorSession>> =
+    override fun observeAllSessions(): Flow<List<AnchorSession>> =
         sessionDao.getAllSessions().map { list -> list.map { it.toDomain() } }
 
-    fun observeActiveSession(): Flow<AnchorSession?> =
+    override fun observeActiveSession(): Flow<AnchorSession?> =
         sessionDao.observeActiveSession().map { it?.toDomain() }
 
-    fun observeSession(id: Long): Flow<AnchorSession?> =
+    override fun observeSession(id: Long): Flow<AnchorSession?> =
         sessionDao.observeSession(id).map { it?.toDomain() }
 
-    suspend fun getSessionById(id: Long): AnchorSession? =
+    override suspend fun getSessionById(id: Long): AnchorSession? =
         sessionDao.getSessionById(id)?.toDomain()
 
-    suspend fun getActiveSession(): AnchorSession? =
+    override suspend fun getActiveSession(): AnchorSession? =
         sessionDao.getActiveSession()?.toDomain()
 
     // ── Session mutations ───────────────────────────────────────────
 
-    suspend fun insertSession(session: AnchorSession): Long =
+    override suspend fun insertSession(session: AnchorSession): Long =
         sessionDao.insert(session.toEntity())
 
-    suspend fun updateSession(session: AnchorSession) {
+    override suspend fun updateSession(session: AnchorSession) {
         sessionDao.update(session.toEntity())
     }
 
-    suspend fun deleteSession(id: Long) {
+    override suspend fun deleteSession(id: Long) {
         sessionDao.deleteSession(id)
     }
 
     // ── Track point queries ─────────────────────────────────────────
 
-    fun observeTrackPoints(sessionId: Long): Flow<List<TrackPoint>> =
+    override fun observeTrackPoints(sessionId: Long): Flow<List<TrackPoint>> =
         trackPointDao.getTrackPointsForSession(sessionId).map { list -> list.map { it.toDomain() } }
 
-    suspend fun getTrackPointsOnce(sessionId: Long): List<TrackPoint> =
+    override suspend fun getTrackPointsOnce(sessionId: Long): List<TrackPoint> =
         trackPointDao.getTrackPointsForSessionOnce(sessionId).map { it.toDomain() }
 
-    suspend fun getTrackPointCount(sessionId: Long): Int =
+    override suspend fun getTrackPointCount(sessionId: Long): Int =
         trackPointDao.getTrackPointCount(sessionId)
 
     // ── Track point mutations ───────────────────────────────────────
 
-    suspend fun insertTrackPoint(trackPoint: TrackPoint) {
+    override suspend fun insertTrackPoint(trackPoint: TrackPoint) {
         trackPointDao.insert(trackPoint.toEntity())
     }
 
     // ── Statistics (aggregate queries) ──────────────────────────────
 
-    suspend fun getCompletedSessionCount(): Int =
+    override suspend fun getCompletedSessionCount(): Int =
         sessionDao.getCompletedSessionCount()
 
-    suspend fun getTotalAlarmCount(): Int =
+    override suspend fun getTotalAlarmCount(): Int =
         sessionDao.getTotalAlarmCount()
 
-    suspend fun getTotalAnchoredMillis(): Long =
+    override suspend fun getTotalAnchoredMillis(): Long =
         sessionDao.getTotalAnchoredMillis()
 
-    suspend fun getLongestSessionMillis(): Long =
+    override suspend fun getLongestSessionMillis(): Long =
         sessionDao.getLongestSessionMillis()
 
-    suspend fun getAverageSessionMillis(): Long =
+    override suspend fun getAverageSessionMillis(): Long =
         sessionDao.getAverageSessionMillis()
 
-    suspend fun getMaxRadiusUsed(): Double =
+    override suspend fun getMaxRadiusUsed(): Double =
         sessionDao.getMaxRadiusUsed()
 
-    suspend fun getAverageRadius(): Double =
+    override suspend fun getAverageRadius(): Double =
         sessionDao.getAverageRadius()
 }

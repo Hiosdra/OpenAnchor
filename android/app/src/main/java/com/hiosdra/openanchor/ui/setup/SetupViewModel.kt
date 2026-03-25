@@ -9,6 +9,7 @@ import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.domain.catenary.CatenaryCalculator
 import com.hiosdra.openanchor.domain.geometry.GeoCalculations
 import com.hiosdra.openanchor.domain.model.*
+import com.hiosdra.openanchor.domain.scope.AnchorScopeCalculator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -64,7 +65,8 @@ data class SetupState(
 class SetupViewModel @Inject constructor(
     private val locationProvider: LocationProvider,
     private val repository: AnchorSessionRepository,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    private val scopeCalculator: AnchorScopeCalculator
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SetupState())
@@ -131,7 +133,7 @@ class SetupViewModel @Inject constructor(
         if (s.selectedScopeRatio == ScopeRatio.CUSTOM) return
         val depth = s.depthM.toDoubleOrNull() ?: return
         if (depth <= 0) return
-        val chain = CatenaryCalculator.recommendedChainLength(depth, s.selectedScopeRatio.ratio)
+        val chain = scopeCalculator.recommendedChainLength(depth, s.selectedScopeRatio.ratio)
         _state.update {
             it.copy(
                 chainLengthM = "%.0f".format(chain),
@@ -143,7 +145,7 @@ class SetupViewModel @Inject constructor(
     private fun recalculateRadius() {
         val chain = _state.value.chainLengthM.toDoubleOrNull() ?: return
         val depth = _state.value.depthM.toDoubleOrNull() ?: return
-        val radius = CatenaryCalculator.calculateRadius(chain, depth)
+        val radius = scopeCalculator.calculateRadius(chain, depth)
         _state.update {
             it.copy(
                 calculatedRadius = radius,

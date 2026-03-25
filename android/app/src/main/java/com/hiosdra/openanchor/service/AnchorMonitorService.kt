@@ -164,6 +164,8 @@ class AnchorMonitorService : Service() {
     // ═══════════════════════════════════════
     // Standalone Mode Monitoring
     // ═══════════════════════════════════════
+    // TODO: Extract standalone GPS monitoring logic into StandaloneMonitorManager
+    //  to reduce this service's responsibility count.
 
     private fun startMonitoring(sessionId: Long) {
         val notification = buildNotification("Monitoring anchor position...", AlarmState.SAFE)
@@ -259,6 +261,12 @@ class AnchorMonitorService : Service() {
         }
     }
 
+    // ═══════════════════════════════════════
+    // Battery Monitoring
+    // ═══════════════════════════════════════
+    // TODO: Extract battery monitoring into a dedicated BatteryMonitorManager class
+    //  to decouple battery concerns from the service.
+
     private fun startBatteryMonitoring() {
         batteryMonitorJob?.cancel()
         batteryMonitorJob = serviceScope.launch {
@@ -299,6 +307,8 @@ class AnchorMonitorService : Service() {
     // ═══════════════════════════════════════
     // WebSocket Server (Paired Mode)
     // ═══════════════════════════════════════
+    // TODO: Extract paired mode orchestration into PairedModeOrchestrator to separate
+    //  WebSocket lifecycle from monitoring logic.
 
     private fun startWebSocketServer() {
         val notification = buildNotification("WebSocket server running...", AlarmState.SAFE)
@@ -549,6 +559,7 @@ class AnchorMonitorService : Service() {
     // ═══════════════════════════════════════
     // WebSocket Client (Client Mode)
     // ═══════════════════════════════════════
+    // TODO: Extract client mode logic into ClientModeOrchestrator to reduce service size.
 
     private fun startClientMode(wsUrl: String) {
         val notification = buildNotification("Connecting to server...", AlarmState.SAFE)
