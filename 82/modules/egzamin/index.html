@@ -495,6 +495,7 @@
                             src={imageDataUrl}
                             alt={`Pytanie #${question.id}`}
                             className="w-full h-auto cursor-zoom-in"
+                            style={{ filter: 'grayscale(1) contrast(1.5)' }}
                             onClick={() => setZoomed(true)}
                         />
                     )}
@@ -502,7 +503,7 @@
                     {/* Fullscreen zoom modal */}
                     {zoomed && imageDataUrl && (
                         <div className="image-modal" onClick={() => setZoomed(false)}>
-                            <img src={imageDataUrl} alt={`Pytanie #${question.id}`} />
+                            <img src={imageDataUrl} alt={`Pytanie #${question.id}`} style={{ filter: 'grayscale(1) contrast(1.5)' }} />
                         </div>
                     )}
                 </div>
