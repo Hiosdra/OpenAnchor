@@ -158,7 +158,7 @@
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
                 const ctx = canvas.getContext('2d');
-                await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                await page.render({ canvasContext: ctx, viewport: viewport, annotationMode: 0 }).promise;
 
                 if (this._cache.size >= this._MAX_CACHE) {
                     const firstKey = this._cache.keys().next().value;
@@ -495,7 +495,6 @@
                             src={imageDataUrl}
                             alt={`Pytanie #${question.id}`}
                             className="w-full h-auto cursor-zoom-in"
-                            style={{ filter: 'grayscale(1) contrast(1.5)' }}
                             onClick={() => setZoomed(true)}
                         />
                     )}
@@ -503,7 +502,7 @@
                     {/* Fullscreen zoom modal */}
                     {zoomed && imageDataUrl && (
                         <div className="image-modal" onClick={() => setZoomed(false)}>
-                            <img src={imageDataUrl} alt={`Pytanie #${question.id}`} style={{ filter: 'grayscale(1) contrast(1.5)' }} />
+                            <img src={imageDataUrl} alt={`Pytanie #${question.id}`} />
                         </div>
                     )}
                 </div>
