@@ -109,6 +109,33 @@ describe('Dashboard - Beta Mode Management', () => {
       document.body.innerHTML = '';
       expect(() => initBetaMode()).not.toThrow();
     });
+
+    it('should handle beta enabled with missing module elements', () => {
+      document.body.innerHTML = '<input type="checkbox" id="betaToggle" />';
+      setBetaMode(true);
+      expect(() => initBetaMode()).not.toThrow();
+      expect(document.getElementById('betaToggle').checked).toBe(true);
+    });
+
+    it('should handle beta enabled with only anchorModule present', () => {
+      document.body.innerHTML = `
+        <input type="checkbox" id="betaToggle" />
+        <div id="anchorModule" class="module-hidden"></div>
+      `;
+      setBetaMode(true);
+      initBetaMode();
+      expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(false);
+    });
+
+    it('should handle beta enabled with only wachtownikModule present', () => {
+      document.body.innerHTML = `
+        <input type="checkbox" id="betaToggle" />
+        <div id="wachtownikModule" class="module-hidden"></div>
+      `;
+      setBetaMode(true);
+      initBetaMode();
+      expect(document.getElementById('wachtownikModule').classList.contains('module-hidden')).toBe(false);
+    });
   });
 
   describe('toggleBetaMode', () => {
@@ -147,6 +174,51 @@ describe('Dashboard - Beta Mode Management', () => {
       toggleBetaMode();
 
       expect(localStorage.getItem(BETA_MODE_KEY)).toBe('true');
+    });
+
+    it('should handle missing betaToggle (defaults to false)', () => {
+      document.body.innerHTML = `
+        <div id="anchorModule"></div>
+        <div id="wachtownikModule"></div>
+      `;
+      toggleBetaMode();
+      expect(isBetaModeEnabled()).toBe(false);
+      expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(true);
+      expect(document.getElementById('wachtownikModule').classList.contains('module-hidden')).toBe(true);
+    });
+
+    it('should handle enabled with missing module elements', () => {
+      document.body.innerHTML = '<input type="checkbox" id="betaToggle" />';
+      document.getElementById('betaToggle').checked = true;
+      expect(() => toggleBetaMode()).not.toThrow();
+      expect(isBetaModeEnabled()).toBe(true);
+    });
+
+    it('should handle disabled with missing module elements', () => {
+      document.body.innerHTML = '<input type="checkbox" id="betaToggle" />';
+      document.getElementById('betaToggle').checked = false;
+      expect(() => toggleBetaMode()).not.toThrow();
+      expect(isBetaModeEnabled()).toBe(false);
+    });
+
+    it('should handle enabled with only anchorModule present', () => {
+      document.body.innerHTML = `
+        <input type="checkbox" id="betaToggle" />
+        <div id="anchorModule" class="module-hidden"></div>
+      `;
+      document.getElementById('betaToggle').checked = true;
+      toggleBetaMode();
+      expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(false);
+    });
+
+    it('should handle disabled with only wachtownikModule present', () => {
+      document.body.innerHTML = `
+        <input type="checkbox" id="betaToggle" />
+        <div id="wachtownikModule"></div>
+      `;
+      document.getElementById('betaToggle').checked = false;
+      toggleBetaMode();
+      expect(document.getElementById('wachtownikModule').classList.contains('module-hidden')).toBe(true);
     });
   });
 });

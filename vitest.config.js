@@ -10,7 +10,13 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'json-summary'],
       include: ['js/**/*.js'],
-      exclude: ['node_modules/**', 'tests/**']
+      exclude: ['node_modules/**', 'tests/**'],
+      thresholds: {
+        lines: 90,
+        statements: 90,
+        functions: 90,
+        branches: 90
+      }
     }
   }
 });
