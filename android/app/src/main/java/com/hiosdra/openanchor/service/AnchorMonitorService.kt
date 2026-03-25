@@ -101,6 +101,8 @@ class AnchorMonitorService : Service() {
     @Inject lateinit var driftDetector: DriftDetector
     @Inject lateinit var wsClient: AnchorWebSocketClient
     @Inject lateinit var clientModeManager: ClientModeManager
+    @Inject lateinit var gpsProcessor: GpsProcessor
+    @Inject lateinit var alarmHandler: AlarmHandler
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var monitoringJob: Job? = null
@@ -112,12 +114,6 @@ class AnchorMonitorService : Service() {
     private var clientStateUpdateJob: Job? = null
     private var clientEventJob: Job? = null
     private var lastGpsFixTime: Long = System.currentTimeMillis()
-    /** Ring buffer of recent track points for drift detection (last 30) */
-    private val recentTrackPoints = ArrayDeque<com.hiosdra.openanchor.domain.model.TrackPoint>(30)
-    private var previousPosition: Position? = null
-    private var previousPositionTime: Long = 0L
-    private var sessionMaxDistance: Double = 0.0
-    private var sessionMaxSog: Double = 0.0
 
     private val _monitorState = MutableStateFlow(MonitorState())
     val monitorState: StateFlow<MonitorState> = _monitorState.asStateFlow()
@@ -200,67 +196,44 @@ class AnchorMonitorService : Service() {
                 if (_monitorState.value.isPairedMode) return@collect
 
                 lastGpsFixTime = System.currentTimeMillis()
-                val distance = GeoCalculations.distanceMeters(position, session.anchorPosition)
-                val zoneResult = GeoCalculations.checkZone(position, zone)
-                val alarmState = alarmEngine.processReading(zoneResult)
+                val result = gpsProcessor.processPosition(position, session.anchorPosition, zone, sessionId)
 
-                // Compute SOG from consecutive positions (knots)
-                var currentSog = 0.0
-                val prevPos = previousPosition
-                val prevTime = previousPositionTime
-                if (prevPos != null && prevTime > 0L) {
-                    val dtSeconds = (position.timestamp - prevTime) / 1000.0
-                    if (dtSeconds > 0.5) {
-                        val distBetween = GeoCalculations.distanceMeters(prevPos, position)
-                        currentSog = distBetween / dtSeconds * 1.94384 // m/s → knots
-                    }
-                }
-                previousPosition = position
-                previousPositionTime = position.timestamp
-
-                // Track session max values
-                if (distance > sessionMaxDistance) sessionMaxDistance = distance
-                if (currentSog > sessionMaxSog) sessionMaxSog = currentSog
-
-                // Save track point with unified alarmState string
-                val trackPoint = TrackPoint(
-                    sessionId = sessionId,
-                    position = position,
-                    distanceToAnchor = distance.toFloat(),
-                    isAlarm = alarmState == AlarmState.ALARM,
-                    alarmState = alarmState.name
-                )
-                repository.insertTrackPoint(trackPoint)
-
-                // Drift detection (Faza 4.5)
-                synchronized(recentTrackPoints) {
-                    recentTrackPoints.add(trackPoint)
-                    if (recentTrackPoints.size > 30) recentTrackPoints.removeFirst()
-                }
-                // Create snapshot for thread-safe iteration
-                val trackPointsSnapshot = synchronized(recentTrackPoints) { recentTrackPoints.toList() }
-                val driftAnalysis = driftDetector.analyze(trackPointsSnapshot, session.anchorPosition)
+                // Save track point
+                repository.insertTrackPoint(result.trackPoint)
 
                 // Handle alarm
                 val previousAlarmState = _monitorState.value.alarmState
-                handleAlarmTransition(alarmState, previousAlarmState, sessionId)
+                val transition = alarmHandler.handleAlarmTransition(result.alarmState, previousAlarmState, alarmPlayer.isPlaying())
+                if (transition.shouldStartAlarm) {
+                    alarmPlayer.startAlarm()
+                    if (transition.shouldIncrementAlarmCount) {
+                        val currentSession = repository.getSessionById(sessionId)
+                        currentSession?.let {
+                            repository.updateSession(it.copy(alarmTriggered = true, alarmCount = it.alarmCount + 1))
+                        }
+                    }
+                }
+                if (transition.shouldStopAlarm) alarmPlayer.stopAlarm()
+                if (transition.shouldSendWearTrigger) {
+                    serviceScope.launch { wearDataSender.sendAlarmTrigger() }
+                }
 
                 // Update state
                 _monitorState.value = _monitorState.value.copy(
                     boatPosition = position,
-                    distanceToAnchor = distance,
-                    alarmState = alarmState,
+                    distanceToAnchor = result.distance,
+                    alarmState = result.alarmState,
                     gpsAccuracyMeters = position.accuracy,
                     gpsSignalLost = false,
-                    driftAnalysis = driftAnalysis
+                    driftAnalysis = result.driftAnalysis
                 )
 
                 // Send state to watch
                 serviceScope.launch { wearDataSender.sendMonitorState(_monitorState.value) }
 
                 // Update notification
-                val notifText = "Distance: %.0f m - %s".format(distance, alarmState.name)
-                updateNotification(notifText, alarmState)
+                val notifText = "Distance: %.0f m - %s".format(result.distance, result.alarmState.name)
+                updateNotification(notifText, result.alarmState)
             }
         }
     }
@@ -270,31 +243,19 @@ class AnchorMonitorService : Service() {
         previousAlarmState: AlarmState,
         sessionId: Long
     ) {
-        when (alarmState) {
-            AlarmState.ALARM -> {
-                if (!alarmPlayer.isPlaying()) {
-                    alarmPlayer.startAlarm()
-                    // Update session alarm count
-                    val currentSession = repository.getSessionById(sessionId)
-                    currentSession?.let {
-                        repository.updateSession(
-                            it.copy(
-                                alarmTriggered = true,
-                                alarmCount = it.alarmCount + 1
-                            )
-                        )
-                    }
-                }
-                // Send vibration trigger to watch on transition to ALARM
-                if (previousAlarmState != AlarmState.ALARM) {
-                    serviceScope.launch { wearDataSender.sendAlarmTrigger() }
+        val transition = alarmHandler.handleAlarmTransition(alarmState, previousAlarmState, alarmPlayer.isPlaying())
+        if (transition.shouldStartAlarm) {
+            alarmPlayer.startAlarm()
+            if (transition.shouldIncrementAlarmCount) {
+                val currentSession = repository.getSessionById(sessionId)
+                currentSession?.let {
+                    repository.updateSession(it.copy(alarmTriggered = true, alarmCount = it.alarmCount + 1))
                 }
             }
-            else -> {
-                if (alarmPlayer.isPlaying()) {
-                    alarmPlayer.stopAlarm()
-                }
-            }
+        }
+        if (transition.shouldStopAlarm) alarmPlayer.stopAlarm()
+        if (transition.shouldSendWearTrigger) {
+            serviceScope.launch { wearDataSender.sendAlarmTrigger() }
         }
     }
 
@@ -436,59 +397,20 @@ class AnchorMonitorService : Service() {
 
             is PairedModeManager.PairedEvent.AlarmTriggered -> {
                 Log.w(TAG, "Paired alarm: ${event.reason} -> ${event.alarmState}")
-                val previousState = _monitorState.value.alarmState
-                val newState = event.alarmState
+                val pairedEvent = PairedAlarmEvent(event.reason, event.message, event.alarmState)
+                val result = alarmHandler.handlePairedAlarm(pairedEvent, _monitorState.value.alarmState, alarmPlayer.isPlaying())
 
-                when (event.reason) {
-                    "GPS_LOST" -> {
-                        // PWA lost GPS — alert crew, always sound alarm
-                        if (!alarmPlayer.isPlaying()) alarmPlayer.startAlarm()
-                        serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-                        _monitorState.value = _monitorState.value.copy(
-                            alarmState = AlarmState.ALARM,
-                            gpsSignalLost = true
-                        )
-                        updateNotification("GPS lost on navigation station!", AlarmState.ALARM)
-                        return
-                    }
-                    "LOW_BATTERY" -> {
-                        // PWA low battery — alert crew
-                        if (!alarmPlayer.isPlaying()) alarmPlayer.startAlarm()
-                        serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-                        _monitorState.value = _monitorState.value.copy(alarmState = AlarmState.WARNING)
-                        updateNotification("Tablet battery critical! ${event.message}", AlarmState.WARNING)
-                        return
-                    }
-                    "WATCH_TIMER" -> {
-                        // Crew watch timer expired — wake up the crew
-                        if (!alarmPlayer.isPlaying()) alarmPlayer.startAlarm()
-                        serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-                        updateNotification("Watch timer: ${event.message}", _monitorState.value.alarmState)
-                        return
-                    }
+                if (result.shouldStartAlarm) alarmPlayer.startAlarm()
+                if (result.shouldStopAlarm) alarmPlayer.stopAlarm()
+                if (result.shouldSendWearTrigger) {
+                    serviceScope.launch { wearDataSender.sendAlarmTrigger() }
                 }
 
-                // Default: zone-based alarm (OUT_OF_ZONE etc.)
-                when (newState) {
-                    AlarmState.ALARM -> {
-                        if (!alarmPlayer.isPlaying()) {
-                            alarmPlayer.startAlarm()
-                        }
-                        if (previousState != AlarmState.ALARM) {
-                            serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-                        }
-                    }
-                    AlarmState.WARNING -> {
-                        // Vibration-only warning
-                        if (alarmPlayer.isPlaying()) alarmPlayer.stopAlarm()
-                    }
-                    else -> {
-                        if (alarmPlayer.isPlaying()) alarmPlayer.stopAlarm()
-                    }
-                }
-
-                _monitorState.value = _monitorState.value.copy(alarmState = newState)
-                updateNotification("ALARM: ${event.message}", newState)
+                _monitorState.value = _monitorState.value.copy(
+                    alarmState = result.newAlarmState,
+                    gpsSignalLost = result.gpsSignalLost
+                )
+                updateNotification(result.notificationText, result.newAlarmState)
             }
 
             is PairedModeManager.PairedEvent.HeartbeatTimeout -> {
