@@ -181,6 +181,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/Manifest*.*",
         "**/*Test*.*",
         "android/**/*.*",
+        // Hilt generated
         "**/*_Hilt*.class",
         "**/Hilt_*.class",
         "**/*_Factory.class",
@@ -190,7 +191,19 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/*Component.class",
         "**/*Component$*.class",
         "**/*_ComponentImpl.class",
-        "**/*_ComponentImpl$*.class"
+        "**/*_ComponentImpl$*.class",
+        // Compose generated lambda holders
+        "**/ComposableSingletons*.class",
+        // Room generated DAO/DB implementations
+        "**/*_Impl.class",
+        "**/*_Impl$*.class",
+        // Navigation graph definition
+        "**/NavHostKt*.class",
+        // Activity lifecycle + permissions (not unit-testable)
+        "**/MainActivity*.class",
+        // Bound service lifecycle (logic extracted to GpsProcessor/AlarmHandler)
+        "**/AnchorMonitorService*.class",
+        "**/ServiceBinder*.class"
     )
 
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
