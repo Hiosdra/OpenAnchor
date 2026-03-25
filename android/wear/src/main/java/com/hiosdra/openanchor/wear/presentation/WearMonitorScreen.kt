@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Text
 import com.hiosdra.openanchor.wear.R
 import com.hiosdra.openanchor.wear.data.WearAlarmState
+import com.hiosdra.openanchor.wear.data.WearConnectionManager
 import com.hiosdra.openanchor.wear.data.WearMonitorState
 import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
 
@@ -46,7 +47,7 @@ private const val GPS_GOOD_THRESHOLD = 18f
 fun WearMonitorScreen() {
     // Collect flows at screen level; child composables use derived state
     val state by WearMonitorStateHolder.state.collectAsState()
-    val isConnected by WearMonitorStateHolder.connected.collectAsState()
+    val isConnected by WearConnectionManager.connected.collectAsState()
 
     Box(
         modifier = Modifier

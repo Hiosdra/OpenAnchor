@@ -11,9 +11,7 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 import com.hiosdra.openanchor.wear.data.DataPaths
-import com.hiosdra.openanchor.wear.data.WearAlarmState
-import com.hiosdra.openanchor.wear.data.WearMonitorState
-import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
+import com.hiosdra.openanchor.wear.data.WearDataRepository
 
 /**
  * Background service that receives DataItems and Messages from the phone app
@@ -21,6 +19,14 @@ import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
  *
  * - DataItems (MONITOR_STATE_PATH): continuous monitor state sync
  * - Messages (ALARM_TRIGGER_PATH): immediate alarm vibration trigger
+ *
+ * TODO: Multi-watch support — When multiple watches are paired, each watch
+ *   receives all DataItems. To support role-based filtering (e.g. primary vs
+ *   secondary watch), filter by source node ID in onDataChanged:
+ *   1. Use NodeClient.getConnectedNodes() to discover phone node IDs
+ *   2. Store a preferred phone node ID in local preferences
+ *   3. In onDataChanged, check event.dataItem.uri.host against the preferred node
+ *   4. Consider assigning roles (primary display, alarm-only, etc.) per watch
  */
 class AnchorDataListenerService : WearableListenerService() {
 
@@ -35,25 +41,14 @@ class AnchorDataListenerService : WearableListenerService() {
             for (event in dataEvents) {
                 val uri = event.dataItem.uri
                 if (uri.path == DataPaths.MONITOR_STATE_PATH) {
-                    try {
-                        val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+                    val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+                    val state = WearDataParser.parse(dataMap)
 
-                        val state = WearMonitorState(
-                            isActive = dataMap.getBoolean(DataPaths.KEY_IS_ACTIVE, false),
-                            alarmState = WearAlarmState.fromString(
-                                dataMap.getString(DataPaths.KEY_ALARM_STATE, "SAFE")
-                            ),
-                            distanceMeters = dataMap.getFloat(DataPaths.KEY_DISTANCE, 0f).toDouble(),
-                            gpsAccuracyMeters = dataMap.getFloat(DataPaths.KEY_GPS_ACCURACY, 0f),
-                            gpsSignalLost = dataMap.getBoolean(DataPaths.KEY_GPS_SIGNAL_LOST, false),
-                            timestamp = dataMap.getLong(DataPaths.KEY_TIMESTAMP, 0L)
-                        )
-
-                        WearMonitorStateHolder.updateState(state)
-
+                    if (state != null) {
+                        WearDataRepository.onStateReceived(state)
                         Log.d(TAG, "State updated: ${state.alarmState}, dist=${state.distanceMeters}m")
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error parsing DataItem", e)
+                    } else {
+                        Log.w(TAG, "Failed to parse DataItem from ${uri.host}")
                     }
                 }
             }

@@ -2,7 +2,13 @@ package com.hiosdra.openanchor.wear.data
 
 /**
  * Constants for Wearable Data Layer paths shared between phone and watch.
- * Phone app uses these same string values (duplicated, not shared module).
+ *
+ * ⚠️ DUPLICATION WARNING: These values are duplicated in the phone module at:
+ *   android/app/src/main/java/com/hiosdra/openanchor/service/WearDataSender.kt
+ * Any changes here MUST be mirrored there (and vice versa).
+ *
+ * TODO: Move these constants to a shared/common Gradle module to eliminate
+ *   duplication risk. Both :app and :wear modules would depend on :shared.
  */
 object DataPaths {
     // DataItem path for monitor state sync
