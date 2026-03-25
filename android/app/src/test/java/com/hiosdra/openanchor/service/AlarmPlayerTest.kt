@@ -154,4 +154,76 @@ class AlarmPlayerTest {
         // Should restore the original volume (5)
         verify { audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 5, 0) }
     }
+
+    // ========== Vibrator branches ==========
+
+    @Test
+    fun `stopAlarm with null vibrator does not crash`() {
+        // vibrator field is null by default
+        alarmPlayer.stopAlarm()
+        // No exception thrown
+    }
+
+    @Test
+    fun `stopAlarm resets previousVolume to negative`() {
+        val previousVolumeField = AlarmPlayer::class.java.getDeclaredField("previousVolume")
+        previousVolumeField.isAccessible = true
+        previousVolumeField.setInt(alarmPlayer, 4)
+
+        alarmPlayer.stopAlarm()
+
+        assertEquals(-1, previousVolumeField.getInt(alarmPlayer))
+    }
+
+    @Test
+    fun `stopAlarm nulls out vibrator`() {
+        val vibrator = mockk<Vibrator>(relaxed = true)
+        val vibratorField = AlarmPlayer::class.java.getDeclaredField("vibrator")
+        vibratorField.isAccessible = true
+        vibratorField.set(alarmPlayer, vibrator)
+
+        alarmPlayer.stopAlarm()
+
+        assertNull(vibratorField.get(alarmPlayer))
+    }
+
+    @Test
+    fun `stopAlarm nulls out mediaPlayer`() {
+        val player = mockk<MediaPlayer>(relaxed = true)
+        every { player.isPlaying } returns false
+        val mpField = AlarmPlayer::class.java.getDeclaredField("mediaPlayer")
+        mpField.isAccessible = true
+        mpField.set(alarmPlayer, player)
+
+        alarmPlayer.stopAlarm()
+
+        assertNull(mpField.get(alarmPlayer))
+    }
+
+    @Test
+    fun `isPlaying returns false when mediaPlayer is null`() {
+        assertFalse(alarmPlayer.isPlaying())
+    }
+
+    @Test
+    fun `isPlaying returns true when mediaPlayer isPlaying`() {
+        val player = mockk<MediaPlayer>(relaxed = true)
+        every { player.isPlaying } returns true
+        val mpField = AlarmPlayer::class.java.getDeclaredField("mediaPlayer")
+        mpField.isAccessible = true
+        mpField.set(alarmPlayer, player)
+
+        assertTrue(alarmPlayer.isPlaying())
+    }
+
+    @Test
+    fun `isPlaying returns false when mediaPlayer is not playing`() {
+        val player = mockk<MediaPlayer>(relaxed = true)
+        every { player.isPlaying } returns false
+        val mpField = AlarmPlayer::class.java.getDeclaredField("mediaPlayer")
+        mpField.isAccessible = true
+        mpField.set(alarmPlayer, player)
+
+        assertFalse(alarmPlayer.isPlaying())
+    }
 }
