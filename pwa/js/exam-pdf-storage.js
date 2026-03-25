@@ -98,3 +98,14 @@ async function verifyPdfHash(arrayBuffer) {
     const hash = await computeSha256(arrayBuffer);
     return { valid: hash === EXPECTED_PDF_HASH, hash };
 }
+
+export {
+    EXPECTED_PDF_HASH,
+    savePdfData,
+    loadPdfBlob,
+    loadPdfMeta,
+    isPdfImported,
+    deletePdf,
+    computeSha256,
+    verifyPdfHash,
+};
