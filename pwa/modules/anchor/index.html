@@ -3814,7 +3814,14 @@ SAFETY: ...`;
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
         new OnboardingController();
-        window.app = new AnchorApp();
+        const app = new AnchorApp();
+        // Expose app globally for cross-module access (e.g., SyncController, AlertController).
+        // Use Object.defineProperty to prevent accidental overwrite from other scripts.
+        Object.defineProperty(window, 'app', {
+            value: app,
+            writable: false,
+            configurable: false
+        });
         // Apply i18n to all static DOM elements after app init (Faza 5.3b)
         I18N._applyToDOM();
     });

@@ -130,6 +130,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
+        // TODO [REFACTOR]: Extract PdfRenderer into separate module (pwa/js/pdf-renderer.js)
         // Configure pdf.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -278,6 +279,9 @@
 
         // ==========================================
         // LEITNER SYSTEM
+        // TODO [REFACTOR]: Replace with shared implementation from pwa/js/leitner.js
+        // This is a duplicate - see Arch 4. The shared module uses date-based intervals
+        // while this uses session-based intervals. Consolidate after agreeing on approach.
         // ==========================================
         const LEITNER_STORAGE_KEY = 'openanchor_leitner';
         const LEITNER_BOX_COUNT = 5;
@@ -342,6 +346,7 @@
 
         // ==========================================
         // STORAGE (Learn/Exam progress)
+        // TODO [REFACTOR]: Migrate to pwa/js/storage-utils.js for unified localStorage API
         // ==========================================
         const STORAGE_KEY = 'openanchor_exam_progress';
         const LEARN_POSITION_KEY = 'openanchor_learn_position';
@@ -668,6 +673,9 @@
 
         // ==========================================
         // PDF IMPORT SCREEN
+        // TODO [REFACTOR]: Extract UI components (ImportPdfScreen, MenuScreen, LearnScreen,
+        // ExamScreen, ResultsScreen, LeitnerScreens) into separate files under
+        // pwa/modules/egzamin/components/
         // ==========================================
         function ImportPdfScreen({ onImportComplete }) {
             const [importing, setImporting] = useState(false);
@@ -1940,6 +1948,42 @@
             }
         }
 
+        // ==========================================
+        // ERROR BOUNDARY
+        // ==========================================
+        class ErrorBoundary extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = { hasError: false, error: null };
+            }
+            static getDerivedStateFromError(error) {
+                return { hasError: true, error };
+            }
+            componentDidCatch(error, errorInfo) {
+                console.error('ErrorBoundary caught:', error, errorInfo);
+            }
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div className="flex items-center justify-center min-h-screen">
+                            <div className="text-center p-8">
+                                <div className="text-red-400 text-4xl mb-4">⚠️</div>
+                                <h2 className="text-xl font-bold text-white mb-2">Wystąpił błąd</h2>
+                                <p className="text-white/50 mb-4">Odśwież stronę, aby spróbować ponownie.</p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-6 py-2 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors"
+                                >
+                                    Odśwież stronę
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
+                return this.props.children;
+            }
+        }
+
         // Mount - load questions from JSON first, then render
         const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -1947,7 +1991,7 @@
             .then(r => r.json())
             .then(data => {
                 QUESTIONS_DB = data.map(transformQuestion);
-                root.render(<App />);
+                root.render(<ErrorBoundary><App /></ErrorBoundary>);
             })
             .catch(err => {
                 console.error('Failed to load exam questions:', err);

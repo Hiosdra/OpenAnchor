@@ -1,6 +1,11 @@
 /**
  * Leitner spaced repetition system
  * https://en.wikipedia.org/wiki/Leitner_system
+ *
+ * NOTE: This is the shared/canonical Leitner implementation using date-based intervals.
+ * There is a duplicate session-based implementation in pwa/modules/egzamin/index.html
+ * (inline, around lines 283-345) that uses session numbers instead of dates.
+ * TODO: Consolidate both implementations into this shared module.
  */
 
 // Box review intervals in days
