@@ -1926,7 +1926,7 @@ private fun QuestionImageCard(question: ExamQuestion, pdfRenderer: ExamPdfRender
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "Nie udalo sie zaladowac obrazka",
+                        text = "Nie udało się załadować obrazka",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextGrey,
                     )

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Nauka do egzaminu Jachtowy Sternik Morski / Żeglarz Jachtowy - baza pytań egzaminacyjnych PZŻ">
+    <meta name="description" content="Nauka do egzaminu Jachtowy Sternik Morski / Żeglarz Jachtowy - baza pytań egzaminacyjnych">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -488,7 +488,7 @@
                         </div>
                     ) : error || !imageDataUrl ? (
                         <div className="flex items-center justify-center h-28 bg-slate-800 text-slate-500 text-sm">
-                            Nie udalo sie zaladowac pytania
+                            Nie udało się załadować pytania
                         </div>
                     ) : (
                         <img
@@ -688,7 +688,7 @@
 
                     await finishImport(blob, meta);
                 } catch (err) {
-                    setProgressText('Blad importu: ' + err.message);
+                    setProgressText('Błąd importu: ' + err.message);
                     setImporting(false);
                 }
             };
@@ -696,10 +696,10 @@
             const finishImport = async (blob, meta) => {
                 setImporting(true);
                 setHashWarning(null);
-                setProgressText('Zapisywanie bazy pytan...');
+                setProgressText('Zapisywanie bazy pytań...');
                 await savePdfData(blob, meta);
 
-                setProgressText('Ladowanie pytan...');
+                setProgressText('Ładowanie pytań...');
                 await PdfRenderer.loadFromBlob(blob);
 
                 setImporting(false);
@@ -720,9 +720,9 @@
                                     <line x1="9" y1="15" x2="15" y2="15"/>
                                 </svg>
                             </div>
-                            <h1 className="text-2xl font-bold mb-2">Importuj baze pytan</h1>
+                            <h1 className="text-2xl font-bold mb-2">Importuj bazę pytań</h1>
                             <p className="text-sm text-white/50 leading-relaxed max-w-sm mx-auto">
-                                Aby korzystac z modulu egzaminacyjnego, zaimportuj plik PDF z baza pytan egzaminacyjnych PZZ.
+                                Aby korzystać z modułu egzaminacyjnego, zaimportuj plik PDF z bazą pytań egzaminacyjnych.
                             </p>
                         </div>
 
@@ -746,7 +746,7 @@
                                     />
                                 </label>
                                 <p className="text-xs text-white/30 text-center">
-                                    Plik PDF z baza pytan egzaminacyjnych (ok. 5 MB)
+                                    Plik PDF z bazą pytań egzaminacyjnych (ok. 5 MB)
                                 </p>
                             </div>
                         )}
@@ -833,7 +833,7 @@
                             </svg>
                         </div>
                         <h1 className="text-2xl font-bold mb-1">Egzamin ZJ / JSM</h1>
-                        <p className="text-sm text-white/40">Baza pytan egzaminacyjnych PZZ &middot; {totalQ} pytan</p>
+                        <p className="text-sm text-white/40">Baza pytań egzaminacyjnych &middot; {totalQ} pytań</p>
                     </div>
 
                     {/* Stats card */}
@@ -851,7 +851,7 @@
                         <div className="grid grid-cols-3 gap-3 text-center">
                             <div>
                                 <div className="text-xl font-bold">{totalQ}</div>
-                                <div className="text-xs text-white/40">pytan</div>
+                                <div className="text-xs text-white/40">pytań</div>
                             </div>
                             <div>
                                 <div className="text-xl font-bold text-green-400">{correctCount}</div>
@@ -877,7 +877,7 @@
                                             <span style={{ width: 8, height: 8, borderRadius: '50%', background: colors.dot }}></span>
                                             <span className="text-base">{cat.name}</span>
                                         </div>
-                                        <span className="text-sm text-white/40">{count} pytan</span>
+                                        <span className="text-sm text-white/40">{count} pytań</span>
                                     </div>
                                 );
                             })}
@@ -913,7 +913,7 @@
                                 </svg>
                                 Egzamin
                             </div>
-                            <div className="text-xs opacity-40 mt-0.5">30 pytan, 45 minut, 70% aby zdac</div>
+                            <div className="text-xs opacity-40 mt-0.5">30 pytań, 45 minut, 70% aby zdać</div>
                         </button>
 
                         <button
@@ -930,33 +930,33 @@
                                 <span className="text-blue-300">Leitner</span>
                             </div>
                             <div className="text-xs text-blue-400/60 mt-0.5">
-                                Powtorki rozlozone w czasie &middot; {dueCount} do powtorki &middot; {masteredCount} opanowanych
+                                Powtórki rozłożone w czasie &middot; {dueCount} do powtórki &middot; {masteredCount} opanowanych
                             </div>
                         </button>
 
                         {answeredCount > 0 && (
                             <button
                                 onClick={() => {
-                                    if (confirm('Na pewno chcesz zresetowac postep nauki?')) {
+                                    if (confirm('Na pewno chcesz zresetować postęp nauki?')) {
                                         saveProgress({ answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } });
                                         window.location.reload();
                                     }
                                 }}
                                 className="w-full py-3 rounded-2xl text-white/30 text-sm hover:text-white/50 transition-colors"
                             >
-                                Resetuj postep
+                                Resetuj postęp
                             </button>
                         )}
 
                         <button
                             onClick={() => {
-                                if (confirm('Na pewno chcesz zmienic plik PDF z baza pytan?')) {
+                                if (confirm('Na pewno chcesz zmienić plik PDF z bazą pytań?')) {
                                     onChangePdf();
                                 }
                             }}
                             className="w-full py-3 rounded-2xl text-white/30 text-sm hover:text-white/50 transition-colors"
                         >
-                            Zmien baze pytan (PDF)
+                            Zmień bazę pytań (PDF)
                         </button>
                     </div>
                 </div>
@@ -1045,13 +1045,13 @@
                         <Header title="Nauka" onBack={onBack} />
                         <div className="flex-1 flex items-center justify-center px-4">
                             <div className="text-center">
-                                <p className="text-white/40 text-lg mb-2">Brak pytan</p>
-                                <p className="text-white/30 text-sm">Brak pytan w wybranych kategoriach</p>
+                                <p className="text-white/40 text-lg mb-2">Brak pytań</p>
+                                <p className="text-white/30 text-sm">Brak pytań w wybranych kategoriach</p>
                                 <button
                                     onClick={() => setShowCategoryFilter(true)}
                                     className="mt-4 px-4 py-2 rounded-xl bg-amber-500/20 text-amber-400 text-sm"
                                 >
-                                    Zmien kategorie
+                                    Zmień kategorie
                                 </button>
                             </div>
                         </div>
@@ -1305,7 +1305,7 @@
                                         onClick={() => {
                                             const unanswered = examQuestions.length - answeredCount;
                                             if (unanswered > 0) {
-                                                if (!confirm(`Masz ${unanswered} pytan bez odpowiedzi. Na pewno chcesz zakonczyc?`)) return;
+                                                if (!confirm(`Masz ${unanswered} pytań bez odpowiedzi. Na pewno chcesz zakończyć?`)) return;
                                             }
                                             handleFinishExam();
                                         }}
@@ -1381,7 +1381,7 @@
                                 onClick={() => setShowDetails(!showDetails)}
                                 className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-sm text-white/50 hover:bg-white/10 mb-4"
                             >
-                                {showDetails ? 'Ukryj szczegoly' : 'Pokaz szczegoly pytan'}
+                                {showDetails ? 'Ukryj szczegóły' : 'Pokaż szczegóły pytań'}
                             </button>
 
                             {showDetails && (
@@ -1444,7 +1444,7 @@
             const totalMastered = boxCounts[4];
             const pctMastered = questions.length > 0 ? Math.round((totalMastered / questions.length) * 100) : 0;
 
-            const boxLabels = ['Pudelko 1', 'Pudelko 2', 'Pudelko 3', 'Pudelko 4', 'Pudelko 5'];
+            const boxLabels = ['Pudełko 1', 'Pudełko 2', 'Pudełko 3', 'Pudełko 4', 'Pudełko 5'];
             const boxColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
             const boxIntervals = ['Co sesje', 'Co 2 sesje', 'Co 4 sesje', 'Co 8 sesji', 'Co 16 sesji'];
 
@@ -1469,11 +1469,11 @@
                                 <div className="grid grid-cols-3 gap-3 text-center">
                                     <div>
                                         <div className="text-xl font-bold">{questions.length}</div>
-                                        <div className="text-xs text-white/40">pytan</div>
+                                        <div className="text-xs text-white/40">pytań</div>
                                     </div>
                                     <div>
                                         <div className="text-xl font-bold text-blue-400">{dueQuestions.length}</div>
-                                        <div className="text-xs text-white/40">do powtorki</div>
+                                        <div className="text-xs text-white/40">do powtórki</div>
                                     </div>
                                     <div>
                                         <div className="text-xl font-bold text-green-400">{totalMastered}</div>
@@ -1489,7 +1489,7 @@
 
                             {/* Box breakdown */}
                             <div className="space-y-2 mb-6">
-                                <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 px-1">Pudelka</h3>
+                                <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 px-1">Pudełka</h3>
                                 {boxLabels.map((label, i) => {
                                     const count = boxCounts[i];
                                     const pct = questions.length > 0 ? (count / questions.length) * 100 : 0;
@@ -1502,7 +1502,7 @@
                                                 </div>
                                                 <div className="text-right">
                                                     <span className="text-sm font-bold" style={{ color: boxColors[i] }}>{count}</span>
-                                                    <span className="text-xs text-white/30 ml-1">pytan</span>
+                                                    <span className="text-xs text-white/30 ml-1">pytań</span>
                                                 </div>
                                             </div>
                                             <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mb-1">
@@ -1530,21 +1530,21 @@
                                             <polygon points="5 3 19 12 5 21 5 3"/>
                                         </svg>
                                         {dueQuestions.length > 0
-                                            ? `Rozpocznij sesje (${dueQuestions.length} pytan)`
-                                            : 'Brak pytan do powtorki'}
+                                            ? `Rozpocznij sesję (${dueQuestions.length} pytań)`
+                                            : 'Brak pytań do powtórki'}
                                     </div>
                                 </button>
 
                                 {leitnerState.sessionNumber > 0 && (
                                     <button
                                         onClick={() => {
-                                            if (confirm('Na pewno chcesz zresetowac postep Leitnera? Wszystkie pytania wroca do Pudelka 1.')) {
+                                            if (confirm('Na pewno chcesz zresetować postęp Leitnera? Wszystkie pytania wrócą do Pudełka 1.')) {
                                                 onReset();
                                             }
                                         }}
                                         className="w-full py-3 rounded-2xl text-white/30 text-sm hover:text-white/50 transition-colors"
                                     >
-                                        Resetuj postep Leitnera
+                                        Resetuj postęp Leitnera
                                     </button>
                                 )}
                             </div>
@@ -1657,11 +1657,11 @@
                                 <div className="mt-3 text-center">
                                     {selectedAnswer === currentQuestion.correctAnswer ? (
                                         <div className="text-sm text-green-400">
-                                            Pudelko {currentBox} &rarr; {Math.min(currentBox + 1, LEITNER_BOX_COUNT)}
+                                            Pudełko {currentBox} &rarr; {Math.min(currentBox + 1, LEITNER_BOX_COUNT)}
                                         </div>
                                     ) : (
                                         <div className="text-sm text-red-400">
-                                            Pudelko {currentBox} &rarr; 1
+                                            Pudełko {currentBox} &rarr; 1
                                         </div>
                                     )}
                                 </div>
@@ -1707,7 +1707,7 @@
                                 <div className="text-5xl font-black text-blue-400 mb-2">{pct}%</div>
                                 <div className="text-lg font-bold mb-1">Sesja zakonczona</div>
                                 <div className="text-sm text-white/40">
-                                    {correct} poprawnych, {incorrect} blednych z {total} pytan
+                                    {correct} poprawnych, {incorrect} błędnych z {total} pytań
                                 </div>
                                 <div className="text-xs text-white/30 mt-2">
                                     Sesja #{leitnerState.sessionNumber}
@@ -1716,7 +1716,7 @@
 
                             {/* Box distribution */}
                             <div className="rounded-2xl bg-white/5 border border-white/10 p-5 mb-6">
-                                <h3 className="text-sm font-semibold mb-4">Rozklad pytan w pudelkach</h3>
+                                <h3 className="text-sm font-semibold mb-4">Rozkład pytań w pudełkach</h3>
                                 <div className="flex gap-2 items-end justify-center h-32 mb-3">
                                     {boxCounts.map((count, i) => {
                                         const maxCount = Math.max(...boxCounts, 1);
@@ -1842,7 +1842,7 @@
                     <div className="flex items-center justify-center min-h-screen">
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400 mx-auto mb-4"></div>
-                            <p className="text-sm text-white/50">Ladowanie...</p>
+                            <p className="text-sm text-white/50">Ładowanie...</p>
                         </div>
                     </div>
                 );
@@ -1940,7 +1940,7 @@
                 console.error('Failed to load exam questions:', err);
                 root.render(
                     <div className="flex items-center justify-center min-h-screen text-red-400">
-                        <p>Blad ladowania pytan. Odswiez strone.</p>
+                        <p>Błąd ładowania pytań. Odśwież stronę.</p>
                     </div>
                 );
             });
