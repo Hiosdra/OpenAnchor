@@ -474,14 +474,50 @@
 
         <!-- Checklists Section -->
         <div id="section-checklists" class="content-section">
-            <div class="placeholder-section">
-                <div class="placeholder-section-icon">✅</div>
-                <h3 class="placeholder-section-title">Checklisty Żeglarskie</h3>
-                <p class="placeholder-section-text">
-                    Tutaj będą checklisty dla różnych sytuacji:<br>
-                    wejście do portu, wyjście z portu, zawijanie żagli, cumowanie, itp.<br>
-                    Sekcja dostępna w przyszłości.
-                </p>
+            <!-- Checklist Type Selector -->
+            <div class="cruise-selector">
+                <button class="cruise-btn active" data-checklist="morning" onclick="switchChecklistType('morning')">
+                    <div class="cruise-btn-title">🌅 Codziennie rano</div>
+                    <div class="cruise-btn-subtitle">Poranne czynności</div>
+                </button>
+                <button class="cruise-btn" data-checklist="departure" onclick="switchChecklistType('departure')">
+                    <div class="cruise-btn-title">⚓ Wyjście z portu</div>
+                    <div class="cruise-btn-subtitle">Przed wypłynięciem</div>
+                </button>
+                <button class="cruise-btn" data-checklist="mooring" onclick="switchChecklistType('mooring')">
+                    <div class="cruise-btn-title">🛟 Cumowanie</div>
+                    <div class="cruise-btn-subtitle">Wejście do portu</div>
+                </button>
+                <button class="cruise-btn" data-checklist="grabbag" onclick="switchChecklistType('grabbag')">
+                    <div class="cruise-btn-title">🎒 Grab bag</div>
+                    <div class="cruise-btn-subtitle">Torba ratunkowa</div>
+                </button>
+            </div>
+
+            <!-- Checklist Content -->
+            <div class="section-card">
+                <h2 class="section-title">
+                    <span class="category-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                        </svg>
+                    </span>
+                    <span id="checklistTitle">Codziennie rano</span>
+                </h2>
+
+                <ul class="checklist" id="checklistItems">
+                    <!-- Items will be dynamically generated -->
+                </ul>
+
+                <button class="reset-btn" onclick="resetChecklistSection()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                    Wyczyść obecną checklistę
+                </button>
             </div>
         </div>
 
@@ -686,6 +722,178 @@
             }
         }
 
+        // Checklist data structures
+        const checklistData = {
+            'morning': {
+                title: 'Codziennie rano',
+                items: [
+                    { id: 'oil', text: 'Sprawdzić olej', crew: false },
+                    { id: 'battery', text: 'V baterii', crew: false },
+                    { id: 'deck', text: 'Przemyć pokład', crew: true },
+                    { id: 'sweep', text: 'Zmiotka wewnątrz', crew: true },
+                    { id: 'water', text: 'Dolać wody', crew: true },
+                    { id: 'weather', text: 'Pogoda', crew: false },
+                    { id: 'routes', text: 'Trasa główna, alternatywna i porty schronienia', crew: false }
+                ]
+            },
+            'departure': {
+                title: 'Wyjście z portu',
+                items: [
+                    { id: 'port-fees', text: 'Opłaty', crew: false },
+                    { id: 'water-refill', text: 'Woda', crew: true },
+                    { id: 'trash', text: 'Śmieci', crew: true },
+                    { id: 'lockers', text: 'Zamknięcie szafek', crew: true },
+                    { id: 'report-out', text: 'Zgłoszenie?', crew: false },
+                    { id: 'wind-prep', text: 'Wiatr', crew: false },
+                    { id: 'bimini-depart', text: 'Bimini', crew: true },
+                    { id: 'bow-thruster', text: 'Cuma prądowa', crew: true },
+                    { id: 'windows', text: 'Okienka', crew: true },
+                    { id: 'ladder', text: 'Trap', crew: true },
+                    { id: 'fenders-depart', text: 'Odbijacze', crew: true },
+                    { id: 'observer-depart', text: 'Obserwator', crew: false },
+                    { id: 'departure-plan', text: 'Plan odejścia', crew: false }
+                ]
+            },
+            'mooring': {
+                title: 'Cumowanie',
+                items: [
+                    { id: 'marina-report', text: 'Zgłoszenie do mariny', crew: false },
+                    { id: 'fenders-moor', text: 'Odbijacze', crew: true },
+                    { id: 'railings', text: 'Nic na relingach', crew: true },
+                    { id: 'bimini-moor', text: 'Bimini', crew: true },
+                    { id: 'observer-moor', text: 'Obserwator', crew: false },
+                    { id: 'landing', text: 'Desant', crew: false },
+                    { id: 'mooring-lines', text: 'Cumy', crew: false },
+                    { id: 'wind-direction', text: 'Kierunek wiatru', crew: false },
+                    { id: 'location', text: 'Miejsce', crew: false },
+                    { id: 'approach-plan', text: 'Plan podejścia', crew: false },
+                    { id: 'fender-height', text: 'Wysokość odbijaczy', crew: false }
+                ]
+            },
+            'grabbag': {
+                title: 'Grab bag',
+                items: [
+                    { id: 'boat-docs', text: 'Dokumenty łódki', crew: false },
+                    { id: 'crew-docs', text: 'Dokumenty załogi', crew: false },
+                    { id: 'logbook', text: 'Dziennik', crew: false },
+                    { id: 'handheld-vhf', text: 'Handheld VHF', crew: false },
+                    { id: 'powerbank-grab', text: 'Powerbank', crew: false },
+                    { id: 'flashlights', text: 'Latarki', crew: false },
+                    { id: 'water-grab', text: 'Woda', crew: false },
+                    { id: 'clothes', text: 'Ubrania, dużo', crew: false }
+                ]
+            }
+        };
+
+        let currentChecklistType = 'morning';
+
+        // Switch checklist type
+        function switchChecklistType(checklistType) {
+            currentChecklistType = checklistType;
+
+            // Update button states
+            document.querySelectorAll('.cruise-btn[data-checklist]').forEach(btn => {
+                if (btn.dataset.checklist === checklistType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Save selected checklist type
+            localStorage.setItem('zeglowanie_selected_checklist_type', checklistType);
+
+            // Update title
+            document.getElementById('checklistTitle').textContent = checklistData[checklistType].title;
+
+            // Render the checklist
+            renderChecklistItems();
+        }
+
+        // Render checklist items
+        function renderChecklistItems() {
+            const listContainer = document.getElementById('checklistItems');
+            listContainer.innerHTML = '';
+
+            const items = checklistData[currentChecklistType].items;
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'checklist-item';
+                li.dataset.item = item.id;
+                li.dataset.checklistType = currentChecklistType;
+
+                const checkbox = document.createElement('div');
+                checkbox.className = 'checklist-checkbox';
+
+                const text = document.createElement('div');
+                text.className = 'checklist-text';
+                // Add crew icon if applicable
+                const crewIcon = item.crew ? '🧑‍🧑‍🧒‍🧒 ' : '';
+                text.textContent = crewIcon + item.text;
+
+                li.appendChild(checkbox);
+                li.appendChild(text);
+                listContainer.appendChild(li);
+            });
+
+            // Load saved state
+            loadChecklistItemsState();
+
+            // Add event listeners to new items
+            attachChecklistItemsListeners();
+        }
+
+        // Attach event listeners to checklist items
+        function attachChecklistItemsListeners() {
+            document.querySelectorAll('#checklistItems .checklist-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const itemId = this.dataset.item;
+                    const checklistType = this.dataset.checklistType;
+                    const checkbox = this.querySelector('.checklist-checkbox');
+                    const isChecked = this.classList.toggle('checked');
+                    checkbox.classList.toggle('checked');
+                    saveChecklistItemState(itemId, checklistType, isChecked);
+                });
+            });
+        }
+
+        // Load checked items from localStorage
+        function loadChecklistItemsState() {
+            document.querySelectorAll('#checklistItems .checklist-item').forEach(item => {
+                const itemId = item.dataset.item;
+                const checklistType = item.dataset.checklistType;
+                const storageKey = `checklist-${checklistType}-${itemId}`;
+                const isChecked = localStorage.getItem(storageKey) === 'true';
+
+                if (isChecked) {
+                    item.classList.add('checked');
+                    item.querySelector('.checklist-checkbox').classList.add('checked');
+                }
+            });
+        }
+
+        // Save checked state to localStorage
+        function saveChecklistItemState(itemId, checklistType, isChecked) {
+            const storageKey = `checklist-${checklistType}-${itemId}`;
+            localStorage.setItem(storageKey, isChecked);
+        }
+
+        // Reset current checklist section
+        function resetChecklistSection() {
+            if (confirm('Czy na pewno chcesz wyczyścić obecną checklistę?')) {
+                document.querySelectorAll('#checklistItems .checklist-item').forEach(item => {
+                    const itemId = item.dataset.item;
+                    const checklistType = item.dataset.checklistType;
+                    const storageKey = `checklist-${checklistType}-${itemId}`;
+
+                    item.classList.remove('checked');
+                    item.querySelector('.checklist-checkbox').classList.remove('checked');
+                    localStorage.removeItem(storageKey);
+                });
+            }
+        }
+
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Load saved section or default to packing
@@ -723,8 +931,29 @@
                 }
             });
 
-            // Render initial checklist
+            // Render initial checklist for packing section
             renderChecklist();
+
+            // Load saved checklist type or default to morning
+            const savedChecklistType = localStorage.getItem('zeglowanie_selected_checklist_type') || 'morning';
+            currentChecklistType = savedChecklistType;
+
+            // Update checklist button states
+            document.querySelectorAll('.cruise-btn[data-checklist]').forEach(btn => {
+                if (btn.dataset.checklist === savedChecklistType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update checklist title
+            if (checklistData[savedChecklistType]) {
+                document.getElementById('checklistTitle').textContent = checklistData[savedChecklistType].title;
+            }
+
+            // Render initial checklist items
+            renderChecklistItems();
         });
     </script>
 </body>
