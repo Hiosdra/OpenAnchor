@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   APP_CACHE_PREFIX,
   isServiceWorkerSupported,
@@ -192,10 +192,15 @@ describe('Service Worker Utils', () => {
   describe('forceUpdate', () => {
     let btn;
     let reloadSpy;
+    let originalLocation;
+    let originalCaches;
 
     beforeEach(() => {
       btn = document.createElement('button');
       btn.innerHTML = 'Update';
+
+      originalLocation = window.location;
+      originalCaches = global.caches;
 
       reloadSpy = vi.fn();
       Object.defineProperty(window, 'location', {
@@ -208,6 +213,15 @@ describe('Service Worker Utils', () => {
         keys: vi.fn().mockResolvedValue([]),
         delete: vi.fn().mockResolvedValue(true)
       };
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window, 'location', {
+        value: originalLocation,
+        writable: true,
+        configurable: true
+      });
+      global.caches = originalCaches;
     });
 
     it('should return early when btn is null', async () => {
