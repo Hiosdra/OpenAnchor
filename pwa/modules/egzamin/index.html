@@ -137,7 +137,7 @@
         const PdfRenderer = {
             _pdfDoc: null,
             _cache: new Map(),
-            _MAX_CACHE: 15,
+            _MAX_CACHE: 8,
 
             async loadFromBlob(blob) {
                 const arrayBuffer = await blob.arrayBuffer();
@@ -146,8 +146,14 @@
                 return this._pdfDoc.numPages;
             },
 
+            _getScale() {
+                // Use lower scale on devices with limited memory
+                if (navigator.deviceMemory && navigator.deviceMemory <= 4) return 1.5;
+                return 2.0;
+            },
+
             async renderPage(pageIndex, scale) {
-                if (scale === undefined) scale = 2.0;
+                if (scale === undefined) scale = this._getScale();
                 const cacheKey = pageIndex + '_' + scale;
                 if (this._cache.has(cacheKey)) return this._cache.get(cacheKey);
 
@@ -199,6 +205,13 @@
                 this._cache.clear();
             }
         };
+
+        // Clear PDF cache when tab is hidden to reduce memory pressure
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && PdfRenderer._cache.size > 0) {
+                PdfRenderer._cache.clear();
+            }
+        });
 
         // ==========================================
         // CATEGORIES (8 categories matching Android)

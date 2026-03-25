@@ -1636,9 +1636,10 @@
         _initBatteryMonitor() {
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(b => {
+                    this._batteryRef = b;
                     this.lastKnownBatteryLevel = b.level;
                     this.lastKnownChargingState = b.charging;
-                    const check = () => {
+                    this._batteryCheck = () => {
                         this.lastKnownBatteryLevel = b.level;
                         this.lastKnownChargingState = b.charging;
                         if (b.level <= 0.15 && !b.charging && window.app && window.app.state.isAnchored && !this.batteryWarningShown) {
@@ -1647,8 +1648,9 @@
                         }
                         if (b.charging) this.batteryWarningShown = false;
                     };
-                    b.addEventListener('levelchange', check); b.addEventListener('chargingchange', check);
-                    this.batteryInterval = setInterval(check, 60000);
+                    b.addEventListener('levelchange', this._batteryCheck);
+                    b.addEventListener('chargingchange', this._batteryCheck);
+                    this.batteryInterval = setInterval(this._batteryCheck, 60000);
                 });
             }
         }
@@ -1656,6 +1658,12 @@
         cleanup() {
             clearInterval(this.alarmInterval);
             clearInterval(this.batteryInterval);
+            if (this._batteryRef && this._batteryCheck) {
+                this._batteryRef.removeEventListener('levelchange', this._batteryCheck);
+                this._batteryRef.removeEventListener('chargingchange', this._batteryCheck);
+                this._batteryRef = null;
+                this._batteryCheck = null;
+            }
             this.releaseWakeLock();
         }
     }
@@ -2037,9 +2045,10 @@
             this.sendFullSync();
 
             this.pingInterval = setInterval(() => this.send('PING'), 5000);
+            this._lastSentStateHash = null;
 
             this.syncInterval = setInterval(() => {
-                this.send('STATE_UPDATE', {
+                const payload = {
                     currentPos: this.app.state.currentPos,
                     gpsAccuracy: this.app.state.accuracy,
                     distanceToAnchor: this.app.state.distance,
@@ -2048,7 +2057,12 @@
                     cog: this.app.state.cog,
                     batteryLevel: this.app.alertCtrl.lastKnownBatteryLevel || 1.0,
                     isCharging: this.app.alertCtrl.lastKnownChargingState || false
-                });
+                };
+                const hash = JSON.stringify(payload);
+                if (hash !== this._lastSentStateHash) {
+                    this._lastSentStateHash = hash;
+                    this.send('STATE_UPDATE', payload);
+                }
             }, 2000);
         }
 
@@ -2348,6 +2362,15 @@
             }
         }
 
+        _debouncedSaveSchedule() {
+            clearTimeout(this._scheduleSaveTimer);
+            this._scheduleSaveTimer = setTimeout(() => {
+                try {
+                    localStorage.setItem('anchor_schedule', JSON.stringify(this.state.schedule));
+                } catch (e) { console.warn('Failed to save schedule:', e); }
+            }, 300);
+        }
+
         async _restoreActiveState() {
             const saved = await this.db.getActiveState();
             if (!saved || !saved.isAnchored) return;
@@ -2479,8 +2502,8 @@
         // ALARM STATE BAR
         // ==========================================
         _updateAlarmStateBar() {
-            const bar = document.getElementById('alarm-state-bar');
-            const text = document.getElementById('alarm-state-text');
+            const bar = this._els.alarmStateBar || document.getElementById('alarm-state-bar');
+            const text = this._els.alarmStateText || document.getElementById('alarm-state-text');
 
             // Remove all alarm classes
             bar.classList.remove('alarm-bar-safe', 'alarm-bar-caution', 'alarm-bar-warning', 'alarm-bar-alarm', 'hidden');
@@ -2782,7 +2805,7 @@
 
         _syncUI() {
             UI.updateDashboard(GeoUtils.formatDist(this.state.distance, this.state.unit), this.state.sog, this.state.cog, GeoUtils.formatDist(this.state.accuracy, this.state.unit), this.state.unit, this.state.isAnchored);
-            document.getElementById('sector-badge').classList.toggle('hidden', !this.state.sectorEnabled);
+            (this._els.sectorBadge || document.getElementById('sector-badge')).classList.toggle('hidden', !this.state.sectorEnabled);
         }
 
         _checkWatchTimer() {
@@ -2797,7 +2820,7 @@
         }
 
         _checkSchedule() {
-            const banner = document.getElementById('active-watch-banner');
+            const banner = this._els.activeWatchBanner || document.getElementById('active-watch-banner');
             if (this.state.schedule.length === 0) { banner.classList.add('hidden'); return; }
 
             const now = new Date(); const currentVal = now.getHours() * 60 + now.getMinutes(); let activePerson = null;
@@ -2819,7 +2842,7 @@
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center bg-slate-800 p-2 rounded border border-slate-700 text-xs";
                 div.innerHTML = `<span class="text-blue-400 font-mono">${item.start} - ${item.end}</span><span class="text-white font-bold truncate px-2">${item.person}</span><button class="text-red-400 hover:text-red-300 transition-colors" data-idx="${index}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`;
-                div.querySelector('button').addEventListener('click', (e) => { this.state.schedule.splice(e.currentTarget.dataset.idx, 1); localStorage.setItem('anchor_schedule', JSON.stringify(this.state.schedule)); this._renderScheduleList(); });
+                div.querySelector('button').addEventListener('click', (e) => { this.state.schedule.splice(e.currentTarget.dataset.idx, 1); this._debouncedSaveSchedule(); this._renderScheduleList(); });
                 list.appendChild(div);
             });
             lucide.createIcons(); this._checkSchedule();
@@ -3375,7 +3398,7 @@ SAFETY: ...`;
             this._renderScheduleList();
             document.getElementById('add-schedule-btn').addEventListener('click', () => {
                 const s = document.getElementById('schedule-start').value, e = document.getElementById('schedule-end').value, p = document.getElementById('schedule-name').value.trim();
-                if (s && e && p) { this.state.schedule.push({ start: s, end: e, person: p }); document.getElementById('schedule-start').value=''; document.getElementById('schedule-end').value=''; document.getElementById('schedule-name').value=''; this._renderScheduleList(); localStorage.setItem('anchor_schedule', JSON.stringify(this.state.schedule));}
+                if (s && e && p) { this.state.schedule.push({ start: s, end: e, person: p }); document.getElementById('schedule-start').value=''; document.getElementById('schedule-end').value=''; document.getElementById('schedule-name').value=''; this._renderScheduleList(); this._debouncedSaveSchedule();}
             });
 
             // ==========================================
