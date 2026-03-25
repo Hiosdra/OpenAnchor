@@ -71,7 +71,10 @@ class ExamQuizUiStateTest {
             id = 1,
             category = ExamCategory.NAWIGACJA,
             correctAnswer = "A",
-            imageAsset = "test.jpg"
+            pdfPage = 0,
+            cropYStart = 100f,
+            cropYEnd = 200f,
+            pageHeight = 842f,
         )
         val result = ExamResult(question = question, userAnswer = "B", isCorrect = false)
         assertEquals(question, result.question)
@@ -85,7 +88,10 @@ class ExamQuizUiStateTest {
             id = 2,
             category = ExamCategory.LOCJA,
             correctAnswer = "C",
-            imageAsset = "test2.jpg"
+            pdfPage = 0,
+            cropYStart = 100f,
+            cropYEnd = 200f,
+            pageHeight = 842f,
         )
         val result = ExamResult(question = question, userAnswer = "C", isCorrect = true)
         assertTrue(result.isCorrect)
@@ -93,7 +99,8 @@ class ExamQuizUiStateTest {
 
     @Test
     fun `ExamScreenState has all expected values`() {
-        assertEquals(7, ExamScreenState.entries.size)
+        assertEquals(8, ExamScreenState.entries.size)
+        assertTrue(ExamScreenState.entries.contains(ExamScreenState.NoPdfImported))
         assertTrue(ExamScreenState.entries.contains(ExamScreenState.Menu))
         assertTrue(ExamScreenState.entries.contains(ExamScreenState.Learn))
         assertTrue(ExamScreenState.entries.contains(ExamScreenState.Exam))

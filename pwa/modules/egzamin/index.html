@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Nauka do egzaminu Jachtowy Sternik Morski / Żeglarz Jachtowy - baza pytań egzaminacyjnych PZŻ">
+    <meta name="description" content="Nauka do egzaminu Jachtowy Sternik Morski / Żeglarz Jachtowy - baza pytań egzaminacyjnych">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,6 +27,12 @@
 
     <!-- Babel Standalone for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- PDF.js for rendering exam questions from PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- Exam PDF storage (IndexedDB) -->
+    <script src="../../js/exam-pdf-storage.js"></script>
 
     <style>
         /* Module-specific styles only - base styles in theme.css */
@@ -124,6 +130,76 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
+        // Configure pdf.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // PDF rendering singleton
+        const PdfRenderer = {
+            _pdfDoc: null,
+            _cache: new Map(),
+            _MAX_CACHE: 15,
+
+            async loadFromBlob(blob) {
+                const arrayBuffer = await blob.arrayBuffer();
+                this._pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                this._cache.clear();
+                return this._pdfDoc.numPages;
+            },
+
+            async renderPage(pageIndex, scale) {
+                if (scale === undefined) scale = 2.0;
+                const cacheKey = pageIndex + '_' + scale;
+                if (this._cache.has(cacheKey)) return this._cache.get(cacheKey);
+
+                if (!this._pdfDoc) return null;
+                const page = await this._pdfDoc.getPage(pageIndex + 1);
+                const viewport = page.getViewport({ scale: scale });
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport: viewport, annotationMode: 0 }).promise;
+
+                if (this._cache.size >= this._MAX_CACHE) {
+                    const firstKey = this._cache.keys().next().value;
+                    this._cache.delete(firstKey);
+                }
+                this._cache.set(cacheKey, canvas);
+                return canvas;
+            },
+
+            async renderQuestion(pageIndex, cropYStart, cropYEnd, pageHeight, scale) {
+                if (scale === undefined) scale = 2.0;
+                const fullPage = await this.renderPage(pageIndex, scale);
+                if (!fullPage) return null;
+
+                const scaleRatio = fullPage.height / pageHeight;
+                const yStart = Math.floor(cropYStart * scaleRatio);
+                const yEnd = Math.ceil(cropYEnd * scaleRatio);
+                const cropHeight = yEnd - yStart;
+
+                const cropCanvas = document.createElement('canvas');
+                cropCanvas.width = fullPage.width;
+                cropCanvas.height = cropHeight;
+                const ctx = cropCanvas.getContext('2d');
+                ctx.drawImage(fullPage, 0, yStart, fullPage.width, cropHeight, 0, 0, fullPage.width, cropHeight);
+
+                return cropCanvas.toDataURL('image/png');
+            },
+
+            isLoaded() {
+                return this._pdfDoc !== null;
+            },
+
+            unload() {
+                if (this._pdfDoc) {
+                    this._pdfDoc.destroy();
+                    this._pdfDoc = null;
+                }
+                this._cache.clear();
+            }
+        };
+
         // ==========================================
         // CATEGORIES (8 categories matching Android)
         // ==========================================
@@ -156,7 +232,7 @@
 
         /**
          * Transform a question from JSON format to the internal PWA format.
-         * New format: { id, category, correct_answer, answer_count, image_asset }
+         * New format: { id, category, correct_answer, answer_count, pdf_page, crop_y_start, crop_y_end, page_height }
          */
         function transformQuestion(q) {
             return {
@@ -164,7 +240,10 @@
                 category: CATEGORY_NAME_TO_ID[q.category.toUpperCase()] || q.category.toLowerCase().replace(/\s+/g, '_'),
                 correctAnswer: q.correct_answer || 'A',
                 answerCount: q.answer_count || 3,
-                imageUrl: q.image_asset, // e.g. "exam_images/pytanie_001.jpg"
+                pdfPage: q.pdf_page,
+                cropYStart: q.crop_y_start,
+                cropYEnd: q.crop_y_end,
+                pageHeight: q.page_height,
             };
         }
 
@@ -358,11 +437,41 @@
         }
 
         /**
-         * Displays the question as a JPG image with optional zoom-to-fullscreen.
+         * Displays the question image rendered from PDF with optional zoom-to-fullscreen.
          */
         function QuestionImageCard({ question }) {
+            const [imageDataUrl, setImageDataUrl] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(false);
             const [zoomed, setZoomed] = useState(false);
-            const [imgError, setImgError] = useState(false);
+
+            useEffect(() => {
+                let cancelled = false;
+                setLoading(true);
+                setError(false);
+                setImageDataUrl(null);
+
+                if (PdfRenderer.isLoaded()) {
+                    PdfRenderer.renderQuestion(question.pdfPage, question.cropYStart, question.cropYEnd, question.pageHeight)
+                        .then(dataUrl => {
+                            if (!cancelled) {
+                                setImageDataUrl(dataUrl);
+                                setLoading(false);
+                            }
+                        })
+                        .catch(() => {
+                            if (!cancelled) {
+                                setError(true);
+                                setLoading(false);
+                            }
+                        });
+                } else {
+                    setError(true);
+                    setLoading(false);
+                }
+
+                return () => { cancelled = true; };
+            }, [question.id]);
 
             return (
                 <div className="rounded-2xl bg-white border border-white/10 overflow-hidden">
@@ -372,26 +481,28 @@
                         <span className="text-sm text-slate-400">#{question.id}</span>
                     </div>
 
-                    {/* Question image */}
-                    {!imgError ? (
+                    {/* Question image from PDF */}
+                    {loading ? (
+                        <div className="flex items-center justify-center h-32 bg-white">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                        </div>
+                    ) : error || !imageDataUrl ? (
+                        <div className="flex items-center justify-center h-28 bg-slate-800 text-slate-500 text-sm">
+                            Nie udało się załadować pytania
+                        </div>
+                    ) : (
                         <img
-                            src={question.imageUrl}
+                            src={imageDataUrl}
                             alt={`Pytanie #${question.id}`}
                             className="w-full h-auto cursor-zoom-in"
-                            loading="lazy"
                             onClick={() => setZoomed(true)}
-                            onError={() => setImgError(true)}
                         />
-                    ) : (
-                        <div className="flex items-center justify-center h-28 bg-slate-800 text-slate-500 text-sm">
-                            Nie udalo sie zaladowac obrazka
-                        </div>
                     )}
 
                     {/* Fullscreen zoom modal */}
-                    {zoomed && (
+                    {zoomed && imageDataUrl && (
                         <div className="image-modal" onClick={() => setZoomed(false)}>
-                            <img src={question.imageUrl} alt={`Pytanie #${question.id}`} />
+                            <img src={imageDataUrl} alt={`Pytanie #${question.id}`} />
                         </div>
                     )}
                 </div>
@@ -543,9 +654,152 @@
         }
 
         // ==========================================
+        // PDF IMPORT SCREEN
+        // ==========================================
+        function ImportPdfScreen({ onImportComplete }) {
+            const [importing, setImporting] = useState(false);
+            const [progress, setProgressText] = useState('');
+            const [hashWarning, setHashWarning] = useState(null);
+
+            const handleFileSelect = async (e) => {
+                const file = e.target.files[0];
+                if (!file || !file.name.toLowerCase().endsWith('.pdf')) return;
+
+                setImporting(true);
+                setProgressText('Obliczanie sumy kontrolnej...');
+
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const { valid, hash } = await verifyPdfHash(arrayBuffer);
+                    const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+
+                    const meta = {
+                        hash: hash,
+                        filename: file.name,
+                        importDate: new Date().toISOString(),
+                        fileSize: file.size,
+                    };
+
+                    if (!valid) {
+                        setImporting(false);
+                        setHashWarning({ hash: hash, blob: blob, meta: meta });
+                        return;
+                    }
+
+                    await finishImport(blob, meta);
+                } catch (err) {
+                    setProgressText('Błąd importu: ' + err.message);
+                    setImporting(false);
+                }
+            };
+
+            const finishImport = async (blob, meta) => {
+                setImporting(true);
+                setHashWarning(null);
+                setProgressText('Zapisywanie bazy pytań...');
+                await savePdfData(blob, meta);
+
+                setProgressText('Ładowanie pytań...');
+                await PdfRenderer.loadFromBlob(blob);
+
+                setImporting(false);
+                onImportComplete();
+            };
+
+            return (
+                <>
+                    <Header title="Egzamin ZJ / JSM" />
+                    <div className="relative z-10 max-w-lg md:max-w-2xl mx-auto px-4 py-8">
+                        <div className="text-center mb-8">
+                            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/20 border border-amber-500/20 flex items-center justify-center">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="1.5"
+                                    strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="12" y1="18" x2="12" y2="12"/>
+                                    <line x1="9" y1="15" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                            <h1 className="text-2xl font-bold mb-2">Importuj bazę pytań</h1>
+                            <p className="text-sm text-white/50 leading-relaxed max-w-sm mx-auto">
+                                Aby korzystać z modułu egzaminacyjnego, zaimportuj plik PDF z bazą pytań egzaminacyjnych.
+                            </p>
+                        </div>
+
+                        {!importing && !hashWarning && (
+                            <div className="space-y-4">
+                                <label className="block w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold text-base text-center cursor-pointer hover:from-amber-500 hover:to-amber-400 transition-all active:scale-[0.98]">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                                            strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="17 8 12 3 7 8"/>
+                                            <line x1="12" y1="3" x2="12" y2="15"/>
+                                        </svg>
+                                        Wybierz plik PDF
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept=".pdf,application/pdf"
+                                        onChange={handleFileSelect}
+                                        className="hidden"
+                                    />
+                                </label>
+                                <p className="text-xs text-white/30 text-center">
+                                    Plik PDF z bazą pytań egzaminacyjnych (ok. 5 MB)
+                                </p>
+                            </div>
+                        )}
+
+                        {importing && (
+                            <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center">
+                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400 mx-auto mb-4"></div>
+                                <p className="text-sm text-white/70">{progress}</p>
+                            </div>
+                        )}
+
+                        {hashWarning && (
+                            <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-5">
+                                <div className="flex items-start gap-3 mb-4">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2"
+                                        strokeLinecap="round" strokeLinejoin="round" width="24" height="24" className="flex-shrink-0 mt-0.5">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                        <line x1="12" y1="9" x2="12" y2="13"/>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                    </svg>
+                                    <div>
+                                        <h3 className="font-bold text-amber-300 mb-1">Nieoczekiwany plik</h3>
+                                        <p className="text-sm text-white/60 leading-relaxed">
+                                            Suma kontrolna SHA-256 tego pliku nie odpowiada oczekiwanej wartosci.
+                                            Plik moze byc niekompatybilny z ta wersja aplikacji.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => finishImport(hashWarning.blob, hashWarning.meta)}
+                                        className="flex-1 py-3 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 font-semibold text-sm hover:bg-amber-500/30 transition-colors"
+                                    >
+                                        Kontynuuj mimo to
+                                    </button>
+                                    <button
+                                        onClick={() => { setHashWarning(null); setProgressText(''); }}
+                                        className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 font-semibold text-sm hover:bg-white/10 transition-colors"
+                                    >
+                                        Anuluj
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </>
+            );
+        }
+
+        // ==========================================
         // MAIN MENU
         // ==========================================
-        function MenuScreen({ onStartLearn, onStartExam, onStartLeitner, progress, leitnerState, questions }) {
+        function MenuScreen({ onStartLearn, onStartExam, onStartLeitner, onChangePdf, progress, leitnerState, questions }) {
             const totalQ = questions.length;
             const answeredCount = Object.keys(progress.answered).length;
             const correctCount = progress.stats.correct;
@@ -579,7 +833,7 @@
                             </svg>
                         </div>
                         <h1 className="text-2xl font-bold mb-1">Egzamin ZJ / JSM</h1>
-                        <p className="text-sm text-white/40">Baza pytan egzaminacyjnych PZZ &middot; {totalQ} pytan</p>
+                        <p className="text-sm text-white/40">Baza pytań egzaminacyjnych &middot; {totalQ} pytań</p>
                     </div>
 
                     {/* Stats card */}
@@ -597,7 +851,7 @@
                         <div className="grid grid-cols-3 gap-3 text-center">
                             <div>
                                 <div className="text-xl font-bold">{totalQ}</div>
-                                <div className="text-xs text-white/40">pytan</div>
+                                <div className="text-xs text-white/40">pytań</div>
                             </div>
                             <div>
                                 <div className="text-xl font-bold text-green-400">{correctCount}</div>
@@ -623,7 +877,7 @@
                                             <span style={{ width: 8, height: 8, borderRadius: '50%', background: colors.dot }}></span>
                                             <span className="text-base">{cat.name}</span>
                                         </div>
-                                        <span className="text-sm text-white/40">{count} pytan</span>
+                                        <span className="text-sm text-white/40">{count} pytań</span>
                                     </div>
                                 );
                             })}
@@ -659,7 +913,7 @@
                                 </svg>
                                 Egzamin
                             </div>
-                            <div className="text-xs opacity-40 mt-0.5">30 pytan, 45 minut, 70% aby zdac</div>
+                            <div className="text-xs opacity-40 mt-0.5">30 pytań, 45 minut, 70% aby zdać</div>
                         </button>
 
                         <button
@@ -676,23 +930,34 @@
                                 <span className="text-blue-300">Leitner</span>
                             </div>
                             <div className="text-xs text-blue-400/60 mt-0.5">
-                                Powtorki rozlozone w czasie &middot; {dueCount} do powtorki &middot; {masteredCount} opanowanych
+                                Powtórki rozłożone w czasie &middot; {dueCount} do powtórki &middot; {masteredCount} opanowanych
                             </div>
                         </button>
 
                         {answeredCount > 0 && (
                             <button
                                 onClick={() => {
-                                    if (confirm('Na pewno chcesz zresetowac postep nauki?')) {
+                                    if (confirm('Na pewno chcesz zresetować postęp nauki?')) {
                                         saveProgress({ answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } });
                                         window.location.reload();
                                     }
                                 }}
                                 className="w-full py-3 rounded-2xl text-white/30 text-sm hover:text-white/50 transition-colors"
                             >
-                                Resetuj postep
+                                Resetuj postęp
                             </button>
                         )}
+
+                        <button
+                            onClick={() => {
+                                if (confirm('Na pewno chcesz zmienić plik PDF z bazą pytań?')) {
+                                    onChangePdf();
+                                }
+                            }}
+                            className="w-full py-3 rounded-2xl text-white/30 text-sm hover:text-white/50 transition-colors"
+                        >
+                            Zmień bazę pytań (PDF)
+                        </button>
                     </div>
                 </div>
                 </>
@@ -780,13 +1045,13 @@
                         <Header title="Nauka" onBack={onBack} />
                         <div className="flex-1 flex items-center justify-center px-4">
                             <div className="text-center">
-                                <p className="text-white/40 text-lg mb-2">Brak pytan</p>
-                                <p className="text-white/30 text-sm">Brak pytan w wybranych kategoriach</p>
+                                <p className="text-white/40 text-lg mb-2">Brak pytań</p>
+                                <p className="text-white/30 text-sm">Brak pytań w wybranych kategoriach</p>
                                 <button
                                     onClick={() => setShowCategoryFilter(true)}
                                     className="mt-4 px-4 py-2 rounded-xl bg-amber-500/20 text-amber-400 text-sm"
                                 >
-                                    Zmien kategorie
+                                    Zmień kategorie
                                 </button>
                             </div>
                         </div>
@@ -1040,7 +1305,7 @@
                                         onClick={() => {
                                             const unanswered = examQuestions.length - answeredCount;
                                             if (unanswered > 0) {
-                                                if (!confirm(`Masz ${unanswered} pytan bez odpowiedzi. Na pewno chcesz zakonczyc?`)) return;
+                                                if (!confirm(`Masz ${unanswered} pytań bez odpowiedzi. Na pewno chcesz zakończyć?`)) return;
                                             }
                                             handleFinishExam();
                                         }}
@@ -1116,7 +1381,7 @@
                                 onClick={() => setShowDetails(!showDetails)}
                                 className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-sm text-white/50 hover:bg-white/10 mb-4"
                             >
-                                {showDetails ? 'Ukryj szczegoly' : 'Pokaz szczegoly pytan'}
+                                {showDetails ? 'Ukryj szczegóły' : 'Pokaż szczegóły pytań'}
                             </button>
 
                             {showDetails && (
@@ -1179,7 +1444,7 @@
             const totalMastered = boxCounts[4];
             const pctMastered = questions.length > 0 ? Math.round((totalMastered / questions.length) * 100) : 0;
 
-            const boxLabels = ['Pudelko 1', 'Pudelko 2', 'Pudelko 3', 'Pudelko 4', 'Pudelko 5'];
+            const boxLabels = ['Pudełko 1', 'Pudełko 2', 'Pudełko 3', 'Pudełko 4', 'Pudełko 5'];
             const boxColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
             const boxIntervals = ['Co sesje', 'Co 2 sesje', 'Co 4 sesje', 'Co 8 sesji', 'Co 16 sesji'];
 
@@ -1204,11 +1469,11 @@
                                 <div className="grid grid-cols-3 gap-3 text-center">
                                     <div>
                                         <div className="text-xl font-bold">{questions.length}</div>
-                                        <div className="text-xs text-white/40">pytan</div>
+                                        <div className="text-xs text-white/40">pytań</div>
                                     </div>
                                     <div>
                                         <div className="text-xl font-bold text-blue-400">{dueQuestions.length}</div>
-                                        <div className="text-xs text-white/40">do powtorki</div>
+                                        <div className="text-xs text-white/40">do powtórki</div>
                                     </div>
                                     <div>
                                         <div className="text-xl font-bold text-green-400">{totalMastered}</div>
@@ -1224,7 +1489,7 @@
 
                             {/* Box breakdown */}
                             <div className="space-y-2 mb-6">
-                                <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 px-1">Pudelka</h3>
+                                <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 px-1">Pudełka</h3>
                                 {boxLabels.map((label, i) => {
                                     const count = boxCounts[i];
                                     const pct = questions.length > 0 ? (count / questions.length) * 100 : 0;
@@ -1237,7 +1502,7 @@
                                                 </div>
                                                 <div className="text-right">
                                                     <span className="text-sm font-bold" style={{ color: boxColors[i] }}>{count}</span>
-                                                    <span className="text-xs text-white/30 ml-1">pytan</span>
+                                                    <span className="text-xs text-white/30 ml-1">pytań</span>
                                                 </div>
                                             </div>
                                             <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mb-1">
@@ -1265,21 +1530,21 @@
                                             <polygon points="5 3 19 12 5 21 5 3"/>
                                         </svg>
                                         {dueQuestions.length > 0
-                                            ? `Rozpocznij sesje (${dueQuestions.length} pytan)`
-                                            : 'Brak pytan do powtorki'}
+                                            ? `Rozpocznij sesję (${dueQuestions.length} pytań)`
+                                            : 'Brak pytań do powtórki'}
                                     </div>
                                 </button>
 
                                 {leitnerState.sessionNumber > 0 && (
                                     <button
                                         onClick={() => {
-                                            if (confirm('Na pewno chcesz zresetowac postep Leitnera? Wszystkie pytania wroca do Pudelka 1.')) {
+                                            if (confirm('Na pewno chcesz zresetować postęp Leitnera? Wszystkie pytania wrócą do Pudełka 1.')) {
                                                 onReset();
                                             }
                                         }}
                                         className="w-full py-3 rounded-2xl text-white/30 text-sm hover:text-white/50 transition-colors"
                                     >
-                                        Resetuj postep Leitnera
+                                        Resetuj postęp Leitnera
                                     </button>
                                 )}
                             </div>
@@ -1392,11 +1657,11 @@
                                 <div className="mt-3 text-center">
                                     {selectedAnswer === currentQuestion.correctAnswer ? (
                                         <div className="text-sm text-green-400">
-                                            Pudelko {currentBox} &rarr; {Math.min(currentBox + 1, LEITNER_BOX_COUNT)}
+                                            Pudełko {currentBox} &rarr; {Math.min(currentBox + 1, LEITNER_BOX_COUNT)}
                                         </div>
                                     ) : (
                                         <div className="text-sm text-red-400">
-                                            Pudelko {currentBox} &rarr; 1
+                                            Pudełko {currentBox} &rarr; 1
                                         </div>
                                     )}
                                 </div>
@@ -1442,7 +1707,7 @@
                                 <div className="text-5xl font-black text-blue-400 mb-2">{pct}%</div>
                                 <div className="text-lg font-bold mb-1">Sesja zakonczona</div>
                                 <div className="text-sm text-white/40">
-                                    {correct} poprawnych, {incorrect} blednych z {total} pytan
+                                    {correct} poprawnych, {incorrect} błędnych z {total} pytań
                                 </div>
                                 <div className="text-xs text-white/30 mt-2">
                                     Sesja #{leitnerState.sessionNumber}
@@ -1451,7 +1716,7 @@
 
                             {/* Box distribution */}
                             <div className="rounded-2xl bg-white/5 border border-white/10 p-5 mb-6">
-                                <h3 className="text-sm font-semibold mb-4">Rozklad pytan w pudelkach</h3>
+                                <h3 className="text-sm font-semibold mb-4">Rozkład pytań w pudełkach</h3>
                                 <div className="flex gap-2 items-end justify-center h-32 mb-3">
                                     {boxCounts.map((count, i) => {
                                         const maxCount = Math.max(...boxCounts, 1);
@@ -1490,6 +1755,8 @@
         // MAIN APP
         // ==========================================
         function App() {
+            const [pdfReady, setPdfReady] = useState(false);
+            const [initializing, setInitializing] = useState(true);
             const [mode, setMode] = useState(MODES.MENU);
             const [progress, setProgress] = useState(loadProgress);
             const [leitnerState, setLeitnerState] = useState(loadLeitnerState);
@@ -1498,6 +1765,31 @@
             const [leitnerSessionQuestions, setLeitnerSessionQuestions] = useState([]);
             const [leitnerSessionCorrect, setLeitnerSessionCorrect] = useState(0);
             const [leitnerSessionIncorrect, setLeitnerSessionIncorrect] = useState(0);
+
+            useEffect(() => {
+                async function init() {
+                    try {
+                        const imported = await isPdfImported();
+                        if (imported) {
+                            const blob = await loadPdfBlob();
+                            if (blob) {
+                                await PdfRenderer.loadFromBlob(blob);
+                                setPdfReady(true);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Failed to initialize PDF:', err);
+                    }
+                    setInitializing(false);
+                }
+                init();
+            }, []);
+
+            const handleChangePdf = useCallback(async () => {
+                PdfRenderer.unload();
+                await deletePdf();
+                setPdfReady(false);
+            }, []);
 
             const updateProgress = useCallback((newProgress) => {
                 setProgress(newProgress);
@@ -1544,6 +1836,23 @@
                 saveLeitnerState(freshState);
             }, []);
 
+            // Initializing: show loading
+            if (initializing) {
+                return (
+                    <div className="flex items-center justify-center min-h-screen">
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400 mx-auto mb-4"></div>
+                            <p className="text-sm text-white/50">Ładowanie...</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            // No PDF imported: show import screen
+            if (!pdfReady) {
+                return <ImportPdfScreen onImportComplete={() => setPdfReady(true)} />;
+            }
+
             switch (mode) {
                 case MODES.MENU:
                     return (
@@ -1554,6 +1863,7 @@
                             onStartLearn={() => setMode(MODES.LEARN)}
                             onStartExam={() => setMode(MODES.EXAM)}
                             onStartLeitner={() => setMode(MODES.LEITNER_OVERVIEW)}
+                            onChangePdf={handleChangePdf}
                         />
                     );
                 case MODES.LEARN:
@@ -1630,7 +1940,7 @@
                 console.error('Failed to load exam questions:', err);
                 root.render(
                     <div className="flex items-center justify-center min-h-screen text-red-400">
-                        <p>Blad ladowania pytan. Odswiez strone.</p>
+                        <p>Błąd ładowania pytań. Odśwież stronę.</p>
                     </div>
                 );
             });

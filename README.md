@@ -10,7 +10,7 @@ Live PWA: **https://hiosdra.github.io/OpenAnchor/**
 |---|---|
 | **Alert Kotwiczny** | Anchor alarm with GPS tracking, map visualisation (Leaflet), audio/vibration/browser notifications, night vision mode, WebSocket pairing with Android for redundant cabin alarm |
 | **Wachtownik** | Maritime watch scheduler for yacht crews — generates watch schedules, PDF export, QR sharing (React + Babel, PL/EN) |
-| **Egzamin** | Maritime examination module (ŻJ/JSM) with question bank, image support, and interactive quiz functionality |
+| **Egzamin** | Maritime examination module (ŻJ/JSM) with Nauka (Learn), Egzamin (Exam, 45 min timed), and Leitner spaced-repetition modes. Questions rendered from user-imported PDF — no copyrighted content bundled |
 
 ## Project Structure
 
@@ -28,8 +28,7 @@ OpenAnchor/
 │       ├── wachtownik/index.html # Wachtownik
 │       └── egzamin/              # Egzamin (exam module)
 │           ├── index.html
-│           ├── exam_questions.json
-│           └── exam_images/
+│           └── exam_questions.json  # Question metadata (no copyrighted content)
 ├── android/                      # Native Android app + Wear OS companion
 │   ├── app/                      # Main mobile application (Jetpack Compose)
 │   └── wear/                     # Wear OS companion app
@@ -45,6 +44,26 @@ npx http-server ./pwa -p 8080
 ```
 
 > Opening `index.html` directly via `file://` will not work — service workers require HTTP/HTTPS.
+
+## Exam Module (Moduł Egzaminacyjny)
+
+The exam module does **not** bundle any copyrighted question content. Users must import their own legally-obtained PDF with the exam question bank.
+
+### How it works
+1. Open the Egzamin module from the main menu
+2. On first use, you'll see an import screen — select your PDF file
+3. The app verifies the file against a known SHA-256 checksum hardcoded in the app. If the checksum does not match (e.g., different PDF version), a warning is shown but the import is not blocked
+4. The PDF is stored **locally on your device** (IndexedDB on web, Internal Storage on Android) and persists through app updates (but not if you uninstall/reinstall the app or clear storage)
+5. Questions are rendered directly from the imported PDF
+
+### Quiz modes
+- **Nauka** (Learn) — Browse all questions with immediate answer feedback
+- **Egzamin** (Exam) — Timed 45-minute exam simulation (30 random questions)
+- **Leitner** — Spaced repetition system with 5 boxes for long-term learning
+
+### Data storage
+- `exam_questions.json` contains only metadata (question ID, category, correct answer, PDF page coordinates) — no copyrighted content
+- The imported PDF never leaves the device and is never uploaded or distributed
 
 ## CI / Deploy
 

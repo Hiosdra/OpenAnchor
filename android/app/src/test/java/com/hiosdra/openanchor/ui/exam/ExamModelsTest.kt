@@ -165,7 +165,10 @@ class ExamModelsTest {
             category = ExamCategory.NAWIGACJA,
             correctAnswer = "B",
             answerCount = 3,
-            imageAsset = "exam_images/q001.jpg"
+            pdfPage = 0,
+            cropYStart = 100f,
+            cropYEnd = 200f,
+            pageHeight = 842f,
         )
         assertEquals(1, q.id)
         assertEquals(ExamCategory.NAWIGACJA, q.category)
@@ -179,7 +182,10 @@ class ExamModelsTest {
             id = 1,
             category = ExamCategory.LOCJA,
             correctAnswer = "A",
-            imageAsset = "test.jpg"
+            pdfPage = 0,
+            cropYStart = 100f,
+            cropYEnd = 200f,
+            pageHeight = 842f,
         )
         assertEquals(3, q.answerCount)
     }
@@ -210,14 +216,20 @@ class ExamModelsTest {
             category = "Nawigacja",
             correctAnswer = "B",
             answerCount = 3,
-            imageAsset = "exam_images/pytanie_005.jpg"
+            pdfPage = 2,
+            cropYStart = 100f,
+            cropYEnd = 200f,
+            pageHeight = 842f,
         )
         val domain = json.toDomain()
         assertEquals(5, domain.id)
         assertEquals(ExamCategory.NAWIGACJA, domain.category)
         assertEquals("B", domain.correctAnswer)
         assertEquals(3, domain.answerCount)
-        assertEquals("exam_images/pytanie_005.jpg", domain.imageAsset)
+        assertEquals(2, domain.pdfPage)
+        assertEquals(100f, domain.cropYStart)
+        assertEquals(200f, domain.cropYEnd)
+        assertEquals(842f, domain.pageHeight)
     }
 
     @Test
@@ -227,7 +239,10 @@ class ExamModelsTest {
             category = "Nawigacja",
             correctAnswer = null,
             answerCount = 3,
-            imageAsset = "test.jpg"
+            pdfPage = 0,
+            cropYStart = 100f,
+            cropYEnd = 200f,
+            pageHeight = 842f,
         )
         val domain = json.toDomain()
         assertEquals("A", domain.correctAnswer)

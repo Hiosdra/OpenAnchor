@@ -2,6 +2,7 @@ package com.hiosdra.openanchor.ui.exam
 
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,6 +46,15 @@ data class ExamQuizUiState(
     val leitnerSessionTotal: Int = 0,
     val leitnerSessionRemaining: Int = 0,
     val leitnerBoxCounts: Map<LeitnerBox, Int> = emptyMap(),
+    // PDF import
+    val isImporting: Boolean = false,
+    val importProgress: String = "",
+    val hashWarning: HashWarningState? = null,
+)
+
+data class HashWarningState(
+    val expectedHash: String,
+    val actualHash: String,
 )
 
 data class ExamResult(
@@ -54,6 +64,7 @@ data class ExamResult(
 )
 
 enum class ExamScreenState {
+    NoPdfImported,
     Menu,
     Learn,
     Exam,
@@ -66,6 +77,8 @@ enum class ExamScreenState {
 @HiltViewModel
 class ExamQuizViewModel @Inject constructor(
     application: Application,
+    val pdfStorage: ExamPdfStorage,
+    val pdfRenderer: ExamPdfRenderer,
 ) : AndroidViewModel(application) {
 
     companion object {
@@ -86,6 +99,11 @@ class ExamQuizViewModel @Inject constructor(
     private val _selectedAnswer = MutableStateFlow<String?>(null)
     private val _showCorrectAnswer = MutableStateFlow(false)
     private val _stats = MutableStateFlow(ExamStats())
+
+    // PDF import state
+    private val _isImporting = MutableStateFlow(false)
+    private val _importProgress = MutableStateFlow("")
+    private val _hashWarning = MutableStateFlow<HashWarningState?>(null)
 
     // Exam mode state
     private val _examQuestions = MutableStateFlow<List<ExamQuestion>>(emptyList())
@@ -117,7 +135,12 @@ class ExamQuizViewModel @Inject constructor(
     init {
         ExamQuestionsDb.init(application)
         allQuestions = ExamQuestionsDb.allQuestions
-        loadLeitnerState()
+        if (pdfStorage.isPdfAvailable()) {
+            pdfRenderer.open()
+            loadLeitnerState()
+        } else {
+            _screen.value = ExamScreenState.NoPdfImported
+        }
     }
 
     val uiState: StateFlow<ExamQuizUiState> = combine(
@@ -136,7 +159,8 @@ class ExamQuizViewModel @Inject constructor(
             _leitnerLastCorrect, _leitnerLastNewBox, _leitnerSessionCorrect,
             _leitnerSessionIncorrect, _leitnerSessionTotal
         ) { correct, box, sc, si, st -> LeitnerUiPart2(correct, box, sc, si, st) },
-        combine(_leitnerSessionRemaining, _leitnerBoxCounts) { rem, counts -> Pair(rem, counts) },
+        combine(_leitnerSessionRemaining, _leitnerBoxCounts, _isImporting, _importProgress, _hashWarning)
+        { rem, counts, importing, progress, hash -> PdfAndLeitnerPart3(rem, counts, importing, progress, hash) },
     ) { values ->
         val screen = values[0] as ExamScreenState
         val selectedCats = values[1] as Set<*>
@@ -154,8 +178,7 @@ class ExamQuizViewModel @Inject constructor(
         val lPart1 = values[7] as LeitnerUiPart1
         val lPart2 = values[8] as LeitnerUiPart2
 
-        @Suppress("UNCHECKED_CAST")
-        val lPart3 = values[9] as Pair<Int, Map<LeitnerBox, Int>>
+        val lPart3 = values[9] as PdfAndLeitnerPart3
 
         @Suppress("UNCHECKED_CAST")
         val typedCats = selectedCats as Set<ExamCategory>
@@ -188,8 +211,11 @@ class ExamQuizViewModel @Inject constructor(
             leitnerSessionCorrect = lPart2.sessionCorrect,
             leitnerSessionIncorrect = lPart2.sessionIncorrect,
             leitnerSessionTotal = lPart2.sessionTotal,
-            leitnerSessionRemaining = lPart3.first,
-            leitnerBoxCounts = lPart3.second,
+            leitnerSessionRemaining = lPart3.remaining,
+            leitnerBoxCounts = lPart3.boxCounts,
+            isImporting = lPart3.isImporting,
+            importProgress = lPart3.importProgress,
+            hashWarning = lPart3.hashWarning,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExamQuizUiState(allQuestions = allQuestions))
 
@@ -215,6 +241,68 @@ class ExamQuizViewModel @Inject constructor(
         val sessionIncorrect: Int,
         val sessionTotal: Int,
     )
+
+    private data class PdfAndLeitnerPart3(
+        val remaining: Int,
+        val boxCounts: Map<LeitnerBox, Int>,
+        val isImporting: Boolean,
+        val importProgress: String,
+        val hashWarning: HashWarningState?,
+    )
+
+    // ---- PDF import actions ----
+
+    fun importPdf(uri: Uri) {
+        viewModelScope.launch {
+            _isImporting.value = true
+            _importProgress.value = "Importowanie pliku PDF…"
+            try {
+                val contentResolver = getApplication<Application>().contentResolver
+                val inputStream = contentResolver.openInputStream(uri)
+                    ?: throw IllegalStateException("Nie można otworzyć pliku")
+                val filename = uri.lastPathSegment ?: "questions.pdf"
+                val result = pdfStorage.savePdf(inputStream, filename)
+
+                if (!result.hashValid) {
+                    _hashWarning.value = HashWarningState(
+                        expectedHash = ExamPdfStorage.EXPECTED_PDF_HASH,
+                        actualHash = result.hash,
+                    )
+                }
+
+                pdfRenderer.open()
+                loadLeitnerState()
+                _screen.value = ExamScreenState.Menu
+            } catch (e: Exception) {
+                _importProgress.value = "Błąd importu: ${e.message}"
+            } finally {
+                _isImporting.value = false
+                _importProgress.value = ""
+            }
+        }
+    }
+
+    fun acceptHashWarning() {
+        _hashWarning.value = null
+    }
+
+    fun rejectHashWarning() {
+        _hashWarning.value = null
+        pdfRenderer.close()
+        pdfStorage.deletePdf()
+        _screen.value = ExamScreenState.NoPdfImported
+    }
+
+    fun deletePdf() {
+        pdfRenderer.close()
+        pdfStorage.deletePdf()
+        _screen.value = ExamScreenState.NoPdfImported
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pdfRenderer.close()
+    }
 
     // ---- Menu actions ----
 

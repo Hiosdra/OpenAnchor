@@ -26,5 +26,8 @@ local.properties
 # Docs
 *.pdf
 
+# Bundled exam images removed (questions now rendered from user-imported PDF)
+**/exam_images/
+
 # Kotlin build artifacts
 /android/.kotlin/

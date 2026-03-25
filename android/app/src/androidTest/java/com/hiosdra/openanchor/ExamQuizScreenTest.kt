@@ -3,14 +3,17 @@ package com.hiosdra.openanchor
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.hiosdra.openanchor.helpers.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
+import java.io.File
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -29,10 +32,33 @@ class ExamQuizScreenTest {
         android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 
+    // Minimal valid PDF so ExamPdfStorage.isPdfAvailable() returns true
+    private val minimalPdf = "%PDF-1.0\n1 0 obj<</Pages 2 0 R>>endobj\n2 0 obj<</Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</MediaBox[0 0 612 792]>>endobj\ntrailer<</Root 1 0 R>>\n".toByteArray()
+
+    private fun provisionDummyPdf() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val dir = File(context.filesDir, "exam_pdf")
+        dir.mkdirs()
+        File(dir, "questions.pdf").writeBytes(minimalPdf)
+    }
+
+    private fun cleanupDummyPdf() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val dir = File(context.filesDir, "exam_pdf")
+        File(dir, "questions.pdf").delete()
+        dir.delete()
+    }
+
     @Before
     fun setUp() {
+        provisionDummyPdf()
         hiltRule.inject()
         navigateToExamQuiz()
+    }
+
+    @After
+    fun tearDown() {
+        cleanupDummyPdf()
     }
 
     private fun navigateToExamQuiz() {

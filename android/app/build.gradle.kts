@@ -203,7 +203,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/MainActivity*.class",
         // Bound service lifecycle (logic extracted to GpsProcessor/AlarmHandler)
         "**/AnchorMonitorService*.class",
-        "**/ServiceBinder*.class"
+        "**/ServiceBinder*.class",
+        // PDF renderer uses system PdfRenderer + Bitmap (not unit-testable)
+        "**/ExamPdfRenderer*.class",
     )
 
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
@@ -244,7 +246,9 @@ tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
         "**/NavHostKt*.class",
         "**/MainActivity*.class",
         "**/AnchorMonitorService*.class",
-        "**/ServiceBinder*.class"
+        "**/ServiceBinder*.class",
+        // PDF renderer uses system PdfRenderer + Bitmap (not unit-testable)
+        "**/ExamPdfRenderer*.class",
     )
 
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {

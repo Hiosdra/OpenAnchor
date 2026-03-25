@@ -1,8 +1,11 @@
 package com.hiosdra.openanchor.ui.exam
 
 import android.app.Application
+import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
+import java.io.InputStream
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import io.mockk.*
@@ -28,13 +31,15 @@ class ExamQuizViewModelTest {
     private lateinit var application: Application
     private lateinit var prefs: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
+    private lateinit var pdfStorage: ExamPdfStorage
+    private lateinit var pdfRenderer: ExamPdfRenderer
 
     private val testQuestions = listOf(
-        ExamQuestion(1, ExamCategory.NAWIGACJA, "A", 3, "exam_images/q1.jpg"),
-        ExamQuestion(2, ExamCategory.NAWIGACJA, "B", 3, "exam_images/q2.jpg"),
-        ExamQuestion(3, ExamCategory.METEOROLOGIA, "C", 3, "exam_images/q3.jpg"),
-        ExamQuestion(4, ExamCategory.LOCJA, "A", 3, "exam_images/q4.jpg"),
-        ExamQuestion(5, ExamCategory.PRAWO, "B", 3, "exam_images/q5.jpg"),
+        ExamQuestion(1, ExamCategory.NAWIGACJA, "A", 3, pdfPage = 0, cropYStart = 100f, cropYEnd = 200f, pageHeight = 842f),
+        ExamQuestion(2, ExamCategory.NAWIGACJA, "B", 3, pdfPage = 0, cropYStart = 200f, cropYEnd = 300f, pageHeight = 842f),
+        ExamQuestion(3, ExamCategory.METEOROLOGIA, "C", 3, pdfPage = 1, cropYStart = 100f, cropYEnd = 200f, pageHeight = 842f),
+        ExamQuestion(4, ExamCategory.LOCJA, "A", 3, pdfPage = 1, cropYStart = 200f, cropYEnd = 300f, pageHeight = 842f),
+        ExamQuestion(5, ExamCategory.PRAWO, "B", 3, pdfPage = 2, cropYStart = 100f, cropYEnd = 200f, pageHeight = 842f),
     )
 
     @Before
@@ -51,6 +56,11 @@ class ExamQuizViewModelTest {
             every { getSharedPreferences(any(), any()) } returns prefs
         }
 
+        pdfStorage = mockk(relaxed = true) {
+            every { isPdfAvailable() } returns true
+        }
+        pdfRenderer = mockk(relaxed = true)
+
         // Pre-initialize ExamQuestionsDb with test data via reflection
         val field = ExamQuestionsDb::class.java.getDeclaredField("_allQuestions")
         field.isAccessible = true
@@ -63,7 +73,7 @@ class ExamQuizViewModelTest {
     }
 
     private fun createViewModel(): ExamQuizViewModel {
-        return ExamQuizViewModel(application)
+        return ExamQuizViewModel(application, pdfStorage, pdfRenderer)
     }
 
     // ---- Initial state ----
@@ -1058,6 +1068,236 @@ class ExamQuizViewModelTest {
             assertEquals("A", state.examAnswers[1])
             assertEquals("B", state.examAnswers[2])
             assertEquals("C", state.examAnswers[3])
+            cancel()
+        }
+    }
+
+    // ---- PDF import ----
+
+    @Test
+    fun `initial state is NoPdfImported when no PDF exists`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns false
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.NoPdfImported, state.screen)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `initial state is Menu when PDF exists`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns true
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.Menu, state.screen)
+            verify { pdfRenderer.open() }
+            cancel()
+        }
+    }
+
+    @Test
+    fun `deletePdf transitions to NoPdfImported`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.deletePdf()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.NoPdfImported, state.screen)
+            verify { pdfRenderer.close() }
+            verify { pdfStorage.deletePdf() }
+            cancel()
+        }
+    }
+
+    @Test
+    fun `rejectHashWarning deletes PDF and transitions to NoPdfImported`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.rejectHashWarning()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.NoPdfImported, state.screen)
+            assertNull(state.hashWarning)
+            cancel()
+        }
+    }
+
+    // ---- importPdf ----
+
+    private fun mockImportDeps(
+        uri: Uri,
+        inputStream: InputStream? = mockk(relaxed = true),
+    ): ContentResolver {
+        every { uri.lastPathSegment } returns "test.pdf"
+        val cr = mockk<ContentResolver> {
+            every { openInputStream(uri) } returns inputStream
+        }
+        every { application.contentResolver } returns cr
+        return cr
+    }
+
+    @Test
+    fun `importPdf successful with valid hash transitions to Menu`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns false
+
+        val uri = mockk<Uri>()
+        mockImportDeps(uri)
+        coEvery { pdfStorage.savePdf(any(), any()) } returns ExamPdfStorage.SaveResult(
+            hashValid = true,
+            hash = ExamPdfStorage.EXPECTED_PDF_HASH,
+            pageCount = 5,
+        )
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.importPdf(uri)
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.Menu, state.screen)
+            assertNull(state.hashWarning)
+            assertFalse(state.isImporting)
+            verify { pdfRenderer.open() }
+            cancel()
+        }
+    }
+
+    @Test
+    fun `importPdf with invalid hash shows hashWarning`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns false
+
+        val uri = mockk<Uri>()
+        mockImportDeps(uri)
+        coEvery { pdfStorage.savePdf(any(), any()) } returns ExamPdfStorage.SaveResult(
+            hashValid = false,
+            hash = "abc123",
+            pageCount = 5,
+        )
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.importPdf(uri)
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.Menu, state.screen)
+            assertNotNull(state.hashWarning)
+            assertEquals("abc123", state.hashWarning!!.actualHash)
+            assertEquals(ExamPdfStorage.EXPECTED_PDF_HASH, state.hashWarning!!.expectedHash)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `importPdf handles null inputStream gracefully`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns false
+
+        val uri = mockk<Uri>()
+        mockImportDeps(uri, inputStream = null)
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.importPdf(uri)
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertFalse(state.isImporting)
+            assertEquals(ExamScreenState.NoPdfImported, state.screen)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `importPdf handles savePdf exception gracefully`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns false
+
+        val uri = mockk<Uri>()
+        mockImportDeps(uri)
+        coEvery { pdfStorage.savePdf(any(), any()) } throws RuntimeException("disk full")
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.importPdf(uri)
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertFalse(state.isImporting)
+            assertEquals(ExamScreenState.NoPdfImported, state.screen)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `acceptHashWarning clears warning and stays on Menu`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns false
+
+        val uri = mockk<Uri>()
+        mockImportDeps(uri)
+        coEvery { pdfStorage.savePdf(any(), any()) } returns ExamPdfStorage.SaveResult(
+            hashValid = false,
+            hash = "wronghash",
+            pageCount = 5,
+        )
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.importPdf(uri)
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            assertNotNull(expectMostRecentItem().hashWarning)
+            cancel()
+        }
+
+        vm.acceptHashWarning()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertNull(state.hashWarning)
+            assertEquals(ExamScreenState.Menu, state.screen)
             cancel()
         }
     }

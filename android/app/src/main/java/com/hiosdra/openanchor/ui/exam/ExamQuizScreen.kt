@@ -1,6 +1,7 @@
 package com.hiosdra.openanchor.ui.exam
 
-import android.graphics.BitmapFactory
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
@@ -33,16 +34,19 @@ import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,7 +68,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -91,6 +94,15 @@ fun ExamQuizScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     when (uiState.screen) {
+        ExamScreenState.NoPdfImported -> ExamImportContent(
+            onImportPdf = viewModel::importPdf,
+            isImporting = uiState.isImporting,
+            importProgress = uiState.importProgress,
+            hashWarning = uiState.hashWarning,
+            onAcceptHashWarning = viewModel::acceptHashWarning,
+            onRejectHashWarning = viewModel::rejectHashWarning,
+            onBack = onBack,
+        )
         ExamScreenState.Menu -> ExamMenuContent(
             uiState = uiState,
             onStartLearn = viewModel::startLearnMode,
@@ -101,6 +113,7 @@ fun ExamQuizScreen(
         )
         ExamScreenState.Learn -> LearnModeContent(
             uiState = uiState,
+            pdfRenderer = viewModel.pdfRenderer,
             onSelectAnswer = viewModel::selectAnswer,
             onNext = viewModel::nextQuestion,
             onPrevious = viewModel::previousQuestion,
@@ -112,6 +125,7 @@ fun ExamQuizScreen(
         )
         ExamScreenState.Exam -> ExamModeContent(
             uiState = uiState,
+            pdfRenderer = viewModel.pdfRenderer,
             onSelectAnswer = viewModel::selectExamAnswer,
             onGoToQuestion = viewModel::goToExamQuestion,
             onNext = viewModel::nextExamQuestion,
@@ -121,6 +135,7 @@ fun ExamQuizScreen(
         )
         ExamScreenState.Results -> ResultsContent(
             uiState = uiState,
+            pdfRenderer = viewModel.pdfRenderer,
             onRetry = viewModel::startExamMode,
             onBack = viewModel::goToMenu,
         )
@@ -132,6 +147,7 @@ fun ExamQuizScreen(
         )
         ExamScreenState.LeitnerSession -> LeitnerSessionContent(
             uiState = uiState,
+            pdfRenderer = viewModel.pdfRenderer,
             onSelectAnswer = viewModel::selectLeitnerAnswer,
             onNext = viewModel::nextLeitnerQuestion,
             onFinishSession = viewModel::finishLeitnerSession,
@@ -142,6 +158,140 @@ fun ExamQuizScreen(
             onNewSession = viewModel::startLeitnerSession,
             onBack = viewModel::openLeitner,
         )
+    }
+}
+
+// ==========================================
+// PDF IMPORT SCREEN
+// ==========================================
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExamImportContent(
+    onImportPdf: (android.net.Uri) -> Unit,
+    isImporting: Boolean,
+    importProgress: String,
+    hashWarning: HashWarningState?,
+    onAcceptHashWarning: () -> Unit,
+    onRejectHashWarning: () -> Unit,
+    onBack: () -> Unit,
+) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri -> uri?.let { onImportPdf(it) } }
+
+    if (hashWarning != null) {
+        AlertDialog(
+            onDismissRequest = {},
+            icon = {
+                Icon(
+                    Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = WarningOrange,
+                    modifier = Modifier.size(32.dp),
+                )
+            },
+            title = { Text("Nieoczekiwany plik PDF") },
+            text = {
+                Text(
+                    "Suma kontrolna pliku nie zgadza się z oczekiwaną. " +
+                        "Plik może nie działać poprawnie z aplikacją.\n\n" +
+                        "Czy chcesz kontynuować?",
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = onAcceptHashWarning) {
+                    Text("Kontynuuj")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onRejectHashWarning) {
+                    Text("Anuluj")
+                }
+            },
+        )
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.exam_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.exam_back),
+                        )
+                    }
+                },
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Description,
+                contentDescription = null,
+                modifier = Modifier.size(80.dp),
+                tint = CautionYellow,
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Import bazy pytań",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Aby korzystać z modułu egzaminacyjnego, zaimportuj plik PDF z bazą pytań egzaminacyjnych.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextGrey,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            if (isImporting) {
+                CircularProgressIndicator(color = CautionYellow)
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = importProgress,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextGrey,
+                )
+            } else {
+                Button(
+                    onClick = { launcher.launch("application/pdf") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = CautionYellow),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Description,
+                        contentDescription = null,
+                        tint = Color.Black,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Wybierz plik PDF",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -426,6 +576,7 @@ private fun ExamMenuContent(
 @Composable
 private fun LearnModeContent(
     uiState: ExamQuizUiState,
+    pdfRenderer: ExamPdfRenderer,
     onSelectAnswer: (String) -> Unit,
     onNext: () -> Unit,
     onPrevious: () -> Unit,
@@ -522,7 +673,7 @@ private fun LearnModeContent(
 
                     // Question image card
                     item {
-                        QuestionImageCard(question = question)
+                        QuestionImageCard(question = question, pdfRenderer = pdfRenderer)
                     }
 
                     // Answer buttons A / B / C
@@ -587,6 +738,7 @@ private fun LearnModeContent(
 @Composable
 private fun ExamModeContent(
     uiState: ExamQuizUiState,
+    pdfRenderer: ExamPdfRenderer,
     onSelectAnswer: (Int, String) -> Unit,
     onGoToQuestion: (Int) -> Unit,
     onNext: () -> Unit,
@@ -721,7 +873,7 @@ private fun ExamModeContent(
 
                     // Question image
                     item {
-                        QuestionImageCard(question = question)
+                        QuestionImageCard(question = question, pdfRenderer = pdfRenderer)
                     }
 
                     // Answer buttons (exam mode - no correct answer shown)
@@ -837,6 +989,7 @@ private fun ExamModeContent(
 @Composable
 private fun ResultsContent(
     uiState: ExamQuizUiState,
+    pdfRenderer: ExamPdfRenderer,
     onRetry: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -1024,7 +1177,7 @@ private fun ResultsContent(
                             if (!result.isCorrect) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 // Show the question image in review
-                                QuestionImageCard(question = result.question)
+                                QuestionImageCard(question = result.question, pdfRenderer = pdfRenderer)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = "${stringResource(R.string.exam_your_answer)}: ${result.userAnswer ?: "-"}  |  ${stringResource(R.string.exam_correct_answer)}: ${result.question.correctAnswer}",
@@ -1371,6 +1524,7 @@ private fun LeitnerOverviewContent(
 @Composable
 private fun LeitnerSessionContent(
     uiState: ExamQuizUiState,
+    pdfRenderer: ExamPdfRenderer,
     onSelectAnswer: (String) -> Unit,
     onNext: () -> Unit,
     onFinishSession: () -> Unit,
@@ -1476,7 +1630,7 @@ private fun LeitnerSessionContent(
                     item { Spacer(modifier = Modifier.height(8.dp)) }
 
                     item {
-                        QuestionImageCard(question = question)
+                        QuestionImageCard(question = question, pdfRenderer = pdfRenderer)
                     }
 
                     // Answer buttons with correct/incorrect feedback
@@ -1726,13 +1880,10 @@ enum class AnswerState { Default, Selected, Correct, Incorrect }
  * Displays the question as a JPG image loaded from assets.
  */
 @Composable
-private fun QuestionImageCard(question: ExamQuestion) {
-    val context = LocalContext.current
-    val bitmap = remember(question.imageAsset) {
+private fun QuestionImageCard(question: ExamQuestion, pdfRenderer: ExamPdfRenderer) {
+    val bitmap = remember(question.id) {
         try {
-            context.assets.open(question.imageAsset).use { inputStream ->
-                BitmapFactory.decodeStream(inputStream)?.asImageBitmap()
-            }
+            pdfRenderer.renderQuestion(question)?.asImageBitmap()
         } catch (_: Exception) {
             null
         }
@@ -1775,7 +1926,7 @@ private fun QuestionImageCard(question: ExamQuestion) {
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "Nie udalo sie zaladowac obrazka",
+                        text = "Nie udało się załadować obrazka",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextGrey,
                     )

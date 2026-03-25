@@ -4,2309 +4,3299 @@
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_001.jpg"
+    "pdf_page": 0,
+    "crop_y_start": 104.2,
+    "crop_y_end": 220.4,
+    "page_height": 842.0
   },
   {
     "id": 2,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_002.jpg"
+    "pdf_page": 0,
+    "crop_y_start": 220.4,
+    "crop_y_end": 322.5,
+    "page_height": 842.0
   },
   {
     "id": 3,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_003.jpg"
+    "pdf_page": 0,
+    "crop_y_start": 322.5,
+    "crop_y_end": 467.1,
+    "page_height": 842.0
   },
   {
     "id": 4,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_004.jpg"
+    "pdf_page": 0,
+    "crop_y_start": 467.1,
+    "crop_y_end": 540.8,
+    "page_height": 842.0
   },
   {
     "id": 5,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_005.jpg"
+    "pdf_page": 0,
+    "crop_y_start": 540.8,
+    "crop_y_end": 614.5,
+    "page_height": 842.0
   },
   {
     "id": 6,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_006.jpg"
+    "pdf_page": 0,
+    "crop_y_start": 614.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 7,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_007.jpg"
+    "pdf_page": 1,
+    "crop_y_start": 68.9,
+    "crop_y_end": 185.1,
+    "page_height": 842.0
   },
   {
     "id": 8,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_008.jpg"
+    "pdf_page": 1,
+    "crop_y_start": 185.1,
+    "crop_y_end": 448.9,
+    "page_height": 842.0
   },
   {
     "id": 9,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_009.jpg"
+    "pdf_page": 1,
+    "crop_y_start": 448.9,
+    "crop_y_end": 712.6,
+    "page_height": 842.0
   },
   {
     "id": 10,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_010.jpg"
+    "pdf_page": 1,
+    "crop_y_start": 712.6,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 11,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_011.jpg"
+    "pdf_page": 2,
+    "crop_y_start": 68.9,
+    "crop_y_end": 148.3,
+    "page_height": 842.0
   },
   {
     "id": 12,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_012.jpg"
+    "pdf_page": 2,
+    "crop_y_start": 148.3,
+    "crop_y_end": 221.9,
+    "page_height": 842.0
   },
   {
     "id": 13,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_013.jpg"
+    "pdf_page": 2,
+    "crop_y_start": 221.9,
+    "crop_y_end": 338.2,
+    "page_height": 842.0
   },
   {
     "id": 14,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_014.jpg"
+    "pdf_page": 2,
+    "crop_y_start": 338.2,
+    "crop_y_end": 411.9,
+    "page_height": 842.0
   },
   {
     "id": 15,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_015.jpg"
+    "pdf_page": 2,
+    "crop_y_start": 411.9,
+    "crop_y_end": 499.9,
+    "page_height": 842.0
   },
   {
     "id": 16,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_016.jpg"
+    "pdf_page": 2,
+    "crop_y_start": 499.9,
+    "crop_y_end": 601.9,
+    "page_height": 842.0
   },
   {
     "id": 17,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_017.jpg"
+    "pdf_page": 2,
+    "crop_y_start": 601.9,
+    "crop_y_end": 670.0,
+    "page_height": 842.0
   },
   {
     "id": 18,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_018.jpg"
+    "pdf_page": 2,
+    "crop_y_start": 670.0,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 19,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_019.jpg"
+    "pdf_page": 3,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.9,
+    "page_height": 842.0
   },
   {
     "id": 20,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_020.jpg"
+    "pdf_page": 3,
+    "crop_y_start": 170.9,
+    "crop_y_end": 258.9,
+    "page_height": 842.0
   },
   {
     "id": 21,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_021.jpg"
+    "pdf_page": 3,
+    "crop_y_start": 258.9,
+    "crop_y_end": 360.9,
+    "page_height": 842.0
   },
   {
     "id": 22,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_022.jpg"
+    "pdf_page": 3,
+    "crop_y_start": 360.9,
+    "crop_y_end": 477.2,
+    "page_height": 842.0
   },
   {
     "id": 23,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_023.jpg"
+    "pdf_page": 3,
+    "crop_y_start": 477.2,
+    "crop_y_end": 536.6,
+    "page_height": 842.0
   },
   {
     "id": 24,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_024.jpg"
+    "pdf_page": 3,
+    "crop_y_start": 536.6,
+    "crop_y_end": 604.7,
+    "page_height": 842.0
   },
   {
     "id": 25,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_025.jpg"
+    "pdf_page": 3,
+    "crop_y_start": 604.7,
+    "crop_y_end": 706.8,
+    "page_height": 842.0
   },
   {
     "id": 26,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_026.jpg"
+    "pdf_page": 3,
+    "crop_y_start": 706.8,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 27,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_027.jpg"
+    "pdf_page": 4,
+    "crop_y_start": 68.9,
+    "crop_y_end": 185.1,
+    "page_height": 842.0
   },
   {
     "id": 28,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_028.jpg"
+    "pdf_page": 4,
+    "crop_y_start": 185.1,
+    "crop_y_end": 258.8,
+    "page_height": 842.0
   },
   {
     "id": 29,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_029.jpg"
+    "pdf_page": 4,
+    "crop_y_start": 258.8,
+    "crop_y_end": 326.8,
+    "page_height": 842.0
   },
   {
     "id": 30,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_030.jpg"
+    "pdf_page": 4,
+    "crop_y_start": 326.8,
+    "crop_y_end": 394.9,
+    "page_height": 842.0
   },
   {
     "id": 31,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_031.jpg"
+    "pdf_page": 4,
+    "crop_y_start": 394.9,
+    "crop_y_end": 482.7,
+    "page_height": 842.0
   },
   {
     "id": 32,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_032.jpg"
+    "pdf_page": 4,
+    "crop_y_start": 482.7,
+    "crop_y_end": 570.6,
+    "page_height": 842.0
   },
   {
     "id": 33,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_033.jpg"
+    "pdf_page": 4,
+    "crop_y_start": 570.6,
+    "crop_y_end": 672.7,
+    "page_height": 842.0
   },
   {
     "id": 34,
     "category": "JACHTY ŻAGLOWE MORSKIE",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_034.jpg"
+    "pdf_page": 4,
+    "crop_y_start": 672.7,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 35,
     "category": "LOCJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_035.jpg"
+    "pdf_page": 5,
+    "crop_y_start": 68.9,
+    "crop_y_end": 128.3,
+    "page_height": 842.0
   },
   {
     "id": 36,
     "category": "LOCJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_036.jpg"
+    "pdf_page": 5,
+    "crop_y_start": 128.3,
+    "crop_y_end": 187.7,
+    "page_height": 842.0
   },
   {
     "id": 37,
     "category": "LOCJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_037.jpg"
+    "pdf_page": 5,
+    "crop_y_start": 187.7,
+    "crop_y_end": 267.2,
+    "page_height": 842.0
   },
   {
     "id": 38,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_038.jpg"
+    "pdf_page": 5,
+    "crop_y_start": 267.2,
+    "crop_y_end": 426.0,
+    "page_height": 842.0
   },
   {
     "id": 39,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_039.jpg"
+    "pdf_page": 5,
+    "crop_y_start": 426.0,
+    "crop_y_end": 542.1,
+    "page_height": 842.0
   },
   {
     "id": 40,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_040.jpg"
+    "pdf_page": 5,
+    "crop_y_start": 542.1,
+    "crop_y_end": 672.5,
+    "page_height": 842.0
   },
   {
     "id": 41,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_041.jpg"
+    "pdf_page": 5,
+    "crop_y_start": 672.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 42,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_042.jpg"
+    "pdf_page": 6,
+    "crop_y_start": 68.9,
+    "crop_y_end": 182.3,
+    "page_height": 842.0
   },
   {
     "id": 43,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_043.jpg"
+    "pdf_page": 6,
+    "crop_y_start": 182.3,
+    "crop_y_end": 273.1,
+    "page_height": 842.0
   },
   {
     "id": 44,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_044.jpg"
+    "pdf_page": 6,
+    "crop_y_start": 273.1,
+    "crop_y_end": 332.5,
+    "page_height": 842.0
   },
   {
     "id": 45,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_045.jpg"
+    "pdf_page": 6,
+    "crop_y_start": 332.5,
+    "crop_y_end": 406.2,
+    "page_height": 842.0
   },
   {
     "id": 46,
     "category": "LOCJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_046.jpg"
+    "pdf_page": 6,
+    "crop_y_start": 406.2,
+    "crop_y_end": 536.6,
+    "page_height": 842.0
   },
   {
     "id": 47,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_047.jpg"
+    "pdf_page": 6,
+    "crop_y_start": 536.6,
+    "crop_y_end": 610.3,
+    "page_height": 842.0
   },
   {
     "id": 48,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_048.jpg"
+    "pdf_page": 6,
+    "crop_y_start": 610.3,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 49,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_049.jpg"
+    "pdf_page": 7,
+    "crop_y_start": 68.6,
+    "crop_y_end": 170.3,
+    "page_height": 842.0
   },
   {
     "id": 50,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_050.jpg"
+    "pdf_page": 7,
+    "crop_y_start": 170.3,
+    "crop_y_end": 272.4,
+    "page_height": 842.0
   },
   {
     "id": 51,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_051.jpg"
+    "pdf_page": 7,
+    "crop_y_start": 272.4,
+    "crop_y_end": 402.7,
+    "page_height": 842.0
   },
   {
     "id": 52,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_052.jpg"
+    "pdf_page": 7,
+    "crop_y_start": 402.7,
+    "crop_y_end": 504.7,
+    "page_height": 842.0
   },
   {
     "id": 53,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_053.jpg"
+    "pdf_page": 7,
+    "crop_y_start": 504.7,
+    "crop_y_end": 592.5,
+    "page_height": 842.0
   },
   {
     "id": 54,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_054.jpg"
+    "pdf_page": 7,
+    "crop_y_start": 592.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 55,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_055.jpg"
+    "pdf_page": 8,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.9,
+    "page_height": 842.0
   },
   {
     "id": 56,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_056.jpg"
+    "pdf_page": 8,
+    "crop_y_start": 170.9,
+    "crop_y_end": 261.7,
+    "page_height": 842.0
   },
   {
     "id": 57,
     "category": "LOCJA",
     "correct_answer": null,
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_057.jpg"
+    "pdf_page": 8,
+    "crop_y_start": 261.7,
+    "crop_y_end": 378.0,
+    "page_height": 842.0
   },
   {
     "id": 58,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_058.jpg"
+    "pdf_page": 8,
+    "crop_y_start": 378.0,
+    "crop_y_end": 494.1,
+    "page_height": 842.0
   },
   {
     "id": 59,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_059.jpg"
+    "pdf_page": 8,
+    "crop_y_start": 494.1,
+    "crop_y_end": 584.9,
+    "page_height": 842.0
   },
   {
     "id": 60,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_060.jpg"
+    "pdf_page": 8,
+    "crop_y_start": 584.9,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 61,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_061.jpg"
+    "pdf_page": 9,
+    "crop_y_start": 68.9,
+    "crop_y_end": 159.7,
+    "page_height": 842.0
   },
   {
     "id": 62,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_062.jpg"
+    "pdf_page": 9,
+    "crop_y_start": 159.7,
+    "crop_y_end": 247.5,
+    "page_height": 842.0
   },
   {
     "id": 63,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_063.jpg"
+    "pdf_page": 9,
+    "crop_y_start": 247.5,
+    "crop_y_end": 321.2,
+    "page_height": 842.0
   },
   {
     "id": 64,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_064.jpg"
+    "pdf_page": 9,
+    "crop_y_start": 321.2,
+    "crop_y_end": 423.3,
+    "page_height": 842.0
   },
   {
     "id": 65,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_065.jpg"
+    "pdf_page": 9,
+    "crop_y_start": 423.3,
+    "crop_y_end": 525.3,
+    "page_height": 842.0
   },
   {
     "id": 66,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_066.jpg"
+    "pdf_page": 9,
+    "crop_y_start": 525.3,
+    "crop_y_end": 657.3,
+    "page_height": 842.0
   },
   {
     "id": 67,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_067.jpg"
+    "pdf_page": 9,
+    "crop_y_start": 657.3,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 68,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_068.jpg"
+    "pdf_page": 10,
+    "crop_y_start": 68.9,
+    "crop_y_end": 185.1,
+    "page_height": 842.0
   },
   {
     "id": 69,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_069.jpg"
+    "pdf_page": 10,
+    "crop_y_start": 185.1,
+    "crop_y_end": 275.9,
+    "page_height": 842.0
   },
   {
     "id": 70,
     "category": "LOCJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_070.jpg"
+    "pdf_page": 10,
+    "crop_y_start": 275.9,
+    "crop_y_end": 366.6,
+    "page_height": 842.0
   },
   {
     "id": 71,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_071.jpg"
+    "pdf_page": 10,
+    "crop_y_start": 366.6,
+    "crop_y_end": 468.6,
+    "page_height": 842.0
   },
   {
     "id": 72,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_072.jpg"
+    "pdf_page": 10,
+    "crop_y_start": 468.6,
+    "crop_y_end": 570.7,
+    "page_height": 842.0
   },
   {
     "id": 73,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_073.jpg"
+    "pdf_page": 10,
+    "crop_y_start": 570.7,
+    "crop_y_end": 661.3,
+    "page_height": 842.0
   },
   {
     "id": 74,
     "category": "LOCJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_074.jpg"
+    "pdf_page": 10,
+    "crop_y_start": 661.3,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 75,
     "category": "LOCJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_075.jpg"
+    "pdf_page": 11,
+    "crop_y_start": 68.9,
+    "crop_y_end": 241.9,
+    "page_height": 842.0
   },
   {
     "id": 76,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_076.jpg"
+    "pdf_page": 11,
+    "crop_y_start": 241.9,
+    "crop_y_end": 329.7,
+    "page_height": 842.0
   },
   {
     "id": 77,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_077.jpg"
+    "pdf_page": 11,
+    "crop_y_start": 329.7,
+    "crop_y_end": 403.5,
+    "page_height": 842.0
   },
   {
     "id": 78,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_078.jpg"
+    "pdf_page": 11,
+    "crop_y_start": 403.5,
+    "crop_y_end": 491.4,
+    "page_height": 842.0
   },
   {
     "id": 79,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_079.jpg"
+    "pdf_page": 11,
+    "crop_y_start": 491.4,
+    "crop_y_end": 593.5,
+    "page_height": 842.0
   },
   {
     "id": 80,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_080.jpg"
+    "pdf_page": 11,
+    "crop_y_start": 593.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 81,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_081.jpg"
+    "pdf_page": 12,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.9,
+    "page_height": 842.0
   },
   {
     "id": 82,
     "category": "METEOROLOGIA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_082.jpg"
+    "pdf_page": 12,
+    "crop_y_start": 170.9,
+    "crop_y_end": 287.1,
+    "page_height": 842.0
   },
   {
     "id": 83,
     "category": "METEOROLOGIA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_083.jpg"
+    "pdf_page": 12,
+    "crop_y_start": 287.1,
+    "crop_y_end": 389.2,
+    "page_height": 842.0
   },
   {
     "id": 84,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_084.jpg"
+    "pdf_page": 12,
+    "crop_y_start": 389.2,
+    "crop_y_end": 477.1,
+    "page_height": 842.0
   },
   {
     "id": 85,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_085.jpg"
+    "pdf_page": 12,
+    "crop_y_start": 477.1,
+    "crop_y_end": 564.9,
+    "page_height": 842.0
   },
   {
     "id": 86,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_086.jpg"
+    "pdf_page": 12,
+    "crop_y_start": 564.9,
+    "crop_y_end": 655.7,
+    "page_height": 842.0
   },
   {
     "id": 87,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_087.jpg"
+    "pdf_page": 12,
+    "crop_y_start": 655.7,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 88,
     "category": "METEOROLOGIA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_088.jpg"
+    "pdf_page": 13,
+    "crop_y_start": 68.9,
+    "crop_y_end": 182.3,
+    "page_height": 842.0
   },
   {
     "id": 89,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_089.jpg"
+    "pdf_page": 13,
+    "crop_y_start": 182.3,
+    "crop_y_end": 270.1,
+    "page_height": 842.0
   },
   {
     "id": 90,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_090.jpg"
+    "pdf_page": 13,
+    "crop_y_start": 270.1,
+    "crop_y_end": 372.3,
+    "page_height": 842.0
   },
   {
     "id": 91,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_091.jpg"
+    "pdf_page": 13,
+    "crop_y_start": 372.3,
+    "crop_y_end": 460.2,
+    "page_height": 842.0
   },
   {
     "id": 92,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_092.jpg"
+    "pdf_page": 13,
+    "crop_y_start": 460.2,
+    "crop_y_end": 528.2,
+    "page_height": 842.0
   },
   {
     "id": 93,
     "category": "METEOROLOGIA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_093.jpg"
+    "pdf_page": 13,
+    "crop_y_start": 528.2,
+    "crop_y_end": 641.7,
+    "page_height": 842.0
   },
   {
     "id": 94,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_094.jpg"
+    "pdf_page": 13,
+    "crop_y_start": 641.7,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 95,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_095.jpg"
+    "pdf_page": 14,
+    "crop_y_start": 68.9,
+    "crop_y_end": 142.6,
+    "page_height": 842.0
   },
   {
     "id": 96,
     "category": "METEOROLOGIA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_096.jpg"
+    "pdf_page": 14,
+    "crop_y_start": 142.6,
+    "crop_y_end": 230.5,
+    "page_height": 842.0
   },
   {
     "id": 97,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_097.jpg"
+    "pdf_page": 14,
+    "crop_y_start": 230.5,
+    "crop_y_end": 318.3,
+    "page_height": 842.0
   },
   {
     "id": 98,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_098.jpg"
+    "pdf_page": 14,
+    "crop_y_start": 318.3,
+    "crop_y_end": 377.8,
+    "page_height": 842.0
   },
   {
     "id": 99,
     "category": "METEOROLOGIA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_099.jpg"
+    "pdf_page": 14,
+    "crop_y_start": 377.8,
+    "crop_y_end": 480.0,
+    "page_height": 842.0
   },
   {
     "id": 100,
     "category": "METEOROLOGIA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_100.jpg"
+    "pdf_page": 14,
+    "crop_y_start": 480.0,
+    "crop_y_end": 539.5,
+    "page_height": 842.0
   },
   {
     "id": 101,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_101.jpg"
+    "pdf_page": 14,
+    "crop_y_start": 539.5,
+    "crop_y_end": 641.5,
+    "page_height": 842.0
   },
   {
     "id": 102,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_102.jpg"
+    "pdf_page": 14,
+    "crop_y_start": 641.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 103,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_103.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 68.8,
+    "crop_y_end": 128.2,
+    "page_height": 842.0
   },
   {
     "id": 104,
     "category": "METEOROLOGIA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_104.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 128.2,
+    "crop_y_end": 207.7,
+    "page_height": 842.0
   },
   {
     "id": 105,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_105.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 207.7,
+    "crop_y_end": 323.8,
+    "page_height": 842.0
   },
   {
     "id": 106,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_106.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 323.8,
+    "crop_y_end": 391.9,
+    "page_height": 842.0
   },
   {
     "id": 107,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_107.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 391.9,
+    "crop_y_end": 451.4,
+    "page_height": 842.0
   },
   {
     "id": 108,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_108.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 451.4,
+    "crop_y_end": 519.5,
+    "page_height": 842.0
   },
   {
     "id": 109,
     "category": "METEOROLOGIA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_109.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 519.5,
+    "crop_y_end": 593.1,
+    "page_height": 842.0
   },
   {
     "id": 110,
     "category": "METEOROLOGIA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_110.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 593.1,
+    "crop_y_end": 681.0,
+    "page_height": 842.0
   },
   {
     "id": 111,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_111.jpg"
+    "pdf_page": 15,
+    "crop_y_start": 681.0,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 112,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_112.jpg"
+    "pdf_page": 16,
+    "crop_y_start": 68.8,
+    "crop_y_end": 136.7,
+    "page_height": 842.0
   },
   {
     "id": 113,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_113.jpg"
+    "pdf_page": 16,
+    "crop_y_start": 136.7,
+    "crop_y_end": 224.6,
+    "page_height": 842.0
   },
   {
     "id": 114,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_114.jpg"
+    "pdf_page": 16,
+    "crop_y_start": 224.6,
+    "crop_y_end": 298.3,
+    "page_height": 842.0
   },
   {
     "id": 115,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_115.jpg"
+    "pdf_page": 16,
+    "crop_y_start": 298.3,
+    "crop_y_end": 389.0,
+    "page_height": 842.0
   },
   {
     "id": 116,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_116.jpg"
+    "pdf_page": 16,
+    "crop_y_start": 389.0,
+    "crop_y_end": 491.0,
+    "page_height": 842.0
   },
   {
     "id": 117,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_117.jpg"
+    "pdf_page": 16,
+    "crop_y_start": 491.0,
+    "crop_y_end": 550.5,
+    "page_height": 842.0
   },
   {
     "id": 118,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_118.jpg"
+    "pdf_page": 16,
+    "crop_y_start": 550.5,
+    "crop_y_end": 610.0,
+    "page_height": 842.0
   },
   {
     "id": 119,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_119.jpg"
+    "pdf_page": 16,
+    "crop_y_start": 610.0,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 120,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_120.jpg"
+    "pdf_page": 17,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.9,
+    "page_height": 842.0
   },
   {
     "id": 121,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_121.jpg"
+    "pdf_page": 17,
+    "crop_y_start": 170.9,
+    "crop_y_end": 273.1,
+    "page_height": 842.0
   },
   {
     "id": 122,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_122.jpg"
+    "pdf_page": 17,
+    "crop_y_start": 273.1,
+    "crop_y_end": 332.5,
+    "page_height": 842.0
   },
   {
     "id": 123,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_123.jpg"
+    "pdf_page": 17,
+    "crop_y_start": 332.5,
+    "crop_y_end": 411.8,
+    "page_height": 842.0
   },
   {
     "id": 124,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_124.jpg"
+    "pdf_page": 17,
+    "crop_y_start": 411.8,
+    "crop_y_end": 485.5,
+    "page_height": 842.0
   },
   {
     "id": 125,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_125.jpg"
+    "pdf_page": 17,
+    "crop_y_start": 485.5,
+    "crop_y_end": 564.8,
+    "page_height": 842.0
   },
   {
     "id": 126,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_126.jpg"
+    "pdf_page": 17,
+    "crop_y_start": 564.8,
+    "crop_y_end": 681.0,
+    "page_height": 842.0
   },
   {
     "id": 127,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_127.jpg"
+    "pdf_page": 17,
+    "crop_y_start": 681.0,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 128,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_128.jpg"
+    "pdf_page": 18,
+    "crop_y_start": 68.9,
+    "crop_y_end": 241.9,
+    "page_height": 842.0
   },
   {
     "id": 129,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_129.jpg"
+    "pdf_page": 18,
+    "crop_y_start": 241.9,
+    "crop_y_end": 343.9,
+    "page_height": 842.0
   },
   {
     "id": 130,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_130.jpg"
+    "pdf_page": 18,
+    "crop_y_start": 343.9,
+    "crop_y_end": 403.4,
+    "page_height": 842.0
   },
   {
     "id": 131,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_131.jpg"
+    "pdf_page": 18,
+    "crop_y_start": 403.4,
+    "crop_y_end": 519.6,
+    "page_height": 842.0
   },
   {
     "id": 132,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_132.jpg"
+    "pdf_page": 18,
+    "crop_y_start": 519.6,
+    "crop_y_end": 635.9,
+    "page_height": 842.0
   },
   {
     "id": 133,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_133.jpg"
+    "pdf_page": 18,
+    "crop_y_start": 635.9,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 134,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_134.jpg"
+    "pdf_page": 19,
+    "crop_y_start": 68.9,
+    "crop_y_end": 159.7,
+    "page_height": 842.0
   },
   {
     "id": 135,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_135.jpg"
+    "pdf_page": 19,
+    "crop_y_start": 159.7,
+    "crop_y_end": 261.8,
+    "page_height": 842.0
   },
   {
     "id": 136,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_136.jpg"
+    "pdf_page": 19,
+    "crop_y_start": 261.8,
+    "crop_y_end": 335.5,
+    "page_height": 842.0
   },
   {
     "id": 137,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_137.jpg"
+    "pdf_page": 19,
+    "crop_y_start": 335.5,
+    "crop_y_end": 437.5,
+    "page_height": 842.0
   },
   {
     "id": 138,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_138.jpg"
+    "pdf_page": 19,
+    "crop_y_start": 437.5,
+    "crop_y_end": 539.6,
+    "page_height": 842.0
   },
   {
     "id": 139,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_139.jpg"
+    "pdf_page": 19,
+    "crop_y_start": 539.6,
+    "crop_y_end": 599.0,
+    "page_height": 842.0
   },
   {
     "id": 140,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_140.jpg"
+    "pdf_page": 19,
+    "crop_y_start": 599.0,
+    "crop_y_end": 701.2,
+    "page_height": 842.0
   },
   {
     "id": 141,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_141.jpg"
+    "pdf_page": 19,
+    "crop_y_start": 701.2,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 142,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_142.jpg"
+    "pdf_page": 20,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.9,
+    "page_height": 842.0
   },
   {
     "id": 143,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_143.jpg"
+    "pdf_page": 20,
+    "crop_y_start": 170.9,
+    "crop_y_end": 261.6,
+    "page_height": 842.0
   },
   {
     "id": 144,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_144.jpg"
+    "pdf_page": 20,
+    "crop_y_start": 261.6,
+    "crop_y_end": 349.5,
+    "page_height": 842.0
   },
   {
     "id": 145,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_145.jpg"
+    "pdf_page": 20,
+    "crop_y_start": 349.5,
+    "crop_y_end": 451.5,
+    "page_height": 842.0
   },
   {
     "id": 146,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_146.jpg"
+    "pdf_page": 20,
+    "crop_y_start": 451.5,
+    "crop_y_end": 542.3,
+    "page_height": 842.0
   },
   {
     "id": 147,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_147.jpg"
+    "pdf_page": 20,
+    "crop_y_start": 542.3,
+    "crop_y_end": 658.6,
+    "page_height": 842.0
   },
   {
     "id": 148,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_148.jpg"
+    "pdf_page": 20,
+    "crop_y_start": 658.6,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 149,
     "category": "PRAWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_149.jpg"
+    "pdf_page": 21,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.9,
+    "page_height": 842.0
   },
   {
     "id": 150,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_150.jpg"
+    "pdf_page": 21,
+    "crop_y_start": 170.9,
+    "crop_y_end": 273.1,
+    "page_height": 842.0
   },
   {
     "id": 151,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_151.jpg"
+    "pdf_page": 21,
+    "crop_y_start": 273.1,
+    "crop_y_end": 332.5,
+    "page_height": 842.0
   },
   {
     "id": 152,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_152.jpg"
+    "pdf_page": 21,
+    "crop_y_start": 332.5,
+    "crop_y_end": 434.5,
+    "page_height": 842.0
   },
   {
     "id": 153,
     "category": "PRAWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_153.jpg"
+    "pdf_page": 21,
+    "crop_y_start": 434.5,
+    "crop_y_end": 525.2,
+    "page_height": 842.0
   },
   {
     "id": 154,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_154.jpg"
+    "pdf_page": 21,
+    "crop_y_start": 525.2,
+    "crop_y_end": 598.9,
+    "page_height": 842.0
   },
   {
     "id": 155,
     "category": "PRAWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_155.jpg"
+    "pdf_page": 21,
+    "crop_y_start": 598.9,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 156,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_156.jpg"
+    "pdf_page": 22,
+    "crop_y_start": 68.9,
+    "crop_y_end": 136.7,
+    "page_height": 842.0
   },
   {
     "id": 157,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_157.jpg"
+    "pdf_page": 22,
+    "crop_y_start": 136.7,
+    "crop_y_end": 238.9,
+    "page_height": 842.0
   },
   {
     "id": 158,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_158.jpg"
+    "pdf_page": 22,
+    "crop_y_start": 238.9,
+    "crop_y_end": 340.9,
+    "page_height": 842.0
   },
   {
     "id": 159,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_159.jpg"
+    "pdf_page": 22,
+    "crop_y_start": 340.9,
+    "crop_y_end": 408.8,
+    "page_height": 842.0
   },
   {
     "id": 160,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_160.jpg"
+    "pdf_page": 22,
+    "crop_y_start": 408.8,
+    "crop_y_end": 539.4,
+    "page_height": 842.0
   },
   {
     "id": 161,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_161.jpg"
+    "pdf_page": 22,
+    "crop_y_start": 539.4,
+    "crop_y_end": 641.4,
+    "page_height": 842.0
   },
   {
     "id": 162,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_162.jpg"
+    "pdf_page": 22,
+    "crop_y_start": 641.4,
+    "crop_y_end": 700.9,
+    "page_height": 842.0
   },
   {
     "id": 163,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_163.jpg"
+    "pdf_page": 22,
+    "crop_y_start": 700.9,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 164,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_164.jpg"
+    "pdf_page": 23,
+    "crop_y_start": 68.9,
+    "crop_y_end": 142.6,
+    "page_height": 842.0
   },
   {
     "id": 165,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_165.jpg"
+    "pdf_page": 23,
+    "crop_y_start": 142.6,
+    "crop_y_end": 263.2,
+    "page_height": 842.0
   },
   {
     "id": 166,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_166.jpg"
+    "pdf_page": 23,
+    "crop_y_start": 263.2,
+    "crop_y_end": 351.2,
+    "page_height": 842.0
   },
   {
     "id": 167,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_167.jpg"
+    "pdf_page": 23,
+    "crop_y_start": 351.2,
+    "crop_y_end": 512.5,
+    "page_height": 842.0
   },
   {
     "id": 168,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_168.jpg"
+    "pdf_page": 23,
+    "crop_y_start": 512.5,
+    "crop_y_end": 600.5,
+    "page_height": 842.0
   },
   {
     "id": 169,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_169.jpg"
+    "pdf_page": 23,
+    "crop_y_start": 600.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 170,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_170.jpg"
+    "pdf_page": 24,
+    "crop_y_start": 68.8,
+    "crop_y_end": 182.0,
+    "page_height": 842.0
   },
   {
     "id": 171,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_171.jpg"
+    "pdf_page": 24,
+    "crop_y_start": 182.0,
+    "crop_y_end": 255.7,
+    "page_height": 842.0
   },
   {
     "id": 172,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_172.jpg"
+    "pdf_page": 24,
+    "crop_y_start": 255.7,
+    "crop_y_end": 357.7,
+    "page_height": 842.0
   },
   {
     "id": 173,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_173.jpg"
+    "pdf_page": 24,
+    "crop_y_start": 357.7,
+    "crop_y_end": 459.8,
+    "page_height": 842.0
   },
   {
     "id": 174,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_174.jpg"
+    "pdf_page": 24,
+    "crop_y_start": 459.8,
+    "crop_y_end": 533.5,
+    "page_height": 842.0
   },
   {
     "id": 175,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_175.jpg"
+    "pdf_page": 24,
+    "crop_y_start": 533.5,
+    "crop_y_end": 607.2,
+    "page_height": 842.0
   },
   {
     "id": 176,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_176.jpg"
+    "pdf_page": 24,
+    "crop_y_start": 607.2,
+    "crop_y_end": 680.9,
+    "page_height": 842.0
   },
   {
     "id": 177,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_177.jpg"
+    "pdf_page": 24,
+    "crop_y_start": 680.9,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 178,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_178.jpg"
+    "pdf_page": 25,
+    "crop_y_start": 68.9,
+    "crop_y_end": 199.4,
+    "page_height": 842.0
   },
   {
     "id": 179,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_179.jpg"
+    "pdf_page": 25,
+    "crop_y_start": 199.4,
+    "crop_y_end": 258.9,
+    "page_height": 842.0
   },
   {
     "id": 180,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_180.jpg"
+    "pdf_page": 25,
+    "crop_y_start": 258.9,
+    "crop_y_end": 346.8,
+    "page_height": 842.0
   },
   {
     "id": 181,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_181.jpg"
+    "pdf_page": 25,
+    "crop_y_start": 346.8,
+    "crop_y_end": 434.6,
+    "page_height": 842.0
   },
   {
     "id": 182,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_182.jpg"
+    "pdf_page": 25,
+    "crop_y_start": 434.6,
+    "crop_y_end": 522.5,
+    "page_height": 842.0
   },
   {
     "id": 183,
     "category": "NAWIGACJA",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_183.jpg"
+    "pdf_page": 25,
+    "crop_y_start": 522.5,
+    "crop_y_end": 624.5,
+    "page_height": 842.0
   },
   {
     "id": 184,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_184.jpg"
+    "pdf_page": 25,
+    "crop_y_start": 624.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 185,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_185.jpg"
+    "pdf_page": 26,
+    "crop_y_start": 68.9,
+    "crop_y_end": 185.1,
+    "page_height": 842.0
   },
   {
     "id": 186,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_186.jpg"
+    "pdf_page": 26,
+    "crop_y_start": 185.1,
+    "crop_y_end": 287.1,
+    "page_height": 842.0
   },
   {
     "id": 187,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_187.jpg"
+    "pdf_page": 26,
+    "crop_y_start": 287.1,
+    "crop_y_end": 375.0,
+    "page_height": 842.0
   },
   {
     "id": 188,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_188.jpg"
+    "pdf_page": 26,
+    "crop_y_start": 375.0,
+    "crop_y_end": 519.5,
+    "page_height": 842.0
   },
   {
     "id": 189,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_189.jpg"
+    "pdf_page": 26,
+    "crop_y_start": 519.5,
+    "crop_y_end": 621.7,
+    "page_height": 842.0
   },
   {
     "id": 190,
     "category": "NAWIGACJA",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_190.jpg"
+    "pdf_page": 26,
+    "crop_y_start": 621.7,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 191,
     "category": "NAWIGACJA",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_191.jpg"
+    "pdf_page": 27,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.9,
+    "page_height": 842.0
   },
   {
     "id": 192,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_192.jpg"
+    "pdf_page": 27,
+    "crop_y_start": 170.9,
+    "crop_y_end": 258.8,
+    "page_height": 842.0
   },
   {
     "id": 193,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_193.jpg"
+    "pdf_page": 27,
+    "crop_y_start": 258.8,
+    "crop_y_end": 375.1,
+    "page_height": 842.0
   },
   {
     "id": 194,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_194.jpg"
+    "pdf_page": 27,
+    "crop_y_start": 375.1,
+    "crop_y_end": 505.4,
+    "page_height": 842.0
   },
   {
     "id": 195,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_195.jpg"
+    "pdf_page": 27,
+    "crop_y_start": 505.4,
+    "crop_y_end": 593.3,
+    "page_height": 842.0
   },
   {
     "id": 196,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_196.jpg"
+    "pdf_page": 27,
+    "crop_y_start": 593.3,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 197,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_197.jpg"
+    "pdf_page": 28,
+    "crop_y_start": 68.9,
+    "crop_y_end": 156.8,
+    "page_height": 842.0
   },
   {
     "id": 198,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_198.jpg"
+    "pdf_page": 28,
+    "crop_y_start": 156.8,
+    "crop_y_end": 244.6,
+    "page_height": 842.0
   },
   {
     "id": 199,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_199.jpg"
+    "pdf_page": 28,
+    "crop_y_start": 244.6,
+    "crop_y_end": 318.3,
+    "page_height": 842.0
   },
   {
     "id": 200,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_200.jpg"
+    "pdf_page": 28,
+    "crop_y_start": 318.3,
+    "crop_y_end": 420.4,
+    "page_height": 842.0
   },
   {
     "id": 201,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_201.jpg"
+    "pdf_page": 28,
+    "crop_y_start": 420.4,
+    "crop_y_end": 522.5,
+    "page_height": 842.0
   },
   {
     "id": 202,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_202.jpg"
+    "pdf_page": 28,
+    "crop_y_start": 522.5,
+    "crop_y_end": 596.3,
+    "page_height": 842.0
   },
   {
     "id": 203,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_203.jpg"
+    "pdf_page": 28,
+    "crop_y_start": 596.3,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 204,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_204.jpg"
+    "pdf_page": 29,
+    "crop_y_start": 68.9,
+    "crop_y_end": 156.8,
+    "page_height": 842.0
   },
   {
     "id": 205,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_205.jpg"
+    "pdf_page": 29,
+    "crop_y_start": 156.8,
+    "crop_y_end": 268.6,
+    "page_height": 842.0
   },
   {
     "id": 206,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_206.jpg"
+    "pdf_page": 29,
+    "crop_y_start": 268.6,
+    "crop_y_end": 348.1,
+    "page_height": 842.0
   },
   {
     "id": 207,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_207.jpg"
+    "pdf_page": 29,
+    "crop_y_start": 348.1,
+    "crop_y_end": 407.5,
+    "page_height": 842.0
   },
   {
     "id": 208,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_208.jpg"
+    "pdf_page": 29,
+    "crop_y_start": 407.5,
+    "crop_y_end": 566.3,
+    "page_height": 842.0
   },
   {
     "id": 209,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_209.jpg"
+    "pdf_page": 29,
+    "crop_y_start": 566.3,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 210,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_210.jpg"
+    "pdf_page": 30,
+    "crop_y_start": 68.9,
+    "crop_y_end": 241.7,
+    "page_height": 842.0
   },
   {
     "id": 211,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_211.jpg"
+    "pdf_page": 30,
+    "crop_y_start": 241.7,
+    "crop_y_end": 301.3,
+    "page_height": 842.0
   },
   {
     "id": 212,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_212.jpg"
+    "pdf_page": 30,
+    "crop_y_start": 301.3,
+    "crop_y_end": 360.8,
+    "page_height": 842.0
   },
   {
     "id": 213,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_213.jpg"
+    "pdf_page": 30,
+    "crop_y_start": 360.8,
+    "crop_y_end": 477.0,
+    "page_height": 842.0
   },
   {
     "id": 214,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_214.jpg"
+    "pdf_page": 30,
+    "crop_y_start": 477.0,
+    "crop_y_end": 607.4,
+    "page_height": 842.0
   },
   {
     "id": 215,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_215.jpg"
+    "pdf_page": 30,
+    "crop_y_start": 607.4,
+    "crop_y_end": 709.5,
+    "page_height": 842.0
   },
   {
     "id": 216,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_216.jpg"
+    "pdf_page": 30,
+    "crop_y_start": 709.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 217,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_217.jpg"
+    "pdf_page": 31,
+    "crop_y_start": 68.9,
+    "crop_y_end": 142.6,
+    "page_height": 842.0
   },
   {
     "id": 218,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_218.jpg"
+    "pdf_page": 31,
+    "crop_y_start": 142.6,
+    "crop_y_end": 244.6,
+    "page_height": 842.0
   },
   {
     "id": 219,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_219.jpg"
+    "pdf_page": 31,
+    "crop_y_start": 244.6,
+    "crop_y_end": 346.6,
+    "page_height": 842.0
   },
   {
     "id": 220,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_220.jpg"
+    "pdf_page": 31,
+    "crop_y_start": 346.6,
+    "crop_y_end": 420.4,
+    "page_height": 842.0
   },
   {
     "id": 221,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_221.jpg"
+    "pdf_page": 31,
+    "crop_y_start": 420.4,
+    "crop_y_end": 536.6,
+    "page_height": 842.0
   },
   {
     "id": 222,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_222.jpg"
+    "pdf_page": 31,
+    "crop_y_start": 536.6,
+    "crop_y_end": 667.1,
+    "page_height": 842.0
   },
   {
     "id": 223,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_223.jpg"
+    "pdf_page": 31,
+    "crop_y_start": 667.1,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 224,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_224.jpg"
+    "pdf_page": 32,
+    "crop_y_start": 68.9,
+    "crop_y_end": 142.6,
+    "page_height": 842.0
   },
   {
     "id": 225,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_225.jpg"
+    "pdf_page": 32,
+    "crop_y_start": 142.6,
+    "crop_y_end": 258.8,
+    "page_height": 842.0
   },
   {
     "id": 226,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_226.jpg"
+    "pdf_page": 32,
+    "crop_y_start": 258.8,
+    "crop_y_end": 360.8,
+    "page_height": 842.0
   },
   {
     "id": 227,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_227.jpg"
+    "pdf_page": 32,
+    "crop_y_start": 360.8,
+    "crop_y_end": 434.6,
+    "page_height": 842.0
   },
   {
     "id": 228,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_228.jpg"
+    "pdf_page": 32,
+    "crop_y_start": 434.6,
+    "crop_y_end": 550.8,
+    "page_height": 842.0
   },
   {
     "id": 229,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_229.jpg"
+    "pdf_page": 32,
+    "crop_y_start": 550.8,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 230,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_230.jpg"
+    "pdf_page": 33,
+    "crop_y_start": 68.8,
+    "crop_y_end": 191.9,
+    "page_height": 842.0
   },
   {
     "id": 231,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_231.jpg"
+    "pdf_page": 33,
+    "crop_y_start": 191.9,
+    "crop_y_end": 322.4,
+    "page_height": 842.0
   },
   {
     "id": 232,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_232.jpg"
+    "pdf_page": 33,
+    "crop_y_start": 322.4,
+    "crop_y_end": 424.4,
+    "page_height": 842.0
   },
   {
     "id": 233,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_233.jpg"
+    "pdf_page": 33,
+    "crop_y_start": 424.4,
+    "crop_y_end": 512.3,
+    "page_height": 842.0
   },
   {
     "id": 234,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_234.jpg"
+    "pdf_page": 33,
+    "crop_y_start": 512.3,
+    "crop_y_end": 585.9,
+    "page_height": 842.0
   },
   {
     "id": 235,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_235.jpg"
+    "pdf_page": 33,
+    "crop_y_start": 585.9,
+    "crop_y_end": 688.0,
+    "page_height": 842.0
   },
   {
     "id": 236,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_236.jpg"
+    "pdf_page": 33,
+    "crop_y_start": 688.0,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 237,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_237.jpg"
+    "pdf_page": 34,
+    "crop_y_start": 68.9,
+    "crop_y_end": 142.6,
+    "page_height": 842.0
   },
   {
     "id": 238,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_238.jpg"
+    "pdf_page": 34,
+    "crop_y_start": 142.6,
+    "crop_y_end": 230.5,
+    "page_height": 842.0
   },
   {
     "id": 239,
     "category": "PLANOWANIE REJSÓW",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_239.jpg"
+    "pdf_page": 34,
+    "crop_y_start": 230.5,
+    "crop_y_end": 332.5,
+    "page_height": 842.0
   },
   {
     "id": 240,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_240.jpg"
+    "pdf_page": 34,
+    "crop_y_start": 332.5,
+    "crop_y_end": 519.6,
+    "page_height": 842.0
   },
   {
     "id": 241,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_241.jpg"
+    "pdf_page": 34,
+    "crop_y_start": 519.6,
+    "crop_y_end": 621.7,
+    "page_height": 842.0
   },
   {
     "id": 242,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_242.jpg"
+    "pdf_page": 34,
+    "crop_y_start": 621.7,
+    "crop_y_end": 681.3,
+    "page_height": 842.0
   },
   {
     "id": 243,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_243.jpg"
+    "pdf_page": 34,
+    "crop_y_start": 681.3,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 244,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_244.jpg"
+    "pdf_page": 35,
+    "crop_y_start": 68.9,
+    "crop_y_end": 213.3,
+    "page_height": 842.0
   },
   {
     "id": 245,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_245.jpg"
+    "pdf_page": 35,
+    "crop_y_start": 213.3,
+    "crop_y_end": 329.7,
+    "page_height": 842.0
   },
   {
     "id": 246,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_246.jpg"
+    "pdf_page": 35,
+    "crop_y_start": 329.7,
+    "crop_y_end": 431.6,
+    "page_height": 842.0
   },
   {
     "id": 247,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_247.jpg"
+    "pdf_page": 35,
+    "crop_y_start": 431.6,
+    "crop_y_end": 533.7,
+    "page_height": 842.0
   },
   {
     "id": 248,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_248.jpg"
+    "pdf_page": 35,
+    "crop_y_start": 533.7,
+    "crop_y_end": 650.1,
+    "page_height": 842.0
   },
   {
     "id": 249,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_249.jpg"
+    "pdf_page": 35,
+    "crop_y_start": 650.1,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 250,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_250.jpg"
+    "pdf_page": 36,
+    "crop_y_start": 68.9,
+    "crop_y_end": 142.6,
+    "page_height": 842.0
   },
   {
     "id": 251,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_251.jpg"
+    "pdf_page": 36,
+    "crop_y_start": 142.6,
+    "crop_y_end": 216.3,
+    "page_height": 842.0
   },
   {
     "id": 252,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_252.jpg"
+    "pdf_page": 36,
+    "crop_y_start": 216.3,
+    "crop_y_end": 375.0,
+    "page_height": 842.0
   },
   {
     "id": 253,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_253.jpg"
+    "pdf_page": 36,
+    "crop_y_start": 375.0,
+    "crop_y_end": 462.8,
+    "page_height": 842.0
   },
   {
     "id": 254,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_254.jpg"
+    "pdf_page": 36,
+    "crop_y_start": 462.8,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 255,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_255.jpg"
+    "pdf_page": 37,
+    "crop_y_start": 68.9,
+    "crop_y_end": 255.9,
+    "page_height": 842.0
   },
   {
     "id": 256,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_256.jpg"
+    "pdf_page": 37,
+    "crop_y_start": 255.9,
+    "crop_y_end": 329.7,
+    "page_height": 842.0
   },
   {
     "id": 257,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_257.jpg"
+    "pdf_page": 37,
+    "crop_y_start": 329.7,
+    "crop_y_end": 446.0,
+    "page_height": 842.0
   },
   {
     "id": 258,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_258.jpg"
+    "pdf_page": 37,
+    "crop_y_start": 446.0,
+    "crop_y_end": 562.2,
+    "page_height": 842.0
   },
   {
     "id": 259,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_259.jpg"
+    "pdf_page": 37,
+    "crop_y_start": 562.2,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 260,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_260.jpg"
+    "pdf_page": 38,
+    "crop_y_start": 68.9,
+    "crop_y_end": 156.8,
+    "page_height": 842.0
   },
   {
     "id": 261,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_261.jpg"
+    "pdf_page": 38,
+    "crop_y_start": 156.8,
+    "crop_y_end": 287.1,
+    "page_height": 842.0
   },
   {
     "id": 262,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_262.jpg"
+    "pdf_page": 38,
+    "crop_y_start": 287.1,
+    "crop_y_end": 403.3,
+    "page_height": 842.0
   },
   {
     "id": 263,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_263.jpg"
+    "pdf_page": 38,
+    "crop_y_start": 403.3,
+    "crop_y_end": 533.7,
+    "page_height": 842.0
   },
   {
     "id": 264,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_264.jpg"
+    "pdf_page": 38,
+    "crop_y_start": 533.7,
+    "crop_y_end": 635.9,
+    "page_height": 842.0
   },
   {
     "id": 265,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_265.jpg"
+    "pdf_page": 38,
+    "crop_y_start": 635.9,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 266,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_266.jpg"
+    "pdf_page": 39,
+    "crop_y_start": 68.9,
+    "crop_y_end": 256.0,
+    "page_height": 842.0
   },
   {
     "id": 267,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_267.jpg"
+    "pdf_page": 39,
+    "crop_y_start": 256.0,
+    "crop_y_end": 358.0,
+    "page_height": 842.0
   },
   {
     "id": 268,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_268.jpg"
+    "pdf_page": 39,
+    "crop_y_start": 358.0,
+    "crop_y_end": 446.0,
+    "page_height": 842.0
   },
   {
     "id": 269,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_269.jpg"
+    "pdf_page": 39,
+    "crop_y_start": 446.0,
+    "crop_y_end": 562.2,
+    "page_height": 842.0
   },
   {
     "id": 270,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_270.jpg"
+    "pdf_page": 39,
+    "crop_y_start": 562.2,
+    "crop_y_end": 650.2,
+    "page_height": 842.0
   },
   {
     "id": 271,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_271.jpg"
+    "pdf_page": 39,
+    "crop_y_start": 650.2,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 272,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_272.jpg"
+    "pdf_page": 40,
+    "crop_y_start": 68.9,
+    "crop_y_end": 227.6,
+    "page_height": 842.0
   },
   {
     "id": 273,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_273.jpg"
+    "pdf_page": 40,
+    "crop_y_start": 227.6,
+    "crop_y_end": 429.0,
+    "page_height": 842.0
   },
   {
     "id": 274,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_274.jpg"
+    "pdf_page": 40,
+    "crop_y_start": 429.0,
+    "crop_y_end": 488.4,
+    "page_height": 842.0
   },
   {
     "id": 275,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_275.jpg"
+    "pdf_page": 40,
+    "crop_y_start": 488.4,
+    "crop_y_end": 576.2,
+    "page_height": 842.0
   },
   {
     "id": 276,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_276.jpg"
+    "pdf_page": 40,
+    "crop_y_start": 576.2,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 277,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_277.jpg"
+    "pdf_page": 41,
+    "crop_y_start": 68.9,
+    "crop_y_end": 142.6,
+    "page_height": 842.0
   },
   {
     "id": 278,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_278.jpg"
+    "pdf_page": 41,
+    "crop_y_start": 142.6,
+    "crop_y_end": 244.6,
+    "page_height": 842.0
   },
   {
     "id": 279,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_279.jpg"
+    "pdf_page": 41,
+    "crop_y_start": 244.6,
+    "crop_y_end": 389.2,
+    "page_height": 842.0
   },
   {
     "id": 280,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_280.jpg"
+    "pdf_page": 41,
+    "crop_y_start": 389.2,
+    "crop_y_end": 519.7,
+    "page_height": 842.0
   },
   {
     "id": 281,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_281.jpg"
+    "pdf_page": 41,
+    "crop_y_start": 519.7,
+    "crop_y_end": 635.9,
+    "page_height": 842.0
   },
   {
     "id": 282,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_282.jpg"
+    "pdf_page": 41,
+    "crop_y_start": 635.9,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 283,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_283.jpg"
+    "pdf_page": 42,
+    "crop_y_start": 68.9,
+    "crop_y_end": 241.9,
+    "page_height": 842.0
   },
   {
     "id": 284,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_284.jpg"
+    "pdf_page": 42,
+    "crop_y_start": 241.9,
+    "crop_y_end": 386.5,
+    "page_height": 842.0
   },
   {
     "id": 285,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_285.jpg"
+    "pdf_page": 42,
+    "crop_y_start": 386.5,
+    "crop_y_end": 488.5,
+    "page_height": 842.0
   },
   {
     "id": 286,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_286.jpg"
+    "pdf_page": 42,
+    "crop_y_start": 488.5,
+    "crop_y_end": 661.5,
+    "page_height": 842.0
   },
   {
     "id": 287,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_287.jpg"
+    "pdf_page": 42,
+    "crop_y_start": 661.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 288,
     "category": "RATOWNICTWO",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_288.jpg"
+    "pdf_page": 43,
+    "crop_y_start": 68.9,
+    "crop_y_end": 185.1,
+    "page_height": 842.0
   },
   {
     "id": 289,
     "category": "RATOWNICTWO",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_289.jpg"
+    "pdf_page": 43,
+    "crop_y_start": 185.1,
+    "crop_y_end": 301.4,
+    "page_height": 842.0
   },
   {
     "id": 290,
     "category": "RATOWNICTWO",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_290.jpg"
+    "pdf_page": 43,
+    "crop_y_start": 301.4,
+    "crop_y_end": 446.0,
+    "page_height": 842.0
   },
   {
     "id": 291,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_291.jpg"
+    "pdf_page": 43,
+    "crop_y_start": 446.0,
+    "crop_y_end": 548.0,
+    "page_height": 842.0
   },
   {
     "id": 292,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_292.jpg"
+    "pdf_page": 43,
+    "crop_y_start": 548.0,
+    "crop_y_end": 678.5,
+    "page_height": 842.0
   },
   {
     "id": 293,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_293.jpg"
+    "pdf_page": 43,
+    "crop_y_start": 678.5,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 294,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_294.jpg"
+    "pdf_page": 44,
+    "crop_y_start": 68.9,
+    "crop_y_end": 128.3,
+    "page_height": 842.0
   },
   {
     "id": 295,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_295.jpg"
+    "pdf_page": 44,
+    "crop_y_start": 128.3,
+    "crop_y_end": 196.4,
+    "page_height": 842.0
   },
   {
     "id": 296,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_296.jpg"
+    "pdf_page": 44,
+    "crop_y_start": 196.4,
+    "crop_y_end": 284.4,
+    "page_height": 842.0
   },
   {
     "id": 297,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_297.jpg"
+    "pdf_page": 44,
+    "crop_y_start": 284.4,
+    "crop_y_end": 386.4,
+    "page_height": 842.0
   },
   {
     "id": 298,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_298.jpg"
+    "pdf_page": 44,
+    "crop_y_start": 386.4,
+    "crop_y_end": 474.2,
+    "page_height": 842.0
   },
   {
     "id": 299,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_299.jpg"
+    "pdf_page": 44,
+    "crop_y_start": 474.2,
+    "crop_y_end": 547.9,
+    "page_height": 842.0
   },
   {
     "id": 300,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_300.jpg"
+    "pdf_page": 44,
+    "crop_y_start": 547.9,
+    "crop_y_end": 650.1,
+    "page_height": 842.0
   },
   {
     "id": 301,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_301.jpg"
+    "pdf_page": 44,
+    "crop_y_start": 650.1,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 302,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_302.jpg"
+    "pdf_page": 45,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.9,
+    "page_height": 842.0
   },
   {
     "id": 303,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_303.jpg"
+    "pdf_page": 45,
+    "crop_y_start": 170.9,
+    "crop_y_end": 230.3,
+    "page_height": 842.0
   },
   {
     "id": 304,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_304.jpg"
+    "pdf_page": 45,
+    "crop_y_start": 230.3,
+    "crop_y_end": 290.0,
+    "page_height": 842.0
   },
   {
     "id": 305,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_305.jpg"
+    "pdf_page": 45,
+    "crop_y_start": 290.0,
+    "crop_y_end": 420.3,
+    "page_height": 842.0
   },
   {
     "id": 306,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_306.jpg"
+    "pdf_page": 45,
+    "crop_y_start": 420.3,
+    "crop_y_end": 522.3,
+    "page_height": 842.0
   },
   {
     "id": 307,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_307.jpg"
+    "pdf_page": 45,
+    "crop_y_start": 522.3,
+    "crop_y_end": 610.3,
+    "page_height": 842.0
   },
   {
     "id": 308,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_308.jpg"
+    "pdf_page": 45,
+    "crop_y_start": 610.3,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 309,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_309.jpg"
+    "pdf_page": 46,
+    "crop_y_start": 68.9,
+    "crop_y_end": 185.1,
+    "page_height": 842.0
   },
   {
     "id": 310,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_310.jpg"
+    "pdf_page": 46,
+    "crop_y_start": 185.1,
+    "crop_y_end": 315.6,
+    "page_height": 842.0
   },
   {
     "id": 311,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_311.jpg"
+    "pdf_page": 46,
+    "crop_y_start": 315.6,
+    "crop_y_end": 446.0,
+    "page_height": 842.0
   },
   {
     "id": 312,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_312.jpg"
+    "pdf_page": 46,
+    "crop_y_start": 446.0,
+    "crop_y_end": 590.6,
+    "page_height": 842.0
   },
   {
     "id": 313,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_313.jpg"
+    "pdf_page": 46,
+    "crop_y_start": 590.6,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 314,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_314.jpg"
+    "pdf_page": 47,
+    "crop_y_start": 68.9,
+    "crop_y_end": 170.8,
+    "page_height": 842.0
   },
   {
     "id": 315,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_315.jpg"
+    "pdf_page": 47,
+    "crop_y_start": 170.8,
+    "crop_y_end": 301.4,
+    "page_height": 842.0
   },
   {
     "id": 316,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_316.jpg"
+    "pdf_page": 47,
+    "crop_y_start": 301.4,
+    "crop_y_end": 446.0,
+    "page_height": 842.0
   },
   {
     "id": 317,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_317.jpg"
+    "pdf_page": 47,
+    "crop_y_start": 446.0,
+    "crop_y_end": 562.1,
+    "page_height": 842.0
   },
   {
     "id": 318,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_318.jpg"
+    "pdf_page": 47,
+    "crop_y_start": 562.1,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 319,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_319.jpg"
+    "pdf_page": 48,
+    "crop_y_start": 68.9,
+    "crop_y_end": 199.4,
+    "page_height": 842.0
   },
   {
     "id": 320,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_320.jpg"
+    "pdf_page": 48,
+    "crop_y_start": 199.4,
+    "crop_y_end": 343.9,
+    "page_height": 842.0
   },
   {
     "id": 321,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_321.jpg"
+    "pdf_page": 48,
+    "crop_y_start": 343.9,
+    "crop_y_end": 531.0,
+    "page_height": 842.0
   },
   {
     "id": 322,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_322.jpg"
+    "pdf_page": 48,
+    "crop_y_start": 531.0,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 323,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_323.jpg"
+    "pdf_page": 49,
+    "crop_y_start": 68.9,
+    "crop_y_end": 213.5,
+    "page_height": 842.0
   },
   {
     "id": 324,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_324.jpg"
+    "pdf_page": 49,
+    "crop_y_start": 213.5,
+    "crop_y_end": 304.2,
+    "page_height": 842.0
   },
   {
     "id": 325,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_325.jpg"
+    "pdf_page": 49,
+    "crop_y_start": 304.2,
+    "crop_y_end": 395.0,
+    "page_height": 842.0
   },
   {
     "id": 326,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_326.jpg"
+    "pdf_page": 49,
+    "crop_y_start": 395.0,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   },
   {
     "id": 327,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "A",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_327.jpg"
+    "pdf_page": 50,
+    "crop_y_start": 68.2,
+    "crop_y_end": 331.0,
+    "page_height": 842.0
   },
   {
     "id": 328,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_328.jpg"
+    "pdf_page": 50,
+    "crop_y_start": 331.0,
+    "crop_y_end": 421.8,
+    "page_height": 842.0
   },
   {
     "id": 329,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "C",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_329.jpg"
+    "pdf_page": 50,
+    "crop_y_start": 421.8,
+    "crop_y_end": 566.4,
+    "page_height": 842.0
   },
   {
     "id": 330,
     "category": "SYGNAŁY I ŁĄCZNOŚĆ",
     "correct_answer": "B",
     "answer_count": 3,
-    "image_asset": "exam_images/pytanie_330.jpg"
+    "pdf_page": 50,
+    "crop_y_start": 566.4,
+    "crop_y_end": 842.0,
+    "page_height": 842.0
   }
 ]

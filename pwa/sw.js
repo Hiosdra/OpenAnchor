@@ -1,4 +1,4 @@
-const CACHE_NAME = 'openanchor-superapp-v7';
+const CACHE_NAME = 'openanchor-superapp-v8';
 const urlsToCache = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const urlsToCache = [
   './modules/egzamin/',
   './modules/egzamin/index.html',
   './modules/egzamin/exam_questions.json',
+  './js/exam-pdf-storage.js',
   './modules/zeglowanie/',
   './modules/zeglowanie/index.html',
   './manifest.json',
@@ -49,7 +50,8 @@ self.addEventListener('fetch', event => {
   // Skip CDN resources - let browser cache handle them
   if (url.hostname.includes('cdn.tailwindcss.com') ||
       url.hostname.includes('cdn.jsdelivr.net') ||
-      url.hostname.includes('unpkg.com')) {
+      url.hostname.includes('unpkg.com') ||
+      url.hostname.includes('cdnjs.cloudflare.com')) {
     return;
   }
 
@@ -169,3 +171,4 @@ async function checkAnchorPosition() {
     throw error;
   }
 }
+
