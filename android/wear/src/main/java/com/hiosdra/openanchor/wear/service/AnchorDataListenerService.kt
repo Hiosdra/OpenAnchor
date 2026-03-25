@@ -85,11 +85,15 @@ class AnchorDataListenerService : WearableListenerService() {
             return
         }
 
-        // Strong repeating pattern: vibrate 500ms, pause 200ms, repeat 5 times
+        // Strong repeating pattern: vibrate 500ms, pause 200ms (no infinite repeat)
         val timings = longArrayOf(0, 500, 200, 500, 200, 500, 200, 500, 200, 500)
         val amplitudes = intArrayOf(0, 255, 0, 255, 0, 255, 0, 255, 0, 255)
 
-        val effect = VibrationEffect.createWaveform(timings, amplitudes, -1)
+        // repeat=-1 was infinite; use 0 to repeat from index 0 and cancel after timeout
+        val effect = VibrationEffect.createWaveform(timings, amplitudes, 0)
         vibrator.vibrate(effect)
+
+        // Cancel vibration after 15 seconds to prevent battery drain
+        android.os.Handler(mainLooper).postDelayed({ vibrator.cancel() }, 15_000L)
     }
 }

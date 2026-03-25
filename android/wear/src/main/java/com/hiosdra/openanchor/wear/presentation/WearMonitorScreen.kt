@@ -9,6 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,6 +27,7 @@ import androidx.wear.compose.material.Text
 import com.hiosdra.openanchor.wear.R
 import com.hiosdra.openanchor.wear.data.WearAlarmState
 import com.hiosdra.openanchor.wear.data.WearMonitorState
+import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
 
 // Maritime dark colors (matching phone app)
 private val NavyDark = Color(0xFF0A1628)
@@ -31,11 +38,16 @@ private val AlarmRed = Color(0xFFF44336)
 private val TextWhite = Color(0xFFECEFF1)
 private val TextGrey = Color(0xFF90A4AE)
 
+/** GPS accuracy hysteresis thresholds to prevent color flickering */
+private const val GPS_BAD_THRESHOLD = 22f
+private const val GPS_GOOD_THRESHOLD = 18f
+
 @Composable
-fun WearMonitorScreen(
-    state: WearMonitorState,
-    isConnected: Boolean
-) {
+fun WearMonitorScreen() {
+    // Collect flows at screen level; child composables use derived state
+    val state by WearMonitorStateHolder.state.collectAsState()
+    val isConnected by WearMonitorStateHolder.connected.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -103,6 +115,25 @@ private fun GpsLostContent(state: WearMonitorState) {
 private fun MonitoringContent(state: WearMonitorState) {
     val stateColor = alarmStateColor(state.alarmState)
 
+    // Cache formatted distance to avoid allocation on every recomposition
+    val formattedDistance = remember(state.distanceMeters) {
+        "%.0f".format(state.distanceMeters)
+    }
+
+    // Hysteresis for GPS accuracy color: turn red at 22m, green again at 18m
+    var gpsBad by remember { mutableStateOf(false) }
+    val isGpsBad by remember(state.gpsAccuracyMeters) {
+        derivedStateOf {
+            if (gpsBad) {
+                state.gpsAccuracyMeters > GPS_GOOD_THRESHOLD
+            } else {
+                state.gpsAccuracyMeters > GPS_BAD_THRESHOLD
+            }
+        }
+    }
+    gpsBad = isGpsBad
+    val gpsColor = if (isGpsBad) AlarmRed else TextGrey
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -115,7 +146,7 @@ private fun MonitoringContent(state: WearMonitorState) {
 
         // Big distance number
         Text(
-            text = "%.0f".format(state.distanceMeters),
+            text = formattedDistance,
             color = stateColor,
             fontSize = 42.sp,
             fontWeight = FontWeight.Bold,
@@ -131,7 +162,6 @@ private fun MonitoringContent(state: WearMonitorState) {
         Spacer(modifier = Modifier.height(6.dp))
 
         // GPS accuracy
-        val gpsColor = if (state.gpsAccuracyMeters > 20f) AlarmRed else TextGrey
         Text(
             text = stringResource(R.string.wear_gps_accuracy, state.gpsAccuracyMeters.toInt()),
             color = gpsColor,
