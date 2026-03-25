@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +42,7 @@ import com.hiosdra.openanchor.wear.data.WearConnectionManager
 import com.hiosdra.openanchor.wear.data.WearMonitorState
 import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
 import kotlinx.coroutines.delay
+import com.google.android.horologist.compose.ambient.AmbientState
 
 // Maritime dark colors (matching phone app)
 private val NavyDark = Color(0xFF0A1628)
@@ -57,28 +60,81 @@ private const val GPS_GOOD_THRESHOLD = 18f
 /** Number of info modes to cycle through on tap */
 private const val INFO_MODE_COUNT = 3
 
+/** Default alarm radius used for progress visualization when not provided by phone */
+private const val DEFAULT_MAX_RADIUS_METERS = 50.0
+
 @Composable
 fun WearMonitorScreen() {
-    // Collect flows at screen level; child composables use derived state
     val state by WearMonitorStateHolder.state.collectAsState()
     val isConnected by WearConnectionManager.connected.collectAsState()
+    val ambientState = LocalAmbientState.current
+    val isAmbient = ambientState is AmbientState.Ambient
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(NavyDark),
+            .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        when {
-            !isConnected || !state.isActive -> {
-                WaitingContent()
+        if (isAmbient) {
+            // Ambient mode: simplified white-on-black layout
+            AmbientContent(state, isConnected)
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(NavyDark),
+                contentAlignment = Alignment.Center
+            ) {
+                when {
+                    !isConnected || !state.isActive -> {
+                        WaitingContent()
+                    }
+                    state.gpsSignalLost -> {
+                        GpsLostContent(state)
+                    }
+                    else -> {
+                        MonitoringContent(state)
+                    }
+                }
             }
-            state.gpsSignalLost -> {
-                GpsLostContent(state)
+        }
+    }
+}
+
+// Feature 2: Ambient mode — simplified white-on-black, essential info only
+@Composable
+private fun AmbientContent(state: WearMonitorState, isConnected: Boolean) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(16.dp)
+    ) {
+        if (!isConnected || !state.isActive) {
+            Text(
+                text = "--",
+                color = Color.White,
+                fontSize = 42.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        } else {
+            val distanceText = remember(state.distanceMeters) {
+                "%.0f".format(state.distanceMeters)
             }
-            else -> {
-                MonitoringContent(state)
-            }
+            Text(
+                text = distanceText,
+                color = Color.White,
+                fontSize = 42.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = stringResource(R.string.wear_meters),
+                color = Color.Gray,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -296,7 +352,34 @@ private fun MonitoringContent(state: WearMonitorState) {
                 textAlign = TextAlign.Center
             )
         }
+
+        // Feature 5: Alarm zone visualization — progress bar showing distance/radius ratio
+        Spacer(modifier = Modifier.height(6.dp))
+        AlarmZoneIndicator(
+            distanceMeters = state.distanceMeters,
+            alarmColor = stateColor
+        )
     }
+}
+
+// Feature 5: Simple progress bar showing how close the boat is to alarm threshold
+@Composable
+private fun AlarmZoneIndicator(
+    distanceMeters: Double,
+    alarmColor: Color
+) {
+    val progress = remember(distanceMeters) {
+        (distanceMeters / DEFAULT_MAX_RADIUS_METERS).coerceIn(0.0, 1.0).toFloat()
+    }
+
+    LinearProgressIndicator(
+        progress = progress,
+        modifier = Modifier
+            .fillMaxWidth(0.7f)
+            .height(4.dp),
+        color = alarmColor,
+        backgroundColor = TextGrey.copy(alpha = 0.3f)
+    )
 }
 
 @Composable

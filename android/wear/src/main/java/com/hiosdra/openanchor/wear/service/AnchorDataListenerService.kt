@@ -46,6 +46,7 @@ class AnchorDataListenerService : WearableListenerService() {
 
                     if (state != null) {
                         WearDataRepository.onStateReceived(state)
+                        WearHapticFeedback.onAlarmStateChanged(this, state.alarmState)
                         Log.d(TAG, "State updated: ${state.alarmState}, dist=${state.distanceMeters}m")
                     } else {
                         Log.w(TAG, "Failed to parse DataItem from ${uri.host}")
