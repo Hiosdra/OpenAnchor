@@ -687,10 +687,11 @@
                 if (!file || !file.name.toLowerCase().endsWith('.pdf')) return;
 
                 setImporting(true);
-                setProgressText('Obliczanie sumy kontrolnej...');
+                setProgressText('Wczytywanie pliku...');
 
                 try {
                     const arrayBuffer = await file.arrayBuffer();
+                    setProgressText('Obliczanie sumy kontrolnej...');
                     const { valid, hash } = await verifyPdfHash(arrayBuffer);
                     const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
 

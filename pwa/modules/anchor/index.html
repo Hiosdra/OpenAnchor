@@ -132,6 +132,11 @@
 </head>
 <body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-y-auto" id="app-body">
 
+<!-- Connection lost banner -->
+<div id="ws-connection-banner" class="hidden fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-center text-xs py-1 px-4 font-bold transition-all">
+    ⚠ Połączenie utracone — próba ponownego połączenia...
+</div>
+
 <!-- Background -->
 <div class="ocean-bg">
     <div class="wave wave-1"></div>
@@ -965,6 +970,7 @@
                 notifVerifying: 'Weryfikacja pozycji...',
                 // GPS
                 gpsPermDenied: 'Brak uprawnień do GPS.',
+                gpsPermDeniedHelp: 'Aby włączyć lokalizację, otwórz Ustawienia przeglądarki > Uprawnienia witryny > Lokalizacja.',
                 // Share
                 shareNoGps: 'Brak ustalonej pozycji GPS do udostępnienia.',
                 sharePrefix: 'Moja pozycja:',
@@ -1183,6 +1189,7 @@
                 notifOutOfZone: 'Outside safe zone!',
                 notifVerifying: 'Verifying position...',
                 gpsPermDenied: 'GPS permission denied.',
+                gpsPermDeniedHelp: 'To re-enable location, open browser Settings > Site permissions > Location.',
                 shareNoGps: 'No GPS position to share.',
                 sharePrefix: 'My position:',
                 shareFallback: 'Copy this link to share position:',
@@ -2041,6 +2048,9 @@
             this.lastPeerPingTime = Date.now();
             this.peerConnectionLost = false;
             document.getElementById('ws-status-icon').classList.replace('text-slate-600', 'text-green-400');
+            // Hide connection lost banner
+            const banner = document.getElementById('ws-connection-banner');
+            if (banner) banner.classList.add('hidden');
 
             this.sendFullSync();
 
@@ -2073,6 +2083,11 @@
             this.peerConnectionLost = false;
             document.getElementById('ws-status-icon').classList.replace('text-green-400', 'text-slate-600');
             document.getElementById('ws-status-icon').classList.replace('text-orange-400', 'text-slate-600');
+            // Show connection lost banner if was connected
+            if (wasConnected) {
+                const banner = document.getElementById('ws-connection-banner');
+                if (banner) banner.classList.remove('hidden');
+            }
             // Hide peer info on disconnect
             const peerBat = document.getElementById('peer-battery');
             if (peerBat) peerBat.classList.add('hidden');
@@ -2495,6 +2510,7 @@
                 this.state.gpsSignalLost = false;
                 this.gpsWatchdogAlerted = false;
                 document.getElementById('no-signal-overlay').classList.add('hidden');
+                UI.hideModal('gps-lost-modal');
             }
         }
 
