@@ -45,14 +45,14 @@ npx http-server ./pwa -p 8080
 
 > Opening `index.html` directly via `file://` will not work — service workers require HTTP/HTTPS.
 
-## Moduł Egzaminacyjny (Exam Module)
+## Exam Module (Moduł Egzaminacyjny)
 
 The exam module does **not** bundle any copyrighted question content. Users must import their own legally-obtained PDF with the exam question bank.
 
 ### How it works
 1. Open the Egzamin module from the main menu
 2. On first use, you'll see an import screen — select your PDF file
-3. The app verifies the file with a SHA-256 checksum (warning if mismatch, non-blocking)
+3. The app verifies the file against a known SHA-256 checksum hardcoded in the app. If the checksum does not match (e.g., different PDF version), a warning is shown but the import is not blocked
 4. The PDF is stored **locally on your device** (IndexedDB on web, Internal Storage on Android) and persists through app updates
 5. Questions are rendered directly from the imported PDF
 
