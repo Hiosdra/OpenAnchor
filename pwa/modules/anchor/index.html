@@ -2276,6 +2276,7 @@
             // Track point batching for IndexedDB
             this._trackPointBuffer = [];
             this._trackFlushInterval = null;
+            this._TRACK_BUFFER_MAX = 1000;
 
             this.db = new SessionDB();
             this.alarmEngine = new AlarmEngine();
@@ -2287,13 +2288,40 @@
             // Store GPS watch ID for cleanup
             this.gpsWatchId = null;
 
+            // Cache frequently accessed DOM elements
+            this._els = {
+                alarmStateBar: document.getElementById('alarm-state-bar'),
+                alarmStateText: document.getElementById('alarm-state-text'),
+                gpsStatusText: document.getElementById('gps-status-text'),
+                gpsStatus: document.getElementById('gps-status'),
+                noSignalOverlay: document.getElementById('no-signal-overlay'),
+                mainBtn: document.getElementById('main-btn'),
+                offsetBtn: document.getElementById('offset-btn'),
+                sectorBadge: document.getElementById('sector-badge'),
+                activeWatchBanner: document.getElementById('active-watch-banner'),
+                activeWatchName: document.getElementById('active-watch-name'),
+                watchBadge: document.getElementById('watch-badge'),
+            };
+
+            // Debounced schedule save
+            this._scheduleSaveTimer = null;
+
             UI.init();
             this._bindAppEvents();
             this._initGPS();
 
             if (this.syncCtrl.url) document.getElementById('ws-url-input').value = this.syncCtrl.url;
 
-            setInterval(() => this._onTick(), 1000);
+            this._tickInterval = setInterval(() => this._onTick(), 1000);
+
+            // Flush track buffer and cleanup before page unload
+            window.addEventListener('beforeunload', () => {
+                if (this._trackPointBuffer.length > 0 && this.state.sessionId && this.db.db) {
+                    this._flushTrackPoints();
+                }
+                clearInterval(this._smClockInterval);
+                clearInterval(this._tickInterval);
+            });
 
             // Init DB and restore state
             this._initDB();
@@ -2657,7 +2685,30 @@
             if ("geolocation" in navigator) {
                 this.gpsWatchId = navigator.geolocation.watchPosition(
                     (pos) => this._onPosition(pos),
-                    (err) => { document.getElementById('no-signal-overlay').classList.remove('hidden'); if (err.code === 1) { document.getElementById('warning-text').textContent = I18N.t.gpsPermDenied; UI.showModal('warning-modal'); } },
+                    (err) => {
+                        document.getElementById('no-signal-overlay').classList.remove('hidden');
+                        if (err.code === 1) {
+                            document.getElementById('warning-text').textContent = I18N.t.gpsPermDenied
+                                + ' ' + (I18N.t.gpsPermDeniedHelp || 'Check browser Site Settings to re-enable location access.');
+                            UI.showModal('warning-modal');
+                        } else if (err.code === 2 || err.code === 3) {
+                            // Position unavailable or timeout - trigger GPS loss alarm if anchored
+                            document.getElementById('gps-status-text').textContent = I18N.t.gpsLost || 'GPS Lost';
+                            document.getElementById('gps-status').classList.replace('text-green-500', 'text-red-500');
+                            if (this.state.isAnchored && !this.state.gpsSignalLost) {
+                                this.state.gpsSignalLost = true;
+                                this.gpsWatchdogAlerted = true;
+                                UI.showModal('gps-lost-modal');
+                                this.alertCtrl.playBeep('warning');
+                                if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
+                                this.syncCtrl.send('TRIGGER_ALARM', {
+                                    reason: err.code === 2 ? "GPS_UNAVAILABLE" : "GPS_TIMEOUT",
+                                    message: "GPS signal lost: " + err.message,
+                                    alarmState: "WARNING"
+                                });
+                            }
+                        }
+                    },
                     { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
                 );
             } else document.getElementById('no-signal-overlay').classList.remove('hidden');
@@ -2673,7 +2724,10 @@
         _onPosition(position) {
             this.lastGpsFixTime = Date.now(); // GPS watchdog reset
             this.state.currentPos = L.latLng(position.coords.latitude, position.coords.longitude);
-            this.state.accuracy = position.coords.accuracy;
+            // Validate accuracy to prevent NaN propagation
+            const rawAccuracy = position.coords.accuracy;
+            const accuracy = (rawAccuracy >= 0 && isFinite(rawAccuracy)) ? rawAccuracy : null;
+            this.state.accuracy = accuracy;
 
             if (position.coords.speed !== null) {
                 this.state.sog = position.coords.speed * GeoUtils.MPS2KNOTS;
@@ -2687,10 +2741,11 @@
                 document.getElementById('main-btn').disabled = false; document.getElementById('offset-btn').disabled = false;
             }
 
-            // Recover from GPS signal lost
+            // Recover from GPS signal lost - auto-dismiss modal
             if (this.state.gpsSignalLost) {
                 this.state.gpsSignalLost = false;
                 this.gpsWatchdogAlerted = false;
+                UI.hideModal('gps-lost-modal');
             }
 
             document.getElementById('gps-status-text').textContent = I18N.t.gpsOk;
@@ -2708,11 +2763,15 @@
                     sessionId: this.state.sessionId,
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
-                    accuracy: position.coords.accuracy,
+                    accuracy: accuracy,
                     timestamp: Date.now(),
                     distance: this.state.distance,
                     alarmState: this.state.alarmState
                 });
+                // Cap buffer to prevent unbounded growth
+                if (this._trackPointBuffer.length > this._TRACK_BUFFER_MAX) {
+                    this._trackPointBuffer.splice(0, this._trackPointBuffer.length - this._TRACK_BUFFER_MAX);
+                }
             }
 
             this._recalculate();
