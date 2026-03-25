@@ -639,21 +639,15 @@ class AnchorMonitorService : Service() {
                     }
                 }
 
-                // Compute SOG from consecutive positions
+                // Compute SOG/COG via GpsProcessor
                 var currentSog: Double? = null
                 var currentCog: Double? = null
-                val prevPos = previousPosition
-                val prevTime = previousPositionTime
-                if (prevPos != null && prevTime > 0L) {
-                    val dtSeconds = (position.timestamp - prevTime) / 1000.0
-                    if (dtSeconds > 0.5) {
-                        val distBetween = GeoCalculations.distanceMeters(prevPos, position)
-                        currentSog = distBetween / dtSeconds * 1.94384 // m/s → knots
-                        currentCog = GeoCalculations.bearingDegrees(prevPos, position)
-                    }
+                if (anchorPos != null && zone != null) {
+                    val sessionId = _monitorState.value.sessionId ?: 0L
+                    val result = gpsProcessor.processPosition(position, anchorPos, zone, sessionId)
+                    currentSog = result.sog
+                    currentCog = result.cog
                 }
-                previousPosition = position
-                previousPositionTime = position.timestamp
 
                 // Send telemetry to server via ClientModeManager
                 val battery = batteryProvider.getCurrentBatteryState()
@@ -776,9 +770,7 @@ class AnchorMonitorService : Service() {
         clientStateUpdateJob = null
         clientEventJob?.cancel()
         clientEventJob = null
-        synchronized(recentTrackPoints) {
-            recentTrackPoints.clear()
-        }
+        gpsProcessor.reset()
         alarmEngine.reset()
         alarmPlayer.stopAlarm()
 
@@ -795,16 +787,13 @@ class AnchorMonitorService : Service() {
                     session?.let {
                         repository.updateSession(it.copy(
                             endTime = System.currentTimeMillis(),
-                            maxDistanceMeters = sessionMaxDistance,
-                            maxSog = sessionMaxSog
+                            maxDistanceMeters = gpsProcessor.getSessionMaxDistance(),
+                            maxSog = gpsProcessor.getSessionMaxSog()
                         ))
                     }
                 }
-                // Reset tracking variables
-                previousPosition = null
-                previousPositionTime = 0L
-                sessionMaxDistance = 0.0
-                sessionMaxSog = 0.0
+                // Reset tracking variables via GpsProcessor
+                gpsProcessor.reset()
                 _monitorState.value = MonitorState()
                 // Notify watch that monitoring stopped
                 wearDataSender.clearMonitorState()
