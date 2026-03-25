@@ -30,8 +30,18 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
     val sessions by viewModel.sessions.collectAsStateWithLifecycle()
+    val deleteError by viewModel.deleteError.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(deleteError) {
+        if (deleteError) {
+            snackbarHostState.showSnackbar("Failed to delete session")
+            viewModel.clearDeleteError()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.history)) },

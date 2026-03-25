@@ -18,9 +18,20 @@ class HistoryViewModel @Inject constructor(
         .map { list -> list.filter { it.endTime != null } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    private val _deleteError = MutableStateFlow(false)
+    val deleteError: StateFlow<Boolean> = _deleteError.asStateFlow()
+
     fun deleteSession(id: Long) {
         viewModelScope.launch {
-            repository.deleteSession(id)
+            try {
+                repository.deleteSession(id)
+            } catch (e: Exception) {
+                _deleteError.value = true
+            }
         }
+    }
+
+    fun clearDeleteError() {
+        _deleteError.value = false
     }
 }

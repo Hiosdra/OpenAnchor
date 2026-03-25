@@ -3,10 +3,9 @@ package com.hiosdra.openanchor.util
 import com.hiosdra.openanchor.domain.model.AnchorSession
 import com.hiosdra.openanchor.domain.model.TrackPoint
 import java.io.OutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /**
  * Exports anchor session data to standard GPX 1.1 format.
@@ -17,9 +16,13 @@ import java.util.TimeZone
  */
 object GpxExporter {
 
-    private val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-    }
+    // DateTimeFormatter is thread-safe (immutable), unlike SimpleDateFormat
+    private val isoFormatter: DateTimeFormatter = DateTimeFormatter
+        .ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        .withZone(ZoneOffset.UTC)
+
+    private fun formatTimestamp(epochMillis: Long): String =
+        isoFormatter.format(Instant.ofEpochMilli(epochMillis))
 
     /**
      * Writes GPX XML to the given [outputStream].
@@ -41,14 +44,14 @@ object GpxExporter {
             // Metadata
             write("  <metadata>\n")
             write("    <name>OpenAnchor Session ${session.id}</name>\n")
-            write("    <time>${isoFormat.format(Date(session.startTime))}</time>\n")
+            write("    <time>${formatTimestamp(session.startTime)}</time>\n")
             write("  </metadata>\n")
 
             // Anchor waypoint
             write("  <wpt lat=\"${session.anchorPosition.latitude}\" lon=\"${session.anchorPosition.longitude}\">\n")
             write("    <name>Anchor</name>\n")
             write("    <desc>Anchor position, radius=${session.zone.radiusMeters}m</desc>\n")
-            write("    <time>${isoFormat.format(Date(session.startTime))}</time>\n")
+            write("    <time>${formatTimestamp(session.startTime)}</time>\n")
             write("    <sym>Anchor</sym>\n")
             write("  </wpt>\n")
 
@@ -59,7 +62,7 @@ object GpxExporter {
                 write("    <trkseg>\n")
                 for (point in trackPoints) {
                     write("      <trkpt lat=\"${point.position.latitude}\" lon=\"${point.position.longitude}\">\n")
-                    write("        <time>${isoFormat.format(Date(point.position.timestamp))}</time>\n")
+                    write("        <time>${formatTimestamp(point.position.timestamp)}</time>\n")
                     if (point.position.accuracy > 0f) {
                         write("        <hdop>${"%.1f".format(point.position.accuracy)}</hdop>\n")
                     }
@@ -81,7 +84,9 @@ object GpxExporter {
      * Generates a suggested filename for the GPX export.
      */
     fun suggestedFilename(session: AnchorSession): String {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd_HHmm", Locale.US)
-        return "openanchor_${dateFormat.format(Date(session.startTime))}.gpx"
+        val dateFormatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd_HHmm")
+            .withZone(ZoneOffset.UTC)
+        return "openanchor_${dateFormatter.format(Instant.ofEpochMilli(session.startTime))}.gpx"
     }
 }

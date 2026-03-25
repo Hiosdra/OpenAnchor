@@ -53,8 +53,9 @@ class HistoryDetailViewModel @Inject constructor(
     }
 
     fun exportGpx() {
+        // Copy data before launching coroutine to avoid race with session deletion
         val session = _state.value.session ?: return
-        val points = _state.value.trackPoints
+        val points = _state.value.trackPoints.toList()
 
         viewModelScope.launch {
             try {
@@ -74,7 +75,7 @@ class HistoryDetailViewModel @Inject constructor(
                 }
                 val filename = GpxExporter.suggestedFilename(session)
                 _state.update { it.copy(gpxExportUri = uri, gpxExportFilename = filename, exportError = false) }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
                 _state.update { it.copy(exportError = true) }
             }
         }
