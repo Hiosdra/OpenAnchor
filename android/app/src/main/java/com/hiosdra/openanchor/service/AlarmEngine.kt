@@ -5,6 +5,9 @@ import com.hiosdra.openanchor.domain.model.AlarmState
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.Clock
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 /**
@@ -16,54 +19,52 @@ import javax.inject.Inject
  * - WARNING: Outside all zones, violation building (< 3 readings or < 3 seconds)
  * - ALARM: 3+ consecutive readings AND 3+ seconds outside all zones
  *
- * Thread safety: Uses kotlinx.coroutines Mutex for coroutine-safe state access.
+ * Thread safety: Uses AtomicReference/AtomicInteger for lock-free state management.
  */
 class AlarmEngine @Inject constructor(
     private val clock: Clock
 ) {
-    private val mutex = Mutex()
-
-    private var violationCount: Int = 0
-    private var firstViolationTime: Long? = null
-    private var _currentState: AlarmState = AlarmState.SAFE
+    private val violationCount = AtomicInteger(0)
+    private val firstViolationTime = AtomicLong(0L) // 0 means not set
+    private val _currentState = AtomicReference(AlarmState.SAFE)
 
     val currentState: AlarmState
-        get() = _currentState
+        get() = _currentState.get()
 
     /**
      * Process a new GPS reading with multi-level zone support.
      * @param zoneResult the result of checking position against the zone
      * @return the new alarm state after processing
      */
-    suspend fun processReading(zoneResult: ZoneCheckResult): AlarmState = mutex.withLock {
-        when (zoneResult) {
+    fun processReading(zoneResult: ZoneCheckResult): AlarmState {
+        return when (zoneResult) {
             ZoneCheckResult.INSIDE -> {
-                resetInternal()
-                _currentState
+                reset()
+                _currentState.get()
             }
             ZoneCheckResult.BUFFER -> {
-                violationCount = 0
-                firstViolationTime = null
-                _currentState = AlarmState.CAUTION
-                _currentState
+                violationCount.set(0)
+                firstViolationTime.set(0L)
+                _currentState.set(AlarmState.CAUTION)
+                AlarmState.CAUTION
             }
             ZoneCheckResult.OUTSIDE -> {
-                violationCount++
-                if (firstViolationTime == null) {
-                    firstViolationTime = clock.millis()
-                }
-                updateState()
-                _currentState
+                val count = violationCount.incrementAndGet()
+                firstViolationTime.compareAndSet(0L, clock.millis())
+                updateState(count)
+                _currentState.get()
             }
         }
     }
 
-    private fun updateState() {
-        _currentState = when {
-            violationCount >= 3 && elapsedSinceFirstViolation() >= 3000L -> AlarmState.ALARM
-            violationCount > 0 -> AlarmState.WARNING
+    private fun updateState(count: Int) {
+        val elapsed = elapsedSinceFirstViolation()
+        val newState = when {
+            count >= 3 && elapsed >= 3000L -> AlarmState.ALARM
+            count > 0 -> AlarmState.WARNING
             else -> AlarmState.SAFE
         }
+        _currentState.set(newState)
     }
 
     /**
@@ -71,18 +72,14 @@ class AlarmEngine @Inject constructor(
      * @param isInsideZone whether the current position is inside the safe zone
      * @return the new alarm state after processing
      */
-    suspend fun processReading(isInsideZone: Boolean): AlarmState {
+    fun processReading(isInsideZone: Boolean): AlarmState {
         return processReading(if (isInsideZone) ZoneCheckResult.INSIDE else ZoneCheckResult.OUTSIDE)
     }
 
-    suspend fun reset() = mutex.withLock {
-        resetInternal()
-    }
-
-    private fun resetInternal() {
-        violationCount = 0
-        firstViolationTime = null
-        _currentState = AlarmState.SAFE
+    fun reset() {
+        violationCount.set(0)
+        firstViolationTime.set(0L)
+        _currentState.set(AlarmState.SAFE)
     }
 
     /**
@@ -91,20 +88,17 @@ class AlarmEngine @Inject constructor(
      * @param externalState the alarm state determined by the PWA
      * @return the alarm state to use (same as input)
      */
-    suspend fun processExternalAlarm(externalState: AlarmState): AlarmState = mutex.withLock {
-        _currentState = externalState
+    fun processExternalAlarm(externalState: AlarmState): AlarmState {
+        _currentState.set(externalState)
         when (externalState) {
-            AlarmState.SAFE, AlarmState.CAUTION -> {
-                resetInternal()
-                externalState
-            }
-            AlarmState.WARNING, AlarmState.ALARM -> {
-                externalState
-            }
+            AlarmState.SAFE, AlarmState.CAUTION -> reset()
+            AlarmState.WARNING, AlarmState.ALARM -> { /* keep state */ }
         }
+        return externalState
     }
 
     private fun elapsedSinceFirstViolation(): Long {
-        return firstViolationTime?.let { clock.millis() - it } ?: 0L
+        val time = firstViolationTime.get()
+        return if (time > 0L) clock.millis() - time else 0L
     }
 }
