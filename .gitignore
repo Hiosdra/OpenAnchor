@@ -26,5 +26,8 @@ local.properties
 # Docs
 *.pdf
 
+# Copyrighted exam content (user-imported, never distributed)
+**/exam_images/
+
 # Kotlin build artifacts
 /android/.kotlin/
