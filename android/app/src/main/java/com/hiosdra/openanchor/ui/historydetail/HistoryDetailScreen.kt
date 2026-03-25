@@ -39,6 +39,14 @@ fun HistoryDetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show snackbar for export results
+    LaunchedEffect(state.exportError, state.exportSuccess) {
+        if (state.exportError) {
+            snackbarHostState.showSnackbar("GPX export failed")
+        }
+    }
 
     // Launch share intent when GPX export is ready
     LaunchedEffect(state.gpxExportUri) {
@@ -55,6 +63,7 @@ fun HistoryDetailScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.session_details)) },
@@ -65,11 +74,20 @@ fun HistoryDetailScreen(
                 },
                 actions = {
                     if (!state.isLoading && state.session != null) {
-                        IconButton(onClick = { viewModel.exportGpx() }) {
-                            Icon(
-                                Icons.Default.Share,
-                                contentDescription = stringResource(R.string.export_gpx)
+                        if (state.isExporting) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .padding(end = 12.dp),
+                                strokeWidth = 2.dp
                             )
+                        } else {
+                            IconButton(onClick = { viewModel.exportGpx() }) {
+                                Icon(
+                                    Icons.Default.Share,
+                                    contentDescription = stringResource(R.string.export_gpx)
+                                )
+                            }
                         }
                     }
                 }
@@ -198,13 +216,21 @@ fun HistoryDetailScreen(
                         // GPX Export button
                         OutlinedButton(
                             onClick = { viewModel.exportGpx() },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !state.isExporting
                         ) {
-                            Icon(
-                                Icons.Default.Share,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
+                            if (state.isExporting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Default.Share,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(stringResource(R.string.export_gpx))
                         }

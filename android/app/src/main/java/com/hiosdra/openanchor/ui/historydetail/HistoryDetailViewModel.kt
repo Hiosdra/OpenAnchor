@@ -23,9 +23,11 @@ data class HistoryDetailState(
     val session: AnchorSession? = null,
     val trackPoints: List<TrackPoint> = emptyList(),
     val isLoading: Boolean = true,
+    val isExporting: Boolean = false,
     val gpxExportUri: Uri? = null,
     val gpxExportFilename: String? = null,
-    val exportError: Boolean = false
+    val exportError: Boolean = false,
+    val exportSuccess: Boolean = false
 )
 
 @HiltViewModel
@@ -53,9 +55,12 @@ class HistoryDetailViewModel @Inject constructor(
     }
 
     fun exportGpx() {
+        if (_state.value.isExporting) return
         // Copy data before launching coroutine to avoid race with session deletion
         val session = _state.value.session ?: return
         val points = _state.value.trackPoints.toList()
+
+        _state.update { it.copy(isExporting = true, exportError = false, exportSuccess = false) }
 
         viewModelScope.launch {
             try {
@@ -74,14 +79,24 @@ class HistoryDetailViewModel @Inject constructor(
                     )
                 }
                 val filename = GpxExporter.suggestedFilename(session)
-                _state.update { it.copy(gpxExportUri = uri, gpxExportFilename = filename, exportError = false) }
+                _state.update {
+                    it.copy(
+                        gpxExportUri = uri,
+                        gpxExportFilename = filename,
+                        exportError = false,
+                        exportSuccess = true,
+                        isExporting = false
+                    )
+                }
             } catch (e: Exception) {
-                _state.update { it.copy(exportError = true) }
+                _state.update { it.copy(exportError = true, isExporting = false) }
             }
         }
     }
 
     fun clearExportState() {
-        _state.update { it.copy(gpxExportUri = null, gpxExportFilename = null, exportError = false) }
+        _state.update {
+            it.copy(gpxExportUri = null, gpxExportFilename = null, exportError = false, exportSuccess = false)
+        }
     }
 }

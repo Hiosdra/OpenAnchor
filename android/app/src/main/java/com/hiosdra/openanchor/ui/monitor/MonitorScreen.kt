@@ -77,7 +77,37 @@ fun MonitorScreen(
         )
     }
 
-    AnimatedContent(
+    // Connection status banner for paired/client mode
+    Column {
+        AnimatedVisibility(
+            visible = (uiState.isPairedMode || uiState.isActive) && !uiState.peerConnected && uiState.isPairedMode
+        ) {
+            Surface(
+                color = WarningOrange,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        Icons.Default.WifiOff,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Peer disconnected",
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            }
+        }
+
+        AnimatedContent(
         targetState = uiState.viewMode,
         label = "monitor_view"
     ) { mode ->
@@ -100,6 +130,7 @@ fun MonitorScreen(
             )
         }
     }
+    } // end Column
 }
 
 private fun sharePosition(context: Context, uiState: MonitorUiState) {

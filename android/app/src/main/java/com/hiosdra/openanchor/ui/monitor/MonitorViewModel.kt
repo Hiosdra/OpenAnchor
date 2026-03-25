@@ -44,6 +44,7 @@ data class MonitorUiState(
     val peerBatteryLevel: Double? = null,
     val peerIsCharging: Boolean? = null,
     val isPairedMode: Boolean = false,
+    val peerConnected: Boolean = false,
     // Drift detection (Faza 4.5)
     val driftAnalysis: DriftAnalysis? = null
 )
@@ -101,6 +102,7 @@ class MonitorViewModel @Inject constructor(
                             peerBatteryLevel = monitorState.peerBatteryLevel,
                             peerIsCharging = monitorState.peerIsCharging,
                             isPairedMode = monitorState.isPairedMode,
+                            peerConnected = monitorState.peerConnected,
                             driftAnalysis = monitorState.driftAnalysis
                         )
                     }

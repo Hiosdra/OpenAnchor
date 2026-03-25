@@ -7,6 +7,8 @@ import com.hiosdra.openanchor.domain.model.AnchorSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,12 +16,30 @@ class HistoryViewModel @Inject constructor(
     private val repository: AnchorSessionRepository
 ) : ViewModel() {
 
-    val sessions: StateFlow<List<AnchorSession>> = repository.observeAllSessions()
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val allSessions: Flow<List<AnchorSession>> = repository.observeAllSessions()
         .map { list -> list.filter { it.endTime != null } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val sessions: StateFlow<List<AnchorSession>> = combine(allSessions, _searchQuery) { list, query ->
+        if (query.isBlank()) list
+        else {
+            val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault())
+            list.filter { session ->
+                val dateStr = dateFormat.format(Date(session.startTime)).lowercase()
+                val coordStr = "%.6f, %.6f".format(session.anchorPosition.latitude, session.anchorPosition.longitude)
+                dateStr.contains(query.lowercase()) || coordStr.contains(query.lowercase())
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _deleteError = MutableStateFlow(false)
     val deleteError: StateFlow<Boolean> = _deleteError.asStateFlow()
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
 
     fun deleteSession(id: Long) {
         viewModelScope.launch {
