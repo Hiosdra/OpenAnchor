@@ -29,7 +29,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <!-- PDF.js for rendering exam questions from PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.124/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
     <!-- Exam PDF storage (IndexedDB) -->
     <script src="../../js/exam-pdf-storage.js"></script>
@@ -131,7 +131,7 @@
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
         // Configure pdf.js worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.124/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         // PDF rendering singleton
         const PdfRenderer = {
