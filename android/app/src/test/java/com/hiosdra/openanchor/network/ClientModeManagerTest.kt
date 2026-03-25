@@ -1,14 +1,19 @@
 package com.hiosdra.openanchor.network
 
+import android.util.Log
 import com.hiosdra.openanchor.domain.model.AlarmState
 import com.hiosdra.openanchor.domain.model.AnchorZone
 import com.hiosdra.openanchor.domain.model.Position
 import io.mockk.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -32,8 +37,8 @@ class ClientModeManagerTest {
     @Before
     fun setup() {
         clientStateFlow = MutableStateFlow(AnchorWebSocketClient.ClientState())
-        inboundMessages = MutableSharedFlow()
-        connectionEvents = MutableSharedFlow()
+        inboundMessages = MutableSharedFlow(extraBufferCapacity = 64)
+        connectionEvents = MutableSharedFlow(extraBufferCapacity = 16)
 
         wsClient = mockk(relaxed = true) {
             every { clientState } returns clientStateFlow
@@ -199,5 +204,258 @@ class ClientModeManagerTest {
         assertNull(state.cog)
         assertNull(state.serverGpsReport)
         assertFalse(state.serverDriftDetected)
+    }
+
+    // --- handleServerMessage ---
+
+    @Test
+    fun `handles GpsReport from server`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        val gpsPayload = AndroidGpsReportPayload(
+            pos = LatLng(54.35, 18.65),
+            accuracy = 5f,
+            distanceToAnchor = 20.0,
+            zoneCheckResult = "INSIDE",
+            alarmState = "SAFE",
+            driftDetected = true
+        )
+        inboundMessages.emit(AnchorWebSocketClient.ServerMessage.GpsReport(gpsPayload))
+
+        val state = manager.clientModeState.value
+        assertEquals(gpsPayload, state.serverGpsReport)
+        assertTrue(state.serverDriftDetected)
+        scope.cancel()
+    }
+
+    @Test
+    fun `handles ActionCommand from server`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        val events = mutableListOf<ClientModeManager.ClientModeEvent>()
+        val collectJob = scope.launch { manager.events.collect { events.add(it) } }
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        inboundMessages.emit(
+            AnchorWebSocketClient.ServerMessage.ActionCommand(
+                ActionCommandPayload("MUTE_ALARM")
+            )
+        )
+
+        assertTrue(events.any { it is ClientModeManager.ClientModeEvent.ServerCommand && it.command == "MUTE_ALARM" })
+        collectJob.cancel()
+        scope.cancel()
+    }
+
+    @Test
+    fun `handles Ping from server without state change`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        inboundMessages.emit(AnchorWebSocketClient.ServerMessage.Ping(System.currentTimeMillis()))
+
+        assertNull(manager.clientModeState.value.serverGpsReport)
+        scope.cancel()
+    }
+
+    // --- handleConnectionEvent ---
+
+    @Test
+    fun `CONNECTED event updates state and emits event`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        val events = mutableListOf<ClientModeManager.ClientModeEvent>()
+        val collectJob = scope.launch { manager.events.collect { events.add(it) } }
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        connectionEvents.emit(AnchorWebSocketClient.ClientConnectionEvent.CONNECTED)
+
+        assertTrue(manager.clientModeState.value.isConnected)
+        assertTrue(events.any { it is ClientModeManager.ClientModeEvent.Connected })
+        collectJob.cancel()
+        scope.cancel()
+    }
+
+    @Test
+    fun `CONNECTED event sends fullSync when zone is configured`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        val anchor = Position(54.35, 18.65)
+        val zone = AnchorZone.Circle(anchor, 30.0)
+        manager.setZoneConfiguration(anchor, zone)
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        connectionEvents.emit(AnchorWebSocketClient.ClientConnectionEvent.CONNECTED)
+
+        verify { wsClient.sendFullSync(match { it.zoneType == "CIRCLE" }) }
+        scope.cancel()
+    }
+
+    @Test
+    fun `CONNECTED event does not send fullSync without zone`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        clearMocks(wsClient, answers = false, recordedCalls = true)
+        connectionEvents.emit(AnchorWebSocketClient.ClientConnectionEvent.CONNECTED)
+
+        verify(exactly = 0) { wsClient.sendFullSync(any()) }
+        scope.cancel()
+    }
+
+    @Test
+    fun `DISCONNECTED event updates state and emits event`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        val events = mutableListOf<ClientModeManager.ClientModeEvent>()
+        val collectJob = scope.launch { manager.events.collect { events.add(it) } }
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        connectionEvents.emit(AnchorWebSocketClient.ClientConnectionEvent.DISCONNECTED)
+
+        assertFalse(manager.clientModeState.value.isConnected)
+        assertTrue(events.any { it is ClientModeManager.ClientModeEvent.Disconnected })
+        collectJob.cancel()
+        scope.cancel()
+    }
+
+    @Test
+    fun `HEARTBEAT_TIMEOUT event updates state and emits event`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        val events = mutableListOf<ClientModeManager.ClientModeEvent>()
+        val collectJob = scope.launch { manager.events.collect { events.add(it) } }
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        connectionEvents.emit(AnchorWebSocketClient.ClientConnectionEvent.HEARTBEAT_TIMEOUT)
+
+        assertFalse(manager.clientModeState.value.isConnected)
+        assertTrue(events.any { it is ClientModeManager.ClientModeEvent.HeartbeatTimeout })
+        collectJob.cancel()
+        scope.cancel()
+    }
+
+    @Test
+    fun `RECONNECTING event does not change connected state`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        connectionEvents.emit(AnchorWebSocketClient.ClientConnectionEvent.RECONNECTING)
+
+        assertFalse(manager.clientModeState.value.isConnected)
+        scope.cancel()
+    }
+
+    // --- client state mirroring ---
+
+    @Test
+    fun `mirrors wsClient state changes`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        clientStateFlow.value = AnchorWebSocketClient.ClientState(
+            isConnected = true,
+            serverUrl = "ws://10.0.0.1:8080"
+        )
+
+        assertTrue(manager.clientModeState.value.isConnected)
+        assertEquals("ws://10.0.0.1:8080", manager.clientModeState.value.serverUrl)
+        scope.cancel()
+    }
+
+    // --- updateTelemetry with all params ---
+
+    @Test
+    fun `updateTelemetry sends with battery and charging info`() {
+        every { wsClient.isConnected } returns true
+        manager.updateTelemetry(
+            position = Position(54.36, 18.66, 4.0f),
+            distanceToAnchor = 30.0,
+            alarmState = AlarmState.ALARM,
+            sog = 3.0,
+            cog = 270.0,
+            batteryLevel = 85.0,
+            isCharging = true
+        )
+        verify {
+            wsClient.sendStateUpdate(match {
+                it.batteryLevel == 85.0 && it.isCharging == true && it.alarmState == "ALARM"
+            })
+        }
+    }
+
+    // --- triggerAlarm payload ---
+
+    @Test
+    fun `triggerAlarm sends correct payload`() {
+        every { wsClient.isConnected } returns true
+        manager.triggerAlarm("GPS_LOST", "GPS signal lost for 60s", AlarmState.WARNING)
+        verify {
+            wsClient.sendTriggerAlarm(match {
+                it.reason == "GPS_LOST" && it.message == "GPS signal lost for 60s" && it.alarmState == "WARNING"
+            })
+        }
+    }
+
+    // --- setZoneConfiguration with SectorWithCircle sends correct payload ---
+
+    @Test
+    fun `CONNECTED with SectorWithCircle zone sends correct fullSync`() = runTest {
+        val unconfinedDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(unconfinedDispatcher)
+        val scope = CoroutineScope(unconfinedDispatcher)
+
+        val anchor = Position(54.35, 18.65)
+        val zone = AnchorZone.SectorWithCircle(
+            anchor, 30.0, bufferRadiusMeters = 50.0,
+            sectorRadiusMeters = 40.0, sectorHalfAngleDeg = 45.0, sectorBearingDeg = 180.0
+        )
+        manager.setZoneConfiguration(anchor, zone, 60.0, 12.0)
+
+        manager.connect("ws://192.168.1.1:8080", scope)
+
+        connectionEvents.emit(AnchorWebSocketClient.ClientConnectionEvent.CONNECTED)
+
+        verify {
+            wsClient.sendFullSync(match {
+                it.zoneType == "SECTOR" &&
+                it.sector != null &&
+                it.sector?.bearingDeg == 180.0 &&
+                it.chainLengthM == 60.0 &&
+                it.depthM == 12.0
+            })
+        }
+        scope.cancel()
     }
 }
