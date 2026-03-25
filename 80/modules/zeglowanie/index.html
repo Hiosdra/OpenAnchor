@@ -692,7 +692,7 @@
             currentCruiseType = cruiseType;
 
             // Update button states
-            document.querySelectorAll('.cruise-btn').forEach(btn => {
+            document.querySelectorAll('.cruise-btn[data-cruise]').forEach(btn => {
                 if (btn.dataset.cruise === cruiseType) {
                     btn.classList.add('active');
                 } else {
@@ -897,7 +897,7 @@
 
         // Attach event listeners to checklist items
         function attachChecklistListeners() {
-            document.querySelectorAll('.checklist-item').forEach(item => {
+            document.querySelectorAll('#packingList .checklist-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const itemId = this.dataset.item;
                     const cruiseType = this.dataset.cruiseType;
@@ -911,7 +911,7 @@
 
         // Load checked items from localStorage
         function loadChecklistState() {
-            document.querySelectorAll('.checklist-item').forEach(item => {
+            document.querySelectorAll('#packingList .checklist-item').forEach(item => {
                 const itemId = item.dataset.item;
                 const cruiseType = item.dataset.cruiseType;
                 const storageKey = `sailing-${cruiseType}-${itemId}`;
@@ -933,7 +933,7 @@
         // Reset checklist
         function resetChecklist() {
             if (confirm('Czy na pewno chcesz wyczyścić obecną listę?')) {
-                document.querySelectorAll('.checklist-item').forEach(item => {
+                document.querySelectorAll('#packingList .checklist-item').forEach(item => {
                     const itemId = item.dataset.item;
                     const cruiseType = item.dataset.cruiseType;
                     const storageKey = `sailing-${cruiseType}-${itemId}`;
@@ -1146,7 +1146,7 @@
             currentCruiseType = savedCruiseType;
 
             // Update button states
-            document.querySelectorAll('.cruise-btn').forEach(btn => {
+            document.querySelectorAll('.cruise-btn[data-cruise]').forEach(btn => {
                 if (btn.dataset.cruise === savedCruiseType) {
                     btn.classList.add('active');
                 } else {
@@ -1184,11 +1184,16 @@
 
             // Load saved checklist type or default to morning
             const savedChecklistType = localStorage.getItem('zeglowanie_selected_checklist_type') || 'morning';
-            currentChecklistType = savedChecklistType;
+            // Validate that the saved type exists in checklistData
+            currentChecklistType = checklistData[savedChecklistType] ? savedChecklistType : 'morning';
+            // Update localStorage if it was invalid
+            if (!checklistData[savedChecklistType]) {
+                localStorage.setItem('zeglowanie_selected_checklist_type', 'morning');
+            }
 
             // Update checklist button states
             document.querySelectorAll('.cruise-btn[data-checklist]').forEach(btn => {
-                if (btn.dataset.checklist === savedChecklistType) {
+                if (btn.dataset.checklist === currentChecklistType) {
                     btn.classList.add('active');
                 } else {
                     btn.classList.remove('active');
@@ -1196,8 +1201,8 @@
             });
 
             // Update checklist title
-            if (checklistData[savedChecklistType]) {
-                document.getElementById('checklistTitle').textContent = checklistData[savedChecklistType].title;
+            if (checklistData[currentChecklistType]) {
+                document.getElementById('checklistTitle').textContent = checklistData[currentChecklistType].title;
             }
 
             // Render initial checklist items
