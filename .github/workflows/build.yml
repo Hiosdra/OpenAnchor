@@ -440,7 +440,7 @@ jobs:
           fi
 
           echo "" >> coverage-comment.md
-          echo "_Coverage thresholds are enforced: PWA ≥ 90% lines, Android ≥ 85% lines. Build fails if thresholds are breached._" >> coverage-comment.md
+          echo "_Coverage thresholds are enforced: ≥ 90% everywhere. Build fails if coverage drops below 90%._" >> coverage-comment.md
 
       - name: Comment PR with coverage
         uses: marocchino/sticky-pull-request-comment@v2
