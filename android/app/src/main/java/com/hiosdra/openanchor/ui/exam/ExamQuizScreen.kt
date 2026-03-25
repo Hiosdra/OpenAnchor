@@ -67,8 +67,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -1912,7 +1910,6 @@ private fun QuestionImageCard(question: ExamQuestion, pdfRenderer: ExamPdfRender
             }
 
             if (bitmap != null) {
-                val desaturated = ColorMatrix().apply { setToSaturation(0f) }
                 Image(
                     bitmap = bitmap,
                     contentDescription = "Pytanie #${question.id}",
@@ -1920,7 +1917,6 @@ private fun QuestionImageCard(question: ExamQuestion, pdfRenderer: ExamPdfRender
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.FillWidth,
-                    colorFilter = ColorFilter.colorMatrix(desaturated),
                 )
             } else {
                 Box(

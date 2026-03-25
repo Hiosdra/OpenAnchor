@@ -47,7 +47,7 @@ class ExamPdfRenderer @Inject constructor(
         val height = (page.height * scale).toInt()
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         bitmap.eraseColor(Color.WHITE)
-        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
         page.close()
 
         cache.put(pageIndex, bitmap)
