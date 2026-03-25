@@ -31,31 +31,34 @@ class AnchorDataListenerService : WearableListenerService() {
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         super.onDataChanged(dataEvents)
 
-        for (event in dataEvents) {
-            val uri = event.dataItem.uri
-            if (uri.path == DataPaths.MONITOR_STATE_PATH) {
-                try {
-                    val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+        try {
+            for (event in dataEvents) {
+                val uri = event.dataItem.uri
+                if (uri.path == DataPaths.MONITOR_STATE_PATH) {
+                    try {
+                        val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
 
-                    val state = WearMonitorState(
-                        isActive = dataMap.getBoolean(DataPaths.KEY_IS_ACTIVE, false),
-                        alarmState = WearAlarmState.fromString(
-                            dataMap.getString(DataPaths.KEY_ALARM_STATE, "SAFE")
-                        ),
-                        distanceMeters = dataMap.getFloat(DataPaths.KEY_DISTANCE, 0f).toDouble(),
-                        gpsAccuracyMeters = dataMap.getFloat(DataPaths.KEY_GPS_ACCURACY, 0f),
-                        gpsSignalLost = dataMap.getBoolean(DataPaths.KEY_GPS_SIGNAL_LOST, false),
-                        timestamp = dataMap.getLong(DataPaths.KEY_TIMESTAMP, 0L)
-                    )
+                        val state = WearMonitorState(
+                            isActive = dataMap.getBoolean(DataPaths.KEY_IS_ACTIVE, false),
+                            alarmState = WearAlarmState.fromString(
+                                dataMap.getString(DataPaths.KEY_ALARM_STATE, "SAFE")
+                            ),
+                            distanceMeters = dataMap.getFloat(DataPaths.KEY_DISTANCE, 0f).toDouble(),
+                            gpsAccuracyMeters = dataMap.getFloat(DataPaths.KEY_GPS_ACCURACY, 0f),
+                            gpsSignalLost = dataMap.getBoolean(DataPaths.KEY_GPS_SIGNAL_LOST, false),
+                            timestamp = dataMap.getLong(DataPaths.KEY_TIMESTAMP, 0L)
+                        )
 
-                    WearMonitorStateHolder.updateState(state)
-                    WearMonitorStateHolder.setConnected(true)
+                        WearMonitorStateHolder.updateState(state)
 
-                    Log.d(TAG, "State updated: ${state.alarmState}, dist=${state.distanceMeters}m")
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing DataItem", e)
+                        Log.d(TAG, "State updated: ${state.alarmState}, dist=${state.distanceMeters}m")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error parsing DataItem", e)
+                    }
                 }
             }
+        } finally {
+            dataEvents.release()
         }
     }
 
@@ -70,11 +73,16 @@ class AnchorDataListenerService : WearableListenerService() {
 
     private fun triggerAlarmVibration() {
         val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val manager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            manager.defaultVibrator
+            val manager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+            manager?.defaultVibrator
         } else {
             @Suppress("DEPRECATION")
-            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        }
+
+        if (vibrator == null || !vibrator.hasVibrator()) {
+            Log.w(TAG, "No vibrator available, skipping alarm vibration")
+            return
         }
 
         // Strong repeating pattern: vibrate 500ms, pause 200ms, repeat 5 times
