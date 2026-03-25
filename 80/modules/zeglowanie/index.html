@@ -827,8 +827,8 @@
 
                 const text = document.createElement('div');
                 text.className = 'checklist-text';
-                // Add crew icon if applicable
-                const crewIcon = item.crew ? '🧑‍🧑‍🧒‍🧒 ' : '';
+                // Add crew indicator if applicable
+                const crewIcon = item.crew ? '(Załoga) ' : '';
                 text.textContent = crewIcon + item.text;
 
                 li.appendChild(checkbox);
