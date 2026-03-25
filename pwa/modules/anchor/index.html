@@ -170,6 +170,7 @@
                 <i data-lucide="satellite" class="w-3 sm:w-3.5 h-3 sm:h-3.5"></i>
                 <span id="gps-status-text" data-i18n="gpsSearching">Szukam...</span>
             </div>
+            <span id="battery-saver-badge" class="hidden text-[9px] bg-yellow-900 text-yellow-300 px-1.5 py-0.5 rounded-full ml-1">🔋 Eco</span>
         </div>
     </div>
 </header>
@@ -559,6 +560,9 @@
         <div class="flex gap-2">
             <button id="replay-export-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2">
                 <i data-lucide="download" class="w-4 h-4"></i> <span data-i18n="replayExport">Eksport GPX</span>
+            </button>
+            <button id="replay-export-csv-btn" class="flex-1 bg-slate-600 hover:bg-slate-500 py-3 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> CSV
             </button>
             <button id="replay-delete-btn" class="flex-1 bg-red-900/50 hover:bg-red-900 text-red-300 py-3 rounded-xl font-bold border border-red-800 text-sm flex items-center justify-center gap-2">
                 <i data-lucide="trash-2" class="w-4 h-4"></i> <span data-i18n="replayDelete">Usuń</span>
@@ -2307,6 +2311,9 @@
             this._trackFlushInterval = null;
             this._TRACK_BUFFER_MAX = 1000;
 
+            // Battery saver mode
+            this._batterySaverActive = false;
+
             this.db = new SessionDB();
             this.alarmEngine = new AlarmEngine();
             this.mapCtrl = new MapController('map');
@@ -2473,6 +2480,7 @@
             this._checkSchedule();
             if (this.syncCtrl) this.syncCtrl.checkHeartbeat();
             this._checkGpsWatchdog();
+            this._checkBatterySaver();
         }
 
         // ==========================================
@@ -2722,6 +2730,9 @@
 
         _initGPS() {
             if ("geolocation" in navigator) {
+                const gpsOptions = this._batterySaverActive
+                    ? { enableHighAccuracy: false, maximumAge: 5000, timeout: 10000 }
+                    : { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 };
                 this.gpsWatchId = navigator.geolocation.watchPosition(
                     (pos) => this._onPosition(pos),
                     (err) => {
@@ -2748,9 +2759,31 @@
                             }
                         }
                     },
-                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                    gpsOptions
                 );
             } else document.getElementById('no-signal-overlay').classList.remove('hidden');
+        }
+
+        _checkBatterySaver() {
+            const level = this.alertCtrl.lastKnownBatteryLevel;
+            const charging = this.alertCtrl.lastKnownChargingState;
+            const shouldSave = level !== undefined && level <= 0.30 && !charging;
+
+            if (shouldSave && !this._batterySaverActive) {
+                this._batterySaverActive = true;
+                // Restart GPS with lower accuracy settings
+                this._cleanupGPS();
+                this._initGPS();
+                // Show battery saver indicator
+                const badge = document.getElementById('battery-saver-badge');
+                if (badge) badge.classList.remove('hidden');
+            } else if (!shouldSave && this._batterySaverActive) {
+                this._batterySaverActive = false;
+                this._cleanupGPS();
+                this._initGPS();
+                const badge = document.getElementById('battery-saver-badge');
+                if (badge) badge.classList.add('hidden');
+            }
         }
 
         _cleanupGPS() {
@@ -2970,6 +3003,8 @@
 
                 // Wire up buttons
                 document.getElementById('replay-export-btn').onclick = () => this._exportSessionGPX(session, points);
+                const csvBtn = document.getElementById('replay-export-csv-btn');
+                if (csvBtn) csvBtn.onclick = () => this._exportSessionCSV(session, points);
                 document.getElementById('replay-delete-btn').onclick = async () => {
                     if (confirm(I18N.t.replayConfirm)) {
                         await this.db.deleteSession(sessionId);
@@ -3066,6 +3101,20 @@
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([gpx], { type: 'application/gpx+xml' }));
             a.download = `openanchor_${startDate.toISOString().slice(0,10)}_${startDate.toISOString().slice(11,16).replace(':','')}.gpx`;
+            a.click();
+        }
+
+        _exportSessionCSV(session, points) {
+            if (points.length === 0) return;
+            const startDate = new Date(session.startTime);
+            const header = 'timestamp,lat,lon,accuracy,distance,alarmState\n';
+            const rows = points.map(p =>
+                `${new Date(p.timestamp).toISOString()},${p.lat},${p.lng},${p.accuracy || ''},${p.distance || ''},${p.alarmState || 'SAFE'}`
+            ).join('\n');
+            const csv = header + rows;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+            a.download = `openanchor_${startDate.toISOString().slice(0,10)}_${startDate.toISOString().slice(11,16).replace(':','')}.csv`;
             a.click();
         }
 

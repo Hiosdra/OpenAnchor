@@ -993,11 +993,19 @@
             const [selectedCategories, setSelectedCategories] = useState(Object.values(CATEGORIES).map(c => c.id));
             const [showCategoryFilter, setShowCategoryFilter] = useState(false);
             const [selectedAnswer, setSelectedAnswer] = useState(null);
+            const [searchQuery, setSearchQuery] = useState('');
 
-            const filteredQuestions = useMemo(() =>
-                questions.filter(q => selectedCategories.includes(q.category)),
-                [questions, selectedCategories]
-            );
+            const filteredQuestions = useMemo(() => {
+                let result = questions.filter(q => selectedCategories.includes(q.category));
+                if (searchQuery.trim()) {
+                    const query = searchQuery.trim().toLowerCase();
+                    result = result.filter(q =>
+                        q.question.toLowerCase().includes(query) ||
+                        (q.answers && q.answers.some(a => a.text && a.text.toLowerCase().includes(query)))
+                    );
+                }
+                return result;
+            }, [questions, selectedCategories, searchQuery]);
 
             // Initialize currentIndex with saved position
             const [currentIndex, setCurrentIndex] = useState(() => {
@@ -1110,6 +1118,17 @@
                             setSelectedAnswer(null);
                         }}
                     />
+
+                    {/* Search input */}
+                    <div className="px-4 pb-2">
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => { setSearchQuery(e.target.value); setCurrentIndex(0); setSelectedAnswer(null); }}
+                            placeholder="Szukaj pytania..."
+                            className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-white/30 focus:outline-none focus:border-amber-500/50"
+                        />
+                    </div>
 
                     {showCategoryFilter && (
                         <div className="px-4 pb-2">
