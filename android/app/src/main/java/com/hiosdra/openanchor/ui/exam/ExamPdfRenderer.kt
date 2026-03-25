@@ -55,7 +55,11 @@ class ExamPdfRenderer @Inject constructor(
     }
 
     fun renderQuestion(question: ExamQuestion, scale: Float = 2f): Bitmap? {
-        val fullPage = renderPage(question.pdfPage, scale) ?: return null
+        // Render at reduced scale when only a portion is needed, to save memory
+        val cropFraction = (question.cropYEnd - question.cropYStart) / question.pageHeight.toFloat()
+        val effectiveScale = if (cropFraction < 0.5f) (scale * 0.75f).coerceAtLeast(1f) else scale
+
+        val fullPage = renderPage(question.pdfPage, effectiveScale) ?: return null
 
         val scaleRatio = fullPage.height.toFloat() / question.pageHeight
         val yStart = (question.cropYStart * scaleRatio).toInt().coerceAtLeast(0)

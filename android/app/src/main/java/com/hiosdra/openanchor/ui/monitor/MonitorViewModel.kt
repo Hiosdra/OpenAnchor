@@ -17,6 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 enum class MonitorViewMode {
     MAP,
@@ -61,15 +62,21 @@ class MonitorViewModel @Inject constructor(
     private var currentTrackSessionId: Long? = null
     /** Job for the current track points collection, cancelled when session changes */
     private var trackPointsJob: Job? = null
+    /** Cached positions for bearing calculation to avoid redundant computation */
+    private var lastBoatPosition: Position? = null
+    private var lastAnchorPosition: Position? = null
+    private var cachedBearing: Double = 0.0
 
     init {
-        // Start compass updates
+        // Start compass updates with debounce to avoid excessive recompositions
         if (compassProvider.isAvailable) {
             _uiState.update { it.copy(compassAvailable = true) }
             viewModelScope.launch {
-                compassProvider.headingUpdates().collect { heading ->
-                    _uiState.update { it.copy(compassHeading = heading) }
-                }
+                compassProvider.headingUpdates()
+                    .distinctUntilChanged { old, new -> abs(old - new) < 1.0f }
+                    .collect { heading ->
+                        _uiState.update { it.copy(compassHeading = heading) }
+                    }
             }
         }
 
@@ -124,7 +131,12 @@ class MonitorViewModel @Inject constructor(
     private fun calculateBearing(state: MonitorState): Double {
         val boat = state.boatPosition ?: return 0.0
         val anchor = state.anchorPosition ?: return 0.0
-        return GeoCalculations.bearingDegrees(boat, anchor)
+        // Only recalculate when positions actually change
+        if (boat == lastBoatPosition && anchor == lastAnchorPosition) return cachedBearing
+        lastBoatPosition = boat
+        lastAnchorPosition = anchor
+        cachedBearing = GeoCalculations.bearingDegrees(boat, anchor)
+        return cachedBearing
     }
 
     fun toggleViewMode() {
