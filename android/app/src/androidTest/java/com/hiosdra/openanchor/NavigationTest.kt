@@ -48,8 +48,6 @@ class NavigationTest {
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
         composeTestRule.waitForIdle()
-        Thread.sleep(500)
-        composeTestRule.waitForIdle()
     }
 
     private fun navigateBack() {

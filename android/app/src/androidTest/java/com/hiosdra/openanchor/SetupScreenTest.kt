@@ -46,6 +46,7 @@ class SetupScreenTest {
     }
 
     private fun navigateToSetup() {
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().performClick()
         composeTestRule.waitForText("Anchor Position")
     }

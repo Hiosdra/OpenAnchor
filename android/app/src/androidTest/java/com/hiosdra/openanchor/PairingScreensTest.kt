@@ -45,8 +45,6 @@ class PairingScreensTest {
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
         composeTestRule.waitForIdle()
-        Thread.sleep(500)
-        composeTestRule.waitForIdle()
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -97,11 +95,6 @@ class PairingScreensTest {
     @Test
     fun scanQRScreen_showsCameraPermissionOrPreview() {
         navigateToScanQRScreen()
-        // In test environment, camera permission is likely denied, so we expect the
-        // permission message or the camera preview area to exist (either is valid)
-        val permissionNodes = composeTestRule
-            .onAllNodesWithText("Camera permission is required", substring = true)
-            .fetchSemanticsNodes()
         // Screen rendered without crash — camera area is present in some form
         composeTestRule.assertTextDisplayed("Scan Server QR Code")
     }

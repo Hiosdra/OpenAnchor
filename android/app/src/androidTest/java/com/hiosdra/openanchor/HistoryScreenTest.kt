@@ -46,8 +46,7 @@ class HistoryScreenTest {
         composeTestRule.onNodeWithText("History", substring = true).performScrollTo()
         composeTestRule.waitForText("History").performClick()
         composeTestRule.waitForIdle()
-        Thread.sleep(500) // Allow navigation animation
-        composeTestRule.waitForIdle()
+        composeTestRule.waitForText("No anchoring history yet")
     }
 
     @Test
