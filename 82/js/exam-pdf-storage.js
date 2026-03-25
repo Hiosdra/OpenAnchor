@@ -2,6 +2,10 @@
  * exam-pdf-storage.js
  * IndexedDB storage for exam PDF data.
  * Persists through service worker cache clears and app updates.
+ *
+ * Loaded as a plain <script> in the browser (functions are global).
+ * In Vitest, the IIFE detects the test env and assigns to globalThis
+ * so named imports still work via the re-export wrapper.
  */
 
 const EXPECTED_PDF_HASH = '967e36168e85a50fc551acbcea171939bad82c2de4872009044c67685c970c10';
@@ -99,13 +103,18 @@ async function verifyPdfHash(arrayBuffer) {
     return { valid: hash === EXPECTED_PDF_HASH, hash };
 }
 
-export {
-    EXPECTED_PDF_HASH,
-    savePdfData,
-    loadPdfBlob,
-    loadPdfMeta,
-    isPdfImported,
-    deletePdf,
-    computeSha256,
-    verifyPdfHash,
-};
+// Make functions available for Vitest named imports while keeping browser compatibility.
+// In the browser, this file is a plain <script> so `export` would cause SyntaxError.
+// Vitest transforms files before execution, so we use a conditional CJS-style export.
+if (typeof module !== 'undefined') {
+    module.exports = {
+        EXPECTED_PDF_HASH,
+        savePdfData,
+        loadPdfBlob,
+        loadPdfMeta,
+        isPdfImported,
+        deletePdf,
+        computeSha256,
+        verifyPdfHash,
+    };
+}
