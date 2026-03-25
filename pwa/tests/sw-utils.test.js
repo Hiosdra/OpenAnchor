@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   APP_CACHE_PREFIX,
   isServiceWorkerSupported,
@@ -6,7 +6,8 @@ import {
   waitForServiceWorkerUpdate,
   showUpdateBanner,
   hideUpdateBanner,
-  handleUpdateClick
+  handleUpdateClick,
+  forceUpdate
 } from '../js/sw-utils.js';
 
 describe('Service Worker Utils', () => {
@@ -185,6 +186,144 @@ describe('Service Worker Utils', () => {
       handleUpdateClick(null);
 
       expect(reloadSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('forceUpdate', () => {
+    let btn;
+    let reloadSpy;
+    let originalLocation;
+    let originalCaches;
+
+    beforeEach(() => {
+      btn = document.createElement('button');
+      btn.innerHTML = 'Update';
+
+      originalLocation = window.location;
+      originalCaches = global.caches;
+
+      reloadSpy = vi.fn();
+      Object.defineProperty(window, 'location', {
+        value: { reload: reloadSpy },
+        writable: true,
+        configurable: true
+      });
+
+      global.caches = {
+        keys: vi.fn().mockResolvedValue([]),
+        delete: vi.fn().mockResolvedValue(true)
+      };
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window, 'location', {
+        value: originalLocation,
+        writable: true,
+        configurable: true
+      });
+      global.caches = originalCaches;
+    });
+
+    it('should return early when btn is null', async () => {
+      await forceUpdate(null);
+      expect(reloadSpy).not.toHaveBeenCalled();
+    });
+
+    it('should reload page when service worker is not supported', async () => {
+      const original = navigator.serviceWorker;
+      delete global.navigator.serviceWorker;
+
+      await forceUpdate(btn);
+
+      expect(btn.disabled).toBe(true);
+      expect(btn.classList.contains('updating')).toBe(true);
+      expect(reloadSpy).toHaveBeenCalled();
+
+      global.navigator.serviceWorker = original;
+    });
+
+    it('should reload page when no registration is found', async () => {
+      global.navigator.serviceWorker = {
+        getRegistration: vi.fn().mockResolvedValue(undefined)
+      };
+
+      await forceUpdate(btn);
+
+      expect(btn.disabled).toBe(true);
+      expect(reloadSpy).toHaveBeenCalled();
+    });
+
+    it('should post SKIP_WAITING when registration has waiting worker', async () => {
+      const postMessageSpy = vi.fn();
+      global.navigator.serviceWorker = {
+        getRegistration: vi.fn().mockResolvedValue({
+          waiting: { postMessage: postMessageSpy }
+        })
+      };
+
+      await forceUpdate(btn);
+
+      expect(postMessageSpy).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+      expect(btn.innerHTML).toContain('Instaluję...');
+    });
+
+    it('should post SKIP_WAITING when update found with waiting worker', async () => {
+      const postMessageSpy = vi.fn();
+      const registration = {
+        waiting: null,
+        installing: null,
+        update: vi.fn().mockResolvedValue(undefined),
+        addEventListener: vi.fn()
+      };
+
+      global.navigator.serviceWorker = {
+        getRegistration: vi.fn().mockResolvedValue(registration)
+      };
+
+      // After update(), simulate a waiting worker appearing
+      registration.update.mockImplementation(async () => {
+        registration.waiting = { postMessage: postMessageSpy };
+      });
+
+      await forceUpdate(btn);
+
+      expect(registration.update).toHaveBeenCalled();
+      expect(postMessageSpy).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+      expect(btn.innerHTML).toContain('Instaluję...');
+    });
+
+    it('should clear caches and reload when no update is available', async () => {
+      const registration = {
+        waiting: null,
+        installing: null,
+        update: vi.fn().mockResolvedValue(undefined),
+        addEventListener: vi.fn()
+      };
+
+      global.navigator.serviceWorker = {
+        getRegistration: vi.fn().mockResolvedValue(registration)
+      };
+
+      await forceUpdate(btn);
+
+      expect(registration.update).toHaveBeenCalled();
+      expect(btn.innerHTML).toContain('Czyszczę cache...');
+      expect(reloadSpy).toHaveBeenCalled();
+    });
+
+    it('should restore button state and re-throw on error', async () => {
+      const testError = new Error('update failed');
+      global.navigator.serviceWorker = {
+        getRegistration: vi.fn().mockRejectedValue(testError)
+      };
+
+      const originalHTML = btn.innerHTML;
+
+      await expect(forceUpdate(btn)).rejects.toThrow('update failed');
+
+      expect(btn.innerHTML).toBe(originalHTML);
+      expect(btn.disabled).toBe(false);
+      expect(btn.classList.contains('updating')).toBe(false);
     });
   });
 

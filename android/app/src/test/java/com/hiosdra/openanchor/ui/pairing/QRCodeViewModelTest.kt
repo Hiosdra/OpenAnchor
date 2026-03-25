@@ -282,4 +282,176 @@ class QRCodeViewModelTest {
             cancel()
         }
     }
+
+    // --- stopPairing with hotspot mode ---
+
+    @Test
+    fun `stopPairing with hotspot mode stops hotspot`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val vm = QRCodeViewModel(hotspotManager, wsServer, serviceBinder)
+        advanceUntilIdle()
+
+        vm.startPairingWithHotspot()
+        advanceUntilIdle()
+
+        vm.stopPairing()
+        advanceUntilIdle()
+
+        verify { hotspotManager.stopHotspot() }
+        verify { serviceBinder.stopWebSocketServer() }
+    }
+
+    // --- startServer with null wsUrl ---
+
+    @Test
+    fun `startServer shows error when wsUrl is null`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { hotspotManager.getWebSocketUrl(any()) } returns null
+
+        val vm = QRCodeViewModel(hotspotManager, wsServer, serviceBinder)
+        advanceUntilIdle()
+
+        vm.startPairingOnExistingNetwork()
+        advanceUntilIdle()
+
+        // Trigger server started
+        serverStateFlow.value = AnchorWebSocketServer.ServerState(isRunning = true)
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(PairingStep.ERROR, state.step)
+            assertEquals("Could not determine device IP address", state.errorMessage)
+            cancel()
+        }
+    }
+
+    // --- startServer with valid wsUrl ---
+
+    @Test
+    fun `startServer generates QR and sets wsUrl when available`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { hotspotManager.getWebSocketUrl(any()) } returns "ws://192.168.43.1:8080"
+
+        val vm = QRCodeViewModel(hotspotManager, wsServer, serviceBinder)
+        advanceUntilIdle()
+
+        vm.startPairingOnExistingNetwork()
+        advanceUntilIdle()
+
+        // Trigger server started
+        serverStateFlow.value = AnchorWebSocketServer.ServerState(isRunning = true)
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(PairingStep.WAITING_FOR_CLIENT, state.step)
+            assertEquals("ws://192.168.43.1:8080", state.wsUrl)
+            cancel()
+        }
+    }
+
+    // --- hotspot active without server running ---
+
+    @Test
+    fun `hotspot active without server shows HOTSPOT_READY`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val vm = QRCodeViewModel(hotspotManager, wsServer, serviceBinder)
+        advanceUntilIdle()
+
+        hotspotStateFlow.value = HotspotManager.HotspotState(
+            isActive = true,
+            ssid = "OpenAnchor-5678",
+            password = "pass456"
+        )
+        // server is NOT running
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(PairingStep.HOTSPOT_READY, state.step)
+            assertEquals("OpenAnchor-5678", state.hotspotSsid)
+            cancel()
+        }
+    }
+
+    // --- hotspot active WITH server shows WAITING_FOR_CLIENT ---
+
+    @Test
+    fun `hotspot active with server running shows WAITING_FOR_CLIENT`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val vm = QRCodeViewModel(hotspotManager, wsServer, serviceBinder)
+        advanceUntilIdle()
+
+        // Set server running first
+        serverStateFlow.value = AnchorWebSocketServer.ServerState(isRunning = true)
+        advanceUntilIdle()
+
+        // Then hotspot active
+        hotspotStateFlow.value = HotspotManager.HotspotState(
+            isActive = true,
+            ssid = "OpenAnchor-ABCD",
+            password = "pass789"
+        )
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(PairingStep.WAITING_FOR_CLIENT, state.step)
+            cancel()
+        }
+    }
+
+    // --- startPairingWithHotspot triggers server start after hotspot ---
+
+    @Test
+    fun `startPairingWithHotspot starts server after hotspot becomes active`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val vm = QRCodeViewModel(hotspotManager, wsServer, serviceBinder)
+        advanceUntilIdle()
+
+        vm.startPairingWithHotspot()
+        advanceUntilIdle()
+
+        // Simulate hotspot becoming active
+        hotspotStateFlow.value = HotspotManager.HotspotState(isActive = true, ssid = "OA", password = "pw")
+        advanceUntilIdle()
+
+        verify { serviceBinder.startWebSocketServer() }
+    }
+
+    // --- QRCodeUiState defaults ---
+
+    @Test
+    fun `QRCodeUiState defaults are correct`() {
+        val state = QRCodeUiState()
+        assertEquals(PairingStep.IDLE, state.step)
+        assertNull(state.hotspotSsid)
+        assertNull(state.hotspotPassword)
+        assertNull(state.wsUrl)
+        assertNull(state.qrBitmap)
+        assertFalse(state.serverRunning)
+        assertFalse(state.clientConnected)
+        assertNull(state.errorMessage)
+        assertFalse(state.useExistingNetwork)
+    }
+
+    // --- PairingStep enum ---
+
+    @Test
+    fun `PairingStep has all expected values`() {
+        val values = PairingStep.values()
+        assertEquals(7, values.size)
+        assertNotNull(PairingStep.IDLE)
+        assertNotNull(PairingStep.STARTING_HOTSPOT)
+        assertNotNull(PairingStep.HOTSPOT_READY)
+        assertNotNull(PairingStep.STARTING_SERVER)
+        assertNotNull(PairingStep.WAITING_FOR_CLIENT)
+        assertNotNull(PairingStep.PAIRED)
+        assertNotNull(PairingStep.ERROR)
+    }
 }

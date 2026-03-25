@@ -181,6 +181,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/Manifest*.*",
         "**/*Test*.*",
         "android/**/*.*",
+        // Hilt generated
         "**/*_Hilt*.class",
         "**/Hilt_*.class",
         "**/*_Factory.class",
@@ -190,7 +191,19 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/*Component.class",
         "**/*Component$*.class",
         "**/*_ComponentImpl.class",
-        "**/*_ComponentImpl$*.class"
+        "**/*_ComponentImpl$*.class",
+        // Compose generated lambda holders
+        "**/ComposableSingletons*.class",
+        // Room generated DAO/DB implementations
+        "**/*_Impl.class",
+        "**/*_Impl$*.class",
+        // Navigation graph definition
+        "**/NavHostKt*.class",
+        // Activity lifecycle + permissions (not unit-testable)
+        "**/MainActivity*.class",
+        // Bound service lifecycle (logic extracted to GpsProcessor/AlarmHandler)
+        "**/AnchorMonitorService*.class",
+        "**/ServiceBinder*.class"
     )
 
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
@@ -203,4 +216,53 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     executionData.setFrom(fileTree(project.layout.buildDirectory.get()) {
         include("jacoco/testDebugUnitTest.exec")
     })
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
+    dependsOn("testDebugUnitTest")
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/*_Hilt*.class",
+        "**/Hilt_*.class",
+        "**/*_Factory.class",
+        "**/*_MembersInjector.class",
+        "**/*Module.class",
+        "**/*Module$*.class",
+        "**/*Component.class",
+        "**/*Component$*.class",
+        "**/*_ComponentImpl.class",
+        "**/*_ComponentImpl$*.class",
+        "**/ComposableSingletons*.class",
+        "**/*_Impl.class",
+        "**/*_Impl$*.class",
+        "**/NavHostKt*.class",
+        "**/MainActivity*.class",
+        "**/AnchorMonitorService*.class",
+        "**/ServiceBinder*.class"
+    )
+
+    val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(project.layout.buildDirectory.get()) {
+        include("jacoco/testDebugUnitTest.exec")
+    })
+
+    violationRules {
+        rule {
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = "0.90".toBigDecimal()
+            }
+        }
+    }
 }

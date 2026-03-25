@@ -104,6 +104,9 @@ jobs:
       - name: Generate coverage report
         run: ./gradlew :app:jacocoTestReport --no-daemon --stacktrace
 
+      - name: Verify coverage thresholds
+        run: ./gradlew :app:jacocoCoverageVerification --no-daemon
+
       - name: Upload Android test results
         uses: actions/upload-artifact@v7
         if: always()
@@ -437,7 +440,7 @@ jobs:
           fi
 
           echo "" >> coverage-comment.md
-          echo "_This is an informational report. Coverage checks are not enforced._" >> coverage-comment.md
+          echo "_Coverage thresholds enforced: PWA ≥ 90% lines/statements/functions/branches (vitest), Android ≥ 90% lines (JaCoCo, after exclusions). Build fails if breached._" >> coverage-comment.md
 
       - name: Comment PR with coverage
         uses: marocchino/sticky-pull-request-comment@v2

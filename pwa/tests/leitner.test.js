@@ -59,6 +59,18 @@ describe('Leitner System - Spaced Repetition', () => {
       expect(advanced.lastReview).toBeGreaterThanOrEqual(before);
       expect(advanced.lastReview).toBeLessThanOrEqual(after);
     });
+
+    it('should default box to 1 when missing', () => {
+      const data = { lastReview: null, reviewCount: 0 };
+      const advanced = advanceQuestion(data);
+      expect(advanced.box).toBe(2);
+    });
+
+    it('should default reviewCount to 0 when missing', () => {
+      const data = { box: 2, lastReview: Date.now() };
+      const advanced = advanceQuestion(data);
+      expect(advanced.reviewCount).toBe(1);
+    });
   });
 
   describe('resetQuestion', () => {
@@ -82,6 +94,12 @@ describe('Leitner System - Spaced Repetition', () => {
       const reset = resetQuestion(data);
 
       expect(reset.reviewCount).toBe(8);
+    });
+
+    it('should default reviewCount to 0 when missing', () => {
+      const data = { box: 3, lastReview: Date.now() };
+      const reset = resetQuestion(data);
+      expect(reset.reviewCount).toBe(1);
     });
   });
 
@@ -125,6 +143,18 @@ describe('Leitner System - Spaced Repetition', () => {
 
     it('should handle undefined lastReview', () => {
       const data = { box: 3, reviewCount: 0 };
+      expect(isDueForReview(data)).toBe(true);
+    });
+
+    it('should default box to 1 when missing', () => {
+      const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000 + 1000);
+      const data = { lastReview: oneDayAgo, reviewCount: 1 };
+      expect(isDueForReview(data)).toBe(true);
+    });
+
+    it('should default interval to 1 for invalid box number', () => {
+      const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000 + 1000);
+      const data = { box: 99, lastReview: oneDayAgo, reviewCount: 1 };
       expect(isDueForReview(data)).toBe(true);
     });
   });
@@ -216,6 +246,18 @@ describe('Leitner System - Spaced Repetition', () => {
 
       expect(stats.total).toBe(0);
     });
+
+    it('should default box to 1 when data.box is missing', () => {
+      const leitnerState = {
+        boxes: {
+          q1: { lastReview: Date.now(), reviewCount: 1 },
+          q2: { box: 0, lastReview: Date.now(), reviewCount: 1 }
+        }
+      };
+      const stats = getLeitnerStats(leitnerState);
+      expect(stats[1]).toBe(2);
+      expect(stats.total).toBe(2);
+    });
   });
 
   describe('getNextReviewDate', () => {
@@ -247,6 +289,22 @@ describe('Leitner System - Spaced Repetition', () => {
     it('should handle null data', () => {
       const nextDate = getNextReviewDate(null);
       expect(nextDate).toBeNull();
+    });
+
+    it('should default box to 1 when missing', () => {
+      const now = Date.now();
+      const data = { lastReview: now, reviewCount: 1 };
+      const nextDate = getNextReviewDate(data);
+      const expectedTime = now + (1 * 24 * 60 * 60 * 1000);
+      expect(nextDate.getTime()).toBe(expectedTime);
+    });
+
+    it('should default interval to 1 for invalid box number', () => {
+      const now = Date.now();
+      const data = { box: 99, lastReview: now, reviewCount: 1 };
+      const nextDate = getNextReviewDate(data);
+      const expectedTime = now + (1 * 24 * 60 * 60 * 1000);
+      expect(nextDate.getTime()).toBe(expectedTime);
     });
   });
 
@@ -311,6 +369,19 @@ describe('Leitner System - Spaced Repetition', () => {
 
       expect(updated.boxes.q2.box).toBe(3);
       expect(updated.boxes.q2.reviewCount).toBe(2);
+    });
+
+    it('should handle missing boxes property in state', () => {
+      const leitnerState = {};
+      const updated = updateLeitnerState(leitnerState, 'q1', true);
+      expect(updated.boxes.q1.box).toBe(2);
+    });
+
+    it('should initialize and reset new question on incorrect answer', () => {
+      const leitnerState = { boxes: {} };
+      const updated = updateLeitnerState(leitnerState, 'q1', false);
+      expect(updated.boxes.q1.box).toBe(1);
+      expect(updated.boxes.q1.reviewCount).toBe(1);
     });
   });
 
