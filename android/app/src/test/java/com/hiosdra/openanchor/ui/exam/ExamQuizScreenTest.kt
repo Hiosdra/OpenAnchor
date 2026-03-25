@@ -32,15 +32,18 @@ class ExamQuizScreenTest {
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var viewModel: ExamQuizViewModel
+    private lateinit var pdfRenderer: ExamPdfRenderer
     private lateinit var state: MutableStateFlow<ExamQuizUiState>
     private var onBackCalled = false
 
     @Before
     fun setUp() {
         ExamQuestionsDb.init(composeRule.activity)
+        pdfRenderer = mockk(relaxed = true)
         viewModel = mockk(relaxed = true)
         state = MutableStateFlow(menuState())
         every { viewModel.uiState } returns state
+        every { viewModel.pdfRenderer } returns pdfRenderer
         onBackCalled = false
     }
 
@@ -986,6 +989,9 @@ class ExamQuizScreenTest {
         category = ExamCategory.NAWIGACJA,
         correctAnswer = "A",
         answerCount = 3,
-        imageAsset = "missing.jpg",
+        pdfPage = 0,
+        cropYStart = 100f,
+        cropYEnd = 200f,
+        pageHeight = 842f,
     )
 }

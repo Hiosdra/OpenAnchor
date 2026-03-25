@@ -31,15 +31,18 @@ enum class ExamCategory(val displayName: String) {
 }
 
 /**
- * An exam question rendered as a JPG image with A/B/C answer buttons.
- * The question text, options, and any diagrams are all baked into the image.
+ * An exam question rendered from a PDF page crop with A/B/C answer buttons.
+ * The question text, options, and any diagrams are all baked into the PDF image.
  */
 data class ExamQuestion(
     val id: Int,
     val category: ExamCategory,
     val correctAnswer: String,       // "A", "B", or "C"
     val answerCount: Int = 3,        // Number of answer options (always 3 for JSM)
-    val imageAsset: String,          // Path inside assets/, e.g. "exam_images/pytanie_001.jpg"
+    val pdfPage: Int,                // 0-based page index in the PDF
+    val cropYStart: Float,           // Y coordinate where the question starts (in PDF points)
+    val cropYEnd: Float,             // Y coordinate where the question ends (in PDF points)
+    val pageHeight: Float,           // Total page height in PDF points (e.g. 842.0 for A4)
 )
 
 // ============================================================
@@ -55,7 +58,10 @@ data class ExamQuestionJson(
     val category: String,
     @SerializedName("correct_answer") val correctAnswer: String?,
     @SerializedName("answer_count") val answerCount: Int,
-    @SerializedName("image_asset") val imageAsset: String,
+    @SerializedName("pdf_page") val pdfPage: Int,
+    @SerializedName("crop_y_start") val cropYStart: Float,
+    @SerializedName("crop_y_end") val cropYEnd: Float,
+    @SerializedName("page_height") val pageHeight: Float,
 ) {
     /**
      * Convert this JSON model to the domain [ExamQuestion] used throughout the app.
@@ -65,7 +71,10 @@ data class ExamQuestionJson(
         category = ExamCategory.fromDisplayName(category),
         correctAnswer = correctAnswer ?: "A", // fallback if answer unknown
         answerCount = answerCount,
-        imageAsset = imageAsset,
+        pdfPage = pdfPage,
+        cropYStart = cropYStart,
+        cropYEnd = cropYEnd,
+        pageHeight = pageHeight,
     )
 }
 

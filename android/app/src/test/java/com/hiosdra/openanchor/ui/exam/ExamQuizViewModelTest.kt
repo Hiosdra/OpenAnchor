@@ -28,13 +28,15 @@ class ExamQuizViewModelTest {
     private lateinit var application: Application
     private lateinit var prefs: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
+    private lateinit var pdfStorage: ExamPdfStorage
+    private lateinit var pdfRenderer: ExamPdfRenderer
 
     private val testQuestions = listOf(
-        ExamQuestion(1, ExamCategory.NAWIGACJA, "A", 3, "exam_images/q1.jpg"),
-        ExamQuestion(2, ExamCategory.NAWIGACJA, "B", 3, "exam_images/q2.jpg"),
-        ExamQuestion(3, ExamCategory.METEOROLOGIA, "C", 3, "exam_images/q3.jpg"),
-        ExamQuestion(4, ExamCategory.LOCJA, "A", 3, "exam_images/q4.jpg"),
-        ExamQuestion(5, ExamCategory.PRAWO, "B", 3, "exam_images/q5.jpg"),
+        ExamQuestion(1, ExamCategory.NAWIGACJA, "A", 3, pdfPage = 0, cropYStart = 100f, cropYEnd = 200f, pageHeight = 842f),
+        ExamQuestion(2, ExamCategory.NAWIGACJA, "B", 3, pdfPage = 0, cropYStart = 200f, cropYEnd = 300f, pageHeight = 842f),
+        ExamQuestion(3, ExamCategory.METEOROLOGIA, "C", 3, pdfPage = 1, cropYStart = 100f, cropYEnd = 200f, pageHeight = 842f),
+        ExamQuestion(4, ExamCategory.LOCJA, "A", 3, pdfPage = 1, cropYStart = 200f, cropYEnd = 300f, pageHeight = 842f),
+        ExamQuestion(5, ExamCategory.PRAWO, "B", 3, pdfPage = 2, cropYStart = 100f, cropYEnd = 200f, pageHeight = 842f),
     )
 
     @Before
@@ -51,6 +53,11 @@ class ExamQuizViewModelTest {
             every { getSharedPreferences(any(), any()) } returns prefs
         }
 
+        pdfStorage = mockk(relaxed = true) {
+            every { isPdfAvailable() } returns true
+        }
+        pdfRenderer = mockk(relaxed = true)
+
         // Pre-initialize ExamQuestionsDb with test data via reflection
         val field = ExamQuestionsDb::class.java.getDeclaredField("_allQuestions")
         field.isAccessible = true
@@ -63,7 +70,7 @@ class ExamQuizViewModelTest {
     }
 
     private fun createViewModel(): ExamQuizViewModel {
-        return ExamQuizViewModel(application)
+        return ExamQuizViewModel(application, pdfStorage, pdfRenderer)
     }
 
     // ---- Initial state ----
@@ -1058,6 +1065,78 @@ class ExamQuizViewModelTest {
             assertEquals("A", state.examAnswers[1])
             assertEquals("B", state.examAnswers[2])
             assertEquals("C", state.examAnswers[3])
+            cancel()
+        }
+    }
+
+    // ---- PDF import ----
+
+    @Test
+    fun `initial state is NoPdfImported when no PDF exists`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns false
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.NoPdfImported, state.screen)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `initial state is Menu when PDF exists`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        every { pdfStorage.isPdfAvailable() } returns true
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.Menu, state.screen)
+            verify { pdfRenderer.open() }
+            cancel()
+        }
+    }
+
+    @Test
+    fun `deletePdf transitions to NoPdfImported`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.deletePdf()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.NoPdfImported, state.screen)
+            verify { pdfRenderer.close() }
+            verify { pdfStorage.deletePdf() }
+            cancel()
+        }
+    }
+
+    @Test
+    fun `rejectHashWarning deletes PDF and transitions to NoPdfImported`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.rejectHashWarning()
+        advanceUntilIdle()
+
+        vm.uiState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertEquals(ExamScreenState.NoPdfImported, state.screen)
+            assertNull(state.hashWarning)
             cancel()
         }
     }
