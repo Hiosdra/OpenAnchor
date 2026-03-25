@@ -9,10 +9,15 @@ import com.hiosdra.openanchor.domain.model.DistanceUnit
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -41,12 +46,18 @@ class SettingsViewModelTest {
         }
     }
 
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     private fun createViewModel(): SettingsViewModel {
         return SettingsViewModel(preferencesManager)
     }
 
     @Test
     fun `preferences StateFlow emits initial default preferences`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -63,6 +74,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `preferences StateFlow emits updated preferences`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -89,6 +101,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `setDistanceUnit calls preferencesManager`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -100,6 +113,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `setDepthUnit calls preferencesManager`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -111,6 +125,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `setLanguage calls preferencesManager`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -122,6 +137,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `setGpsInterval calls preferencesManager`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -133,6 +149,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `setNightFilterEnabled calls preferencesManager`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -144,6 +161,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `multiple settings changes call correct methods`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -163,6 +181,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `all distance units can be set`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -175,6 +194,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `all depth units can be set`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 

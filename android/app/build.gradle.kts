@@ -18,7 +18,7 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.hiosdra.openanchor.HiltTestRunner"
     }
 
     buildTypes {
@@ -40,6 +40,7 @@ android {
         }
     }
     testOptions {
+        unitTests.isIncludeAndroidResources = true
         unitTests.isReturnDefaultValues = true
         unitTests.all {
             it.configure<JacocoTaskExtension> {
@@ -56,7 +57,11 @@ android {
             excludes += setOf(
                 "META-INF/INDEX.LIST",
                 "META-INF/io.netty.versions.properties",
-                "META-INF/DEPENDENCIES"
+                "META-INF/DEPENDENCIES",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
             )
         }
     }
@@ -138,15 +143,20 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.turbine)
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
