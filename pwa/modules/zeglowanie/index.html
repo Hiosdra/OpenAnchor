@@ -335,6 +335,15 @@
             font-size: 0.9rem;
             line-height: 1.6;
         }
+
+        /* Briefing content sections */
+        .briefing-content {
+            display: none;
+        }
+
+        .briefing-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -461,14 +470,420 @@
 
         <!-- Briefing Section -->
         <div id="section-briefing" class="content-section">
-            <div class="placeholder-section">
-                <div class="placeholder-section-icon">👥</div>
-                <h3 class="placeholder-section-title">Briefing dla Nowej Załogi</h3>
-                <p class="placeholder-section-text">
-                    Tutaj będzie można znaleźć informacje dla nowej załogi:<br>
-                    zasady bezpieczeństwa, organizacja życia na łodzi, itp.<br>
-                    Sekcja dostępna w przyszłości.
-                </p>
+            <!-- Briefing Type Selector -->
+            <div class="cruise-selector">
+                <button class="cruise-btn active" data-briefing="zero" onclick="switchBriefingType('zero')">
+                    <div class="cruise-btn-title">🎓 Briefing zerowy</div>
+                    <div class="cruise-btn-subtitle">Podstawowe informacje</div>
+                </button>
+                <button class="cruise-btn" data-briefing="first-day" onclick="switchBriefingType('first-day')">
+                    <div class="cruise-btn-title">⚓ Briefing pierwszy dzień</div>
+                    <div class="cruise-btn-subtitle">Operacje na łódce</div>
+                </button>
+            </div>
+
+            <!-- Briefing Zerowy Content -->
+            <div id="briefing-zero" class="briefing-content active">
+                <!-- Jak wygląda żeglowanie -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">⛵</span>
+                        Jak wygląda żeglowanie?
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Żeglowanie to połączenie przygody, współpracy i relaksu. Dzień na jachcie dzieli się na wachty – okresy dyżuru, podczas których część załogi steruje, pilnuje żagli i nawigacji, a reszta odpoczywa. Każdy ma swoją rolę i wszyscy współpracują dla bezpieczeństwa i przyjemności rejsu.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Obsługa WC -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🚽</span>
+                        Obsługa WC
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Toaleta na łódce (zwana głową) działa inaczej niż domowa. Przed użyciem otwórz zawór dopływu wody morskiej (zwykle pod miską). Po użyciu pompuj ręczną pompą, aby przepłukać i wypompować zawartość. Zamknij zawór po zakończeniu. <strong>NIGDY nie wrzucaj papieru do WC</strong> – może zatkać system. Papier wyrzucaj do specjalnego kosza.
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>⚠️ Pamiętaj:</strong> Papier toaletowy i inne przedmioty ZAWSZE do kosza, nigdy do WC!
+                    </div>
+                </div>
+
+                <!-- Wchodzenie i schodzenie z łódki -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🪜</span>
+                        Wchodzenie i schodzenie z łódki
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Zawsze trzymaj się oburącz przy wchodzeniu lub schodzeniu. Używaj trap, platform rufowych lub drabin. <strong>Jedna ręka dla siebie, druga dla łódki</strong> – to żeglarska zasada. Przy falach czekaj na odpowiedni moment, gdy łódka jest stabilna. Nigdy nie skacz na pokład lub z niego.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Poruszanie się po pokładzie -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">👣</span>
+                        Poruszanie się po pokładzie
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Poruszaj się powoli i ostrożnie. Zawsze trzymaj się poręczy, lin ratunkowych lub innych stałych elementów. Unikaj chodzenia po dziobie podczas żeglugi. W nocy lub przy złej pogodzie załóż kamizelkę ratunkową i wpinaj się linką ratunkową. <strong>Jedna ręka zawsze się trzyma!</strong>
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>💡 Złota zasada:</strong> Jedna ręka dla siebie, druga dla łódki – zawsze się czegoś trzymaj!
+                    </div>
+                </div>
+
+                <!-- Choroba morska -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🤢</span>
+                        Choroba morska
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Choroba morska to powszechne zjawisko. Pomaga: patrzenie na horyzont, przebywanie na świeżym powietrzu, unikanie czytania i ekranów, lekkie jedzenie (sucharki, banany), picie wody. Można wziąć Aviomarin lub nosić opaski akupresurowe. Jeśli musisz zwymiotować – zrób to za burtą, po zawietrznej stronie (tam, gdzie wieje wiatr).
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>🌊 Porady:</strong> Patrzeć na horyzont, unikać ekranów, zostać na świeżym powietrzu. Aviomarin działa prewencyjnie – brać PRZED wyjściem w morze.
+                    </div>
+                </div>
+
+                <!-- Oparzenia słoneczne -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">☀️</span>
+                        Oparzenia słoneczne
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Na morzu słońce jest mocniejsze niż na lądzie (odbicie od wody). Używaj kremu z wysokim filtrem SPF 50+, nakładaj co 2-3 godziny. Noś czapkę z daszkiem lub kapelusz, okulary przeciwsłoneczne i lekkie, ale długie ubrania. Nawet w pochmurny dzień możesz się opalić!
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>🧴 Pamiętaj:</strong> Krem SPF 50+ co 2-3 godziny, czapka, okulary. Woda odbija promienie UV!
+                    </div>
+                </div>
+
+                <!-- Stolik nawigacyjny -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🗺️</span>
+                        Stolik nawigacyjny
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Stolik nawigacyjny to centrum sterowania jachtem. Znajdziesz tam: plotter GPS z mapami, VHF radio, przełączniki elektryczne, panel sterowania silnikiem. Nie dotykaj urządzeń bez pozwolenia skipera. Tutaj planujemy trasę, sprawdzamy pogodę i komunikujemy się z innymi statkami.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SOLAS - bezpieczeństwo -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🆘</span>
+                        SOLAS - Bezpieczeństwo i Ratownictwo
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            SOLAS (Safety of Life at Sea) to międzynarodowe przepisy bezpieczeństwa:
+                        </p>
+                        <ul style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin: 1rem 0; padding-left: 1.5rem;">
+                            <li><strong>MAYDAY</strong> - wołanie o pomoc w sytuacji zagrożenia życia (wymawiane trzy razy przez radio VHF na kanale 16)</li>
+                            <li><strong>EPIRB</strong> - radiolatarnia, która automatycznie wysyła sygnał SOS i pozycję GPS do satelitów ratunkowych</li>
+                            <li><strong>Flary</strong> - race sygnalizacyjne czerwone (niebezpieczeństwo) i białe (wskazanie pozycji)</li>
+                            <li><strong>MOB (Man Over Board)</strong> - człowiek za burtą, najpoważniejszy alarm na łodzi. Natychmiast krzyczeć "CZŁOWIEK ZA BURTĄ!", wcisnąć przycisk MOB na plotterze, nie spuszczać rozbitka z oczu</li>
+                            <li><strong>Tratwa ratunkowa</strong> - nadmuchiwany ponton w hermetycznym kontenerze, używany gdy łódka tonie</li>
+                            <li><strong>Kamizelki ratunkowe</strong> - muszą być zawsze dostępne, noszone nocą i przy złej pogodzie</li>
+                            <li><strong>Pożar</strong> - znaj lokalizację gaśnic (silnik, kambuz, kokpit). Gaśnice proszkowe lub CO2</li>
+                        </ul>
+                    </div>
+                    <div class="important-note">
+                        <strong>🚨 Mayday Call:</strong> "MAYDAY, MAYDAY, MAYDAY, tu jacht [nazwa], pozycja [GPS], [liczba osób] osób na pokładzie, [problem]"
+                    </div>
+                </div>
+
+                <!-- Apteczka -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">⚕️</span>
+                        Apteczka
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Na łódce jest apteczka z podstawowymi lekami i materiałami opatrunkowym. Zawiera: plastry, bandaże, środki dezynfekcyjne, leki przeciwbólowe, na chorobę morską, na wypadek alergii. Jeśli bierzesz własne leki na receptę – zabierz zapas na cały rejs + kilka dni rezerwy. Powiedz skipperowi o swoich alergiach i stanie zdrowia!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Alkohol -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🍺</span>
+                        Alkohol
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            <strong>Zero alkoholu podczas żeglugi i na wachtach!</strong> Alkohol można pić tylko w porcie, po cumowaniu, gdy łódka jest bezpiecznie przycumowana i nikt nie będzie pełnić wachty. Można wspólnie wypić piwo czy wino przy kolacji w porcie, ale zachowaj umiar – rano wypływamy. Skipper decyduje o zasadach alkoholowych na swojej łódce.
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>⚓ Zasada:</strong> Zero alkoholu podczas żeglugi i na wachtach. Tylko w porcie, po cumowaniu.
+                    </div>
+                </div>
+
+                <!-- Jak robić herbatę i woda -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">☕</span>
+                        Jak robić herbatę i woda
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Woda pitna na łódce jest ograniczona (zbiorniki). Używaj jej oszczędnie: szybkie prysznice, zakręcaj kran podczas mycia zębów. Herbatę i kawę robimy na kuchence gazowej w kambuzie. Podczas gotowania zawsze pilnuj garnka – przy fali może się przewrócić! Używaj zabezpieczeń na kuchence (bariery). Woda z kranów jest pitna, ale na niektórych łódkach skipper może zalecić picie tylko wody butelkowanej.
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>💧 Oszczędzaj wodę:</strong> Szybkie prysznice, zakręcaj kran. Woda jest cenna!
+                    </div>
+                </div>
+
+                <!-- Zamknięte szafki i luźne rzeczy -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🔒</span>
+                        Zamknięte szafki i luźne rzeczy, zamknięte okna
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            <strong>Przed wypłynięciem WSZYSTKO musi być zabezpieczone!</strong> Zamknij wszystkie szafki, schowki, okna (iluminatory). Luźne przedmioty mogą latać przy falach i kogoś zranić lub się rozbić. Nie zostawiaj niczego na stole, na koi, w łazience. Twoja torba musi być zapięta lub zabezpieczona. Przy silnym falowaniu nawet ciężkie przedmioty się poruszają!
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>⚠️ Przed wyjściem:</strong> Zamknij wszystkie szafki, okna, zabezpiecz luźne rzeczy!
+                    </div>
+                </div>
+
+                <!-- Aplikacje nawigacyjne -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">📱</span>
+                        Aplikacje nawigacyjne
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Przydatne aplikacje do żeglarstwa:
+                        </p>
+                        <ul style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin: 1rem 0; padding-left: 1.5rem;">
+                            <li><strong>Orca</strong> - darmowa nawigacja GPS z mapami morskimi, planowanie tras, AIS (pozycje innych statków)</li>
+                            <li>Android: <a href="https://play.google.com/store/apps/details?id=com.theorca.slate&hl=en" target="_blank" style="color: #3b82f6;">Google Play</a></li>
+                            <li>iOS: <a href="https://apps.apple.com/us/app/orca-boat-gps-charts-routes/id1514423198" target="_blank" style="color: #3b82f6;">App Store</a></li>
+                        </ul>
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-top: 1rem;">
+                            Pobierz mapy offline przed wypłynięciem – w morzu często nie ma internetu!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Patrzenie w mapę -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🗺️</span>
+                        Patrzenie w mapę - analogia do F1
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Podobnie jak kierowcy F1 patrzą na niebo i radary, żeby przewidzieć deszcz i zmienić strategię, żeglarz patrzy na mapy pogodowe i wind.roszczuje kierunek wiatru. <strong>Nawigacja to planowanie z wyprzedzeniem</strong> – sprawdzamy mapę, prognozę wiatru, prądy morskie. Nie czekamy, aż będzie problem, działamy prewencyjnie. Dobry żeglarz wie, co będzie za 2-3 godziny i jest na to przygotowany.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Czas na zakupy i piwko/winko -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🛒</span>
+                        Czas na zakupy i piwko/winko
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Po cumowaniu w porcie jest czas na zakupy i relaks. Zazwyczaj robimy wspólne zakupy na następny dzień (świeże pieczywo, warzywa, mięso). Wieczorem można pójść do restauracji, baru portowego lub kupić wino/piwo do łódki. To świetny czas na zwiedzanie miasta, rozmowy z załogą i odpoczynek po dniu żeglugi. Pamiętaj: rano wypływamy, więc nie przesadzaj z alkoholem!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Briefing Pierwszy Dzień Content -->
+            <div id="briefing-first-day" class="briefing-content">
+                <!-- Łódka waży tyle, co autobus -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🚢</span>
+                        Łódka waży tyle, co autobus
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Pamiętaj: jacht ma masę 8-15 ton – jak autobus miejski! <strong>Nie zatrzyma się natychmiast</strong>, ma masę i bezwładność. Hamowanie zajmuje czas i dystans. Dlatego wszystko robimy powoli, z namysłem, z wyprzedzeniem. Nie ma "nagłych manewrów". Nawet przy silniku płyniemy powoli w portach i w pobliżu innych łodzi. Zachowaj ostrożność!
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>⚠️ Pamiętaj:</strong> Łódka to 8-15 ton! Wszystko robimy powoli i z wyprzedzeniem.
+                    </div>
+                </div>
+
+                <!-- Wpinanie się -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🔗</span>
+                        Wpinanie się
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            W nocy i przy złej pogodzie <strong>zawsze wpinaj się linką ratunkową (life line)</strong> do lin ratunkowych na burcie. Karabińczyki wpinasz w punkty cumownicze na burcie lub w specjalne liny lifeline. Jeśli spadniesz za burtę, linka Cię trzyma i nie zginiesz. <strong>Wpinaj się PRZED wyjściem na pokład!</strong> Najpierw kamizelka, potem linka, dopiero potem wychodzisz.
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>🔐 Kolejność:</strong> Kamizelka → Linka ratunkowa → Wyjście na pokład. Nocą i przy złej pogodzie zawsze!
+                    </div>
+                </div>
+
+                <!-- Sterowanie, wachty, przejęcie steru -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🎯</span>
+                        Sterowanie, wachty, przejęcie steru
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            <strong>Wachty</strong> to dyżury na łódce (zwykle 2-4 godziny). Na wachcie sternik trzyma ster, pilnuje kursu, obserwuje horyzont, inne statki i kolizje. Przy przejęciu steru nowy sternik pyta: "Jaki kurs?", "Jakie ustawienia żagli?". Ustępujący sternik przekazuje: "Kurs 270°, żagle na bakburcie, autopilot wyłączony". <strong>Zawsze potwierdź przejęcie steru!</strong>
+                        </p>
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-top: 1rem;">
+                            Jak sterować: kółko steru (sterówka) lub rumple (drążek). Obracasz ster w kierunku, w którym chcesz płynąć (w prawo = łódka skręca w prawo). Na żaglach reaguje wolniej niż na silniku – bądź cierpliwy!
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>⚓ Przy przejęciu steru:</strong> Potwierdź kurs, ustawienia żagli, autopilot. Zawsze przejmuj ster świadomie!
+                    </div>
+                </div>
+
+                <!-- Plotter -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">📡</span>
+                        Plotter
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            <strong>Plotter</strong> to GPS nawigacyjny z mapami morskimi. Pokazuje: aktualną pozycję łódki, kurs, prędkość, głębokość, mapy z oznaczeniami (bajery, mielizny, porty), trasę do celu. Możesz zaznaczyć waypoint (punkt na mapie) i plotter poproadzi Cię tam. Nauczysz się go używać w trakcie rejsu. <strong>Nigdy nie zmieniaj ustawień bez zgody skipera!</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Obsługa silnika -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🔧</span>
+                        Obsługa silnika
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Silnik jachtu to diesel. Uruchamianie: włącz kluczyk, poczekaj na rozgrzanie (świeca żarowa), naciśnij start. Dźwignia gazu ma pozycje: N (neutral – luz), F (forward – do przodu), R (reverse – wstecz). <strong>Zmieniaj biegi TYLKO na luzie (neutral)!</strong> Dodawaj gaz stopniowo. W portach zawsze powoli – max 3-4 węzły (kroki). Wyłączanie: zmniejsz obroty, postaw N, wyłącz kluczyk.
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>⚙️ Zasada:</strong> Zmieniaj biegi tylko na luzie (N). W portach max 3-4 węzły!
+                    </div>
+                </div>
+
+                <!-- Nie stoimy na linach -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">⛔</span>
+                        Nie stoimy na linach
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            <strong>NIGDY nie stój na linie!</strong> Liny pod napięciem mogą się nagle naciągnąć, szarpnąć, albo puścić i uderzyć Cię z wielką siłą. Lina pod napięciem potrafi złamać kości, obciąć palce lub zrzucić Cię za burtę. <strong>Zawsze stój z boku lin, nigdy na nich ani w ich zasięgu przy naciągu.</strong> Szczególnie przy cumowaniu, kotwiczeniu i obsłudze żagli!
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>🚨 NIGDY:</strong> Nie stój na linie! Lina pod napięciem jest śmiertelnie niebezpieczna!
+                    </div>
+                </div>
+
+                <!-- Obsługa kabestanów -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">⚙️</span>
+                        Obsługa kabestanów
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            <strong>Kabestan (winch)</strong> to bęben, na którym nawijasz liny, żeby łatwiej je naciągać (np. szoty, fały). Linę owiń 3-4 razy wokół kabestanu zgodnie z ruchem wskazówek zegara. Potem ciągnij linę z boku – kabestan pomoże Ci ją naciągnąć. Możesz też używać rączki kabestanu (korbki) do kręcenia. <strong>UWAGA: trzymaj dłonie z dala od kabestanu pod napięciem!</strong> Nigdy nie wkładaj palców między linę a kabestan!
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>⚠️ Bezpieczeństwo:</strong> Nigdy nie wkładaj palców między linę a kabestan! Zaciśnie je!
+                    </div>
+                </div>
+
+                <!-- Węzły -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🪢</span>
+                        Węzły
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            Podstawowe węzły żeglarskie do opanowania:
+                        </p>
+                        <ul style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin: 1rem 0; padding-left: 1.5rem;">
+                            <li><strong>Węzeł ósemkowy (ósemka)</strong> - zapobiega wyślizgiwaniu się liny z bloku, prosty w wiązaniu</li>
+                            <li><strong>Węzeł cumowniczy (kotwiczny)</strong> - do przywiązywania lin cumowniczych do knagi lub pachołka, łatwo rozwiązać nawet pod napięciem</li>
+                            <li><strong>Węzeł szkotowy (żaglowy)</strong> - do łączenia dwóch lin lub przywiązywania szoty do żagla</li>
+                            <li><strong>Węzeł ratowniczy (bulina)</strong> - tworzy pętlę, która się nie zaciska, do ratowania człowieka z wody</li>
+                            <li><strong>Dwa półsztyki</strong> - uniwersalny węzeł do wielu zastosowań, mocny i prosty</li>
+                        </ul>
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-top: 1rem;">
+                            Skipper pokaże Ci te węzły w praktyce. Nie ma pośpiechu – naucz się ich w trakcie rejsu!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Człowiek za burtą -->
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <span class="category-icon">🆘</span>
+                        Człowiek za burtą (MOB)
+                    </h2>
+                    <div class="checklist-text">
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-bottom: 1rem;">
+                            <strong>Człowiek za burtą (Man Over Board - MOB)</strong> to najpoważniejsza sytuacja awaryjna. Procedura:
+                        </p>
+                        <ol style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin: 1rem 0; padding-left: 1.5rem;">
+                            <li><strong>KRZYCZ "CZŁOWIEK ZA BURTĄ!"</strong> – najgłośniej jak możesz, żeby cała załoga słyszała</li>
+                            <li><strong>Wciśnij przycisk MOB na plotterze</strong> – zapisze pozycję GPS</li>
+                            <li><strong>Rzuć koło ratunkowe i pływający przedmiot</strong> (poduszka, boja) w kierunku rozbitka</li>
+                            <li><strong>Wyznacz obserwatora</strong> – jedna osoba NON-STOP wskazuje palcem rozbitka i nie spuszcza go z oczu</li>
+                            <li><strong>Skipper podejmuje manewr ratunkowy</strong> – zawraca łódką (zwykle manewrem MOB z plotterem lub ręcznie)</li>
+                            <li><strong>Wyciąganie z wody</strong> – użyj drabinki, lin, tratwy lub silnika (ostrożnie z śrubą!)</li>
+                        </ol>
+                        <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; margin-top: 1rem;">
+                            <strong>Najważniejsze: NIE TRACIĆ Z OCZU ROZBITKA!</strong> Na falach człowiek w wodzie jest prawie niewidoczny. Nawet 100 metrów to wielka odległość. Obserwator pokazuje palcem non-stop!
+                        </p>
+                    </div>
+                    <div class="important-note">
+                        <strong>🆘 Procedura MOB:</strong> Krzycz! → MOB na plotterze → Koło ratunkowe → Wyznacz obserwatora → Skipper zawraca → Wyciągamy z wody
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -605,6 +1020,36 @@
             renderChecklist();
         }
 
+        // Current briefing type
+        let currentBriefingType = 'zero';
+
+        // Switch briefing type
+        function switchBriefingType(briefingType) {
+            currentBriefingType = briefingType;
+
+            // Update button states
+            document.querySelectorAll('.cruise-btn[data-briefing]').forEach(btn => {
+                if (btn.dataset.briefing === briefingType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update content sections
+            document.querySelectorAll('.briefing-content').forEach(content => {
+                if (content.id === `briefing-${briefingType}`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+
+            // Save selected briefing type
+            localStorage.setItem('zeglowanie_selected_briefing_type', briefingType);
+        }
+
+
         // Render checklist based on current cruise type
         function renderChecklist() {
             const listContainer = document.getElementById('packingList');
@@ -725,6 +1170,28 @@
 
             // Render initial checklist
             renderChecklist();
+
+            // Load saved briefing type or default to zero
+            const savedBriefingType = localStorage.getItem('zeglowanie_selected_briefing_type') || 'zero';
+            currentBriefingType = savedBriefingType;
+
+            // Update briefing button states
+            document.querySelectorAll('.cruise-btn[data-briefing]').forEach(btn => {
+                if (btn.dataset.briefing === savedBriefingType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update briefing content sections
+            document.querySelectorAll('.briefing-content').forEach(content => {
+                if (content.id === `briefing-${savedBriefingType}`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
         });
     </script>
 </body>
