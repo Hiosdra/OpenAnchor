@@ -48,10 +48,11 @@ async function loadPdfBlob() {
             const store = tx.objectStore(PDF_STORE_NAME);
             const request = store.get(PDF_KEY);
             request.onsuccess = () => {
-                db.close();
                 resolve(request.result ? request.result.blob : null);
             };
-            request.onerror = () => { db.close(); reject(request.error); };
+            request.onerror = () => { reject(request.error); };
+            tx.oncomplete = () => { db.close(); };
+            tx.onerror = () => { db.close(); };
         });
     } catch {
         return null;
@@ -66,10 +67,11 @@ async function loadPdfMeta() {
             const store = tx.objectStore(PDF_STORE_NAME);
             const request = store.get(PDF_KEY);
             request.onsuccess = () => {
-                db.close();
                 resolve(request.result ? request.result.metadata : null);
             };
-            request.onerror = () => { db.close(); reject(request.error); };
+            request.onerror = () => { reject(request.error); };
+            tx.oncomplete = () => { db.close(); };
+            tx.onerror = () => { db.close(); };
         });
     } catch {
         return null;
