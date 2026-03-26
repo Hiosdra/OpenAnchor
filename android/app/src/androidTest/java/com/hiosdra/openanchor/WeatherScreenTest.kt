@@ -48,9 +48,8 @@ class WeatherScreenTest {
 
     @Test
     fun setupScreen_isReachableForWeatherPrerequisite() {
-        composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
-        composeTestRule.waitForText("Drop Anchor", timeoutMs = 5_000).performClick()
-        composeTestRule.waitForText("Anchor Position", timeoutMs = 5_000)
+        composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000).performClick()
+        composeTestRule.waitForText("Anchor Position")
         composeTestRule.assertTextDisplayed("Anchor Position")
     }
 }

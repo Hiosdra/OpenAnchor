@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
 import com.hiosdra.openanchor.helpers.safeWaitForIdle
 import com.hiosdra.openanchor.helpers.skipOnboardingIfPresent
+import com.hiosdra.openanchor.helpers.safeWaitForIdle
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

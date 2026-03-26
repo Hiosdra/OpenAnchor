@@ -8,9 +8,8 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 
 /**
  * Unregisters Compose IdlingResources from Espresso and waits a short time.
- * Replaces composeTestRule.waitForIdle() which blocks forever when
- * Compose considers itself busy (DataStore loading, permission checks,
- * navigation transitions).
+ * Replaces composeTestRule.waitForIdle() which blocks forever when infinite
+ * animations are present (OceanBackground, rememberPulsingAlpha).
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.safeWaitForIdle(
     delayMs: Long = 500
@@ -115,8 +114,9 @@ private fun unregisterComposeIdling() {
 
 /**
  * Polls a condition with Thread.sleep, permanently unregistering the Compose
- * IdlingResource from Espresso so that fetchSemanticsNodes, performClick,
- * performScrollTo, and assertIsDisplayed bypass the idle check.
+ * IdlingResource from Espresso so that ALL Compose test operations (including
+ * fetchSemanticsNodes, performClick, performScrollTo, assertIsDisplayed) bypass
+ * the idle check that blocks on infinite animations (OceanBackground).
  */
 private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForCondition(
     timeoutMs: Long,
