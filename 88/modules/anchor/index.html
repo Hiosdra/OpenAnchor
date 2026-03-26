@@ -2282,19 +2282,23 @@
     // Throttle utility – limits fn execution to at most once per `ms` milliseconds
     function throttle(fn, ms) {
         let last = 0, timer = null;
-        return function(...args) {
+        function throttled(...args) {
             const now = Date.now();
             clearTimeout(timer);
             if (now - last >= ms) {
                 last = now;
                 return fn.apply(this, args);
             }
-            // Ensure trailing call fires after throttle window
             timer = setTimeout(() => {
                 last = Date.now();
                 fn.apply(this, args);
             }, ms - (now - last));
+        }
+        throttled.cancel = function() {
+            clearTimeout(timer);
+            timer = null;
         };
+        return throttled;
     }
 
     // ==========================================
@@ -2344,6 +2348,7 @@
 
             // RAF guard for batched DOM updates
             this._rafPending = false;
+            this._smRafPending = false;
 
             // Cache frequently accessed DOM elements
             this._els = {
@@ -2765,9 +2770,9 @@
                 const gpsOptions = this._batterySaverActive
                     ? { enableHighAccuracy: false, maximumAge: 5000, timeout: 10000 }
                     : { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 };
-                const throttledOnPosition = throttle((pos) => this._onPosition(pos), 500);
+                this._throttledOnPosition = throttle((pos) => this._onPosition(pos), 500);
                 this.gpsWatchId = navigator.geolocation.watchPosition(
-                    throttledOnPosition,
+                    this._throttledOnPosition,
                     (err) => {
                         this._els.noSignalOverlay.classList.remove('hidden');
                         if (err.code === 1) {
@@ -2820,6 +2825,7 @@
         }
 
         _cleanupGPS() {
+            if (this._throttledOnPosition) this._throttledOnPosition.cancel();
             if (this.gpsWatchId !== null) {
                 navigator.geolocation.clearWatch(this.gpsWatchId);
                 this.gpsWatchId = null;
@@ -3816,8 +3822,11 @@ SAFETY: ...`;
         // ==========================================
         _updateSimpleMonitor() {
             if (!this._simpleMonitorActive) return;
+            if (this._smRafPending) return;
+            this._smRafPending = true;
 
             requestAnimationFrame(() => {
+                this._smRafPending = false;
                 const els = this._els;
                 const dist = this.state.isAnchored ? GeoUtils.formatDist(this.state.distance, this.state.unit) : '--';
                 const lbl = this.state.unit === 'm' ? I18N.t.smUnit : I18N.t.smUnitFt;

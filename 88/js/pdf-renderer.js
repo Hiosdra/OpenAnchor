@@ -67,6 +67,7 @@ var PdfRenderer = {
 
         return new Promise((resolve) => {
             cropCanvas.toBlob((blob) => {
+                if (!blob) { resolve(null); return; }
                 var url = URL.createObjectURL(blob);
                 this._blobUrls.push(url);
                 resolve(url);

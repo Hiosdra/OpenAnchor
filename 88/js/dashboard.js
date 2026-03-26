@@ -93,7 +93,7 @@ export function closeSettingsOnBackdrop(event) {
 
 /**
  * Navigate to a module
- * Sends CACHE_MODULE message to service worker for lazy caching before navigating.
+ * Sends CACHE_MODULE message to service worker for best-effort lazy caching, then navigates.
  * @param {string} url - Module URL
  */
 export function openModule(url) {

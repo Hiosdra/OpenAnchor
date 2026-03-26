@@ -1154,7 +1154,11 @@
                  prev.isNightMode === next.isNightMode &&
                  prev.isReadOnly === next.isReadOnly &&
                  prev.draggedItem === next.draggedItem &&
-                 prev.userLocale === next.userLocale;
+                 prev.userLocale === next.userLocale &&
+                 prev.onDragStart === next.onDragStart &&
+                 prev.onDrop === next.onDrop &&
+                 prev.onDragOver === next.onDragOver &&
+                 prev.t === next.t;
         });
 
         function App() {
@@ -1967,12 +1971,12 @@
             }
           };
 
-          const handleDragStart = (e, dayIdx, slotIdx, pIdx) => {
+          const handleDragStart = useCallback((e, dayIdx, slotIdx, pIdx) => {
             setDraggedItem({ dayIdx, slotIdx, pIdx });
             e.dataTransfer.effectAllowed = 'move';
-          };
+          }, []);
 
-          const handleDrop = (e, targetDayIdx, targetSlotIdx, targetPIdx) => {
+          const handleDrop = useCallback((e, targetDayIdx, targetSlotIdx, targetPIdx) => {
             e.preventDefault();
             if (!draggedItem) return;
 
@@ -1988,9 +1992,9 @@
 
             setSchedule(newSchedule);
             setDraggedItem(null);
-          };
+          }, [draggedItem, schedule]);
 
-          const handleDragOver = (e) => e.preventDefault();
+          const handleDragOver = useCallback((e) => e.preventDefault(), []);
 
           const crewStats = useMemo(() => {
             if (!isGenerated || !dashboardData) return [];

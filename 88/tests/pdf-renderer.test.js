@@ -44,11 +44,16 @@ function mockPdfDoc(numPages = 5) {
 describe('PdfRenderer', () => {
   let canvases;
   let origCreateElement;
+  let origCreateObjectURL, origRevokeObjectURL;
 
   beforeEach(() => {
     PdfRenderer._pdfDoc = null;
     PdfRenderer._cache.clear();
     PdfRenderer._blobUrls = [];
+
+    // Save originals before overwriting
+    origCreateObjectURL = globalThis.URL.createObjectURL;
+    origRevokeObjectURL = globalThis.URL.revokeObjectURL;
 
     // Mock URL.createObjectURL / revokeObjectURL
     globalThis.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
@@ -70,6 +75,8 @@ describe('PdfRenderer', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    globalThis.URL.createObjectURL = origCreateObjectURL;
+    globalThis.URL.revokeObjectURL = origRevokeObjectURL;
   });
 
   // --- loadFromBlob ---
