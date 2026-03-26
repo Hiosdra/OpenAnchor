@@ -1,5 +1,10 @@
 package com.hiosdra.openanchor.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -31,7 +36,39 @@ fun OpenAnchorNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        enterTransition = {
+            fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) +
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    initialOffset = { it / 4 }
+                )
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing)) +
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    targetOffset = { it / 4 }
+                )
+        },
+        popEnterTransition = {
+            fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) +
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    initialOffset = { it / 4 }
+                )
+        },
+        popExitTransition = {
+            fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing)) +
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    targetOffset = { it / 4 }
+                )
+        }
     ) {
         composable(Screen.PermissionOnboarding.route) {
             PermissionOnboardingScreen(
@@ -43,7 +80,13 @@ fun OpenAnchorNavHost(
             )
         }
 
-        composable(Screen.Home.route) {
+        composable(
+            route = Screen.Home.route,
+            enterTransition = { fadeIn(tween(300)) },
+            exitTransition = { fadeOut(tween(200)) },
+            popEnterTransition = { fadeIn(tween(300)) },
+            popExitTransition = { fadeOut(tween(200)) }
+        ) {
             HomeScreen(
                 onStartSetup = { navController.navigate(Screen.Setup.route) },
                 onOpenHistory = { navController.navigate(Screen.History.route) },
@@ -68,7 +111,23 @@ fun OpenAnchorNavHost(
             )
         }
 
-        composable(Screen.Setup.route) {
+        composable(
+            route = Screen.Setup.route,
+            enterTransition = {
+                fadeIn(tween(350)) + slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(350, easing = FastOutSlowInEasing),
+                    initialOffset = { it / 3 }
+                )
+            },
+            popExitTransition = {
+                fadeOut(tween(250)) + slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(350, easing = FastOutSlowInEasing),
+                    targetOffset = { it / 3 }
+                )
+            }
+        ) {
             SetupScreen(
                 onSessionCreated = { sessionId ->
                     navController.navigate(Screen.Monitor.createRoute(sessionId)) {
@@ -81,7 +140,35 @@ fun OpenAnchorNavHost(
 
         composable(
             route = Screen.Monitor.route,
-            arguments = listOf(navArgument("sessionId") { type = NavType.LongType })
+            arguments = listOf(navArgument("sessionId") { type = NavType.LongType }),
+            enterTransition = {
+                fadeIn(tween(400)) + slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                    initialOffset = { it / 3 }
+                )
+            },
+            exitTransition = {
+                fadeOut(tween(300)) + slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                    targetOffset = { it / 3 }
+                )
+            },
+            popEnterTransition = {
+                fadeIn(tween(400)) + slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                    initialOffset = { it / 3 }
+                )
+            },
+            popExitTransition = {
+                fadeOut(tween(300)) + slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                    targetOffset = { it / 3 }
+                )
+            }
         ) { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: return@composable
             MonitorScreen(
