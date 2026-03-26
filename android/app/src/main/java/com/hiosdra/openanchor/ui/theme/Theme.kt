@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import com.hiosdra.openanchor.ui.components.OceanBackground
 
 enum class ThemeMode {
     DARK, LIGHT, NIGHT_VISION
@@ -78,34 +79,40 @@ fun OpenAnchorTheme(
         ThemeMode.DARK, ThemeMode.NIGHT_VISION -> DarkColorScheme
     }
 
-    CompositionLocalProvider(LocalNightFilterEnabled provides nightFilterEnabled) {
+    CompositionLocalProvider(
+        LocalNightFilterEnabled provides nightFilterEnabled,
+        LocalSpacing provides Spacing()
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography
         ) {
-            if (nightFilterEnabled) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .drawWithContent {
-                            drawContent()
-                            // Red overlay: draws a dark red layer with Color blend mode.
-                            // This maps all hues to red tones while preserving luminance.
-                            drawRect(
-                                color = Color(0xFFCC0000),
-                                blendMode = BlendMode.Color
-                            )
-                            // Slight darkening to reduce brightness further for night vision
-                            drawRect(
-                                color = Color.Black.copy(alpha = 0.3f),
-                                blendMode = BlendMode.Darken
-                            )
-                        }
-                ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                OceanBackground(enabled = !nightFilterEnabled)
+                if (nightFilterEnabled) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .drawWithContent {
+                                drawContent()
+                                // Red overlay: draws a dark red layer with Color blend mode.
+                                // This maps all hues to red tones while preserving luminance.
+                                drawRect(
+                                    color = Color(0xFFCC0000),
+                                    blendMode = BlendMode.Color
+                                )
+                                // Slight darkening to reduce brightness further for night vision
+                                drawRect(
+                                    color = Color.Black.copy(alpha = 0.3f),
+                                    blendMode = BlendMode.Darken
+                                )
+                            }
+                    ) {
+                        content()
+                    }
+                } else {
                     content()
                 }
-            } else {
-                content()
             }
         }
     }
