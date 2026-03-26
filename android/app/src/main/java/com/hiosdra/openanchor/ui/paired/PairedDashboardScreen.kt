@@ -30,11 +30,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
+import com.hiosdra.openanchor.ui.components.GlassCard
 import com.hiosdra.openanchor.domain.model.AlarmState
 import com.hiosdra.openanchor.domain.model.AnchorZone
+import com.hiosdra.openanchor.ui.components.AlarmStatusBadge
 import com.hiosdra.openanchor.ui.components.MapCircle
 import com.hiosdra.openanchor.ui.components.MapMarker
 import com.hiosdra.openanchor.ui.components.OsmMapView
+import com.hiosdra.openanchor.ui.components.icon
 import com.hiosdra.openanchor.ui.theme.*
 import org.osmdroid.util.GeoPoint
 
@@ -250,6 +253,7 @@ private fun AlarmStateBar(alarmState: AlarmState, bgColor: Color) {
         AlarmState.WARNING -> "WARNING"
         AlarmState.ALARM -> "ALARM"
     }
+    val textColor = if (alarmState == AlarmState.WARNING) Color.Black else Color.White
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,12 +262,24 @@ private fun AlarmStateBar(alarmState: AlarmState, bgColor: Color) {
             .semantics { liveRegion = LiveRegionMode.Polite },
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = if (alarmState == AlarmState.WARNING) Color.Black else Color.White
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = alarmState.icon(),
+                contentDescription = null,
+                tint = textColor,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+        }
     }
 }
 
@@ -392,16 +408,9 @@ private fun StatusCard(
     modifier: Modifier = Modifier,
     valueColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
+    GlassCard(modifier = modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
