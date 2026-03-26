@@ -19,8 +19,7 @@ class WearMainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AmbientAware { ambientStateUpdate ->
-                val ambientState = ambientStateUpdate.ambientState
+            AmbientAware { ambientState ->
                 CompositionLocalProvider(LocalAmbientState provides ambientState) {
                     WearMonitorScreen()
                 }
