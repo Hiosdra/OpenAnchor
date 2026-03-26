@@ -6,6 +6,7 @@ import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.data.repository.AnchorSessionRepository
 import com.hiosdra.openanchor.domain.geometry.GeoCalculations
 import com.hiosdra.openanchor.domain.model.*
+import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -29,7 +30,7 @@ class StandaloneMonitorManager @Inject constructor(
 
     private var monitoringJob: Job? = null
     private var gpsWatchdogJob: Job? = null
-    private var lastGpsFixTime: Long = System.currentTimeMillis()
+    private val lastGpsFixTime = AtomicLong(System.currentTimeMillis())
     private var lastDbWriteTime: Long = 0L
 
     fun startMonitoring(
@@ -59,7 +60,7 @@ class StandaloneMonitorManager @Inject constructor(
             locationProvider.locationUpdates(intervalMs).collect { position ->
                 if (monitorState.value.isPairedMode) return@collect
 
-                lastGpsFixTime = System.currentTimeMillis()
+                lastGpsFixTime.set(System.currentTimeMillis())
                 val result = gpsProcessor.processPosition(position, session.anchorPosition, zone, sessionId)
 
                 // Throttle DB writes: every 5s or on alarm state changes
@@ -134,7 +135,7 @@ class StandaloneMonitorManager @Inject constructor(
         gpsWatchdogJob = scope.launch {
             while (isActive) {
                 delay(GPS_WATCHDOG_CHECK_INTERVAL_MS)
-                val elapsed = System.currentTimeMillis() - lastGpsFixTime
+                val elapsed = System.currentTimeMillis() - lastGpsFixTime.get()
                 val signalLost = elapsed > GPS_WATCHDOG_TIMEOUT_MS
                 if (signalLost != monitorState.value.gpsSignalLost) {
                     monitorState.value = monitorState.value.copy(gpsSignalLost = signalLost)
@@ -157,13 +158,13 @@ class StandaloneMonitorManager @Inject constructor(
         monitoringJob?.cancel()
         monitoringJob = scope.launch {
             val intervalMs = preferencesManager.preferences.first().gpsIntervalSeconds * 1000L
-            lastGpsFixTime = System.currentTimeMillis()
+            lastGpsFixTime.set(System.currentTimeMillis())
             startGpsWatchdog(scope, monitorState, onUpdateNotification)
 
             locationProvider.locationUpdates(intervalMs).collect { position ->
                 if (monitorState.value.isPairedMode) return@collect
 
-                lastGpsFixTime = System.currentTimeMillis()
+                lastGpsFixTime.set(System.currentTimeMillis())
                 val distance = GeoCalculations.distanceMeters(position, anchorPosition)
                 val zoneResult = GeoCalculations.checkZone(position, zone)
                 val alarmState = alarmEngine.processReading(zoneResult)
@@ -187,11 +188,11 @@ class StandaloneMonitorManager @Inject constructor(
     }
 
     fun resetGpsFixTime() {
-        lastGpsFixTime = System.currentTimeMillis()
+        lastGpsFixTime.set(System.currentTimeMillis())
     }
 
     fun updateLastGpsFixTime() {
-        lastGpsFixTime = System.currentTimeMillis()
+        lastGpsFixTime.set(System.currentTimeMillis())
     }
 
     fun cancelMonitoringJob() {
