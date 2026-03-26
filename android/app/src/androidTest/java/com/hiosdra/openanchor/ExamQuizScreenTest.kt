@@ -75,9 +75,7 @@ class ExamQuizScreenTest {
     private fun navigateToLearnMode() {
         scrollToTextInList("Learn Mode")
         composeTestRule.onNodeWithText("Learn Mode").performClick()
-        composeTestRule.waitUntil(10_000) {
-            composeTestRule.onAllNodesWithText("#", substring = true).fetchSemanticsNodes().isNotEmpty()
-        }
+        composeTestRule.waitForText("#", timeoutMs = 10_000)
     }
 
     // --- Menu tests ---
@@ -138,14 +136,14 @@ class ExamQuizScreenTest {
     @Test
     fun learnMode_displaysNavigationButtons() {
         navigateToLearnMode()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.assertTextDisplayed("Previous")
     }
 
     @Test
     fun learnMode_displaysAnswerOptions() {
         navigateToLearnMode()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         // Answer buttons are labeled A, B, C
         composeTestRule.assertTextDisplayed("A")
         composeTestRule.assertTextDisplayed("B")
@@ -155,9 +153,9 @@ class ExamQuizScreenTest {
     @Test
     fun learnMode_canClickAnswer() {
         navigateToLearnMode()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.onNodeWithText("A").performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         // After selecting, the Next button should appear
         composeTestRule.assertTextDisplayed("Next")
     }
@@ -165,10 +163,10 @@ class ExamQuizScreenTest {
     @Test
     fun learnMode_canNavigateNext() {
         navigateToLearnMode()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         // Click Skip/Next to advance without answering
         composeTestRule.onNodeWithText("Skip").performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
     }
 
     @Test

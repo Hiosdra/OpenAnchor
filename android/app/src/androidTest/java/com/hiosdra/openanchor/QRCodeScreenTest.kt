@@ -42,9 +42,9 @@ class QRCodeScreenTest {
 
     private fun scrollToAndClick(text: String) {
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.waitForText(text).performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
     }
 
     private fun navigateToQRCodeScreen() {
@@ -96,14 +96,14 @@ class QRCodeScreenTest {
     @Test
     fun qrCodeScreen_backNavigation_returnsToHome() {
         Espresso.pressBack()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 
     @Test
     fun qrCodeScreen_backButton_returnsToHome() {
         composeTestRule.onNodeWithContentDescription("Cancel").performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 }

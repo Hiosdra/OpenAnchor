@@ -42,9 +42,9 @@ class PairingScreensTest {
     private fun scrollToAndClick(text: String) {
         composeTestRule.waitForText("OpenAnchor")
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.waitForText(text).performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -105,7 +105,7 @@ class PairingScreensTest {
     fun scanQRScreen_backNavigation_returnsToHome() {
         navigateToScanQRScreen()
         Espresso.pressBack()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 
@@ -113,7 +113,7 @@ class PairingScreensTest {
     fun scanQRScreen_backButton_returnsToHome() {
         navigateToScanQRScreen()
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 

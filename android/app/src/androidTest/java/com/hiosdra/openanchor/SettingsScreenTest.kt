@@ -75,7 +75,7 @@ class SettingsScreenTest {
     fun settingsScreen_nightFilterToggleClickable() {
         composeTestRule.onNodeWithText("Enable red light mode").performScrollTo()
         composeTestRule.onNodeWithText("Enable red light mode").performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
     }
 
     @Test

@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
+import com.hiosdra.openanchor.helpers.safeWaitForIdle
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -45,7 +46,7 @@ class HistoryScreenTest {
         composeTestRule.waitForText("OpenAnchor")
         composeTestRule.onNodeWithText("History", substring = true).performScrollTo()
         composeTestRule.waitForText("History").performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.waitForText("No anchoring history yet")
     }
 

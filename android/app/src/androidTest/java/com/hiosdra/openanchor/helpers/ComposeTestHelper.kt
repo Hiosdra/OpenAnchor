@@ -6,7 +6,20 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 
+/**
+ * Unregisters Compose IdlingResources from Espresso and waits a short time.
+ * Replaces composeTestRule.waitForIdle() which blocks forever when infinite
+ * animations are present (OceanBackground, rememberPulsingAlpha).
+ */
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.safeWaitForIdle(
+    delayMs: Long = 500
+) {
+    unregisterComposeIdling()
+    Thread.sleep(delayMs)
+}
+
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
+    unregisterComposeIdling()
     val nodes = onAllNodesWithText(text, substring = true, ignoreCase = true)
     val count = nodes.fetchSemanticsNodes().size
     if (count == 0) throw AssertionError("No nodes found with text containing '$text'")
@@ -60,34 +73,37 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 }
 
 /**
- * Polls a condition with Thread.sleep, temporarily unregistering the Compose
- * IdlingResource from Espresso so that fetchSemanticsNodes() → getRoots() →
- * waitForIdle() → Espresso.onIdle() returns immediately instead of blocking
- * on infinite animations (e.g. OceanBackground's rememberInfiniteTransition).
+ * Permanently unregisters Compose IdlingResources from Espresso.
+ * Safe to call multiple times (no-op if already unregistered).
+ */
+private fun unregisterComposeIdling() {
+    val registry = IdlingRegistry.getInstance()
+    registry.resources
+        .filter { it.name.contains("Compose", ignoreCase = true) }
+        .forEach { registry.unregister(it) }
+}
+
+/**
+ * Polls a condition with Thread.sleep, permanently unregistering the Compose
+ * IdlingResource from Espresso so that ALL Compose test operations (including
+ * fetchSemanticsNodes, performClick, performScrollTo, assertIsDisplayed) bypass
+ * the idle check that blocks on infinite animations (OceanBackground).
  */
 private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForCondition(
     timeoutMs: Long,
     condition: () -> Boolean
 ) {
-    val registry = IdlingRegistry.getInstance()
-    val composeIdling = registry.resources.filter {
-        it.name.contains("Compose", ignoreCase = true)
-    }
-    composeIdling.forEach { registry.unregister(it) }
+    unregisterComposeIdling()
 
-    try {
-        val startNanos = System.nanoTime()
-        val timeoutNanos = timeoutMs * 1_000_000L
-        while (true) {
-            if (condition()) return
-            if (System.nanoTime() - startNanos > timeoutNanos) {
-                throw ComposeTimeoutException(
-                    "Condition still not satisfied after $timeoutMs ms"
-                )
-            }
-            Thread.sleep(100)
+    val startNanos = System.nanoTime()
+    val timeoutNanos = timeoutMs * 1_000_000L
+    while (true) {
+        if (condition()) return
+        if (System.nanoTime() - startNanos > timeoutNanos) {
+            throw ComposeTimeoutException(
+                "Condition still not satisfied after $timeoutMs ms"
+            )
         }
-    } finally {
-        composeIdling.forEach { registry.register(it) }
+        Thread.sleep(100)
     }
 }
