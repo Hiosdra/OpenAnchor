@@ -46,6 +46,7 @@ cd pwa
 npm install              # Install dev dependencies
 npm test                 # Run unit tests (Vitest)
 npm run test:coverage    # Generate coverage report
+npm run test:e2e         # Run E2E tests (Playwright)
 ```
 
 **Service Worker cache:** Bump the cache version string in `sw.js` whenever you change cached assets.
@@ -73,6 +74,9 @@ cd android
 # Instrumented tests
 ./gradlew assembleDebugAndroidTest
 ./gradlew connectedAndroidTest
+
+# Code coverage
+./gradlew testDebugUnitTest jacocoTestReport
 ```
 
 See `android/README.md` for detailed architecture and features.
@@ -92,7 +96,9 @@ All PRs trigger the following CI checks:
 | `deploy-pwa.yml` | push to `master` with changes in `pwa/**` | Deploys PWA to GitHub Pages |
 | `deploy-pr-preview.yml` | pull request with changes in `pwa/**` | Deploys PR preview site |
 | `screenshot.yml` | pull request | Captures Playwright screenshots (mobile + desktop) and uploads as artifact |
-| `build.yml` | push / PR | Builds Android project |
+| `build.yml` | push / PR | Builds Android project (debug + release), Wear OS, generates code coverage |
+| `e2e-pwa.yml` | push / PR with changes in `pwa/**` | Runs end-to-end tests for PWA with Playwright |
+| `e2e-android.yml` | push / PR with changes in `android/**` | Runs instrumented tests on Android emulator |
 
 ## Commit messages
 

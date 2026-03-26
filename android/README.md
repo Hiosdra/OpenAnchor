@@ -71,19 +71,22 @@ android/
 #### 3. Client Mode
 - Connect to another Android device for redundancy
 - WiFi-based communication
-- Similar to paired mode but Android-to-Android
+- QR code scanning for easy pairing
+- Similar architecture to paired mode but Android-to-Android
+- Master Android acts as monitoring station
+- Client Android provides redundant cabin alarm
 
 ### Advanced Features
 
-- **Wear OS Integration**: Real-time data sync to smartwatch companion app
+- **Wear OS Integration**: Real-time data sync to smartwatch companion app with watch face complications
 - **Crew Watch Management**: Watch schedule generation and tracking
-- **AI Advisor**: Anchoring recommendations powered by AI
+- **AI Advisor**: Anchoring recommendations powered by Google Gemini API
+- **Digital Logbook**: AI-powered logbook entry generation with session tracking
 - **Maritime Exam**: Interactive quiz module (ŻJ/JSM) synced with PWA
 - **Session History**: SQLite database for session tracking and analysis
 - **GPS Accuracy**: Visual accuracy indicators and reliability checks
 - **Compass Support**: Heading data integration
-- **Weather Integration**: Weather data display and advisories
-- **Digital Logbook**: Comprehensive logging of anchoring sessions
+- **Weather Integration**: Real-time marine weather data and advisories via API
 - **Navigation**: Routing and navigation features
 
 ## Architecture
@@ -112,12 +115,17 @@ android/
 
 **Repositories:**
 - `AnchorSessionRepository`: SQLite session storage
+- `LogbookRepository`: Digital logbook with AI-powered entry generation
+- `WeatherRepository`: Marine weather data caching and access
 
 **Network:**
 - `WebSocketServer`: Hotspot server for iPad pairing
 - `WebSocketClient`: Client mode for Android-to-Android
 - `HotspotManager`: WiFi hotspot management
 - `PairedModeManager`: Pairing state and heartbeat logic
+- `ClientModeManager`: Android-to-Android client mode orchestration
+- `GeminiService`: AI integration for advisor and logbook features
+- `MarineWeatherApi`: Real-time weather data fetching
 
 ### Service Layer
 
@@ -154,16 +162,18 @@ android/
 - `SetupScreen`: Initial anchor configuration
 - `PairingScreen`: QR code generation and scanning for PWA pairing
 - `PairedScreen`: Paired mode display with PWA telemetry
+- `ClientScreen`: Client mode for connecting to another Android
+- `ClientDashboardScreen`: Android-to-Android connection display
+- `ScanQRCodeScreen`: QR code scanning for client mode
 - `NavigationScreen`: Navigation and routing
 - `AdvisorScreen`: AI-powered anchoring advisor
 - `CrewWatchScreen`: Watch schedule management
 - `ExamScreen`: Examination module
 - `HistoryScreen`: Session history and statistics
 - `HistoryDetailScreen`: Detailed session analysis
-- `LogbookScreen`: Digital logbook
-- `WeatherScreen`: Weather information
+- `LogbookScreen`: Digital logbook with AI entry generation
+- `WeatherScreen`: Weather information and advisories
 - `SettingsScreen`: App configuration
-- `ClientScreen`: Client mode for connecting to another Android
 
 ## Communication Protocol
 
@@ -291,6 +301,21 @@ The Wear OS app provides real-time anchor monitoring on smartwatches.
 - Distance to anchor
 - Battery level
 - GPS accuracy
+- Watch face complications support
+
+### Watch Face Complications
+
+The Wear OS app provides data source for watch face complications, allowing anchor monitoring information directly on your watch face.
+
+**Supported Complication Types:**
+- `SHORT_TEXT`: Distance in meters (e.g., "42m")
+- `LONG_TEXT`: Distance with alarm state (e.g., "42m — SAFE")
+- `RANGED_VALUE`: Distance as percentage of max radius (default: 100m)
+
+**Features:**
+- Live updates when monitor state changes
+- Automatic synchronization with phone app
+- No manual configuration required
 
 ### Communication
 - Uses Wear OS Data Layer API

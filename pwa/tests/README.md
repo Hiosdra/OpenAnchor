@@ -11,6 +11,7 @@ This test suite provides comprehensive coverage for the OpenAnchor PWA, includin
 - **Exam module** - Progress tracking, localStorage persistence, statistics
 - **Leitner spaced repetition** - Box advancement, review scheduling, state management
 - **Anchor utilities** - GPS calculations, alarm states, distance/bearing calculations
+- **End-to-end testing** - Full user flows with Playwright
 
 ## Setup
 
@@ -23,7 +24,7 @@ npm install
 
 ## Running Tests
 
-Run all tests:
+Run all unit tests:
 ```bash
 npm test
 ```
@@ -36,6 +37,16 @@ npm run test:ui
 Run tests with coverage:
 ```bash
 npm run test:coverage
+```
+
+Run E2E tests:
+```bash
+npm run test:e2e
+```
+
+Run E2E tests with UI:
+```bash
+npm run test:e2e:ui
 ```
 
 ## Test Structure
@@ -56,6 +67,16 @@ pwa/
 │   ├── anchor-utils.test.js # Anchor utilities tests (35+ tests)
 │   ├── sw-utils.test.js     # SW utilities tests (15+ tests)
 │   └── service-worker.test.js # SW core tests (15+ tests)
+├── e2e/                     # Playwright E2E tests
+│   ├── anchor.spec.ts       # Anchor alarm E2E tests
+│   ├── egzamin.spec.ts      # Exam module E2E tests
+│   ├── wachtownik.spec.ts   # Watch scheduler E2E tests
+│   ├── cross-module.spec.ts # Multi-module integration tests
+│   ├── dashboard.spec.ts    # Dashboard/launcher tests
+│   ├── service-worker.spec.ts # Service worker E2E tests
+│   ├── smoke.spec.ts        # Basic smoke tests
+│   ├── fixtures.ts          # Test fixtures
+│   └── helpers.ts           # Test helper functions
 └── vitest.config.js         # Vitest configuration
 ```
 
@@ -105,6 +126,45 @@ pwa/
 - ✅ GPS coordinate validation
 
 **Total: 149 comprehensive tests**
+
+## E2E Test Coverage
+
+### Anchor Alarm Module
+- ✅ Initial setup and configuration
+- ✅ GPS position tracking
+- ✅ Zone monitoring and alerts
+- ✅ Map visualization
+- ✅ WebSocket pairing flows
+
+### Exam Module
+- ✅ Question navigation
+- ✅ Answer selection
+- ✅ Progress tracking
+- ✅ Learn mode functionality
+- ✅ Leitner system integration
+
+### Wachtownik Module
+- ✅ Crew management
+- ✅ Watch schedule generation
+- ✅ PDF export
+- ✅ State persistence
+
+### Cross-Module Tests
+- ✅ Navigation between modules
+- ✅ State isolation
+- ✅ Service worker caching
+- ✅ Offline functionality
+
+### Dashboard Tests
+- ✅ Module launcher
+- ✅ Beta mode toggle
+- ✅ Settings modal
+- ✅ Module visibility
+
+### Smoke Tests
+- ✅ Basic page loads
+- ✅ Critical user paths
+- ✅ Performance benchmarks
 
 ## Code Architecture
 
