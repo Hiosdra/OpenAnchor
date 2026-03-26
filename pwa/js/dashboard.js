@@ -93,8 +93,16 @@ export function closeSettingsOnBackdrop(event) {
 
 /**
  * Navigate to a module
+ * Sends CACHE_MODULE message to service worker for lazy caching before navigating.
  * @param {string} url - Module URL
  */
 export function openModule(url) {
+  const match = url.match(/modules\/([^/]+)\//);
+  if (match && navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'CACHE_MODULE',
+      module: match[1]
+    });
+  }
   window.location.href = url;
 }

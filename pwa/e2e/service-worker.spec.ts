@@ -54,8 +54,9 @@ test.describe('Service Worker', () => {
       return keys.map((r) => new URL(r.url).pathname);
     });
 
+    // Core assets are always pre-cached on install
     expect(cachedUrls).toContain('/index.html');
-    expect(cachedUrls).toContain('/modules/egzamin/index.html');
+    expect(cachedUrls).toContain('/manifest.json');
   });
 
   test('serves cached dashboard when offline', async ({ page }) => {
