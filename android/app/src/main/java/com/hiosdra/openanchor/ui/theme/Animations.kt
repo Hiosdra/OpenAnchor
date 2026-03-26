@@ -96,6 +96,7 @@ fun Modifier.bounceClick(
 /**
  * A pulsing glow effect for alarm states.
  * Returns an animated alpha value that pulses between minAlpha and maxAlpha.
+ * When disabled, returns a static 1.0f without creating an InfiniteTransition.
  */
 @Composable
 fun rememberPulsingAlpha(
@@ -104,10 +105,11 @@ fun rememberPulsingAlpha(
     maxAlpha: Float = 1.0f,
     durationMillis: Int = 1000
 ): State<Float> {
+    if (!enabled) return remember { mutableFloatStateOf(1f) }
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     return infiniteTransition.animateFloat(
-        initialValue = if (enabled) maxAlpha else 1f,
-        targetValue = if (enabled) minAlpha else 1f,
+        initialValue = maxAlpha,
+        targetValue = minAlpha,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
