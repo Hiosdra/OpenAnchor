@@ -120,7 +120,7 @@ private fun SessionCard(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             title = { Text(stringResource(R.string.delete_session_title)) },
-            text = { Text("Delete session from $sessionDateStr? This cannot be undone.") },
+            text = { Text(stringResource(R.string.delete_session_message)) },
             confirmButton = {
                 Button(
                     onClick = {
