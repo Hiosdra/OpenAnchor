@@ -110,7 +110,7 @@ function _resetExamDataInternal() {
  */
 export function resetExamData(message) {
   const confirmMsg = message || 'Na pewno chcesz zresetować dane egzaminu?';
-  if (typeof window !== 'undefined' && !window.confirm(confirmMsg)) {
+  if (typeof window !== 'undefined' && typeof window.confirm === 'function' && !window.confirm(confirmMsg)) {
     return false;
   }
   _resetExamDataInternal();
