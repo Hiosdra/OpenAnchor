@@ -34,6 +34,8 @@ class HistoryScreenTest {
     @Before
     fun setup() {
         every { viewModel.sessions } returns sessions
+        every { viewModel.searchQuery } returns MutableStateFlow("")
+        every { viewModel.deleteError } returns MutableStateFlow(false)
         clickedSessionId = null
     }
 

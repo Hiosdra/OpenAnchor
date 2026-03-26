@@ -29,7 +29,6 @@ export function initBetaMode() {
   const isBetaEnabled = isBetaModeEnabled();
   const betaToggle = document.getElementById('betaToggle');
   const anchorModule = document.getElementById('anchorModule');
-  const wachtownikModule = document.getElementById('wachtownikModule');
 
   // Set toggle state
   if (betaToggle) {
@@ -40,7 +39,6 @@ export function initBetaMode() {
   // Modules are hidden by default in HTML to prevent flash on load
   if (isBetaEnabled) {
     if (anchorModule) anchorModule.classList.remove('module-hidden');
-    if (wachtownikModule) wachtownikModule.classList.remove('module-hidden');
   }
 }
 
@@ -51,7 +49,6 @@ export function toggleBetaMode() {
   const betaToggle = document.getElementById('betaToggle');
   const isBetaEnabled = betaToggle?.checked ?? false;
   const anchorModule = document.getElementById('anchorModule');
-  const wachtownikModule = document.getElementById('wachtownikModule');
 
   // Save preference
   setBetaMode(isBetaEnabled);
@@ -59,10 +56,8 @@ export function toggleBetaMode() {
   // Show/hide modules
   if (isBetaEnabled) {
     if (anchorModule) anchorModule.classList.remove('module-hidden');
-    if (wachtownikModule) wachtownikModule.classList.remove('module-hidden');
   } else {
     if (anchorModule) anchorModule.classList.add('module-hidden');
-    if (wachtownikModule) wachtownikModule.classList.add('module-hidden');
   }
 }
 

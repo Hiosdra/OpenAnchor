@@ -27,8 +27,8 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
-  // Don't force skip waiting - let the page control when to update
 });
+
 
 // Listen for messages from the page
 self.addEventListener('message', event => {
@@ -126,6 +126,13 @@ self.addEventListener('activate', event => {
     }).then(() => {
       // Claim clients to ensure the new service worker takes control immediately
       return self.clients.claim();
+    }).then(() => {
+      // Notify all clients to reload for the new version
+      return self.clients.matchAll({ type: 'window' }).then(clients => {
+        clients.forEach(client => {
+          client.postMessage({ type: 'SW_UPDATED', cacheName: CACHE_NAME });
+        });
+      });
     })
   );
 });

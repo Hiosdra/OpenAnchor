@@ -23,11 +23,9 @@ test.describe('Page Load & Basic Display', () => {
     await expect(anchorCard).not.toBeVisible();
   });
 
-  test('wachtownik module card is hidden by default', async ({ page }) => {
+  test('wachtownik module card is visible by default', async ({ page }) => {
     await page.goto(MODULES.dashboard, GOTO_OPTS);
-    const watchCard = page.locator('#wachtownikModule');
-    await expect(watchCard).toHaveClass(/module-hidden/);
-    await expect(watchCard).not.toBeVisible();
+    await expect(page.locator('.module-card.card-watch')).toBeVisible();
   });
 
   test('settings button is visible', async ({ page }) => {
@@ -37,30 +35,27 @@ test.describe('Page Load & Basic Display', () => {
 });
 
 test.describe('Beta Mode Toggle', () => {
-  test('enabling beta mode shows anchor and wachtownik cards', async ({ page }) => {
+  test('enabling beta mode shows anchor card', async ({ page }) => {
     await page.goto(MODULES.dashboard, GOTO_OPTS);
     await page.locator('.settings-btn').click();
     await expect(page.locator('#settingsModal')).toHaveClass(/show/);
     await page.locator('#betaToggle').evaluate((el: HTMLInputElement) => el.click());
 
     await expect(page.locator('#anchorModule')).toBeVisible();
-    await expect(page.locator('#wachtownikModule')).toBeVisible();
   });
 
-  test('disabling beta mode hides anchor and wachtownik cards', async ({ setLocalStorage }) => {
+  test('disabling beta mode hides anchor card', async ({ setLocalStorage }) => {
     const page = await setLocalStorage(MODULES.dashboard, [
       { key: STORAGE_KEYS.betaMode, value: 'true' },
     ]);
 
     await expect(page.locator('#anchorModule')).toBeVisible();
-    await expect(page.locator('#wachtownikModule')).toBeVisible();
 
     await page.locator('.settings-btn').click();
     await expect(page.locator('#settingsModal')).toHaveClass(/show/);
     await page.locator('#betaToggle').evaluate((el: HTMLInputElement) => el.click());
 
     await expect(page.locator('#anchorModule')).not.toBeVisible();
-    await expect(page.locator('#wachtownikModule')).not.toBeVisible();
   });
 
   test('beta mode persists across page reload', async ({ setLocalStorage }) => {
@@ -72,7 +67,6 @@ test.describe('Beta Mode Toggle', () => {
 
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('#anchorModule')).toBeVisible();
-    await expect(page.locator('#wachtownikModule')).toBeVisible();
   });
 
   test('beta mode is disabled by default on fresh load', async ({ page }) => {
@@ -133,11 +127,9 @@ test.describe('Module Navigation', () => {
     await expect(page).toHaveURL(/modules\/anchor/);
   });
 
-  test('clicking wachtownik card navigates to wachtownik module', async ({ setLocalStorage }) => {
-    const page = await setLocalStorage(MODULES.dashboard, [
-      { key: STORAGE_KEYS.betaMode, value: 'true' },
-    ]);
-    await page.locator('#wachtownikModule').click();
+  test('clicking wachtownik card navigates to wachtownik module', async ({ page }) => {
+    await page.goto(MODULES.dashboard, GOTO_OPTS);
+    await page.locator('.module-card.card-watch').click();
     await expect(page).toHaveURL(/modules\/wachtownik/);
   });
 });
@@ -148,7 +140,7 @@ test.describe('Accessibility', () => {
       { key: STORAGE_KEYS.betaMode, value: 'true' },
     ]);
     await expect(page.locator('#anchorModule')).toHaveAttribute('role', 'button');
-    await expect(page.locator('#wachtownikModule')).toHaveAttribute('role', 'button');
+    await expect(page.locator('.module-card.card-watch')).toHaveAttribute('role', 'button');
     await expect(page.locator('.module-card.card-exam')).toHaveAttribute('role', 'button');
   });
 
@@ -157,7 +149,7 @@ test.describe('Accessibility', () => {
       { key: STORAGE_KEYS.betaMode, value: 'true' },
     ]);
     await expect(page.locator('#anchorModule')).toHaveAttribute('tabindex', '0');
-    await expect(page.locator('#wachtownikModule')).toHaveAttribute('tabindex', '0');
+    await expect(page.locator('.module-card.card-watch')).toHaveAttribute('tabindex', '0');
     await expect(page.locator('.module-card.card-exam')).toHaveAttribute('tabindex', '0');
   });
 

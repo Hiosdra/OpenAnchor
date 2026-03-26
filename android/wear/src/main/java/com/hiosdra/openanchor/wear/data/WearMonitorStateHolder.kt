@@ -3,24 +3,21 @@ package com.hiosdra.openanchor.wear.data
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 /**
- * Singleton state holder that bridges the WearableListenerService and the UI.
- * The service writes state here; the activity observes it.
+ * Singleton state holder for anchor monitoring data on the watch.
+ * Focused solely on monitor state — connection tracking is in [WearConnectionManager].
+ *
+ * The service writes state here (via [WearDataRepository]); the activity observes it.
  */
 object WearMonitorStateHolder {
 
     private val _state = MutableStateFlow(WearMonitorState())
     val state: StateFlow<WearMonitorState> = _state.asStateFlow()
 
-    private val _connected = MutableStateFlow(false)
-    val connected: StateFlow<Boolean> = _connected.asStateFlow()
-
+    /** Atomically update the monitor state. */
     fun updateState(newState: WearMonitorState) {
-        _state.value = newState
-    }
-
-    fun setConnected(isConnected: Boolean) {
-        _connected.value = isConnected
+        _state.update { newState }
     }
 }

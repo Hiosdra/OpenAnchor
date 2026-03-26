@@ -402,7 +402,7 @@ test.describe('Night Mode', () => {
     const appContainer = page.locator('[data-night-mode]');
     await expect(appContainer).toHaveAttribute('data-night-mode', 'false');
 
-    await page.getByRole('button', { name: 'Włącz tryb nocny' }).click();
+    await page.getByRole('button', { name: /night mode/i }).click();
     await expect(appContainer).toHaveAttribute('data-night-mode', 'true');
   });
 
@@ -410,18 +410,18 @@ test.describe('Night Mode', () => {
     await page.goto(MODULES.wachtownik);
     await waitForApp(page);
 
-    await page.getByRole('button', { name: 'Włącz tryb nocny' }).click();
-    await expect(page.getByRole('button', { name: 'Wyłącz tryb nocny' })).toBeVisible();
+    await page.getByRole('button', { name: /night mode/i }).click();
+    await expect(page.getByRole('button', { name: /night mode/i })).toBeVisible();
   });
 
   test('night mode can be toggled off', async ({ page }) => {
     await page.goto(MODULES.wachtownik);
     await waitForApp(page);
 
-    await page.getByRole('button', { name: 'Włącz tryb nocny' }).click();
+    await page.getByRole('button', { name: /night mode/i }).click();
     await expect(page.locator('[data-night-mode="true"]')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Wyłącz tryb nocny' }).click();
+    await page.getByRole('button', { name: /night mode/i }).click();
     await expect(page.locator('[data-night-mode="false"]')).toBeVisible();
   });
 
@@ -429,7 +429,7 @@ test.describe('Night Mode', () => {
     await page.goto(MODULES.wachtownik);
     await waitForApp(page);
 
-    await page.getByRole('button', { name: 'Włącz tryb nocny' }).click();
+    await page.getByRole('button', { name: /night mode/i }).click();
     await expect(page.locator('[data-night-mode="true"]')).toBeVisible();
 
     await page.reload({ waitUntil: 'domcontentloaded' });

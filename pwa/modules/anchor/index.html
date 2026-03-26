@@ -132,6 +132,11 @@
 </head>
 <body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-y-auto" id="app-body">
 
+<!-- Connection lost banner -->
+<div id="ws-connection-banner" class="hidden fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-center text-xs py-1 px-4 font-bold transition-all">
+    ⚠ Połączenie utracone — próba ponownego połączenia...
+</div>
+
 <!-- Background -->
 <div class="ocean-bg">
     <div class="wave wave-1"></div>
@@ -165,6 +170,7 @@
                 <i data-lucide="satellite" class="w-3 sm:w-3.5 h-3 sm:h-3.5"></i>
                 <span id="gps-status-text" data-i18n="gpsSearching">Szukam...</span>
             </div>
+            <span id="battery-saver-badge" class="hidden text-[9px] bg-yellow-900 text-yellow-300 px-1.5 py-0.5 rounded-full ml-1">🔋 Eco</span>
         </div>
     </div>
 </header>
@@ -554,6 +560,9 @@
         <div class="flex gap-2">
             <button id="replay-export-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2">
                 <i data-lucide="download" class="w-4 h-4"></i> <span data-i18n="replayExport">Eksport GPX</span>
+            </button>
+            <button id="replay-export-csv-btn" class="flex-1 bg-slate-600 hover:bg-slate-500 py-3 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> CSV
             </button>
             <button id="replay-delete-btn" class="flex-1 bg-red-900/50 hover:bg-red-900 text-red-300 py-3 rounded-xl font-bold border border-red-800 text-sm flex items-center justify-center gap-2">
                 <i data-lucide="trash-2" class="w-4 h-4"></i> <span data-i18n="replayDelete">Usuń</span>
@@ -965,6 +974,7 @@
                 notifVerifying: 'Weryfikacja pozycji...',
                 // GPS
                 gpsPermDenied: 'Brak uprawnień do GPS.',
+                gpsPermDeniedHelp: 'Aby włączyć lokalizację, otwórz Ustawienia przeglądarki > Uprawnienia witryny > Lokalizacja.',
                 // Share
                 shareNoGps: 'Brak ustalonej pozycji GPS do udostępnienia.',
                 sharePrefix: 'Moja pozycja:',
@@ -1183,6 +1193,7 @@
                 notifOutOfZone: 'Outside safe zone!',
                 notifVerifying: 'Verifying position...',
                 gpsPermDenied: 'GPS permission denied.',
+                gpsPermDeniedHelp: 'To re-enable location, open browser Settings > Site permissions > Location.',
                 shareNoGps: 'No GPS position to share.',
                 sharePrefix: 'My position:',
                 shareFallback: 'Copy this link to share position:',
@@ -1636,9 +1647,10 @@
         _initBatteryMonitor() {
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(b => {
+                    this._batteryRef = b;
                     this.lastKnownBatteryLevel = b.level;
                     this.lastKnownChargingState = b.charging;
-                    const check = () => {
+                    this._batteryCheck = () => {
                         this.lastKnownBatteryLevel = b.level;
                         this.lastKnownChargingState = b.charging;
                         if (b.level <= 0.15 && !b.charging && window.app && window.app.state.isAnchored && !this.batteryWarningShown) {
@@ -1647,8 +1659,9 @@
                         }
                         if (b.charging) this.batteryWarningShown = false;
                     };
-                    b.addEventListener('levelchange', check); b.addEventListener('chargingchange', check);
-                    this.batteryInterval = setInterval(check, 60000);
+                    b.addEventListener('levelchange', this._batteryCheck);
+                    b.addEventListener('chargingchange', this._batteryCheck);
+                    this.batteryInterval = setInterval(this._batteryCheck, 60000);
                 });
             }
         }
@@ -1656,6 +1669,12 @@
         cleanup() {
             clearInterval(this.alarmInterval);
             clearInterval(this.batteryInterval);
+            if (this._batteryRef && this._batteryCheck) {
+                this._batteryRef.removeEventListener('levelchange', this._batteryCheck);
+                this._batteryRef.removeEventListener('chargingchange', this._batteryCheck);
+                this._batteryRef = null;
+                this._batteryCheck = null;
+            }
             this.releaseWakeLock();
         }
     }
@@ -2033,13 +2052,17 @@
             this.lastPeerPingTime = Date.now();
             this.peerConnectionLost = false;
             document.getElementById('ws-status-icon').classList.replace('text-slate-600', 'text-green-400');
+            // Hide connection lost banner
+            const banner = document.getElementById('ws-connection-banner');
+            if (banner) banner.classList.add('hidden');
 
             this.sendFullSync();
 
             this.pingInterval = setInterval(() => this.send('PING'), 5000);
+            this._lastSentStateHash = null;
 
             this.syncInterval = setInterval(() => {
-                this.send('STATE_UPDATE', {
+                const payload = {
                     currentPos: this.app.state.currentPos,
                     gpsAccuracy: this.app.state.accuracy,
                     distanceToAnchor: this.app.state.distance,
@@ -2048,7 +2071,12 @@
                     cog: this.app.state.cog,
                     batteryLevel: this.app.alertCtrl.lastKnownBatteryLevel || 1.0,
                     isCharging: this.app.alertCtrl.lastKnownChargingState || false
-                });
+                };
+                const hash = JSON.stringify(payload);
+                if (hash !== this._lastSentStateHash) {
+                    this._lastSentStateHash = hash;
+                    this.send('STATE_UPDATE', payload);
+                }
             }, 2000);
         }
 
@@ -2059,6 +2087,11 @@
             this.peerConnectionLost = false;
             document.getElementById('ws-status-icon').classList.replace('text-green-400', 'text-slate-600');
             document.getElementById('ws-status-icon').classList.replace('text-orange-400', 'text-slate-600');
+            // Show connection lost banner if was connected
+            if (wasConnected) {
+                const banner = document.getElementById('ws-connection-banner');
+                if (banner) banner.classList.remove('hidden');
+            }
             // Hide peer info on disconnect
             const peerBat = document.getElementById('peer-battery');
             if (peerBat) peerBat.classList.add('hidden');
@@ -2276,6 +2309,10 @@
             // Track point batching for IndexedDB
             this._trackPointBuffer = [];
             this._trackFlushInterval = null;
+            this._TRACK_BUFFER_MAX = 1000;
+
+            // Battery saver mode
+            this._batterySaverActive = false;
 
             this.db = new SessionDB();
             this.alarmEngine = new AlarmEngine();
@@ -2287,13 +2324,40 @@
             // Store GPS watch ID for cleanup
             this.gpsWatchId = null;
 
+            // Cache frequently accessed DOM elements
+            this._els = {
+                alarmStateBar: document.getElementById('alarm-state-bar'),
+                alarmStateText: document.getElementById('alarm-state-text'),
+                gpsStatusText: document.getElementById('gps-status-text'),
+                gpsStatus: document.getElementById('gps-status'),
+                noSignalOverlay: document.getElementById('no-signal-overlay'),
+                mainBtn: document.getElementById('main-btn'),
+                offsetBtn: document.getElementById('offset-btn'),
+                sectorBadge: document.getElementById('sector-badge'),
+                activeWatchBanner: document.getElementById('active-watch-banner'),
+                activeWatchName: document.getElementById('active-watch-name'),
+                watchBadge: document.getElementById('watch-badge'),
+            };
+
+            // Debounced schedule save
+            this._scheduleSaveTimer = null;
+
             UI.init();
             this._bindAppEvents();
             this._initGPS();
 
             if (this.syncCtrl.url) document.getElementById('ws-url-input').value = this.syncCtrl.url;
 
-            setInterval(() => this._onTick(), 1000);
+            this._tickInterval = setInterval(() => this._onTick(), 1000);
+
+            // Flush track buffer and cleanup before page unload
+            window.addEventListener('beforeunload', () => {
+                if (this._trackPointBuffer.length > 0 && this.state.sessionId && this.db.db) {
+                    this._flushTrackPoints();
+                }
+                clearInterval(this._smClockInterval);
+                clearInterval(this._tickInterval);
+            });
 
             // Init DB and restore state
             this._initDB();
@@ -2318,6 +2382,15 @@
                 console.error('Failed to parse schedule from localStorage:', err);
                 return [];
             }
+        }
+
+        _debouncedSaveSchedule() {
+            clearTimeout(this._scheduleSaveTimer);
+            this._scheduleSaveTimer = setTimeout(() => {
+                try {
+                    localStorage.setItem('anchor_schedule', JSON.stringify(this.state.schedule));
+                } catch (e) { console.warn('Failed to save schedule:', e); }
+            }, 300);
         }
 
         async _restoreActiveState() {
@@ -2407,6 +2480,7 @@
             this._checkSchedule();
             if (this.syncCtrl) this.syncCtrl.checkHeartbeat();
             this._checkGpsWatchdog();
+            this._checkBatterySaver();
         }
 
         // ==========================================
@@ -2444,6 +2518,7 @@
                 this.state.gpsSignalLost = false;
                 this.gpsWatchdogAlerted = false;
                 document.getElementById('no-signal-overlay').classList.add('hidden');
+                UI.hideModal('gps-lost-modal');
             }
         }
 
@@ -2451,8 +2526,8 @@
         // ALARM STATE BAR
         // ==========================================
         _updateAlarmStateBar() {
-            const bar = document.getElementById('alarm-state-bar');
-            const text = document.getElementById('alarm-state-text');
+            const bar = this._els.alarmStateBar || document.getElementById('alarm-state-bar');
+            const text = this._els.alarmStateText || document.getElementById('alarm-state-text');
 
             // Remove all alarm classes
             bar.classList.remove('alarm-bar-safe', 'alarm-bar-caution', 'alarm-bar-warning', 'alarm-bar-alarm', 'hidden');
@@ -2655,12 +2730,60 @@
 
         _initGPS() {
             if ("geolocation" in navigator) {
+                const gpsOptions = this._batterySaverActive
+                    ? { enableHighAccuracy: false, maximumAge: 5000, timeout: 10000 }
+                    : { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 };
                 this.gpsWatchId = navigator.geolocation.watchPosition(
                     (pos) => this._onPosition(pos),
-                    (err) => { document.getElementById('no-signal-overlay').classList.remove('hidden'); if (err.code === 1) { document.getElementById('warning-text').textContent = I18N.t.gpsPermDenied; UI.showModal('warning-modal'); } },
-                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                    (err) => {
+                        document.getElementById('no-signal-overlay').classList.remove('hidden');
+                        if (err.code === 1) {
+                            document.getElementById('warning-text').textContent = I18N.t.gpsPermDenied
+                                + ' ' + (I18N.t.gpsPermDeniedHelp || 'Check browser Site Settings to re-enable location access.');
+                            UI.showModal('warning-modal');
+                        } else if (err.code === 2 || err.code === 3) {
+                            // Position unavailable or timeout - trigger GPS loss alarm if anchored
+                            document.getElementById('gps-status-text').textContent = I18N.t.gpsLost || 'GPS Lost';
+                            document.getElementById('gps-status').classList.replace('text-green-500', 'text-red-500');
+                            if (this.state.isAnchored && !this.state.gpsSignalLost) {
+                                this.state.gpsSignalLost = true;
+                                this.gpsWatchdogAlerted = true;
+                                UI.showModal('gps-lost-modal');
+                                this.alertCtrl.playBeep('warning');
+                                if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
+                                this.syncCtrl.send('TRIGGER_ALARM', {
+                                    reason: err.code === 2 ? "GPS_UNAVAILABLE" : "GPS_TIMEOUT",
+                                    message: "GPS signal lost: " + err.message,
+                                    alarmState: "WARNING"
+                                });
+                            }
+                        }
+                    },
+                    gpsOptions
                 );
             } else document.getElementById('no-signal-overlay').classList.remove('hidden');
+        }
+
+        _checkBatterySaver() {
+            const level = this.alertCtrl.lastKnownBatteryLevel;
+            const charging = this.alertCtrl.lastKnownChargingState;
+            const shouldSave = level !== undefined && level <= 0.30 && !charging;
+
+            if (shouldSave && !this._batterySaverActive) {
+                this._batterySaverActive = true;
+                // Restart GPS with lower accuracy settings
+                this._cleanupGPS();
+                this._initGPS();
+                // Show battery saver indicator
+                const badge = document.getElementById('battery-saver-badge');
+                if (badge) badge.classList.remove('hidden');
+            } else if (!shouldSave && this._batterySaverActive) {
+                this._batterySaverActive = false;
+                this._cleanupGPS();
+                this._initGPS();
+                const badge = document.getElementById('battery-saver-badge');
+                if (badge) badge.classList.add('hidden');
+            }
         }
 
         _cleanupGPS() {
@@ -2673,7 +2796,13 @@
         _onPosition(position) {
             this.lastGpsFixTime = Date.now(); // GPS watchdog reset
             this.state.currentPos = L.latLng(position.coords.latitude, position.coords.longitude);
-            this.state.accuracy = position.coords.accuracy;
+            // Validate accuracy to prevent NaN propagation
+            const rawAccuracy = position.coords.accuracy;
+            const accuracy = (rawAccuracy >= 0 && isFinite(rawAccuracy)) ? rawAccuracy : null;
+            if (accuracy !== null) {
+                this.state.accuracy = accuracy;
+            }
+            // When accuracy is invalid, keep previous valid value
 
             if (position.coords.speed !== null) {
                 this.state.sog = position.coords.speed * GeoUtils.MPS2KNOTS;
@@ -2687,10 +2816,11 @@
                 document.getElementById('main-btn').disabled = false; document.getElementById('offset-btn').disabled = false;
             }
 
-            // Recover from GPS signal lost
+            // Recover from GPS signal lost - auto-dismiss modal
             if (this.state.gpsSignalLost) {
                 this.state.gpsSignalLost = false;
                 this.gpsWatchdogAlerted = false;
+                UI.hideModal('gps-lost-modal');
             }
 
             document.getElementById('gps-status-text').textContent = I18N.t.gpsOk;
@@ -2708,11 +2838,15 @@
                     sessionId: this.state.sessionId,
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
-                    accuracy: position.coords.accuracy,
+                    accuracy: accuracy,
                     timestamp: Date.now(),
                     distance: this.state.distance,
                     alarmState: this.state.alarmState
                 });
+                // Cap buffer to prevent unbounded growth
+                if (this._trackPointBuffer.length > this._TRACK_BUFFER_MAX) {
+                    this._trackPointBuffer.splice(0, this._trackPointBuffer.length - this._TRACK_BUFFER_MAX);
+                }
             }
 
             this._recalculate();
@@ -2723,7 +2857,7 @@
 
         _syncUI() {
             UI.updateDashboard(GeoUtils.formatDist(this.state.distance, this.state.unit), this.state.sog, this.state.cog, GeoUtils.formatDist(this.state.accuracy, this.state.unit), this.state.unit, this.state.isAnchored);
-            document.getElementById('sector-badge').classList.toggle('hidden', !this.state.sectorEnabled);
+            (this._els.sectorBadge || document.getElementById('sector-badge')).classList.toggle('hidden', !this.state.sectorEnabled);
         }
 
         _checkWatchTimer() {
@@ -2738,7 +2872,7 @@
         }
 
         _checkSchedule() {
-            const banner = document.getElementById('active-watch-banner');
+            const banner = this._els.activeWatchBanner || document.getElementById('active-watch-banner');
             if (this.state.schedule.length === 0) { banner.classList.add('hidden'); return; }
 
             const now = new Date(); const currentVal = now.getHours() * 60 + now.getMinutes(); let activePerson = null;
@@ -2760,7 +2894,7 @@
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center bg-slate-800 p-2 rounded border border-slate-700 text-xs";
                 div.innerHTML = `<span class="text-blue-400 font-mono">${item.start} - ${item.end}</span><span class="text-white font-bold truncate px-2">${item.person}</span><button class="text-red-400 hover:text-red-300 transition-colors" data-idx="${index}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`;
-                div.querySelector('button').addEventListener('click', (e) => { this.state.schedule.splice(e.currentTarget.dataset.idx, 1); localStorage.setItem('anchor_schedule', JSON.stringify(this.state.schedule)); this._renderScheduleList(); });
+                div.querySelector('button').addEventListener('click', (e) => { this.state.schedule.splice(e.currentTarget.dataset.idx, 1); this._debouncedSaveSchedule(); this._renderScheduleList(); });
                 list.appendChild(div);
             });
             lucide.createIcons(); this._checkSchedule();
@@ -2872,6 +3006,8 @@
 
                 // Wire up buttons
                 document.getElementById('replay-export-btn').onclick = () => this._exportSessionGPX(session, points);
+                const csvBtn = document.getElementById('replay-export-csv-btn');
+                if (csvBtn) csvBtn.onclick = () => this._exportSessionCSV(session, points);
                 document.getElementById('replay-delete-btn').onclick = async () => {
                     if (confirm(I18N.t.replayConfirm)) {
                         await this.db.deleteSession(sessionId);
@@ -2968,6 +3104,20 @@
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([gpx], { type: 'application/gpx+xml' }));
             a.download = `openanchor_${startDate.toISOString().slice(0,10)}_${startDate.toISOString().slice(11,16).replace(':','')}.gpx`;
+            a.click();
+        }
+
+        _exportSessionCSV(session, points) {
+            if (points.length === 0) return;
+            const startDate = new Date(session.startTime);
+            const header = 'timestamp,lat,lon,accuracy,distance,alarmState\n';
+            const rows = points.map(p =>
+                `${new Date(p.timestamp).toISOString()},${p.lat},${p.lng},${p.accuracy || ''},${p.distance || ''},${p.alarmState || 'SAFE'}`
+            ).join('\n');
+            const csv = header + rows;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+            a.download = `openanchor_${startDate.toISOString().slice(0,10)}_${startDate.toISOString().slice(11,16).replace(':','')}.csv`;
             a.click();
         }
 
@@ -3316,7 +3466,7 @@ SAFETY: ...`;
             this._renderScheduleList();
             document.getElementById('add-schedule-btn').addEventListener('click', () => {
                 const s = document.getElementById('schedule-start').value, e = document.getElementById('schedule-end').value, p = document.getElementById('schedule-name').value.trim();
-                if (s && e && p) { this.state.schedule.push({ start: s, end: e, person: p }); document.getElementById('schedule-start').value=''; document.getElementById('schedule-end').value=''; document.getElementById('schedule-name').value=''; this._renderScheduleList(); localStorage.setItem('anchor_schedule', JSON.stringify(this.state.schedule));}
+                if (s && e && p) { this.state.schedule.push({ start: s, end: e, person: p }); document.getElementById('schedule-start').value=''; document.getElementById('schedule-end').value=''; document.getElementById('schedule-name').value=''; this._renderScheduleList(); this._debouncedSaveSchedule();}
             });
 
             // ==========================================
@@ -3732,7 +3882,14 @@ SAFETY: ...`;
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
         new OnboardingController();
-        window.app = new AnchorApp();
+        const app = new AnchorApp();
+        // Expose app globally for cross-module access (e.g., SyncController, AlertController).
+        // Use Object.defineProperty to prevent accidental overwrite from other scripts.
+        Object.defineProperty(window, 'app', {
+            value: app,
+            writable: false,
+            configurable: false
+        });
         // Apply i18n to all static DOM elements after app init (Faza 5.3b)
         I18N._applyToDOM();
     });

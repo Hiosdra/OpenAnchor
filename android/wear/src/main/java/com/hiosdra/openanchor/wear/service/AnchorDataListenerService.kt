@@ -11,9 +11,7 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 import com.hiosdra.openanchor.wear.data.DataPaths
-import com.hiosdra.openanchor.wear.data.WearAlarmState
-import com.hiosdra.openanchor.wear.data.WearMonitorState
-import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
+import com.hiosdra.openanchor.wear.data.WearDataRepository
 
 /**
  * Background service that receives DataItems and Messages from the phone app
@@ -21,41 +19,55 @@ import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
  *
  * - DataItems (MONITOR_STATE_PATH): continuous monitor state sync
  * - Messages (ALARM_TRIGGER_PATH): immediate alarm vibration trigger
+ *
+ * Multi-watch architecture: When multiple watches are paired, each receives all
+ * DataItems. Source node filtering is applied here — only events from a known
+ * phone node are processed. A full role-based model (primary display vs alarm-only)
+ * would require a preferences UI and NodeClient discovery, deferred for now.
  */
 class AnchorDataListenerService : WearableListenerService() {
 
     companion object {
         private const val TAG = "AnchorDataListener"
+
+        /** Node ID of the last phone that sent us data. */
+        @Volatile
+        private var connectedPhoneNodeId: String? = null
     }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         super.onDataChanged(dataEvents)
 
-        for (event in dataEvents) {
-            val uri = event.dataItem.uri
-            if (uri.path == DataPaths.MONITOR_STATE_PATH) {
-                try {
+        try {
+            for (event in dataEvents) {
+                val uri = event.dataItem.uri
+                val sourceNodeId = uri.host
+
+                if (uri.path == DataPaths.MONITOR_STATE_PATH) {
+                    // Accept data from the first phone we see, then filter to that node
+                    if (connectedPhoneNodeId == null) {
+                        connectedPhoneNodeId = sourceNodeId
+                        Log.d(TAG, "Locked to phone node: $sourceNodeId")
+                    } else if (sourceNodeId != connectedPhoneNodeId) {
+                        Log.d(TAG, "Ignoring data from unknown node: $sourceNodeId")
+                        continue
+                    }
+
                     val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+                    val state = WearDataParser.parse(dataMap)
 
-                    val state = WearMonitorState(
-                        isActive = dataMap.getBoolean(DataPaths.KEY_IS_ACTIVE, false),
-                        alarmState = WearAlarmState.fromString(
-                            dataMap.getString(DataPaths.KEY_ALARM_STATE, "SAFE")
-                        ),
-                        distanceMeters = dataMap.getFloat(DataPaths.KEY_DISTANCE, 0f).toDouble(),
-                        gpsAccuracyMeters = dataMap.getFloat(DataPaths.KEY_GPS_ACCURACY, 0f),
-                        gpsSignalLost = dataMap.getBoolean(DataPaths.KEY_GPS_SIGNAL_LOST, false),
-                        timestamp = dataMap.getLong(DataPaths.KEY_TIMESTAMP, 0L)
-                    )
-
-                    WearMonitorStateHolder.updateState(state)
-                    WearMonitorStateHolder.setConnected(true)
-
-                    Log.d(TAG, "State updated: ${state.alarmState}, dist=${state.distanceMeters}m")
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing DataItem", e)
+                    if (state != null) {
+                        WearDataRepository.onStateReceived(state)
+                        WearHapticFeedback.onAlarmStateChanged(this, state.alarmState)
+                        WearComplicationService.requestComplicationUpdate(this)
+                        Log.d(TAG, "State updated: ${state.alarmState}, dist=${state.distanceMeters}m")
+                    } else {
+                        Log.w(TAG, "Failed to parse DataItem from $sourceNodeId")
+                    }
                 }
             }
+        } finally {
+            dataEvents.release()
         }
     }
 
@@ -70,18 +82,27 @@ class AnchorDataListenerService : WearableListenerService() {
 
     private fun triggerAlarmVibration() {
         val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val manager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            manager.defaultVibrator
+            val manager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+            manager?.defaultVibrator
         } else {
             @Suppress("DEPRECATION")
-            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
         }
 
-        // Strong repeating pattern: vibrate 500ms, pause 200ms, repeat 5 times
+        if (vibrator == null || !vibrator.hasVibrator()) {
+            Log.w(TAG, "No vibrator available, skipping alarm vibration")
+            return
+        }
+
+        // Strong repeating pattern: vibrate 500ms, pause 200ms (no infinite repeat)
         val timings = longArrayOf(0, 500, 200, 500, 200, 500, 200, 500, 200, 500)
         val amplitudes = intArrayOf(0, 255, 0, 255, 0, 255, 0, 255, 0, 255)
 
-        val effect = VibrationEffect.createWaveform(timings, amplitudes, -1)
+        // repeat=0 loops pattern from index 0; cancel after timeout to prevent battery drain
+        val effect = VibrationEffect.createWaveform(timings, amplitudes, 0)
         vibrator.vibrate(effect)
+
+        // Cancel vibration after 15 seconds to prevent battery drain
+        android.os.Handler(mainLooper).postDelayed({ vibrator.cancel() }, 15_000L)
     }
 }

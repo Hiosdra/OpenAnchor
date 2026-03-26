@@ -1,5 +1,8 @@
 package com.hiosdra.openanchor.domain.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class AnchorSession(
     val id: Long = 0,
     val anchorPosition: Position,

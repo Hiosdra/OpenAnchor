@@ -6,6 +6,7 @@ import com.hiosdra.openanchor.data.location.LocationProvider
 import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.data.repository.AnchorSessionRepository
 import com.hiosdra.openanchor.domain.model.ZoneType
+import com.hiosdra.openanchor.domain.scope.AnchorScopeCalculator
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -47,7 +48,7 @@ class SetupViewModelTest {
     }
 
     private fun createViewModel(): SetupViewModel {
-        return SetupViewModel(locationProvider, repository, preferencesManager)
+        return SetupViewModel(locationProvider, repository, preferencesManager, AnchorScopeCalculator())
     }
 
     @Test

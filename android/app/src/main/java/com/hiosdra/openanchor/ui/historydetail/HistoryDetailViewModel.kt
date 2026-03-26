@@ -23,9 +23,27 @@ data class HistoryDetailState(
     val session: AnchorSession? = null,
     val trackPoints: List<TrackPoint> = emptyList(),
     val isLoading: Boolean = true,
+    val isExporting: Boolean = false,
     val gpxExportUri: Uri? = null,
     val gpxExportFilename: String? = null,
-    val exportError: Boolean = false
+    val exportError: Boolean = false,
+    val exportSuccess: Boolean = false,
+    // Per-session analytics
+    val analytics: SessionAnalytics? = null
+)
+
+data class SessionAnalytics(
+    val totalDurationMs: Long,
+    val maxDriftMeters: Float,
+    val alarmCount: Int,
+    val averageAccuracy: Float,
+    val alarmEvents: List<AlarmEvent>
+)
+
+data class AlarmEvent(
+    val timestampMs: Long,
+    val distanceMeters: Float,
+    val alarmState: String
 )
 
 @HiltViewModel
@@ -44,17 +62,48 @@ class HistoryDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val session = repository.getSessionById(sessionId)
             val points = repository.getTrackPointsOnce(sessionId)
+            val analytics = if (session != null && points.isNotEmpty()) {
+                computeAnalytics(session, points)
+            } else null
             _state.value = HistoryDetailState(
                 session = session,
                 trackPoints = points,
-                isLoading = false
+                isLoading = false,
+                analytics = analytics
             )
         }
     }
 
+    private fun computeAnalytics(session: AnchorSession, points: List<TrackPoint>): SessionAnalytics {
+        val totalDuration = (session.endTime ?: System.currentTimeMillis()) - session.startTime
+        val maxDrift = points.maxOfOrNull { it.distanceToAnchor } ?: 0f
+        val alarmCount = session.alarmCount
+        val averageAccuracy = if (points.isNotEmpty()) {
+            points.map { it.position.accuracy }.average().toFloat()
+        } else 0f
+        val alarmEvents = points.filter { it.isAlarm }.map { point ->
+            AlarmEvent(
+                timestampMs = point.position.timestamp,
+                distanceMeters = point.distanceToAnchor,
+                alarmState = point.alarmState
+            )
+        }
+        return SessionAnalytics(
+            totalDurationMs = totalDuration,
+            maxDriftMeters = maxDrift,
+            alarmCount = alarmCount,
+            averageAccuracy = averageAccuracy,
+            alarmEvents = alarmEvents
+        )
+    }
+
     fun exportGpx() {
+        if (_state.value.isExporting) return
+        // Copy data before launching coroutine to avoid race with session deletion
         val session = _state.value.session ?: return
-        val points = _state.value.trackPoints
+        val points = _state.value.trackPoints.toList()
+
+        _state.update { it.copy(isExporting = true, exportError = false, exportSuccess = false) }
 
         viewModelScope.launch {
             try {
@@ -73,14 +122,24 @@ class HistoryDetailViewModel @Inject constructor(
                     )
                 }
                 val filename = GpxExporter.suggestedFilename(session)
-                _state.update { it.copy(gpxExportUri = uri, gpxExportFilename = filename, exportError = false) }
-            } catch (_: Exception) {
-                _state.update { it.copy(exportError = true) }
+                _state.update {
+                    it.copy(
+                        gpxExportUri = uri,
+                        gpxExportFilename = filename,
+                        exportError = false,
+                        exportSuccess = true,
+                        isExporting = false
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(exportError = true, isExporting = false) }
             }
         }
     }
 
     fun clearExportState() {
-        _state.update { it.copy(gpxExportUri = null, gpxExportFilename = null, exportError = false) }
+        _state.update {
+            it.copy(gpxExportUri = null, gpxExportFilename = null, exportError = false, exportSuccess = false)
+        }
     }
 }

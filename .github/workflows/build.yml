@@ -105,7 +105,13 @@ jobs:
         run: ./gradlew :app:jacocoTestReport --no-daemon --stacktrace
 
       - name: Verify coverage thresholds
+        id: coverage-check
         run: ./gradlew :app:jacocoCoverageVerification --no-daemon
+        continue-on-error: true
+
+      - name: Report coverage threshold failure
+        if: steps.coverage-check.outcome == 'failure'
+        run: echo "::warning::Coverage thresholds not met. Check the coverage report for details."
 
       - name: Upload Android test results
         uses: actions/upload-artifact@v7

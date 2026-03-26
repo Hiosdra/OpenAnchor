@@ -5,28 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.hiosdra.openanchor.MainActivity
-import com.hiosdra.openanchor.R
-import com.hiosdra.openanchor.data.location.LocationProvider
-import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.data.repository.AnchorSessionRepository
-import com.hiosdra.openanchor.data.battery.BatteryProvider
-import com.hiosdra.openanchor.domain.drift.DriftDetector
-import com.hiosdra.openanchor.domain.geometry.GeoCalculations
 import com.hiosdra.openanchor.domain.model.*
-import com.hiosdra.openanchor.network.AnchorWebSocketServer
-import com.hiosdra.openanchor.network.AnchorWebSocketClient
-import com.hiosdra.openanchor.network.ClientModeManager
-import com.hiosdra.openanchor.network.HotspotManager
 import com.hiosdra.openanchor.network.PairedModeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.util.Collections
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,10 +31,6 @@ class AnchorMonitorService : Service() {
         const val ACTION_STOP_CLIENT = "com.hiosdra.openanchor.STOP_WS_CLIENT"
         const val EXTRA_SESSION_ID = "session_id"
         const val EXTRA_WS_URL = "ws_url"
-        private const val GPS_WATCHDOG_TIMEOUT_MS = 60_000L
-        private const val GPS_WATCHDOG_CHECK_INTERVAL_MS = 10_000L
-        private const val PAIRED_GPS_VERIFICATION_INTERVAL_MS = 10 * 60 * 1000L // 10 min
-        private const val CLIENT_STATE_UPDATE_INTERVAL_MS = 2_000L
 
         fun startIntent(context: Context, sessionId: Long): Intent {
             return Intent(context, AnchorMonitorService::class.java).apply {
@@ -88,32 +71,18 @@ class AnchorMonitorService : Service() {
         }
     }
 
-    @Inject lateinit var locationProvider: LocationProvider
     @Inject lateinit var repository: AnchorSessionRepository
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var alarmPlayer: AlarmPlayer
     @Inject lateinit var alarmEngine: AlarmEngine
     @Inject lateinit var wearDataSender: WearDataSender
-    @Inject lateinit var wsServer: AnchorWebSocketServer
-    @Inject lateinit var hotspotManager: HotspotManager
     @Inject lateinit var pairedModeManager: PairedModeManager
-    @Inject lateinit var batteryProvider: BatteryProvider
-    @Inject lateinit var driftDetector: DriftDetector
-    @Inject lateinit var wsClient: AnchorWebSocketClient
-    @Inject lateinit var clientModeManager: ClientModeManager
     @Inject lateinit var gpsProcessor: GpsProcessor
-    @Inject lateinit var alarmHandler: AlarmHandler
+    @Inject lateinit var standaloneMonitorManager: StandaloneMonitorManager
+    @Inject lateinit var batteryMonitorManager: BatteryMonitorManager
+    @Inject lateinit var pairedModeOrchestrator: PairedModeOrchestrator
+    @Inject lateinit var clientModeOrchestrator: ClientModeOrchestrator
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private var monitoringJob: Job? = null
-    private var gpsWatchdogJob: Job? = null
-    private var pairedModeEventJob: Job? = null
-    private var pairedGpsVerificationJob: Job? = null
-    private var batteryMonitorJob: Job? = null
-    private var clientModeJob: Job? = null
-    private var clientStateUpdateJob: Job? = null
-    private var clientEventJob: Job? = null
-    private var lastGpsFixTime: Long = System.currentTimeMillis()
 
     private val _monitorState = MutableStateFlow(MonitorState())
     val monitorState: StateFlow<MonitorState> = _monitorState.asStateFlow()
@@ -167,133 +136,10 @@ class AnchorMonitorService : Service() {
 
     private fun startMonitoring(sessionId: Long) {
         val notification = buildNotification("Monitoring anchor position...", AlarmState.SAFE)
-
         startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 
-        monitoringJob?.cancel()
-        monitoringJob = serviceScope.launch {
-            val session = repository.getSessionById(sessionId) ?: return@launch
-            val zone = session.zone
-
-            _monitorState.value = MonitorState(
-                isActive = true,
-                sessionId = sessionId,
-                anchorPosition = session.anchorPosition,
-                zone = zone,
-                alarmState = AlarmState.SAFE
-            )
-
-            val intervalMs = preferencesManager.preferences.first().gpsIntervalSeconds * 1000L
-
-            // Start GPS watchdog
-            startGpsWatchdog()
-
-            // Start battery monitoring
-            startBatteryMonitoring()
-
-            locationProvider.locationUpdates(intervalMs).collect { position ->
-                // In paired mode, skip standalone GPS processing
-                if (_monitorState.value.isPairedMode) return@collect
-
-                lastGpsFixTime = System.currentTimeMillis()
-                val result = gpsProcessor.processPosition(position, session.anchorPosition, zone, sessionId)
-
-                // Save track point
-                repository.insertTrackPoint(result.trackPoint)
-
-                // Handle alarm
-                val previousAlarmState = _monitorState.value.alarmState
-                val transition = alarmHandler.handleAlarmTransition(result.alarmState, previousAlarmState, alarmPlayer.isPlaying())
-                if (transition.shouldStartAlarm) {
-                    alarmPlayer.startAlarm()
-                    if (transition.shouldIncrementAlarmCount) {
-                        val currentSession = repository.getSessionById(sessionId)
-                        currentSession?.let {
-                            repository.updateSession(it.copy(alarmTriggered = true, alarmCount = it.alarmCount + 1))
-                        }
-                    }
-                }
-                if (transition.shouldStopAlarm) alarmPlayer.stopAlarm()
-                if (transition.shouldSendWearTrigger) {
-                    serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-                }
-
-                // Update state
-                _monitorState.value = _monitorState.value.copy(
-                    boatPosition = position,
-                    distanceToAnchor = result.distance,
-                    alarmState = result.alarmState,
-                    gpsAccuracyMeters = position.accuracy,
-                    gpsSignalLost = false,
-                    driftAnalysis = result.driftAnalysis
-                )
-
-                // Send state to watch
-                serviceScope.launch { wearDataSender.sendMonitorState(_monitorState.value) }
-
-                // Update notification
-                val notifText = "Distance: %.0f m - %s".format(result.distance, result.alarmState.name)
-                updateNotification(notifText, result.alarmState)
-            }
-        }
-    }
-
-    private suspend fun handleAlarmTransition(
-        alarmState: AlarmState,
-        previousAlarmState: AlarmState,
-        sessionId: Long
-    ) {
-        val transition = alarmHandler.handleAlarmTransition(alarmState, previousAlarmState, alarmPlayer.isPlaying())
-        if (transition.shouldStartAlarm) {
-            alarmPlayer.startAlarm()
-            if (transition.shouldIncrementAlarmCount) {
-                val currentSession = repository.getSessionById(sessionId)
-                currentSession?.let {
-                    repository.updateSession(it.copy(alarmTriggered = true, alarmCount = it.alarmCount + 1))
-                }
-            }
-        }
-        if (transition.shouldStopAlarm) alarmPlayer.stopAlarm()
-        if (transition.shouldSendWearTrigger) {
-            serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-        }
-    }
-
-    private fun startBatteryMonitoring() {
-        batteryMonitorJob?.cancel()
-        batteryMonitorJob = serviceScope.launch {
-            batteryProvider.batteryUpdates().collect { battery ->
-                _monitorState.value = _monitorState.value.copy(
-                    localBatteryLevel = battery.level,
-                    localBatteryCharging = battery.isCharging
-                )
-                // Alert if low battery
-                if (battery.level in 1..BatteryProvider.LOW_BATTERY_THRESHOLD && !battery.isCharging) {
-                    updateNotification(
-                        "Low battery (${battery.level}%) — monitoring continues",
-                        _monitorState.value.alarmState
-                    )
-                }
-            }
-        }
-    }
-
-    private fun startGpsWatchdog() {
-        gpsWatchdogJob?.cancel()
-        gpsWatchdogJob = serviceScope.launch {
-            while (isActive) {
-                delay(GPS_WATCHDOG_CHECK_INTERVAL_MS)
-                val elapsed = System.currentTimeMillis() - lastGpsFixTime
-                val signalLost = elapsed > GPS_WATCHDOG_TIMEOUT_MS
-                if (signalLost != _monitorState.value.gpsSignalLost) {
-                    _monitorState.value = _monitorState.value.copy(gpsSignalLost = signalLost)
-                    serviceScope.launch { wearDataSender.sendMonitorState(_monitorState.value) }
-                    if (signalLost) {
-                        updateNotification("GPS signal lost!", _monitorState.value.alarmState)
-                    }
-                }
-            }
-        }
+        standaloneMonitorManager.startMonitoring(sessionId, serviceScope, _monitorState, ::updateNotification)
+        batteryMonitorManager.startBatteryMonitoring(serviceScope, _monitorState, ::updateNotification)
     }
 
     // ═══════════════════════════════════════
@@ -302,248 +148,22 @@ class AnchorMonitorService : Service() {
 
     private fun startWebSocketServer() {
         val notification = buildNotification("WebSocket server running...", AlarmState.SAFE)
-
         startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 
-        wsServer.start(scope = serviceScope)
-        pairedModeManager.startListening(serviceScope)
-        startPairedModeEventCollection()
+        pairedModeOrchestrator.startServer(serviceScope)
+        pairedModeOrchestrator.startEventCollection(serviceScope, _monitorState, ::updateNotification, ::stopMonitoring)
     }
 
     private fun stopWebSocketServer() {
-        pairedModeEventJob?.cancel()
-        pairedModeEventJob = null
-        pairedGpsVerificationJob?.cancel()
-        pairedGpsVerificationJob = null
-        monitoringJob?.cancel()
-        monitoringJob = null
-        gpsWatchdogJob?.cancel()
-        gpsWatchdogJob = null
-        batteryMonitorJob?.cancel()
-        batteryMonitorJob = null
+        pairedModeOrchestrator.cancelAll()
+        standaloneMonitorManager.cancelAll()
+        batteryMonitorManager.cancelAll()
         alarmEngine.reset()
         alarmPlayer.stopAlarm()
-        pairedModeManager.stopListening()
-        wsServer.stop()
+        pairedModeOrchestrator.stopServer()
         _monitorState.value = MonitorState()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
-    }
-
-    private fun startPairedModeEventCollection() {
-        pairedModeEventJob?.cancel()
-        pairedModeEventJob = serviceScope.launch {
-            // Collect paired mode events
-            launch {
-                pairedModeManager.events.collect { event ->
-                    handlePairedEvent(event)
-                }
-            }
-
-            // Mirror paired state to monitor state
-            launch {
-                pairedModeManager.pairedState.collect { pairedState ->
-                    if (pairedState.isPaired) {
-                        _monitorState.value = _monitorState.value.copy(
-                            isPairedMode = true,
-                            peerConnected = pairedState.peerConnected,
-                            anchorPosition = pairedState.anchorPosition ?: _monitorState.value.anchorPosition,
-                            zone = pairedState.zone ?: _monitorState.value.zone,
-                            boatPosition = pairedState.peerBoatPosition ?: _monitorState.value.boatPosition,
-                            distanceToAnchor = pairedState.peerDistanceToAnchor,
-                            alarmState = pairedState.peerAlarmState,
-                            gpsAccuracyMeters = pairedState.peerGpsAccuracy,
-                            peerBatteryLevel = pairedState.peerBatteryLevel,
-                            peerIsCharging = pairedState.peerIsCharging,
-                            sog = pairedState.peerSog,
-                            cog = pairedState.peerCog
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private suspend fun handlePairedEvent(event: PairedModeManager.PairedEvent) {
-        when (event) {
-            is PairedModeManager.PairedEvent.EnterPairedMode -> {
-                Log.i(TAG, "Entering paired mode")
-                // Cancel any standalone fallback monitoring that may be running
-                monitoringJob?.cancel()
-                monitoringJob = null
-                // Dismiss connection-loss alarm if active
-                if (alarmPlayer.isPlaying()) alarmPlayer.stopAlarm()
-                alarmEngine.reset()
-                _monitorState.value = _monitorState.value.copy(
-                    isActive = true,
-                    isPairedMode = true,
-                    anchorPosition = event.anchorPosition,
-                    zone = event.zone,
-                    alarmState = AlarmState.SAFE
-                )
-                // Start periodic GPS verification
-                startPairedGpsVerification(event.zone, event.anchorPosition)
-                updateNotification("Paired mode - monitoring via tablet", AlarmState.SAFE)
-            }
-
-            is PairedModeManager.PairedEvent.ExitPairedMode -> {
-                Log.i(TAG, "Exiting paired mode")
-                pairedGpsVerificationJob?.cancel()
-                _monitorState.value = _monitorState.value.copy(
-                    isPairedMode = false,
-                    peerConnected = false
-                )
-            }
-
-            is PairedModeManager.PairedEvent.AlarmTriggered -> {
-                Log.w(TAG, "Paired alarm: ${event.reason} -> ${event.alarmState}")
-                val pairedEvent = PairedAlarmEvent(event.reason, event.message, event.alarmState)
-                val result = alarmHandler.handlePairedAlarm(pairedEvent, _monitorState.value.alarmState, alarmPlayer.isPlaying())
-
-                if (result.shouldStartAlarm) alarmPlayer.startAlarm()
-                if (result.shouldStopAlarm) alarmPlayer.stopAlarm()
-                if (result.shouldSendWearTrigger) {
-                    serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-                }
-
-                _monitorState.value = _monitorState.value.copy(
-                    alarmState = result.newAlarmState,
-                    gpsSignalLost = result.gpsSignalLost
-                )
-                updateNotification(result.notificationText, result.newAlarmState)
-            }
-
-            is PairedModeManager.PairedEvent.HeartbeatTimeout -> {
-                Log.w(TAG, "Heartbeat timeout — switching to standalone fallback")
-                // Trigger connection lost alarm
-                alarmPlayer.startAlarm()
-                serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-                _monitorState.value = _monitorState.value.copy(
-                    isPairedMode = false,
-                    peerConnected = false,
-                    alarmState = AlarmState.ALARM
-                )
-                updateNotification("Connection lost with navigation station!", AlarmState.ALARM)
-                // Cancel paired GPS verification (will be replaced by continuous monitoring)
-                pairedGpsVerificationJob?.cancel()
-                pairedGpsVerificationJob = null
-                // Start continuous standalone GPS monitoring as safety fallback
-                val zone = _monitorState.value.zone
-                val anchorPos = _monitorState.value.anchorPosition
-                if (zone != null && anchorPos != null) {
-                    startStandaloneFallbackMonitoring(zone, anchorPos)
-                }
-            }
-
-            is PairedModeManager.PairedEvent.SessionEnded -> {
-                Log.i(TAG, "Paired session ended: ${event.reason}")
-                pairedGpsVerificationJob?.cancel()
-                when (event.reason) {
-                    "SESSION_ENDED" -> {
-                        // Anchor weighed — stop everything
-                        stopMonitoring()
-                    }
-                    else -> {
-                        // User disconnect — keep standalone if anchor is still deployed
-                        _monitorState.value = _monitorState.value.copy(
-                            isPairedMode = false,
-                            peerConnected = false
-                        )
-                    }
-                }
-            }
-
-            is PairedModeManager.PairedEvent.LowBatteryWarning -> {
-                Log.w(TAG, "Peer low battery: ${event.level}")
-                updateNotification(
-                    "Tablet battery low! (${(event.level * 100).toInt()}%)",
-                    _monitorState.value.alarmState
-                )
-            }
-        }
-    }
-
-    /**
-     * Periodic GPS verification in paired mode (~10 min interval).
-     * Uses phone GPS to cross-check the anchor zone.
-     */
-    private fun startPairedGpsVerification(zone: AnchorZone, anchorPosition: Position) {
-        pairedGpsVerificationJob?.cancel()
-        pairedGpsVerificationJob = serviceScope.launch {
-            while (isActive) {
-                delay(PAIRED_GPS_VERIFICATION_INTERVAL_MS)
-                if (!_monitorState.value.isPairedMode) break
-
-                try {
-                    // Get a single GPS fix
-                    locationProvider.locationUpdates(0).first().let { position ->
-                        val distance = GeoCalculations.distanceMeters(position, anchorPosition)
-                        val adjustedDistance = distance - position.accuracy
-                        val zoneResult = if (adjustedDistance > zone.radiusMeters) {
-                            GeoCalculations.checkZone(position, zone)
-                        } else {
-                            com.hiosdra.openanchor.domain.geometry.ZoneCheckResult.INSIDE
-                        }
-                        val alarmState = alarmEngine.processReading(zoneResult)
-
-                        // Collect battery + drift info
-                        val battery = batteryProvider.getCurrentBatteryState()
-                        val drift = _monitorState.value.driftAnalysis
-
-                        // Report to PWA with battery/drift
-                        pairedModeManager.sendGpsReport(
-                            position, distance, zoneResult, alarmState,
-                            batteryLevel = battery?.level,
-                            isCharging = battery?.isCharging,
-                            driftDetected = drift?.isDragging,
-                            driftBearingDeg = drift?.driftBearingDeg,
-                            driftSpeedMps = drift?.driftSpeedMpm?.let { it / 60.0 } // m/min → m/s
-                        )
-                        Log.i(TAG, "GPS verification: dist=${distance}m, zone=$zoneResult, alarm=$alarmState")
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "GPS verification failed", e)
-                }
-            }
-        }
-    }
-
-    /**
-     * Start continuous GPS monitoring as a fallback after heartbeat timeout in paired mode.
-     * Uses the zone received from the last FULL_SYNC to perform standalone zone checks.
-     */
-    private fun startStandaloneFallbackMonitoring(zone: AnchorZone, anchorPosition: Position) {
-        monitoringJob?.cancel()
-        monitoringJob = serviceScope.launch {
-            val intervalMs = preferencesManager.preferences.first().gpsIntervalSeconds * 1000L
-            lastGpsFixTime = System.currentTimeMillis()
-            startGpsWatchdog()
-
-            locationProvider.locationUpdates(intervalMs).collect { position ->
-                // If we're back in paired mode (reconnected), stop standalone processing
-                if (_monitorState.value.isPairedMode) return@collect
-
-                lastGpsFixTime = System.currentTimeMillis()
-                val distance = GeoCalculations.distanceMeters(position, anchorPosition)
-                val zoneResult = GeoCalculations.checkZone(position, zone)
-                val alarmState = alarmEngine.processReading(zoneResult)
-
-                val previousAlarmState = _monitorState.value.alarmState
-                handleAlarmTransition(alarmState, previousAlarmState, _monitorState.value.sessionId ?: -1)
-
-                _monitorState.value = _monitorState.value.copy(
-                    boatPosition = position,
-                    distanceToAnchor = distance,
-                    alarmState = alarmState,
-                    gpsAccuracyMeters = position.accuracy,
-                    gpsSignalLost = false
-                )
-
-                serviceScope.launch { wearDataSender.sendMonitorState(_monitorState.value) }
-                val notifText = "FALLBACK: %.0f m - %s".format(distance, alarmState.name)
-                updateNotification(notifText, alarmState)
-            }
-        }
     }
 
     // ═══════════════════════════════════════
@@ -554,201 +174,20 @@ class AnchorMonitorService : Service() {
         val notification = buildNotification("Connecting to server...", AlarmState.SAFE)
         startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 
-        // Connect via ClientModeManager → AnchorWebSocketClient
-        clientModeManager.connect(wsUrl, serviceScope)
-
-        // Start GPS monitoring and send STATE_UPDATE every 2s
-        startClientGpsMonitoring()
-
-        // Collect events from ClientModeManager
-        startClientEventCollection()
-
-        // Start battery monitoring for local battery reporting
-        startBatteryMonitoring()
-
-        _monitorState.value = _monitorState.value.copy(
-            isActive = true,
-            isClientMode = true
-        )
-        updateNotification("Client mode — connecting to $wsUrl", AlarmState.SAFE)
+        clientModeOrchestrator.startClientMode(wsUrl, serviceScope, _monitorState, ::updateNotification, ::muteAlarm, ::dismissAlarm)
+        batteryMonitorManager.startBatteryMonitoring(serviceScope, _monitorState, ::updateNotification)
     }
 
     private fun stopClientMode() {
-        clientModeJob?.cancel()
-        clientModeJob = null
-        clientStateUpdateJob?.cancel()
-        clientStateUpdateJob = null
-        clientEventJob?.cancel()
-        clientEventJob = null
-        gpsWatchdogJob?.cancel()
-        gpsWatchdogJob = null
-        batteryMonitorJob?.cancel()
-        batteryMonitorJob = null
+        clientModeOrchestrator.cancelAll()
+        standaloneMonitorManager.cancelAll()
+        batteryMonitorManager.cancelAll()
         alarmEngine.reset()
         alarmPlayer.stopAlarm()
-        clientModeManager.disconnect("USER_DISCONNECT")
+        clientModeOrchestrator.disconnect("USER_DISCONNECT")
         _monitorState.value = MonitorState()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
-    }
-
-    private fun startClientGpsMonitoring() {
-        clientModeJob?.cancel()
-        clientModeJob = serviceScope.launch {
-            val intervalMs = preferencesManager.preferences.first().gpsIntervalSeconds * 1000L
-            lastGpsFixTime = System.currentTimeMillis()
-            startGpsWatchdog()
-
-            locationProvider.locationUpdates(intervalMs).collect { position ->
-                lastGpsFixTime = System.currentTimeMillis()
-
-                val state = clientModeManager.clientModeState.value
-                val anchorPos = state.anchorPosition
-                val zone = state.zone
-
-                var distance = 0.0
-                var alarmState = AlarmState.SAFE
-
-                if (anchorPos != null && zone != null) {
-                    distance = GeoCalculations.distanceMeters(position, anchorPos)
-                    val zoneResult = GeoCalculations.checkZone(position, zone)
-                    alarmState = alarmEngine.processReading(zoneResult)
-
-                    // Handle alarm transitions
-                    val previousAlarmState = _monitorState.value.alarmState
-                    when (alarmState) {
-                        AlarmState.ALARM -> {
-                            if (!alarmPlayer.isPlaying()) {
-                                alarmPlayer.startAlarm()
-                            }
-                            if (previousAlarmState != AlarmState.ALARM) {
-                                launch { wearDataSender.sendAlarmTrigger() }
-                            }
-                            // Notify server about the alarm
-                            clientModeManager.triggerAlarm(
-                                reason = "OUT_OF_ZONE",
-                                message = "Boat is %.0f m from anchor (zone limit: %.0f m)".format(distance, zone.radiusMeters),
-                                alarmState = alarmState
-                            )
-                        }
-                        else -> {
-                            if (alarmPlayer.isPlaying()) {
-                                alarmPlayer.stopAlarm()
-                            }
-                        }
-                    }
-                }
-
-                // Compute SOG/COG via GpsProcessor
-                var currentSog: Double? = null
-                var currentCog: Double? = null
-                if (anchorPos != null && zone != null) {
-                    val sessionId = _monitorState.value.sessionId ?: 0L
-                    val result = gpsProcessor.processPosition(position, anchorPos, zone, sessionId)
-                    currentSog = result.sog
-                    currentCog = result.cog
-                }
-
-                // Send telemetry to server via ClientModeManager
-                val battery = batteryProvider.getCurrentBatteryState()
-                val batteryLevelPercent = if (battery.level >= 0) {
-                    battery.level.toDouble() / 100.0
-                } else {
-                    null
-                }
-                clientModeManager.updateTelemetry(
-                    position = position,
-                    distanceToAnchor = distance,
-                    alarmState = alarmState,
-                    sog = currentSog,
-                    cog = currentCog,
-                    batteryLevel = batteryLevelPercent,
-                    isCharging = battery.isCharging
-                )
-
-                // Update local monitor state
-                _monitorState.value = _monitorState.value.copy(
-                    boatPosition = position,
-                    distanceToAnchor = distance,
-                    alarmState = alarmState,
-                    gpsAccuracyMeters = position.accuracy,
-                    gpsSignalLost = false,
-                    sog = currentSog,
-                    cog = currentCog,
-                    isClientMode = true
-                )
-
-                launch { wearDataSender.sendMonitorState(_monitorState.value) }
-
-                val notifText = "Client: %.0f m - %s".format(distance, alarmState.name)
-                updateNotification(notifText, alarmState)
-            }
-        }
-    }
-
-    private fun startClientEventCollection() {
-        clientEventJob?.cancel()
-        clientEventJob = serviceScope.launch {
-            // Mirror ClientModeManager state to MonitorState
-            launch {
-                clientModeManager.clientModeState.collect { clientState ->
-                    _monitorState.value = _monitorState.value.copy(
-                        isClientMode = true,
-                        peerConnected = clientState.isConnected,
-                        anchorPosition = clientState.anchorPosition ?: _monitorState.value.anchorPosition,
-                        zone = clientState.zone ?: _monitorState.value.zone
-                    )
-                    if (clientState.isConnected) {
-                        updateNotification(
-                            "Connected to server — monitoring",
-                            _monitorState.value.alarmState
-                        )
-                    }
-                }
-            }
-
-            // Handle events from ClientModeManager
-            launch {
-                clientModeManager.events.collect { event ->
-                    handleClientEvent(event)
-                }
-            }
-        }
-    }
-
-    private fun handleClientEvent(event: ClientModeManager.ClientModeEvent) {
-        when (event) {
-            is ClientModeManager.ClientModeEvent.Connected -> {
-                Log.i(TAG, "Client connected to server: ${event.serverUrl}")
-                _monitorState.value = _monitorState.value.copy(peerConnected = true)
-                updateNotification("Connected to server", AlarmState.SAFE)
-            }
-            is ClientModeManager.ClientModeEvent.Disconnected -> {
-                Log.w(TAG, "Client disconnected from server")
-                _monitorState.value = _monitorState.value.copy(peerConnected = false)
-                updateNotification("Disconnected — reconnecting...", _monitorState.value.alarmState)
-            }
-            is ClientModeManager.ClientModeEvent.HeartbeatTimeout -> {
-                Log.w(TAG, "Client heartbeat timeout")
-                alarmPlayer.startAlarm()
-                serviceScope.launch { wearDataSender.sendAlarmTrigger() }
-                _monitorState.value = _monitorState.value.copy(
-                    peerConnected = false,
-                    alarmState = AlarmState.ALARM
-                )
-                updateNotification("Connection lost with server!", AlarmState.ALARM)
-            }
-            is ClientModeManager.ClientModeEvent.ServerCommand -> {
-                when (event.command) {
-                    "MUTE_ALARM" -> muteAlarm()
-                    "DISMISS_ALARM" -> dismissAlarm()
-                }
-            }
-            is ClientModeManager.ClientModeEvent.ServerGpsReport -> {
-                Log.i(TAG, "Server GPS report: zone=${event.payload.zoneCheckResult}")
-                // Informational — the server's GPS verification of our anchor
-            }
-        }
     }
 
     // ═══════════════════════════════════════
@@ -756,27 +195,16 @@ class AnchorMonitorService : Service() {
     // ═══════════════════════════════════════
 
     fun stopMonitoring() {
-        monitoringJob?.cancel()
-        monitoringJob = null
-        gpsWatchdogJob?.cancel()
-        gpsWatchdogJob = null
-        pairedGpsVerificationJob?.cancel()
-        pairedGpsVerificationJob = null
-        batteryMonitorJob?.cancel()
-        batteryMonitorJob = null
-        clientModeJob?.cancel()
-        clientModeJob = null
-        clientStateUpdateJob?.cancel()
-        clientStateUpdateJob = null
-        clientEventJob?.cancel()
-        clientEventJob = null
+        standaloneMonitorManager.cancelAll()
+        pairedModeOrchestrator.cancelAll()
+        batteryMonitorManager.cancelAll()
+        clientModeOrchestrator.cancelAll()
         gpsProcessor.reset()
         alarmEngine.reset()
         alarmPlayer.stopAlarm()
 
-        // Disconnect client mode if active
         if (_monitorState.value.isClientMode) {
-            clientModeManager.disconnect("SESSION_ENDED")
+            clientModeOrchestrator.disconnect("SESSION_ENDED")
         }
 
         serviceScope.launch {
@@ -792,13 +220,10 @@ class AnchorMonitorService : Service() {
                         ))
                     }
                 }
-                // Reset tracking variables via GpsProcessor
                 gpsProcessor.reset()
                 _monitorState.value = MonitorState()
-                // Notify watch that monitoring stopped
                 wearDataSender.clearMonitorState()
             } finally {
-                // Guarantee service stops even if DB/wear operations fail
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
@@ -808,11 +233,9 @@ class AnchorMonitorService : Service() {
     fun dismissAlarm() {
         alarmPlayer.stopAlarm()
         alarmEngine.reset()
-        // In paired mode, also notify PWA
         if (_monitorState.value.isPairedMode) {
             serviceScope.launch { pairedModeManager.sendDismissAlarm() }
         }
-        // Update alarm state
         _monitorState.value = _monitorState.value.copy(alarmState = AlarmState.SAFE)
     }
 
@@ -823,7 +246,6 @@ class AnchorMonitorService : Service() {
      */
     fun muteAlarm() {
         alarmPlayer.stopAlarm()
-        // In paired mode, also notify PWA
         if (_monitorState.value.isPairedMode) {
             serviceScope.launch { pairedModeManager.sendMuteAlarm() }
         }
@@ -891,7 +313,7 @@ class AnchorMonitorService : Service() {
     override fun onDestroy() {
         stopWebSocketServer()
         if (_monitorState.value.isClientMode) {
-            clientModeManager.disconnect("SERVICE_DESTROYED")
+            clientModeOrchestrator.disconnect("SERVICE_DESTROYED")
         }
         serviceScope.cancel()
         alarmPlayer.stopAlarm()

@@ -11,6 +11,47 @@ const waitForApp = async (page: import('@playwright/test').Page) => {
   }, { timeout: 15_000 });
 };
 
+// Stub PDF storage and renderer so the egzamin module skips the ImportPdfScreen.
+// Without these stubs, the module blocks on PDF import and all tests timeout.
+test.beforeEach(async ({ page }) => {
+  // Intercept exam-pdf-storage.js and append stubs so isPdfImported() returns true
+  await page.route('**/js/exam-pdf-storage.js', async route => {
+    const response = await route.fetch();
+    const body = await response.text();
+    const stubbed = body + `\n;
+      // --- E2E test stubs ---
+      isPdfImported = async function() { return true; };
+      loadPdfBlob = async function() { return new Blob(['fake-pdf'], { type: 'application/pdf' }); };
+    `;
+    await route.fulfill({ body: stubbed, contentType: 'application/javascript' });
+  });
+
+  // Replace pdf-renderer.js entirely with a lightweight stub
+  await page.route('**/js/pdf-renderer.js', async route => {
+    const PLACEHOLDER_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+    const stub = `
+      var PdfRenderer = {
+        _pdfDoc: { numPages: 200 },
+        _cache: new Map(),
+        _MAX_CACHE: 8,
+        async loadFromBlob() { return 200; },
+        _getScale() { return 2.0; },
+        async renderPage() {
+          var c = document.createElement('canvas');
+          c.width = 100; c.height = 100;
+          return c;
+        },
+        async renderQuestion() {
+          return '${PLACEHOLDER_PNG}';
+        },
+        isLoaded() { return true; },
+        unload() { this._pdfDoc = null; this._cache.clear(); }
+      };
+    `;
+    await route.fulfill({ body: stub, contentType: 'application/javascript' });
+  });
+});
+
 // ==========================================
 // 1. PAGE LOAD & INITIAL STATE
 // ==========================================
@@ -33,7 +74,7 @@ test.describe('Page Load & Initial State', () => {
   test('main menu shows Egzamin button', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    await expect(page.locator('button', { hasText: '30 pytan, 45 minut' })).toBeVisible();
+    await expect(page.locator('button', { hasText: '30 pytań, 45 minut' })).toBeVisible();
   });
 
   test('main menu shows Leitner button', async ({ page }) => {
@@ -46,7 +87,7 @@ test.describe('Page Load & Initial State', () => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     await expect(page.getByText('Postep nauki')).toBeVisible();
-    await expect(page.getByText('pytan').first()).toBeVisible();
+    await expect(page.getByText('pytań').first()).toBeVisible();
     await expect(page.getByText('poprawnych')).toBeVisible();
     await expect(page.getByText('odpowiedziano')).toBeVisible();
   });
@@ -275,7 +316,7 @@ test.describe('Learn Mode - Category Filter', () => {
     await page.locator('button', { hasText: /^Odznacz$/ }).click();
 
     // Should show empty state
-    await expect(page.getByText('Brak pytan', { exact: true })).toBeVisible();
+    await expect(page.getByText('Brak pytań', { exact: true })).toBeVisible();
   });
 
   test('Select all restores all categories after partial deselection', async ({ page }) => {
@@ -513,12 +554,12 @@ test.describe('Leitner Mode', () => {
     await page.locator('button', { hasText: 'Leitner' }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Leitner');
 
-    // 5 boxes: Pudelko 1 through 5
-    await expect(page.getByText('Pudelko 1')).toBeVisible();
-    await expect(page.getByText('Pudelko 2')).toBeVisible();
-    await expect(page.getByText('Pudelko 3')).toBeVisible();
-    await expect(page.getByText('Pudelko 4')).toBeVisible();
-    await expect(page.getByText('Pudelko 5')).toBeVisible();
+    // 5 boxes: Pudełko 1 through 5
+    await expect(page.getByText('Pudełko 1')).toBeVisible();
+    await expect(page.getByText('Pudełko 2')).toBeVisible();
+    await expect(page.getByText('Pudełko 3')).toBeVisible();
+    await expect(page.getByText('Pudełko 4')).toBeVisible();
+    await expect(page.getByText('Pudełko 5')).toBeVisible();
   });
 
   test('Leitner overview shows progress stats', async ({ page }) => {
@@ -527,7 +568,7 @@ test.describe('Leitner Mode', () => {
     await page.locator('button', { hasText: 'Leitner' }).click();
 
     await expect(page.getByText('Postep Leitnera')).toBeVisible();
-    await expect(page.getByText('do powtorki')).toBeVisible();
+    await expect(page.getByText('do powtórki')).toBeVisible();
     await expect(page.getByText('opanowanych')).toBeVisible();
   });
 
@@ -537,7 +578,7 @@ test.describe('Leitner Mode', () => {
     await page.locator('button', { hasText: 'Leitner' }).click();
 
     // Click start session button
-    await page.locator('button', { hasText: /Rozpocznij sesje/ }).click();
+    await page.locator('button', { hasText: /Rozpocznij sesję/ }).click();
 
     // Should enter session mode
     await expect(page.locator('.oa-header-title')).toHaveText('Sesja Leitner');
@@ -547,7 +588,7 @@ test.describe('Leitner Mode', () => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     await page.locator('button', { hasText: 'Leitner' }).click();
-    await page.locator('button', { hasText: /Rozpocznij sesje/ }).click();
+    await page.locator('button', { hasText: /Rozpocznij sesję/ }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Sesja Leitner');
 
     // Answer buttons should be visible
@@ -565,14 +606,14 @@ test.describe('Leitner Mode', () => {
     page.on('dialog', dialog => dialog.accept());
 
     await page.locator('button', { hasText: 'Leitner' }).click();
-    await page.locator('button', { hasText: /Rozpocznij sesje/ }).click();
+    await page.locator('button', { hasText: /Rozpocznij sesję/ }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Sesja Leitner');
 
     // Answer a question
     await page.locator('.answer-btn').first().click();
 
-    // Should show box movement: "Pudelko X → Y"
-    await expect(page.getByText(/Pudelko \d/)).toBeVisible();
+    // Should show box movement: "Pudełko X → Y"
+    await expect(page.getByText(/Pudełko \d/)).toBeVisible();
   });
 
   test('answering in Leitner enables Next button', async ({ page }) => {
@@ -581,7 +622,7 @@ test.describe('Leitner Mode', () => {
     page.on('dialog', dialog => dialog.accept());
 
     await page.locator('button', { hasText: 'Leitner' }).click();
-    await page.locator('button', { hasText: /Rozpocznij sesje/ }).click();
+    await page.locator('button', { hasText: /Rozpocznij sesję/ }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Sesja Leitner');
 
     // Before answering: "Wybierz odpowiedz" (no action button)
@@ -605,17 +646,17 @@ test.describe('Leitner Mode', () => {
       const questions: { id: string }[] = await res.json();
       if (!questions || questions.length === 0) return;
 
-      // Set all questions to box 5 with lastReviewed=0 except the first one
-      const states: Record<string, { box: number; lastReviewed: number }> = {};
+      // Set all questions to box 5 recently reviewed except the first one (box 1, long ago)
+      const boxes: Record<string, { box: number; lastReview: number; reviewCount: number }> = {};
       questions.forEach((q, i) => {
         if (i === 0) {
-          states[q.id] = { box: 1, lastReviewed: 0 };
+          boxes[q.id] = { box: 1, lastReview: 0, reviewCount: 0 };
         } else {
-          states[q.id] = { box: 5, lastReviewed: 100 };
+          boxes[q.id] = { box: 5, lastReview: Date.now(), reviewCount: 5 };
         }
       });
 
-      const leitnerState = { questionStates: states, sessionNumber: 100 };
+      const leitnerState = { boxes };
       localStorage.setItem('openanchor_leitner', JSON.stringify(leitnerState));
     });
 
@@ -624,7 +665,7 @@ test.describe('Leitner Mode', () => {
     await waitForApp(page);
 
     await page.locator('button', { hasText: 'Leitner' }).click();
-    await page.locator('button', { hasText: /Rozpocznij sesje/ }).click();
+    await page.locator('button', { hasText: /Rozpocznij sesję/ }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Sesja Leitner');
 
     // Answer the single question
@@ -633,7 +674,7 @@ test.describe('Leitner Mode', () => {
 
     // Should show completion screen
     await expect(page.locator('.oa-header-title')).toHaveText('Sesja zakonczona');
-    await expect(page.getByText('Rozklad pytan w pudelkach')).toBeVisible();
+    await expect(page.getByText('Rozkład pytań w pudełkach')).toBeVisible();
     await expect(page.locator('button', { hasText: 'Powrot do przegladu' })).toBeVisible();
   });
 });

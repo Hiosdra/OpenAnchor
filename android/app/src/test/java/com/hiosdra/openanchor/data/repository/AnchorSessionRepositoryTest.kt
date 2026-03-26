@@ -18,14 +18,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Robolectric-based tests for AnchorSessionRepository using in-memory Room database.
+ * Robolectric-based tests for RoomAnchorSessionRepository using in-memory Room database.
  * These tests run in the JVM and provide comprehensive coverage of repository operations.
  */
 @RunWith(AndroidJUnit4::class)
 class AnchorSessionRepositoryTest {
 
     private lateinit var database: OpenAnchorDatabase
-    private lateinit var repository: AnchorSessionRepository
+    private lateinit var repository: RoomAnchorSessionRepository
 
     @Before
     fun setup() {
@@ -34,7 +34,7 @@ class AnchorSessionRepositoryTest {
             .allowMainThreadQueries()
             .build()
 
-        repository = AnchorSessionRepository(
+        repository = RoomAnchorSessionRepository(
             sessionDao = database.anchorSessionDao(),
             trackPointDao = database.trackPointDao()
         )

@@ -2,9 +2,16 @@
     <string name="app_name">OpenAnchor</string>
     <string name="wear_app_name">OpenAnchor</string>
     <string name="wear_waiting">Waiting for phone\u2026\nStart monitoring on the phone app.</string>
+    <string name="wear_connecting">Connecting\u2026</string>
+    <string name="wear_searching_phone">Looking for phone\u2026</string>
+    <string name="wear_no_connection">No connection</string>
+    <string name="wear_check_phone">Check phone</string>
+    <string name="wear_last_distance">Last: %1$s m</string>
+    <string name="wear_gps_lost_ago">Lost %1$s ago</string>
     <string name="wear_gps_lost">GPS SIGNAL LOST</string>
     <string name="wear_meters">m</string>
     <string name="wear_gps_accuracy">GPS: \u00B1%1$d m</string>
+    <string name="wear_gps_accuracy_label">GPS accuracy</string>
     <string name="wear_state_safe">SAFE</string>
     <string name="wear_state_caution">CAUTION</string>
     <string name="wear_state_warning">WARNING</string>

@@ -206,6 +206,18 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/ServiceBinder*.class",
         // PDF renderer uses system PdfRenderer + Bitmap (not unit-testable)
         "**/ExamPdfRenderer*.class",
+        // Service orchestrators/managers extracted from AnchorMonitorService
+        // (interact with Android services, GPS, alarms — not unit-testable)
+        "**/StandaloneMonitorManager*.class",
+        "**/PairedModeOrchestrator*.class",
+        "**/ClientModeOrchestrator*.class",
+        "**/BatteryMonitorManager*.class",
+        // Hardware sensor providers (require Android system APIs)
+        "**/LocationProvider*.class",
+        "**/CompassProvider*.class",
+        "**/BatteryProvider*.class",
+        // Application class (Hilt setup only)
+        "**/OpenAnchorApp*.class",
     )
 
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
@@ -249,6 +261,17 @@ tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
         "**/ServiceBinder*.class",
         // PDF renderer uses system PdfRenderer + Bitmap (not unit-testable)
         "**/ExamPdfRenderer*.class",
+        // Service orchestrators/managers extracted from AnchorMonitorService
+        "**/StandaloneMonitorManager*.class",
+        "**/PairedModeOrchestrator*.class",
+        "**/ClientModeOrchestrator*.class",
+        "**/BatteryMonitorManager*.class",
+        // Hardware sensor providers (require Android system APIs)
+        "**/LocationProvider*.class",
+        "**/CompassProvider*.class",
+        "**/BatteryProvider*.class",
+        // Application class (Hilt setup only)
+        "**/OpenAnchorApp*.class",
     )
 
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {

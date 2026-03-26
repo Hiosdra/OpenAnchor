@@ -121,29 +121,26 @@ class AnchorWebSocketServer @Inject constructor(
         heartbeatWatchdogJob?.cancel()
         heartbeatWatchdogJob = null
 
-        // Grab session under lock, then close it outside to avoid blocking
-        val sessionToClose = runBlocking {
-            mutex.withLock {
-                val session = clientSession
-                clientSession = null
-                session
-            }
-        }
+        // Capture references before nulling out
+        val serverToStop = server
+        val scopeToCancel = serverScope
+        val sessionToClose = clientSession
 
-        if (sessionToClose != null) {
-            runBlocking(Dispatchers.IO) {
-                try {
-                    sessionToClose.close(CloseReason(CloseReason.Codes.GOING_AWAY, "Server stopping"))
-                } catch (_: Exception) {}
-            }
-        }
-
-        server?.stop(1000, 2000)
+        // Immediately mark as stopped so callers see consistent state
         server = null
         serverScope = null
-
+        clientSession = null
         _serverState.value = ServerState()
-        Log.i(TAG, "WebSocket server stopped")
+
+        // Async cleanup of network resources off the main thread
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                sessionToClose?.close(CloseReason(CloseReason.Codes.GOING_AWAY, "Server stopping"))
+            } catch (_: Exception) {}
+            serverToStop?.stop(1000, 2000)
+            scopeToCancel?.cancel()
+            Log.i(TAG, "WebSocket server stopped")
+        }
     }
 
     private suspend fun handleClientConnection(session: WebSocketServerSession) {

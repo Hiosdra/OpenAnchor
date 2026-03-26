@@ -618,6 +618,17 @@
         </div>
     </div>
 
+    <!-- PWA Install Banner -->
+    <div id="installBanner" class="update-banner" role="status" aria-live="polite">
+        <div class="update-banner-content">
+            <div class="update-banner-text">
+                <strong>Zainstaluj OpenAnchor</strong> Dodaj do ekranu głównego, aby korzystać offline.
+            </div>
+            <button id="installBtn" class="update-btn">Zainstaluj</button>
+            <button id="installDismissBtn" class="dismiss-btn">Nie teraz</button>
+        </div>
+    </div>
+
     <!-- Animated background -->
     <div class="ocean-bg">
         <div class="wave wave-1"></div>
@@ -702,63 +713,6 @@
                 </div>
             </div>
 
-            <!-- Wachtownik -->
-            <div id="wachtownikModule" class="module-card card-watch module-hidden" onclick="openModule('modules/wachtownik/index.html')" role="button" tabindex="0"
-                 aria-label="Otwórz Wachtownik"
-                 onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/wachtownik/index.html')">
-                <div class="module-card-inner">
-                    <div class="flex items-start gap-4">
-                        <!-- Icon -->
-                        <div class="module-icon icon-watch flex-shrink-0">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
-                                 stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
-                        </div>
-                        <!-- Title -->
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Wachtownik</h2>
-                            </div>
-                            <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Morski grafik wacht PRO</p>
-                        </div>
-                    </div>
-
-                    <!-- Features -->
-                    <div style="margin-top:1rem">
-                        <div class="feature-item">
-                            <span class="feature-dot-watch"></span>
-                            <span>Inteligentne szablony wacht</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-dot-watch"></span>
-                            <span>Zarządzanie załogą i rolami</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-dot-watch"></span>
-                            <span>Eksport PDF &amp; kalendarze ICS</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-dot-watch"></span>
-                            <span>Udostępnianie przez QR kod</span>
-                        </div>
-                    </div>
-
-                    <!-- Launch button -->
-                    <div class="launch-btn launch-btn-watch">
-                        <span class="launch-divider"></span>
-                        <span>Uruchom</span>
-                        <svg class="arrow-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                             width="16" height="16">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
             <!-- Egzamin ŻJ/JSM -->
             <div class="module-card card-exam" onclick="openModule('modules/egzamin/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Egzamin ŻJ/JSM"
@@ -817,6 +771,7 @@
                 </div>
             </div>
 
+            <!-- Wachtownik -->
             <!-- Sailing Info -->
             <div class="module-card card-sailing" onclick="openModule('modules/zeglowanie/index.html')" role="button" tabindex="0"
                  aria-label="Otwórz Żeglowanie - Informacje"
@@ -876,6 +831,63 @@
                 </div>
             </div>
 
+            <!-- Wachtownik -->
+            <div class="module-card card-watch" onclick="openModule('modules/wachtownik/index.html')" role="button" tabindex="0"
+                 aria-label="Otwórz Wachtownik"
+                 onkeydown="if(event.key==='Enter'||event.key===' ')openModule('modules/wachtownik/index.html')">
+                <div class="module-card-inner">
+                    <div class="flex items-start gap-4">
+                        <!-- Icon -->
+                        <div class="module-icon icon-watch flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <!-- Title -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">Wachtownik</h2>
+                            </div>
+                            <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Morski grafik wacht</p>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div style="margin-top:1rem">
+                        <div class="feature-item">
+                            <span class="feature-dot-watch"></span>
+                            <span>Inteligentne szablony wacht</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-watch"></span>
+                            <span>Zarządzanie załogą i rolami</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-watch"></span>
+                            <span>Eksport PDF &amp; kalendarze ICS</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-watch"></span>
+                            <span>Udostępnianie przez QR kod</span>
+                        </div>
+                    </div>
+
+                    <!-- Launch button -->
+                    <div class="launch-btn launch-btn-watch">
+                        <span class="launch-divider"></span>
+                        <span>Uruchom</span>
+                        <svg class="arrow-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                             width="16" height="16">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -895,7 +907,7 @@
             <div class="settings-item">
                 <div class="settings-label">
                     <div class="settings-label-text">Wersja Beta</div>
-                    <div class="settings-label-desc">Funkcje eksperymentalne (Wachtownik, Alert Kotwiczny)</div>
+                    <div class="settings-label-desc">Funkcje eksperymentalne (Alert Kotwiczny)</div>
                 </div>
                 <label class="toggle-switch">
                     <input type="checkbox" id="betaToggle" onchange="toggleBetaMode()">
@@ -1065,6 +1077,43 @@
 
         // Expose forceUpdate to global scope
         window.forceUpdate = forceUpdate;
+
+        // ==========================================
+        // PWA Install Prompt
+        // ==========================================
+        let deferredInstallPrompt = null;
+        const installBanner = document.getElementById('installBanner');
+        const installBtn = document.getElementById('installBtn');
+        const installDismissBtn = document.getElementById('installDismissBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            // Only show if not previously dismissed this session
+            if (!sessionStorage.getItem('installDismissed')) {
+                installBanner.classList.add('show');
+            }
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredInstallPrompt) return;
+            installBanner.classList.remove('show');
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            console.log('Install prompt outcome:', outcome);
+            deferredInstallPrompt = null;
+        });
+
+        installDismissBtn.addEventListener('click', () => {
+            installBanner.classList.remove('show');
+            sessionStorage.setItem('installDismissed', 'true');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBanner.classList.remove('show');
+            deferredInstallPrompt = null;
+            console.log('PWA installed');
+        });
 
         // Service worker update handling
         let newWorker;

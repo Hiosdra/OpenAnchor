@@ -3,10 +3,14 @@ package com.hiosdra.openanchor.wear.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
+import com.google.android.horologist.compose.ambient.AmbientAware
+import com.google.android.horologist.compose.ambient.AmbientState
+
+/** CompositionLocal providing the current ambient state to child composables. */
+val LocalAmbientState = compositionLocalOf<AmbientState> { AmbientState.Interactive }
 
 class WearMainActivity : ComponentActivity() {
 
@@ -15,13 +19,11 @@ class WearMainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val state by WearMonitorStateHolder.state.collectAsState()
-            val connected by WearMonitorStateHolder.connected.collectAsState()
-
-            WearMonitorScreen(
-                state = state,
-                isConnected = connected
-            )
+            AmbientAware { ambientState ->
+                CompositionLocalProvider(LocalAmbientState provides ambientState) {
+                    WearMonitorScreen()
+                }
+            }
         }
     }
 }

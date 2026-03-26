@@ -1,5 +1,7 @@
 package com.hiosdra.openanchor.wear.data
 
+import android.util.Log
+
 /**
  * Lightweight data class representing anchor monitoring state on the watch.
  * Mirrors relevant fields from the phone's MonitorState, received via Data Layer.
@@ -23,10 +25,13 @@ enum class WearAlarmState {
     ALARM;
 
     companion object {
+        private const val TAG = "WearAlarmState"
+
         fun fromString(value: String): WearAlarmState {
             return try {
                 valueOf(value.uppercase())
             } catch (_: IllegalArgumentException) {
+                Log.w(TAG, "Unknown alarm state received: '$value', defaulting to SAFE")
                 SAFE
             }
         }

@@ -108,6 +108,10 @@ class CrewWatchManager @Inject constructor(
     fun startWatch() {
         if (_state.value.crewMembers.isEmpty()) return
 
+        // Always cancel any existing timer before starting a new one
+        timerJob?.cancel()
+        timerJob = null
+
         val now = System.currentTimeMillis()
         _state.update {
             it.copy(
@@ -118,7 +122,6 @@ class CrewWatchManager @Inject constructor(
             )
         }
 
-        timerJob?.cancel()
         timerJob = scope.launch {
             while (isActive && _state.value.isRunning) {
                 delay(1000)

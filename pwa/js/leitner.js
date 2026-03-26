@@ -1,10 +1,16 @@
 /**
  * Leitner spaced repetition system
  * https://en.wikipedia.org/wiki/Leitner_system
+ *
+ * Shared/canonical implementation using date-based intervals.
+ * Used by pwa/modules/egzamin/ and available for any future modules.
+ *
+ * Loaded as a plain <script> in the browser (window.Leitner namespace).
+ * In Vitest, the conditional module.exports makes named imports work.
  */
 
 // Box review intervals in days
-export const LEITNER_INTERVALS = {
+var LEITNER_INTERVALS = {
   1: 1,    // Box 1: Review daily
   2: 2,    // Box 2: Review every 2 days
   3: 4,    // Box 3: Review every 4 days
@@ -17,7 +23,7 @@ export const LEITNER_INTERVALS = {
  * @param {string} questionId
  * @returns {Object} Initial Leitner data for question
  */
-export function initializeLeitnerQuestion(questionId) {
+function initializeLeitnerQuestion(questionId) {
   return {
     box: 1,
     lastReview: null,
@@ -30,9 +36,9 @@ export function initializeLeitnerQuestion(questionId) {
  * @param {Object} leitnerData - Current Leitner data for question
  * @returns {Object} Updated Leitner data
  */
-export function advanceQuestion(leitnerData) {
-  const currentBox = leitnerData.box || 1;
-  const nextBox = Math.min(currentBox + 1, 5);
+function leitnerAdvanceQuestion(leitnerData) {
+  var currentBox = leitnerData.box || 1;
+  var nextBox = Math.min(currentBox + 1, 5);
 
   return {
     ...leitnerData,
@@ -47,7 +53,7 @@ export function advanceQuestion(leitnerData) {
  * @param {Object} leitnerData - Current Leitner data for question
  * @returns {Object} Updated Leitner data
  */
-export function resetQuestion(leitnerData) {
+function resetQuestion(leitnerData) {
   return {
     ...leitnerData,
     box: 1,
@@ -61,15 +67,15 @@ export function resetQuestion(leitnerData) {
  * @param {Object} leitnerData - Leitner data for question
  * @returns {boolean}
  */
-export function isDueForReview(leitnerData) {
+function leitnerIsDueForReview(leitnerData) {
   if (!leitnerData || !leitnerData.lastReview) {
     return true; // Never reviewed
   }
 
-  const box = leitnerData.box || 1;
-  const intervalDays = LEITNER_INTERVALS[box] || 1;
-  const intervalMs = intervalDays * 24 * 60 * 60 * 1000;
-  const timeSinceReview = Date.now() - leitnerData.lastReview;
+  var box = leitnerData.box || 1;
+  var intervalDays = LEITNER_INTERVALS[box] || 1;
+  var intervalMs = intervalDays * 24 * 60 * 60 * 1000;
+  var timeSinceReview = Date.now() - leitnerData.lastReview;
 
   return timeSinceReview >= intervalMs;
 }
@@ -80,16 +86,15 @@ export function isDueForReview(leitnerData) {
  * @param {Array} allQuestions - All available questions
  * @returns {Array} Questions due for review
  */
-export function getDueQuestions(leitnerState, allQuestions) {
-  const dueQuestions = [];
+function leitnerGetDueQuestions(leitnerState, allQuestions) {
+  var dueQuestions = [];
 
-  allQuestions.forEach(question => {
-    const leitnerData = leitnerState.boxes?.[question.id];
+  allQuestions.forEach(function (question) {
+    var leitnerData = leitnerState.boxes && leitnerState.boxes[question.id];
 
     if (!leitnerData) {
-      // Never reviewed - add to due list
       dueQuestions.push(question);
-    } else if (isDueForReview(leitnerData)) {
+    } else if (leitnerIsDueForReview(leitnerData)) {
       dueQuestions.push(question);
     }
   });
@@ -102,8 +107,8 @@ export function getDueQuestions(leitnerState, allQuestions) {
  * @param {Object} leitnerState - Complete Leitner state
  * @returns {Object} Box statistics
  */
-export function getLeitnerStats(leitnerState) {
-  const stats = {
+function getLeitnerStats(leitnerState) {
+  var stats = {
     1: 0,
     2: 0,
     3: 0,
@@ -112,10 +117,10 @@ export function getLeitnerStats(leitnerState) {
     total: 0
   };
 
-  const boxes = leitnerState.boxes || {};
+  var boxes = leitnerState.boxes || {};
 
-  Object.values(boxes).forEach(data => {
-    const box = data.box || 1;
+  Object.values(boxes).forEach(function (data) {
+    var box = data.box || 1;
     stats[box]++;
     stats.total++;
   });
@@ -128,14 +133,14 @@ export function getLeitnerStats(leitnerState) {
  * @param {Object} leitnerData - Leitner data for question
  * @returns {Date|null} Next review date
  */
-export function getNextReviewDate(leitnerData) {
+function getNextReviewDate(leitnerData) {
   if (!leitnerData || !leitnerData.lastReview) {
     return null; // Review now
   }
 
-  const box = leitnerData.box || 1;
-  const intervalDays = LEITNER_INTERVALS[box] || 1;
-  const intervalMs = intervalDays * 24 * 60 * 60 * 1000;
+  var box = leitnerData.box || 1;
+  var intervalDays = LEITNER_INTERVALS[box] || 1;
+  var intervalMs = intervalDays * 24 * 60 * 60 * 1000;
 
   return new Date(leitnerData.lastReview + intervalMs);
 }
@@ -147,12 +152,12 @@ export function getNextReviewDate(leitnerData) {
  * @param {boolean} correct - Whether answer was correct
  * @returns {Object} Updated Leitner state
  */
-export function updateLeitnerState(leitnerState, questionId, correct) {
-  const boxes = leitnerState.boxes || {};
-  const currentData = boxes[questionId] || initializeLeitnerQuestion(questionId);
+function updateLeitnerState(leitnerState, questionId, correct) {
+  var boxes = leitnerState.boxes || {};
+  var currentData = boxes[questionId] || initializeLeitnerQuestion(questionId);
 
-  const updatedData = correct
-    ? advanceQuestion(currentData)
+  var updatedData = correct
+    ? leitnerAdvanceQuestion(currentData)
     : resetQuestion(currentData);
 
   return {
@@ -161,5 +166,35 @@ export function updateLeitnerState(leitnerState, questionId, correct) {
       ...boxes,
       [questionId]: updatedData
     }
+  };
+}
+
+// Browser global namespace
+if (typeof window !== 'undefined') {
+  window.Leitner = {
+    LEITNER_INTERVALS: LEITNER_INTERVALS,
+    initializeLeitnerQuestion: initializeLeitnerQuestion,
+    advanceQuestion: leitnerAdvanceQuestion,
+    resetQuestion: resetQuestion,
+    isDueForReview: leitnerIsDueForReview,
+    getDueQuestions: leitnerGetDueQuestions,
+    getLeitnerStats: getLeitnerStats,
+    getNextReviewDate: getNextReviewDate,
+    updateLeitnerState: updateLeitnerState
+  };
+}
+
+// Vitest / CommonJS compatibility — export under original names for tests
+if (typeof module !== 'undefined') {
+  module.exports = {
+    LEITNER_INTERVALS: LEITNER_INTERVALS,
+    initializeLeitnerQuestion: initializeLeitnerQuestion,
+    advanceQuestion: leitnerAdvanceQuestion,
+    resetQuestion: resetQuestion,
+    isDueForReview: leitnerIsDueForReview,
+    getDueQuestions: leitnerGetDueQuestions,
+    getLeitnerStats: getLeitnerStats,
+    getNextReviewDate: getNextReviewDate,
+    updateLeitnerState: updateLeitnerState
   };
 }

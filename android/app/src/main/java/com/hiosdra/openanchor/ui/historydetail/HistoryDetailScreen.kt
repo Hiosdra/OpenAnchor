@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +40,14 @@ fun HistoryDetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show snackbar for export results
+    LaunchedEffect(state.exportError, state.exportSuccess) {
+        if (state.exportError) {
+            snackbarHostState.showSnackbar(context.getString(R.string.gpx_export_failed))
+        }
+    }
 
     // Launch share intent when GPX export is ready
     LaunchedEffect(state.gpxExportUri) {
@@ -55,21 +64,31 @@ fun HistoryDetailScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.session_details)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     if (!state.isLoading && state.session != null) {
-                        IconButton(onClick = { viewModel.exportGpx() }) {
-                            Icon(
-                                Icons.Default.Share,
-                                contentDescription = stringResource(R.string.export_gpx)
+                        if (state.isExporting) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .padding(end = 12.dp),
+                                strokeWidth = 2.dp
                             )
+                        } else {
+                            IconButton(onClick = { viewModel.exportGpx() }) {
+                                Icon(
+                                    Icons.Default.Share,
+                                    contentDescription = stringResource(R.string.export_gpx)
+                                )
+                            }
                         }
                     }
                 }
@@ -193,18 +212,83 @@ fun HistoryDetailScreen(
                         InfoRow(stringResource(R.string.track_points_count), "${state.trackPoints.size}")
                         InfoRow(stringResource(R.string.alarms_triggered), "${session.alarmCount}")
 
+                        // Session analytics
+                        state.analytics?.let { analytics ->
+                            Spacer(modifier = Modifier.height(8.dp))
+                            HorizontalDivider()
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Analytics",
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            InfoRow("Max drift", "%.1f m".format(analytics.maxDriftMeters))
+                            InfoRow("Avg GPS accuracy", "%.1f m".format(analytics.averageAccuracy))
+
+                            // Alarm timeline
+                            if (analytics.alarmEvents.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                HorizontalDivider()
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Alarm Timeline",
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                                analytics.alarmEvents.take(20).forEach { event ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 2.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = timeFormat.format(Date(event.timestampMs)),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = AlarmRed
+                                        )
+                                        Text(
+                                            text = "%.1f m".format(event.distanceMeters),
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                        Text(
+                                            text = event.alarmState,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = AlarmRed
+                                        )
+                                    }
+                                }
+                                if (analytics.alarmEvents.size > 20) {
+                                    Text(
+                                        text = "… and ${analytics.alarmEvents.size - 20} more",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // GPX Export button
                         OutlinedButton(
                             onClick = { viewModel.exportGpx() },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !state.isExporting
                         ) {
-                            Icon(
-                                Icons.Default.Share,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
+                            if (state.isExporting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Default.Share,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(stringResource(R.string.export_gpx))
                         }

@@ -301,17 +301,19 @@ class AnchorWebSocketServerTest {
     }
 
     @Test
-    fun `stop nullifies server scope`() {
+    fun `stop nullifies server scope`() = runBlocking {
         setPrivateField("serverScope", CoroutineScope(SupervisorJob()))
         server.stop()
+        delay(500)
         assertNull(getPrivateField("serverScope"))
     }
 
     @Test
-    fun `stop nullifies server reference`() {
+    fun `stop nullifies server reference`() = runBlocking {
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         server.start(port = 0, scope = scope)
         server.stop()
+        delay(4000)
         assertNull(getPrivateField("server"))
         scope.cancel()
     }
