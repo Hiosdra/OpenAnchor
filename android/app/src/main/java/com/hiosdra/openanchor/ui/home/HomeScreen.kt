@@ -29,6 +29,7 @@ import com.hiosdra.openanchor.R
 import com.hiosdra.openanchor.ui.theme.CautionYellow
 import com.hiosdra.openanchor.ui.theme.OceanBlue
 import com.hiosdra.openanchor.ui.theme.SafeGreen
+import com.hiosdra.openanchor.ui.theme.pressEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,7 +104,8 @@ fun HomeScreen(
                     onClick = { activeSession?.let { onResumeMonitoring(it.id) } },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(56.dp)
+                        .pressEffect(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SafeGreen
                     )
@@ -123,7 +125,8 @@ fun HomeScreen(
                     onClick = onResumeClientMode,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(56.dp)
+                        .pressEffect(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = OceanBlue
                     )
@@ -143,6 +146,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
+                    .pressEffect()
             ) {
                 Icon(Icons.Default.Anchor, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -158,7 +162,8 @@ fun HomeScreen(
                 onClick = onPairWithTablet,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(56.dp)
+                    .pressEffect(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = OceanBlue
                 )
@@ -178,6 +183,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
+                    .pressEffect()
             ) {
                 Icon(Icons.Default.QrCodeScanner, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -194,6 +200,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
+                    .pressEffect()
             ) {
                 Icon(Icons.Default.AccessTime, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -215,6 +222,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp)
+                        .pressEffect()
                 ) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null)
                     Spacer(modifier = Modifier.width(6.dp))
@@ -228,6 +236,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp)
+                        .pressEffect()
                 ) {
                     Icon(Icons.Default.Book, contentDescription = null)
                     Spacer(modifier = Modifier.width(6.dp))
@@ -246,6 +255,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
+                    .pressEffect()
             ) {
                 Icon(Icons.Default.School, contentDescription = null, tint = CautionYellow)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -262,6 +272,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
+                    .pressEffect()
             ) {
                 Icon(Icons.Default.History, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -278,6 +289,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
+                    .pressEffect()
             ) {
                 Icon(Icons.Default.Analytics, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))

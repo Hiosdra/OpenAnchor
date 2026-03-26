@@ -5,6 +5,30 @@
 /* === THEME VARIABLES === */
 :root,
 [data-theme="dark"] {
+    /* Spacing scale */
+    --oa-space-xxs: 0.125rem;
+    --oa-space-xs: 0.25rem;
+    --oa-space-sm: 0.5rem;
+    --oa-space-md: 0.75rem;
+    --oa-space-lg: 1rem;
+    --oa-space-xl: 1.5rem;
+    --oa-space-xxl: 2rem;
+    --oa-space-xxxl: 3rem;
+    /* Typography scale */
+    --oa-font-xs: 0.7rem;
+    --oa-font-sm: 0.8rem;
+    --oa-font-base: 0.9rem;
+    --oa-font-md: 1rem;
+    --oa-font-lg: 1.125rem;
+    --oa-font-xl: 1.25rem;
+    --oa-font-xxl: 1.5rem;
+    /* Radius scale */
+    --oa-radius-sm: 0.5rem;
+    --oa-radius-md: 0.75rem;
+    --oa-radius-lg: 1rem;
+    --oa-radius-xl: 1.5rem;
+    --oa-radius-full: 999px;
+
     --oa-bg: #0f172a;
     --oa-bg-secondary: rgba(30, 41, 59, 0.5);
     --oa-text: #f1f5f9;

@@ -1,6 +1,7 @@
 package com.hiosdra.openanchor.ui.paired
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,6 +18,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,14 +49,18 @@ fun PairedDashboardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Announce alarm state changes to screen readers
+    // Announce alarm state changes to screen readers and provide haptic feedback
     val view = LocalView.current
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     LaunchedEffect(uiState.alarmState) {
         if (uiState.alarmState != AlarmState.SAFE) {
             view.announceForAccessibility(
                 context.getString(R.string.a11y_alarm_state_announcement, uiState.alarmState.name)
             )
+        }
+        if (uiState.alarmState == AlarmState.WARNING || uiState.alarmState == AlarmState.ALARM) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
 
@@ -279,6 +286,12 @@ private fun DistanceDisplay(distance: Double, alarmState: AlarmState) {
         label = "dist_color"
     )
 
+    val animatedDistance by animateFloatAsState(
+        targetValue = distance.toFloat(),
+        animationSpec = OaAnimations.quickSpring,
+        label = "distance"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -287,7 +300,7 @@ private fun DistanceDisplay(distance: Double, alarmState: AlarmState) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = String.format(java.util.Locale.US, "%.0f", distance),
+            text = String.format(java.util.Locale.US, "%.0f", animatedDistance.toDouble()),
             fontSize = 72.sp,
             fontWeight = FontWeight.Bold,
             color = color
