@@ -12,6 +12,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +23,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.ui.navigation.OpenAnchorNavHost
+import com.hiosdra.openanchor.ui.navigation.Screen
 import com.hiosdra.openanchor.ui.theme.OpenAnchorTheme
+import com.hiosdra.openanchor.ui.theme.ThemeMode
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -82,82 +85,100 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        checkAndRequestPermissions()
 
         setContent {
             val prefs by preferencesManager.preferences.collectAsState(
                 initial = com.hiosdra.openanchor.data.preferences.UserPreferences()
             )
+            val hasSeenOnboarding by preferencesManager.hasSeenPermissionOnboarding
+                .collectAsState(initial = null)
 
-            OpenAnchorTheme(nightFilterEnabled = prefs.nightFilterEnabled) {
+            OpenAnchorTheme(themeMode = prefs.themeMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    val navController = rememberNavController()
-                    OpenAnchorNavHost(navController = navController)
-
-                    // Location Permission Explanation Dialog
-                    if (showLocationPermissionDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showLocationPermissionDialog = false },
-                            title = { Text(stringResource(R.string.permissions_location_title)) },
-                            text = { Text(stringResource(R.string.permissions_location_message)) },
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    showLocationPermissionDialog = false
-                                    locationPermissionRequest.launch(permissionsToRequest.toTypedArray())
-                                }) {
-                                    Text(stringResource(R.string.permissions_continue))
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { showLocationPermissionDialog = false }) {
-                                    Text(stringResource(R.string.cancel))
-                                }
-                            }
+                    val onboardingLoaded = hasSeenOnboarding
+                    if (onboardingLoaded != null) {
+                        val navController = rememberNavController()
+                        val startDestination = if (onboardingLoaded)
+                            Screen.Home.route
+                        else
+                            Screen.PermissionOnboarding.route
+                        OpenAnchorNavHost(
+                            navController = navController,
+                            startDestination = startDestination
                         )
-                    }
 
-                    // Background Location Permission Explanation Dialog
-                    if (showBackgroundLocationDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showBackgroundLocationDialog = false },
-                            title = { Text(stringResource(R.string.permissions_background_location_title)) },
-                            text = { Text(stringResource(R.string.permissions_background_location_message)) },
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    showBackgroundLocationDialog = false
-                                    requestBackgroundLocationPermission()
-                                }) {
-                                    Text(stringResource(R.string.permissions_continue))
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { showBackgroundLocationDialog = false }) {
-                                    Text(stringResource(R.string.cancel))
-                                }
+                        // Existing permission dialogs only after onboarding is complete
+                        if (onboardingLoaded) {
+                            LaunchedEffect(Unit) {
+                                checkAndRequestPermissions()
                             }
-                        )
-                    }
 
-                    // Notifications Permission Explanation Dialog
-                    if (showNotificationsDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showNotificationsDialog = false },
-                            title = { Text(stringResource(R.string.permissions_notifications_title)) },
-                            text = { Text(stringResource(R.string.permissions_notifications_message)) },
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    showNotificationsDialog = false
-                                    locationPermissionRequest.launch(permissionsToRequest.toTypedArray())
-                                }) {
-                                    Text(stringResource(R.string.permissions_continue))
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { showNotificationsDialog = false }) {
-                                    Text(stringResource(R.string.cancel))
-                                }
+                            // Location Permission Explanation Dialog
+                            if (showLocationPermissionDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showLocationPermissionDialog = false },
+                                    title = { Text(stringResource(R.string.permissions_location_title)) },
+                                    text = { Text(stringResource(R.string.permissions_location_message)) },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            showLocationPermissionDialog = false
+                                            locationPermissionRequest.launch(permissionsToRequest.toTypedArray())
+                                        }) {
+                                            Text(stringResource(R.string.permissions_continue))
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showLocationPermissionDialog = false }) {
+                                            Text(stringResource(R.string.cancel))
+                                        }
+                                    }
+                                )
                             }
-                        )
+
+                            // Background Location Permission Explanation Dialog
+                            if (showBackgroundLocationDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showBackgroundLocationDialog = false },
+                                    title = { Text(stringResource(R.string.permissions_background_location_title)) },
+                                    text = { Text(stringResource(R.string.permissions_background_location_message)) },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            showBackgroundLocationDialog = false
+                                            requestBackgroundLocationPermission()
+                                        }) {
+                                            Text(stringResource(R.string.permissions_continue))
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showBackgroundLocationDialog = false }) {
+                                            Text(stringResource(R.string.cancel))
+                                        }
+                                    }
+                                )
+                            }
+
+                            // Notifications Permission Explanation Dialog
+                            if (showNotificationsDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showNotificationsDialog = false },
+                                    title = { Text(stringResource(R.string.permissions_notifications_title)) },
+                                    text = { Text(stringResource(R.string.permissions_notifications_message)) },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            showNotificationsDialog = false
+                                            locationPermissionRequest.launch(permissionsToRequest.toTypedArray())
+                                        }) {
+                                            Text(stringResource(R.string.permissions_continue))
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showNotificationsDialog = false }) {
+                                            Text(stringResource(R.string.cancel))
+                                        }
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
