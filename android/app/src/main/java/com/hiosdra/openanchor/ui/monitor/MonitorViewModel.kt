@@ -120,7 +120,7 @@ class MonitorViewModel @Inject constructor(
     private fun observeTrackPoints(sessionId: Long) {
         trackPointsJob?.cancel()
         trackPointsJob = viewModelScope.launch {
-            repository.observeTrackPoints(sessionId).collect { points ->
+            repository.observeRecentTrackPoints(sessionId, 500).collect { points ->
                 _uiState.update { it.copy(trackPoints = points) }
             }
         }
