@@ -62,7 +62,7 @@ dependencies {
     implementation("androidx.compose.material:material")
 
     // Ambient mode (Horologist)
-    implementation(libs.horologist.compose.ambient)
+    implementation(libs.horologist.compose.layout)
 
     // Watch face complications
     implementation(libs.wear.watchface.complications.data)
