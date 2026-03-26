@@ -1050,7 +1050,7 @@
                 <div
                   id={menuId.current}
                   role="menu"
-                  className={`absolute right-0 mt-2 w-56 rounded-lg shadow-lg z-50 border ${isNightMode ? 'bg-zinc-900 border-red-900' : 'bg-white border-slate-200'}`}
+                  className={`absolute right-0 mt-2 w-56 rounded-lg shadow-lg z-50 border ${isNightMode ? 'bg-zinc-900 border-red-900' : 'bg-white border-slate-200 text-slate-800'}`}
                 >
                   <div className="py-1">
                     {React.Children.map(children, child =>
@@ -2540,7 +2540,7 @@
               <main id="main-content" className="max-w-7xl mx-auto px-2 sm:px-4 mt-2 space-y-4 sm:space-y-6 pb-8 sm:pb-10">
 
                 {activeTab === 'schedule' && isGenerated && dashboardData && (
-                  <div className={`rounded-xl shadow-md overflow-hidden print:hidden border-l-4 ${isNightMode ? 'bg-zinc-950 border-red-800' : 'bg-white border-sky-500'}`}>
+                  <div className={`rounded-xl shadow-md overflow-hidden print:hidden border-l-4 ${isNightMode ? 'bg-zinc-950 border-red-800' : 'bg-white border-sky-500 text-slate-800'}`}>
                     <div className={`p-4 border-b flex justify-between items-center ${isNightMode ? 'bg-zinc-900 border-red-900' : 'bg-sky-50 border-sky-100'}`}>
                       <div className={`flex items-center space-x-2 font-bold ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
                         <Icon name="Navigation" className="w-5 h-5" /> <span>{t('tab.livePanel', userLocale)}</span>
@@ -2657,7 +2657,7 @@
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 print:hidden">
 
                       <div className="lg:col-span-4 space-y-4 sm:space-y-6">
-                        <div className={`p-4 sm:p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                        <div className={`p-4 sm:p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200 text-slate-800'}`}>
                           <div className={`flex items-center space-x-2 mb-3 sm:mb-4 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
                             <Icon name="Users" className="w-5 h-5" />
                             <h2 className="text-base sm:text-lg font-semibold">{t('heading.crewAndRolesWithLimit', userLocale)} ({crew.length}/15)</h2>
@@ -2763,7 +2763,7 @@
                         </div>
 
 
-                        <div className={`p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                        <div className={`p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200 text-slate-800'}`}>
                           <div className={`flex items-center space-x-2 mb-4 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
                             <Icon name="Settings" className="w-5 h-5" /> <h2 className="text-lg font-semibold">{t('heading.cruiseSettings', userLocale)}</h2>
                           </div>
@@ -2783,7 +2783,7 @@
                         </div>
                       </div>
 
-                      <div className={`lg:col-span-8 p-4 sm:p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                      <div className={`lg:col-span-8 p-4 sm:p-5 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200 text-slate-800'}`}>
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
                           <div className={`flex items-center space-x-2 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
                             <Icon name="Clock" className="w-5 h-5" /> <h2 className="text-base sm:text-lg font-semibold">{t('heading.watchSystem', userLocale)}</h2>
@@ -3156,7 +3156,7 @@
                 )}
 
                 {activeTab === 'schedule' && isGenerated && crewStats.length > 0 && (
-                  <div className={`p-6 rounded-xl shadow-sm border print:hidden ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                  <div className={`p-6 rounded-xl shadow-sm border print:hidden ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200 text-slate-800'}`}>
                     <h2 className={`text-xl font-bold mb-4 flex items-center space-x-2 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
                       <Icon name="Shield" className="w-5 h-5" /> <span>{t('heading.summaryAndExport', userLocale)}</span>
                     </h2>
@@ -3198,7 +3198,7 @@
 
                 {/* Gantt Chart View */}
                 {activeTab === 'gantt' && isGenerated && schedule.length > 0 && (
-                  <div className={`p-6 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                  <div className={`p-6 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200 text-slate-800'}`}>
                     <h2 className={`text-2xl font-bold mb-6 flex items-center space-x-2 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
                       <Icon name="BarChart3" className="w-6 h-6" />
                       <span>{t('heading.ganttChart', userLocale)}</span>
@@ -3312,7 +3312,7 @@
                 {/* Analytics Dashboard */}
                 {activeTab === 'analytics' && isGenerated && crewStats.length > 0 && (
                   <div className="space-y-6">
-                    <div className={`p-6 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200'}`}>
+                    <div className={`p-6 rounded-xl shadow-sm border ${isNightMode ? 'bg-zinc-950 border-red-900' : 'bg-white border-slate-200 text-slate-800'}`}>
                       <h2 className={`text-2xl font-bold mb-6 flex items-center space-x-2 ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>
                         <Icon name="TrendingUp" className="w-6 h-6" />
                         <span>{t('heading.analytics', userLocale)}</span>
