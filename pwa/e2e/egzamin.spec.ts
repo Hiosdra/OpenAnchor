@@ -11,6 +11,47 @@ const waitForApp = async (page: import('@playwright/test').Page) => {
   }, { timeout: 15_000 });
 };
 
+// Stub PDF storage and renderer so the egzamin module skips the ImportPdfScreen.
+// Without these stubs, the module blocks on PDF import and all tests timeout.
+test.beforeEach(async ({ page }) => {
+  // Intercept exam-pdf-storage.js and append stubs so isPdfImported() returns true
+  await page.route('**/js/exam-pdf-storage.js', async route => {
+    const response = await route.fetch();
+    const body = await response.text();
+    const stubbed = body + `\n;
+      // --- E2E test stubs ---
+      isPdfImported = async function() { return true; };
+      loadPdfBlob = async function() { return new Blob(['fake-pdf'], { type: 'application/pdf' }); };
+    `;
+    await route.fulfill({ body: stubbed, contentType: 'application/javascript' });
+  });
+
+  // Replace pdf-renderer.js entirely with a lightweight stub
+  await page.route('**/js/pdf-renderer.js', async route => {
+    const PLACEHOLDER_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+    const stub = `
+      var PdfRenderer = {
+        _pdfDoc: { numPages: 200 },
+        _cache: new Map(),
+        _MAX_CACHE: 8,
+        async loadFromBlob() { return 200; },
+        _getScale() { return 2.0; },
+        async renderPage() {
+          var c = document.createElement('canvas');
+          c.width = 100; c.height = 100;
+          return c;
+        },
+        async renderQuestion() {
+          return '${PLACEHOLDER_PNG}';
+        },
+        isLoaded() { return true; },
+        unload() { this._pdfDoc = null; this._cache.clear(); }
+      };
+    `;
+    await route.fulfill({ body: stub, contentType: 'application/javascript' });
+  });
+});
+
 // ==========================================
 // 1. PAGE LOAD & INITIAL STATE
 // ==========================================
