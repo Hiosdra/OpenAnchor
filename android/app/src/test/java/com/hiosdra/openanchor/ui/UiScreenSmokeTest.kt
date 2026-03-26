@@ -56,7 +56,7 @@ import com.hiosdra.openanchor.ui.statistics.StatisticsScreen
 import com.hiosdra.openanchor.ui.statistics.StatisticsUiState
 import com.hiosdra.openanchor.ui.statistics.StatisticsViewModel
 import com.hiosdra.openanchor.data.preferences.UserPreferences
-import com.hiosdra.openanchor.ui.theme.ThemeMode
+import com.hiosdra.openanchor.domain.model.ThemeMode
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
 import com.hiosdra.openanchor.domain.model.LogbookEntry

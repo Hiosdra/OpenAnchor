@@ -12,11 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import com.hiosdra.openanchor.domain.model.ThemeMode
 import com.hiosdra.openanchor.ui.components.OceanBackground
-
-enum class ThemeMode {
-    DARK, LIGHT, NIGHT_VISION
-}
 
 private val DarkColorScheme = darkColorScheme(
     primary = OceanBlue,

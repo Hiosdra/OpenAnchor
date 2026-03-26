@@ -6,7 +6,7 @@ import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.data.preferences.UserPreferences
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
-import com.hiosdra.openanchor.ui.theme.ThemeMode
+import com.hiosdra.openanchor.domain.model.ThemeMode
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

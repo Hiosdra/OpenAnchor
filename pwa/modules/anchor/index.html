@@ -215,7 +215,7 @@
 </header>
 
 <!-- === DASHBOARD === -->
-<div class="grid grid-cols-4 bg-slate-800 border-b border-slate-700 divide-x divide-slate-700 text-center z-20 shadow-lg" role="region" aria-label="Navigation metrics" aria-live="polite">
+<div class="grid grid-cols-4 bg-slate-800 border-b border-slate-700 divide-x divide-slate-700 text-center z-20 shadow-lg" role="region" aria-label="Navigation metrics">
     <div class="p-1.5 sm:p-2">
         <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase" data-i18n="dashDistance">Dystans</div>
         <div class="font-mono font-bold text-lg sm:text-xl text-white" id="val-dist">--</div>
@@ -241,7 +241,7 @@
 </div>
 
 <!-- === MAP WIDGET === -->
-<div id="map" class="flex-grow w-full relative min-h-[200px] max-h-[50vh]" role="application" aria-label="Anchor position map">
+<div id="map" class="flex-grow w-full relative min-h-[200px] max-h-[50vh]" role="region" aria-label="Anchor position map">
     <div id="no-signal-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm z-[1000]">
         <i data-lucide="map-pin-off" class="w-10 h-10 text-slate-500 mb-2"></i>
         <p class="text-slate-400 text-sm font-medium" data-i18n="noGpsSignal">Brak sygnału GPS</p>
@@ -262,7 +262,7 @@
 </div>
 
 <!-- === ALARM STATE INDICATOR === -->
-<div id="alarm-state-bar" class="w-full py-1 text-center text-xs font-bold uppercase tracking-widest z-20 hidden transition-all" role="alert" aria-live="assertive">
+<div id="alarm-state-bar" class="w-full py-1 text-center text-xs font-bold uppercase tracking-widest z-20 hidden transition-all">
     <span id="alarm-state-text"></span>
 </div>
 

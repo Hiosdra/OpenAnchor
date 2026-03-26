@@ -16,7 +16,7 @@ import com.hiosdra.openanchor.R
 import com.hiosdra.openanchor.ui.components.GlassCard
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
-import com.hiosdra.openanchor.ui.theme.ThemeMode
+import com.hiosdra.openanchor.domain.model.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
