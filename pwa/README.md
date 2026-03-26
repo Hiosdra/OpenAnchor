@@ -1,6 +1,6 @@
 # PWA (Progressive Web App)
 
-This directory contains the OpenAnchor Progressive Web App — a hub-and-spoke maritime superapp with three specialized modules, built with vanilla JavaScript and no build system.
+This directory contains the OpenAnchor Progressive Web App — a hub-and-spoke maritime superapp with four specialized modules, built with vanilla JavaScript and no build system.
 
 ## Overview
 
@@ -9,6 +9,7 @@ The PWA runs on any modern browser (iPad, desktop, mobile) and serves as a compr
 - **Alert Kotwiczny**: Anchor alarm with GPS tracking, zone monitoring, and WebSocket pairing
 - **Wachtownik**: Crew watch scheduler with PDF export and QR sharing
 - **Egzamin**: Maritime examination module with interactive quizzes
+- **Żeglowanie**: Sailing information and preparation module with interactive checklists
 
 All modules are installable as Progressive Web Apps on any device with offline support and an app-like experience. The Anchor Alarm and Wachtownik modules support local notifications.
 
@@ -65,6 +66,19 @@ Interactive maritime examination module for Polish yacht sailor certifications (
 - localStorage persistence
 - Responsive mobile layout
 
+### 4. Żeglowanie (Sailing Information)
+**Location:** `modules/zeglowanie/`
+
+Sailing information and preparation module for different types of sailing cruises.
+
+**Features:**
+- Interactive checklists for different cruise types (coastal, offshore, etc.)
+- Pre-voyage briefing guides (initial briefing, first day briefing)
+- Operational checklists (departure, arrival, daily, emergency)
+- What to pack information
+- State persistence via localStorage
+- Responsive mobile layout with dark theme
+
 ## Architecture
 
 ### Alert Kotwiczny (Anchor Module)
@@ -97,8 +111,12 @@ Business logic has been refactored into testable ES6 modules in the `js/` direct
 - `dashboard.js` - Beta mode & settings management
 - `sw-utils.js` - Service Worker utilities
 - `exam-storage.js` - Exam progress & localStorage
+- `exam-pdf-storage.js` - PDF storage and management for exam module
 - `leitner.js` - Spaced repetition algorithm
 - `anchor-utils.js` - GPS calculations & alarm logic
+- `pdf-renderer.js` - PDF rendering functionality
+- `sync-queue.js` - Queue-based synchronization for offline operations
+- `storage-utils.js` - General localStorage utilities
 
 These modules are tested with Vitest (149 tests, 96.52% coverage). See [tests/README.md](tests/README.md).
 
@@ -191,16 +209,30 @@ pwa/
 │   ├── dashboard.js
 │   ├── sw-utils.js
 │   ├── exam-storage.js
+│   ├── exam-pdf-storage.js
 │   ├── leitner.js
-│   └── anchor-utils.js
+│   ├── anchor-utils.js
+│   ├── pdf-renderer.js
+│   ├── sync-queue.js
+│   └── storage-utils.js
 ├── tests/             # Vitest test suite
 │   └── *.test.js      # 149 tests, 96.52% coverage
+├── e2e/               # Playwright E2E tests
+│   ├── anchor.spec.ts
+│   ├── egzamin.spec.ts
+│   ├── wachtownik.spec.ts
+│   ├── cross-module.spec.ts
+│   ├── dashboard.spec.ts
+│   ├── service-worker.spec.ts
+│   └── smoke.spec.ts
 ├── assets/            # Icons and images
-└── modules/           # Three specialized modules
+└── modules/           # Four specialized modules
     ├── anchor/
     │   └── index.html # Alert Kotwiczny (anchor alarm)
     ├── wachtownik/
     │   └── index.html # Watch scheduler (React + Babel)
+    ├── zeglowanie/
+    │   └── index.html # Sailing information and checklists
     └── egzamin/       # Maritime exam module
         ├── index.html
         ├── exam_questions.json
@@ -293,6 +325,14 @@ npm install
 npm test                # Run all tests
 npm run test:ui         # Run tests with UI
 npm run test:coverage   # Generate coverage report
+```
+
+### E2E Tests
+```bash
+cd pwa
+npm install
+npx playwright install chromium   # On Linux, use: npx playwright install chromium --with-deps
+npm run test:e2e                  # Run end-to-end tests with Playwright
 ```
 
 See [tests/README.md](tests/README.md) for detailed test documentation.

@@ -1,6 +1,6 @@
 # OpenAnchor
 
-OpenAnchor is a maritime superapp — a PWA hub-and-spoke shell with three modules, plus companion native Android apps and Wear OS support.
+OpenAnchor is a maritime superapp — a PWA hub-and-spoke shell with four modules, plus companion native Android apps and Wear OS support.
 
 Live PWA: **https://hiosdra.github.io/OpenAnchor/**
 
@@ -11,6 +11,7 @@ Live PWA: **https://hiosdra.github.io/OpenAnchor/**
 | **Alert Kotwiczny** | Anchor alarm with GPS tracking, map visualisation (Leaflet), audio/vibration/browser notifications, night vision mode, WebSocket pairing with Android for redundant cabin alarm |
 | **Wachtownik** | Maritime watch scheduler for yacht crews — generates watch schedules, PDF export, QR sharing (React + Babel, PL/EN) |
 | **Egzamin** | Maritime examination module (ŻJ/JSM) with Nauka (Learn), Egzamin (Exam, 45 min timed), and Leitner spaced-repetition modes. Questions rendered from user-imported PDF — no copyrighted content bundled |
+| **Żeglowanie** | Sailing information and preparation module with interactive checklists for different cruise types, briefing guides, and pre-voyage preparation tips |
 
 ## Project Structure
 
@@ -22,10 +23,12 @@ OpenAnchor/
 │   ├── sw.js                     # Service Worker (offline cache)
 │   ├── js/                       # Testable JavaScript modules
 │   ├── tests/                    # Vitest test suite (149 tests, 96.52% coverage)
+│   ├── e2e/                      # Playwright E2E tests
 │   ├── assets/                   # Icons
 │   └── modules/
 │       ├── anchor/index.html     # Alert Kotwiczny
 │       ├── wachtownik/index.html # Wachtownik
+│       ├── zeglowanie/index.html # Żeglowanie
 │       └── egzamin/              # Egzamin (exam module)
 │           ├── index.html
 │           └── exam_questions.json  # Question metadata (no copyrighted content)
@@ -72,7 +75,9 @@ The exam module does **not** bundle any copyrighted question content. Users must
 | `deploy-pwa.yml` | push to `master` (`pwa/**`) | Deploy to GitHub Pages (production) |
 | `deploy-pr-preview.yml` | pull request (`pwa/**`) | Deploy PR preview to `https://hiosdra.github.io/OpenAnchor/<PR-number>/` |
 | `screenshot.yml` | pull request | Playwright screenshots (mobile + desktop) → artifact + PR comment |
-| `build.yml` | push / PR | Android build |
+| `build.yml` | push / PR | Android build (debug + release), Wear OS build, JaCoCo coverage |
+| `e2e-pwa.yml` | push / PR (`pwa/**`) | End-to-end tests for PWA with Playwright |
+| `e2e-android.yml` | push / PR (`android/**`) | Instrumented tests on Android emulator |
 
 ### PR Preview Sites
 
@@ -127,15 +132,18 @@ See [android/README.md](android/README.md) for detailed architecture and feature
 ```bash
 cd pwa
 npm install
-npm test                # Run unit tests (Vitest)
-npm run test:coverage   # Generate coverage report
+npx playwright install chromium   # Install Playwright browser binaries (first run)
+npm test                          # Run unit tests (Vitest)
+npm run test:coverage             # Generate coverage report
+npm run test:e2e                  # Run E2E tests (Playwright)
 ```
 
 ### Android Tests
 ```bash
 cd android
-./gradlew test                      # Run unit tests
-./gradlew assembleDebugAndroidTest  # Build instrumented tests
+./gradlew test                         # Run unit tests
+./gradlew assembleDebugAndroidTest     # Build instrumented tests
+./gradlew connectedDebugAndroidTest    # Run debug instrumented tests on device/emulator (same task as CI)
 ```
 
 See [pwa/tests/README.md](pwa/tests/README.md) for PWA test documentation.
