@@ -27,9 +27,8 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
-  // Activate immediately so new cache version takes effect
-  self.skipWaiting();
 });
+
 
 // Listen for messages from the page
 self.addEventListener('message', event => {
