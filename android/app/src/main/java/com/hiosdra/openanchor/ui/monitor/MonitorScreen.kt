@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -24,6 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -38,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
 import com.hiosdra.openanchor.domain.model.AlarmState
 import com.hiosdra.openanchor.domain.model.AnchorZone
+import com.hiosdra.openanchor.ui.components.AlarmStatusBadge
 import com.hiosdra.openanchor.ui.components.MapCircle
 import com.hiosdra.openanchor.ui.components.MapMarker
 import com.hiosdra.openanchor.ui.components.MapPolylineData
@@ -56,13 +60,17 @@ fun MonitorScreen(
     var showStopDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    // Announce alarm state changes to screen readers
+    // Announce alarm state changes to screen readers and provide haptic feedback
     val view = LocalView.current
+    val haptic = LocalHapticFeedback.current
     LaunchedEffect(uiState.alarmState) {
         if (uiState.alarmState != AlarmState.SAFE) {
             view.announceForAccessibility(
                 context.getString(R.string.a11y_alarm_state_announcement, uiState.alarmState.name)
             )
+        }
+        if (uiState.alarmState == AlarmState.WARNING || uiState.alarmState == AlarmState.ALARM) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
 
@@ -317,12 +325,8 @@ private fun MapMonitorView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(
-                            text = uiState.alarmState.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                        AlarmStatusBadge(alarmState = uiState.alarmState)
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = stringResource(R.string.distance_format, "%.0f".format(uiState.distanceToAnchor)),
                             style = MaterialTheme.typography.bodyLarge,
@@ -452,11 +456,8 @@ private fun SimpleMonitorView(
             verticalArrangement = Arrangement.Center
         ) {
             // Status
-            Text(
-                text = uiState.alarmState.name,
-                style = MaterialTheme.typography.headlineLarge,
-                color = statusColor,
-                fontWeight = FontWeight.Bold,
+            AlarmStatusBadge(
+                alarmState = uiState.alarmState,
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
             )
 
@@ -492,9 +493,14 @@ private fun SimpleMonitorView(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Distance - big number
+            // Distance - big number with animated counter
+            val animatedDistance by animateFloatAsState(
+                targetValue = uiState.distanceToAnchor.toFloat(),
+                animationSpec = OaAnimations.quickSpring,
+                label = "distance"
+            )
             Text(
-                text = "%.0f".format(uiState.distanceToAnchor),
+                text = "%.0f".format(animatedDistance.toDouble()),
                 fontSize = 96.sp,
                 fontWeight = FontWeight.Bold,
                 color = statusColor,
