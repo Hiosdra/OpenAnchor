@@ -31,8 +31,15 @@
     <!-- PDF.js for rendering exam questions from PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
+    <!-- Shared utilities -->
+    <script src="../../js/storage-utils.js"></script>
+    <script src="../../js/leitner.js"></script>
+
     <!-- Exam PDF storage (IndexedDB) -->
     <script src="../../js/exam-pdf-storage.js"></script>
+
+    <!-- PDF page renderer (singleton with LRU cache) -->
+    <script src="../../js/pdf-renderer.js"></script>
 
     <style>
         /* Module-specific styles only - base styles in theme.css */
@@ -130,89 +137,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
-        // TODO [REFACTOR]: Extract PdfRenderer into separate module (pwa/js/pdf-renderer.js)
-        // Configure pdf.js worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-        // PDF rendering singleton
-        const PdfRenderer = {
-            _pdfDoc: null,
-            _cache: new Map(),
-            _MAX_CACHE: 8,
-
-            async loadFromBlob(blob) {
-                const arrayBuffer = await blob.arrayBuffer();
-                this._pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                this._cache.clear();
-                return this._pdfDoc.numPages;
-            },
-
-            _getScale() {
-                // Use lower scale on devices with limited memory
-                if (navigator.deviceMemory && navigator.deviceMemory <= 4) return 1.5;
-                return 2.0;
-            },
-
-            async renderPage(pageIndex, scale) {
-                if (scale === undefined) scale = this._getScale();
-                const cacheKey = pageIndex + '_' + scale;
-                if (this._cache.has(cacheKey)) return this._cache.get(cacheKey);
-
-                if (!this._pdfDoc) return null;
-                const page = await this._pdfDoc.getPage(pageIndex + 1);
-                const viewport = page.getViewport({ scale: scale });
-                const canvas = document.createElement('canvas');
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
-                const ctx = canvas.getContext('2d');
-                await page.render({ canvasContext: ctx, viewport: viewport, annotationMode: 0 }).promise;
-
-                if (this._cache.size >= this._MAX_CACHE) {
-                    const firstKey = this._cache.keys().next().value;
-                    this._cache.delete(firstKey);
-                }
-                this._cache.set(cacheKey, canvas);
-                return canvas;
-            },
-
-            async renderQuestion(pageIndex, cropYStart, cropYEnd, pageHeight, scale) {
-                if (scale === undefined) scale = 2.0;
-                const fullPage = await this.renderPage(pageIndex, scale);
-                if (!fullPage) return null;
-
-                const scaleRatio = fullPage.height / pageHeight;
-                const yStart = Math.floor(cropYStart * scaleRatio);
-                const yEnd = Math.ceil(cropYEnd * scaleRatio);
-                const cropHeight = yEnd - yStart;
-
-                const cropCanvas = document.createElement('canvas');
-                cropCanvas.width = fullPage.width;
-                cropCanvas.height = cropHeight;
-                const ctx = cropCanvas.getContext('2d');
-                ctx.drawImage(fullPage, 0, yStart, fullPage.width, cropHeight, 0, 0, fullPage.width, cropHeight);
-
-                return cropCanvas.toDataURL('image/png');
-            },
-
-            isLoaded() {
-                return this._pdfDoc !== null;
-            },
-
-            unload() {
-                if (this._pdfDoc) {
-                    this._pdfDoc.destroy();
-                    this._pdfDoc = null;
-                }
-                this._cache.clear();
-            }
-        };
-
-        // Clear PDF cache when tab is hidden to reduce memory pressure
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && PdfRenderer._cache.size > 0) {
-                PdfRenderer._cache.clear();
-            }
-        });
+        // PdfRenderer loaded from pwa/js/pdf-renderer.js (global)
 
         // ==========================================
         // CATEGORIES (8 categories matching Android)
@@ -278,50 +203,45 @@
         };
 
         // ==========================================
-        // LEITNER SYSTEM
-        // TODO [REFACTOR]: Replace with shared implementation from pwa/js/leitner.js
-        // This is a duplicate - see Arch 4. The shared module uses date-based intervals
-        // while this uses session-based intervals. Consolidate after agreeing on approach.
+        // LEITNER SYSTEM — thin wrappers over shared pwa/js/leitner.js
         // ==========================================
-        const LEITNER_STORAGE_KEY = 'openanchor_leitner';
+        const _leitnerStorage = new StorageUtils('openanchor');
         const LEITNER_BOX_COUNT = 5;
-        const LEITNER_INTERVALS = [1, 2, 4, 8, 16]; // review intervals per box
 
         function loadLeitnerState() {
-            try {
-                const data = localStorage.getItem(LEITNER_STORAGE_KEY);
-                if (data) return JSON.parse(data);
-            } catch { /* ignore */ }
-            return { questionStates: {}, sessionNumber: 0 };
+            const state = _leitnerStorage.get('leitner', null);
+            // Migrate from old session-based format (questionStates → boxes)
+            if (state && state.questionStates && !state.boxes) {
+                const boxes = {};
+                Object.entries(state.questionStates).forEach(([id, data]) => {
+                    boxes[id] = { box: data.box || 1, lastReview: Date.now(), reviewCount: 0 };
+                });
+                const migrated = { boxes };
+                _leitnerStorage.set('leitner', migrated);
+                return migrated;
+            }
+            return state || { boxes: {} };
         }
 
         function saveLeitnerState(state) {
-            try {
-                localStorage.setItem(LEITNER_STORAGE_KEY, JSON.stringify(state));
-            } catch { /* ignore */ }
+            _leitnerStorage.set('leitner', state);
         }
 
         function getBoxForQuestion(leitnerState, questionId) {
-            return (leitnerState.questionStates[questionId] || { box: 1 }).box;
-        }
-
-        function getLastReviewedSession(leitnerState, questionId) {
-            return (leitnerState.questionStates[questionId] || { lastReviewed: 0 }).lastReviewed;
+            return (leitnerState.boxes && leitnerState.boxes[questionId] && leitnerState.boxes[questionId].box) || 1;
         }
 
         function isDueForReview(leitnerState, questionId) {
-            const state = leitnerState.questionStates[questionId];
-            if (!state) return true; // New question, always due
-            const interval = LEITNER_INTERVALS[state.box - 1] || 1;
-            return (leitnerState.sessionNumber - state.lastReviewed) >= interval;
+            const qData = leitnerState.boxes && leitnerState.boxes[questionId];
+            return Leitner.isDueForReview(qData);
         }
 
         function getDueQuestions(leitnerState, questions) {
-            return questions.filter(q => isDueForReview(leitnerState, q.id));
+            return Leitner.getDueQuestions(leitnerState, questions);
         }
 
         function getBoxCounts(leitnerState, questions) {
-            const counts = [0, 0, 0, 0, 0]; // boxes 1-5
+            const counts = [0, 0, 0, 0, 0];
             questions.forEach(q => {
                 const box = getBoxForQuestion(leitnerState, q.id);
                 counts[box - 1]++;
@@ -330,58 +250,28 @@
         }
 
         function advanceQuestion(leitnerState, questionId, correct) {
-            const currentBox = getBoxForQuestion(leitnerState, questionId);
-            const newBox = correct ? Math.min(currentBox + 1, LEITNER_BOX_COUNT) : 1;
-            return {
-                ...leitnerState,
-                questionStates: {
-                    ...leitnerState.questionStates,
-                    [questionId]: {
-                        box: newBox,
-                        lastReviewed: leitnerState.sessionNumber,
-                    }
-                }
-            };
+            return Leitner.updateLeitnerState(leitnerState, questionId, correct);
         }
 
         // ==========================================
-        // STORAGE (Learn/Exam progress)
-        // TODO [REFACTOR]: Migrate to pwa/js/storage-utils.js for unified localStorage API
+        // STORAGE — using shared pwa/js/storage-utils.js
         // ==========================================
-        const STORAGE_KEY = 'openanchor_exam_progress';
-        const LEARN_POSITION_KEY = 'openanchor_learn_position';
+        const _examStorage = new StorageUtils('openanchor');
 
         function loadProgress() {
-            try {
-                const data = localStorage.getItem(STORAGE_KEY);
-                return data ? JSON.parse(data) : { answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } };
-            } catch {
-                return { answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } };
-            }
+            return _examStorage.get('exam_progress', { answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } });
         }
 
         function saveProgress(progress) {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-            } catch { /* ignore */ }
+            _examStorage.set('exam_progress', progress);
         }
 
         function loadLearnPosition() {
-            try {
-                const data = localStorage.getItem(LEARN_POSITION_KEY);
-                return data ? JSON.parse(data) : { questionId: null, timestamp: 0 };
-            } catch {
-                return { questionId: null, timestamp: 0 };
-            }
+            return _examStorage.get('learn_position', { questionId: null, timestamp: 0 });
         }
 
         function saveLearnPosition(questionId) {
-            try {
-                localStorage.setItem(LEARN_POSITION_KEY, JSON.stringify({
-                    questionId,
-                    timestamp: Date.now()
-                }));
-            } catch { /* ignore */ }
+            _examStorage.set('learn_position', { questionId, timestamp: Date.now() });
         }
 
         // ==========================================
@@ -673,9 +563,6 @@
 
         // ==========================================
         // PDF IMPORT SCREEN
-        // TODO [REFACTOR]: Extract UI components (ImportPdfScreen, MenuScreen, LearnScreen,
-        // ExamScreen, ResultsScreen, LeitnerScreens) into separate files under
-        // pwa/modules/egzamin/components/
         // ==========================================
         function ImportPdfScreen({ onImportComplete }) {
             const [importing, setImporting] = useState(false);
@@ -1523,9 +1410,9 @@
                                 </div>
                             </div>
 
-                            {/* Session info */}
+                            {/* Total reviewed info */}
                             <div className="text-xs text-white/30 text-center mb-4">
-                                Sesja #{leitnerState.sessionNumber + 1}
+                                {Leitner.getLeitnerStats(leitnerState).total} pytań w systemie
                             </div>
 
                             {/* Box breakdown */}
@@ -1576,7 +1463,7 @@
                                     </div>
                                 </button>
 
-                                {leitnerState.sessionNumber > 0 && (
+                                {Leitner.getLeitnerStats(leitnerState).total > 0 && (
                                     <button
                                         onClick={() => {
                                             if (confirm('Na pewno chcesz zresetować postęp Leitnera? Wszystkie pytania wrócą do Pudełka 1.')) {
@@ -1751,7 +1638,7 @@
                                     {correct} poprawnych, {incorrect} błędnych z {total} pytań
                                 </div>
                                 <div className="text-xs text-white/30 mt-2">
-                                    Sesja #{leitnerState.sessionNumber}
+                                    {correct + incorrect} pytań w sesji
                                 </div>
                             </div>
 
@@ -1852,12 +1739,6 @@
                 const due = getDueQuestions(leitnerState, QUESTIONS_DB);
                 if (due.length === 0) return;
 
-                // Increment session number
-                const newState = { ...leitnerState, sessionNumber: leitnerState.sessionNumber + 1 };
-                setLeitnerState(newState);
-                saveLeitnerState(newState);
-
-                // Shuffle due questions
                 const shuffled = [...due].sort(() => Math.random() - 0.5);
                 setLeitnerSessionQuestions(shuffled);
                 setMode(MODES.LEITNER_SESSION);
@@ -1872,7 +1753,7 @@
             }, []);
 
             const handleResetLeitner = useCallback(() => {
-                const freshState = { questionStates: {}, sessionNumber: 0 };
+                const freshState = { boxes: {} };
                 setLeitnerState(freshState);
                 saveLeitnerState(freshState);
             }, []);
