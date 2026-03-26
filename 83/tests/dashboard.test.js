@@ -57,36 +57,27 @@ describe('Dashboard - Beta Mode Management', () => {
 
   describe('initBetaMode', () => {
     beforeEach(() => {
-      // Modules start with module-hidden class to prevent flash on load
+      // Anchor module starts with module-hidden class to prevent flash on load
       document.body.innerHTML = `
         <input type="checkbox" id="betaToggle" />
         <div id="anchorModule" class="module-hidden"></div>
-        <div id="wachtownikModule" class="module-hidden"></div>
       `;
     });
 
-    it('should keep modules hidden when beta mode is disabled', () => {
+    it('should keep anchor hidden when beta mode is disabled', () => {
       setBetaMode(false);
       initBetaMode();
 
       const anchor = document.getElementById('anchorModule');
-      const wachtownik = document.getElementById('wachtownikModule');
-
-      // Modules should remain hidden (initBetaMode doesn't remove the class)
       expect(anchor.classList.contains('module-hidden')).toBe(true);
-      expect(wachtownik.classList.contains('module-hidden')).toBe(true);
     });
 
-    it('should show modules when beta mode is enabled', () => {
+    it('should show anchor when beta mode is enabled', () => {
       setBetaMode(true);
       initBetaMode();
 
       const anchor = document.getElementById('anchorModule');
-      const wachtownik = document.getElementById('wachtownikModule');
-
-      // Modules should be visible (initBetaMode removes the hidden class)
       expect(anchor.classList.contains('module-hidden')).toBe(false);
-      expect(wachtownik.classList.contains('module-hidden')).toBe(false);
     });
 
     it('should set checkbox to checked when beta mode is enabled', () => {
@@ -126,16 +117,6 @@ describe('Dashboard - Beta Mode Management', () => {
       initBetaMode();
       expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(false);
     });
-
-    it('should handle beta enabled with only wachtownikModule present', () => {
-      document.body.innerHTML = `
-        <input type="checkbox" id="betaToggle" />
-        <div id="wachtownikModule" class="module-hidden"></div>
-      `;
-      setBetaMode(true);
-      initBetaMode();
-      expect(document.getElementById('wachtownikModule').classList.contains('module-hidden')).toBe(false);
-    });
   });
 
   describe('toggleBetaMode', () => {
@@ -143,7 +124,6 @@ describe('Dashboard - Beta Mode Management', () => {
       document.body.innerHTML = `
         <input type="checkbox" id="betaToggle" />
         <div id="anchorModule"></div>
-        <div id="wachtownikModule"></div>
       `;
     });
 
@@ -179,12 +159,10 @@ describe('Dashboard - Beta Mode Management', () => {
     it('should handle missing betaToggle (defaults to false)', () => {
       document.body.innerHTML = `
         <div id="anchorModule"></div>
-        <div id="wachtownikModule"></div>
       `;
       toggleBetaMode();
       expect(isBetaModeEnabled()).toBe(false);
       expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(true);
-      expect(document.getElementById('wachtownikModule').classList.contains('module-hidden')).toBe(true);
     });
 
     it('should handle enabled with missing module elements', () => {
@@ -209,16 +187,6 @@ describe('Dashboard - Beta Mode Management', () => {
       document.getElementById('betaToggle').checked = true;
       toggleBetaMode();
       expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(false);
-    });
-
-    it('should handle disabled with only wachtownikModule present', () => {
-      document.body.innerHTML = `
-        <input type="checkbox" id="betaToggle" />
-        <div id="wachtownikModule"></div>
-      `;
-      document.getElementById('betaToggle').checked = false;
-      toggleBetaMode();
-      expect(document.getElementById('wachtownikModule').classList.contains('module-hidden')).toBe(true);
     });
   });
 });
