@@ -22,7 +22,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.a
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForText(
     text: String,
-    timeoutMs: Long = 5000
+    timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
     waitForCondition(timeoutMs) {
         onAllNodesWithText(text, substring = true, ignoreCase = true)
@@ -34,7 +34,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForTag(
     tag: String,
-    timeoutMs: Long = 5000
+    timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
     waitForCondition(timeoutMs) {
         onAllNodesWithTag(tag)

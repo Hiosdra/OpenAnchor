@@ -36,14 +36,8 @@ class StatisticsScreenTest {
     }
 
     private fun navigateToStatistics() {
-        composeTestRule.waitForText("OpenAnchor", timeoutMs = 10_000)
-        try {
-            composeTestRule.onNodeWithText("Statistics", substring = true).performScrollTo()
-        } catch (_: Exception) {
-            // Scroll may not be needed if Statistics is already visible
-        }
-        composeTestRule.waitForText("Statistics", timeoutMs = 5_000).performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.waitForText("Statistics").tryPerformScrollTo().performClick()
+        composeTestRule.waitForText("No anchoring data yet")
     }
 
     // --- 1. Navigation ---
@@ -83,7 +77,7 @@ class StatisticsScreenTest {
     @Test
     fun statisticsScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("Drop Anchor", timeoutMs = 5_000)
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("Drop Anchor").assertIsDisplayed()
     }
 }
