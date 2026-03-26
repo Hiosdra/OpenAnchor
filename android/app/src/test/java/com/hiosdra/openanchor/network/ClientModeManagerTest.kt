@@ -157,10 +157,11 @@ class ClientModeManagerTest {
     }
 
     @Test
-    fun `updateTelemetry does not send when disconnected`() {
+    fun `updateTelemetry sends even when disconnected but returns false`() {
         every { wsClient.isConnected } returns false
+        every { wsClient.sendStateUpdate(any()) } returns false
         manager.updateTelemetry(Position(54.36, 18.66), 25.0, AlarmState.SAFE)
-        verify(exactly = 0) { wsClient.sendStateUpdate(any()) }
+        verify { wsClient.sendStateUpdate(any()) }
     }
 
     @Test
@@ -171,10 +172,11 @@ class ClientModeManagerTest {
     }
 
     @Test
-    fun `triggerAlarm does not send when disconnected`() {
+    fun `triggerAlarm sends even when disconnected but returns false`() {
         every { wsClient.isConnected } returns false
+        every { wsClient.sendTriggerAlarm(any()) } returns false
         manager.triggerAlarm("ZONE_VIOLATION", "Test", AlarmState.ALARM)
-        verify(exactly = 0) { wsClient.sendTriggerAlarm(any()) }
+        verify { wsClient.sendTriggerAlarm(any()) }
     }
 
     @Test
