@@ -132,17 +132,18 @@ See [android/README.md](android/README.md) for detailed architecture and feature
 ```bash
 cd pwa
 npm install
-npm test                # Run unit tests (Vitest)
-npm run test:coverage   # Generate coverage report
-npm run test:e2e        # Run E2E tests (Playwright)
+npx playwright install chromium   # Install Playwright browser binaries (first run)
+npm test                          # Run unit tests (Vitest)
+npm run test:coverage             # Generate coverage report
+npm run test:e2e                  # Run E2E tests (Playwright)
 ```
 
 ### Android Tests
 ```bash
 cd android
-./gradlew test                      # Run unit tests
-./gradlew assembleDebugAndroidTest  # Build instrumented tests
-./gradlew connectedAndroidTest      # Run instrumented tests on device/emulator
+./gradlew test                         # Run unit tests
+./gradlew assembleDebugAndroidTest     # Build instrumented tests
+./gradlew connectedDebugAndroidTest    # Run debug instrumented tests on device/emulator (same task as CI)
 ```
 
 See [pwa/tests/README.md](pwa/tests/README.md) for PWA test documentation.

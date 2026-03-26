@@ -43,10 +43,11 @@ Opening `index.html` directly via `file://` will not work — service workers re
 **Testing:**
 ```bash
 cd pwa
-npm install              # Install dev dependencies
-npm test                 # Run unit tests (Vitest)
-npm run test:coverage    # Generate coverage report
-npm run test:e2e         # Run E2E tests (Playwright)
+npm install                              # Install dev dependencies
+npx playwright install chromium          # Install Playwright browser binaries (use --with-deps on Linux if needed)
+npm test                                 # Run unit tests (Vitest)
+npm run test:coverage                    # Generate coverage report
+npm run test:e2e                         # Run E2E tests (Playwright)
 ```
 
 **Service Worker cache:** Bump the cache version string in `sw.js` whenever you change cached assets.
@@ -73,7 +74,7 @@ cd android
 
 # Instrumented tests
 ./gradlew assembleDebugAndroidTest
-./gradlew connectedAndroidTest
+./gradlew connectedDebugAndroidTest
 
 # Code coverage
 ./gradlew testDebugUnitTest jacocoTestReport

@@ -314,8 +314,8 @@ The Wear OS app provides data source for watch face complications, allowing anch
 
 **Features:**
 - Live updates when monitor state changes
-- Automatic synchronization with phone app
-- No manual configuration required
+- Automatic data synchronization with phone app once both apps are installed and connected
+- Simple setup: add OpenAnchor as a complication provider to an available slot on your watch face; no extra configuration inside the app is required
 
 ### Communication
 - Uses Wear OS Data Layer API

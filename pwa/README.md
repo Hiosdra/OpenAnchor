@@ -331,7 +331,8 @@ npm run test:coverage   # Generate coverage report
 ```bash
 cd pwa
 npm install
-npm run test:e2e        # Run end-to-end tests with Playwright
+npx playwright install chromium   # On Linux, use: npx playwright install chromium --with-deps
+npm run test:e2e                  # Run end-to-end tests with Playwright
 ```
 
 See [tests/README.md](tests/README.md) for detailed test documentation.

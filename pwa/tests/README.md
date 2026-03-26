@@ -41,6 +41,7 @@ npm run test:coverage
 
 Run E2E tests:
 ```bash
+npx playwright install chromium   # Install Playwright browser binaries (first run; use --with-deps on Linux if needed)
 npm run test:e2e
 ```
 
@@ -164,7 +165,6 @@ pwa/
 ### Smoke Tests
 - ✅ Basic page loads
 - ✅ Critical user paths
-- ✅ Performance benchmarks
 
 ## Code Architecture
 
