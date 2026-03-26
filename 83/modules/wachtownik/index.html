@@ -2710,7 +2710,7 @@
                                 <div key={person.id} className={`flex items-center justify-between p-2 rounded border ${isNightMode ? 'bg-black border-red-900' : 'bg-slate-50 border-slate-100'}`}>
                                   <div className="flex items-center space-x-3">
                                     <Icon name={roleIcon} className={`w-4 h-4 ${isNightMode ? 'text-red-600' : roleColor}`} />
-                                    <span className={`text-sm font-medium ${isExcluded ? 'line-through opacity-70' : ''}`} title={isExcluded ? t('label.exemptFromWatches', userLocale) : ''}>
+                                    <span className={`text-sm font-medium ${isNightMode ? '' : 'text-slate-800'} ${isExcluded ? 'line-through opacity-70' : ''}`} title={isExcluded ? t('label.exemptFromWatches', userLocale) : ''}>
                                       {person.name}
                                     </span>
                                   </div>
@@ -2747,11 +2747,11 @@
                                 type="text" placeholder="Imię..." value={newCrewName}
                                 onChange={(e) => setNewCrewName(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && addCrew()}
-                                className={`flex-1 rounded-md shadow-sm text-sm p-2 border ${isNightMode ? 'bg-zinc-900 border-red-800 text-red-400 placeholder-red-900 focus:ring-red-500 focus:border-red-500' : 'border-slate-300 focus:border-sky-500 focus:ring-sky-500'}`}
+                                className={`flex-1 rounded-md shadow-sm text-sm p-2 border ${isNightMode ? 'bg-zinc-900 border-red-800 text-red-400 placeholder-red-900 focus:ring-red-500 focus:border-red-500' : 'border-slate-300 text-slate-900 focus:border-sky-500 focus:ring-sky-500'}`}
                               />
                               <select
                                 value={newCrewRole} onChange={(e) => setNewCrewRole(e.target.value)}
-                                className={`w-28 rounded-md shadow-sm text-sm p-2 border ${isNightMode ? 'bg-zinc-900 border-red-800 text-red-400' : 'border-slate-300'}`}
+                                className={`w-28 rounded-md shadow-sm text-sm p-2 border ${isNightMode ? 'bg-zinc-900 border-red-800 text-red-400' : 'border-slate-300 text-slate-900'}`}
                               >
                                 {Object.values(ROLES).map(r => <option key={r.id} value={r.id}>{t('role.' + r.id, userLocale)}</option>)}
                               </select>
@@ -2769,14 +2769,14 @@
                           </div>
                           <div className="space-y-4">
                             <div>
-                              <label className="block text-sm font-medium mb-1 flex items-center space-x-2">
+                              <label className={`block text-sm font-medium mb-1 flex items-center space-x-2 ${isNightMode ? '' : 'text-slate-800'}`}>
                                 <Icon name="CalendarDays" className="w-4 h-4" /> <span>{t('label.startDate', userLocale)}</span>
                               </label>
-                              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={`w-full rounded-md shadow-sm p-2 border text-sm ${isNightMode ? 'bg-zinc-900 border-red-800 text-red-400' : 'border-slate-300'}`} style={isNightMode ? {colorScheme: 'dark'} : {}} />
+                              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={`w-full rounded-md shadow-sm p-2 border text-sm ${isNightMode ? 'bg-zinc-900 border-red-800 text-red-400' : 'border-slate-300 text-slate-900'}`} style={isNightMode ? {colorScheme: 'dark'} : {}} />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium mb-1">{t('label.duration', userLocale)}</label>
-                              <input type="number" min="1" max="60" value={days} onChange={(e) => setDays(Number(e.target.value))} className={`w-full rounded-md shadow-sm p-2 border text-sm ${isNightMode ? 'bg-zinc-900 border-red-800 text-red-400' : 'border-slate-300'}`} />
+                              <label className={`block text-sm font-medium mb-1 ${isNightMode ? '' : 'text-slate-800'}`}>{t('label.duration', userLocale)}</label>
+                              <input type="number" min="1" max="60" value={days} onChange={(e) => setDays(Number(e.target.value))} className={`w-full rounded-md shadow-sm p-2 border text-sm ${isNightMode ? 'bg-zinc-900 border-red-800 text-red-400' : 'border-slate-300 text-slate-900'}`} />
                               <p className={`text-xs mt-1 ${isNightMode ? 'text-red-700' : 'text-slate-500'}`}>{t('label.maxDuration', userLocale)}</p>
                             </div>
                           </div>
@@ -3137,7 +3137,7 @@
                                               className={`text-sm px-2 py-1 rounded border flex items-center space-x-2 ${!isReadOnly ? 'cursor-move' : ''} print:border-none print:p-0 print:bg-transparent transition-all ${draggedItem?.dayIdx === dayIndex && draggedItem?.slotIdx === slotIndex && draggedItem?.pIdx === personIndex ? 'opacity-50' : ''} ${isNightMode ? 'bg-black border-red-800 hover:border-red-500' : 'bg-white border-slate-200 hover:border-sky-300 hover:shadow-sm'}`}
                                             >
                                               <Icon name={roleIcon} className={`w-3 h-3 print:hidden ${isNightMode ? 'text-red-800' : 'text-slate-400'}`} />
-                                              <span className="font-medium truncate">{person.name}</span>
+                                              <span className={`font-medium truncate ${isNightMode ? '' : 'text-slate-800'}`}>{person.name}</span>
                                             </div>
                                           );
                                         })}
@@ -3168,7 +3168,7 @@
                           <div key={c.id} className={`p-4 rounded-lg border flex justify-between items-center ${isNightMode ? 'bg-black border-red-900' : 'bg-slate-50 border-slate-200'}`}>
                             <div>
                               <div className="font-bold flex items-center space-x-2">
-                                <span className={isExcluded ? 'line-through opacity-50' : ''}>{c.name}</span>
+                                <span className={`${isNightMode ? '' : 'text-slate-800'} ${isExcluded ? 'line-through opacity-50' : ''}`}>{c.name}</span>
                                 {normalizedRole === 'cook' && <Icon name="ChefHat" className="w-4 h-4 text-emerald-500" />}
                                 {normalizedRole === 'captain' && !captainParticipates && <Icon name="Shield" className="w-4 h-4 text-amber-500" />}
                               </div>
