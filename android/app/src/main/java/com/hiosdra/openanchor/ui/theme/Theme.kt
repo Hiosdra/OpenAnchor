@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -11,6 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+
+enum class ThemeMode {
+    DARK, LIGHT, NIGHT_VISION
+}
 
 private val DarkColorScheme = darkColorScheme(
     primary = OceanBlue,
@@ -34,6 +39,28 @@ private val DarkColorScheme = darkColorScheme(
     outline = TextGrey
 )
 
+private val LightColorScheme = lightColorScheme(
+    primary = LightPrimary,
+    onPrimary = Color.White,
+    primaryContainer = LightPrimary.copy(alpha = 0.12f),
+    onPrimaryContainer = LightPrimary,
+    secondary = LightSecondary,
+    onSecondary = Color.White,
+    tertiary = LightTertiary,
+    onTertiary = Color.White,
+    background = LightBackground,
+    onBackground = LightOnBackground,
+    surface = LightSurface,
+    onSurface = LightOnSurface,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = Color(0xFF64748B),
+    error = LightError,
+    onError = Color.White,
+    errorContainer = LightError.copy(alpha = 0.12f),
+    onErrorContainer = LightError,
+    outline = Color(0xFF94A3B8)
+)
+
 /**
  * CompositionLocal to indicate if the red night filter is active.
  * Child composables can read this to adapt if needed.
@@ -42,12 +69,18 @@ val LocalNightFilterEnabled = compositionLocalOf { false }
 
 @Composable
 fun OpenAnchorTheme(
-    nightFilterEnabled: Boolean = false,
+    themeMode: ThemeMode = ThemeMode.DARK,
     content: @Composable () -> Unit
 ) {
+    val nightFilterEnabled = themeMode == ThemeMode.NIGHT_VISION
+    val colorScheme = when (themeMode) {
+        ThemeMode.LIGHT -> LightColorScheme
+        ThemeMode.DARK, ThemeMode.NIGHT_VISION -> DarkColorScheme
+    }
+
     CompositionLocalProvider(LocalNightFilterEnabled provides nightFilterEnabled) {
         MaterialTheme(
-            colorScheme = DarkColorScheme,
+            colorScheme = colorScheme,
             typography = Typography
         ) {
             if (nightFilterEnabled) {

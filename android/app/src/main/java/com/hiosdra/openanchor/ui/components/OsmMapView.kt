@@ -81,6 +81,7 @@ data class MapPolylineData(
  * @param markers List of markers to display
  * @param circles List of circles to draw
  * @param polylines List of polylines to draw
+ * @param mapContentDescription Accessibility description for the map view
  * @param onMapReady Callback when the MapView is ready; use for one-time setup
  */
 @Composable
@@ -91,6 +92,7 @@ fun OsmMapView(
     markers: List<MapMarker> = emptyList(),
     circles: List<MapCircle> = emptyList(),
     polylines: List<MapPolylineData> = emptyList(),
+    mapContentDescription: String? = null,
     onMapReady: ((MapView) -> Unit)? = null
 ) {
     val context = LocalContext.current
@@ -110,6 +112,7 @@ fun OsmMapView(
             MapView(ctx).apply {
                 setTileSource(TileSourceFactory.MAPNIK)
                 setMultiTouchControls(true)
+                mapContentDescription?.let { this.contentDescription = it }
                 controller.setZoom(zoomLevel)
                 centerOn?.let { controller.setCenter(it) }
                 // Dark overlay for maritime feel - invert tiles via hardware layer
