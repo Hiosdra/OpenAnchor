@@ -1,11 +1,14 @@
 package com.hiosdra.openanchor.ui.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -28,6 +31,24 @@ import com.hiosdra.openanchor.ui.setup.SetupScreen
 import com.hiosdra.openanchor.ui.statistics.StatisticsScreen
 import com.hiosdra.openanchor.ui.weather.WeatherScreen
 
+private const val STANDARD_DURATION = 300
+private const val SHEET_DURATION = 350
+private const val MONITOR_DURATION = 400
+private val NAV_EASING = FastOutSlowInEasing
+private const val HORIZONTAL_OFFSET_DIVISOR = 4
+private const val VERTICAL_OFFSET_DIVISOR = 3
+
+private val sheetScreenRoutes = setOf(Screen.Setup.route, Screen.Monitor.route)
+
+private fun NavBackStackEntry.isSheetScreen(): Boolean =
+    destination.route in sheetScreenRoutes
+
+private fun standardFade(duration: Int = STANDARD_DURATION): EnterTransition =
+    fadeIn(tween(duration))
+
+private fun standardFadeOut(duration: Int = STANDARD_DURATION): ExitTransition =
+    fadeOut(tween(duration))
+
 @Composable
 fun OpenAnchorNavHost(
     navController: NavHostController,
@@ -37,44 +58,44 @@ fun OpenAnchorNavHost(
         navController = navController,
         startDestination = startDestination,
         enterTransition = {
-            fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) +
+            fadeIn(tween(STANDARD_DURATION, easing = NAV_EASING)) +
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(300, easing = FastOutSlowInEasing),
-                    initialOffset = { it / 4 }
+                    animationSpec = tween(STANDARD_DURATION, easing = NAV_EASING),
+                    initialOffset = { it / HORIZONTAL_OFFSET_DIVISOR }
                 )
         },
         exitTransition = {
-            fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing)) +
+            fadeOut(tween(STANDARD_DURATION, easing = NAV_EASING)) +
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(300, easing = FastOutSlowInEasing),
-                    targetOffset = { it / 4 }
+                    animationSpec = tween(STANDARD_DURATION, easing = NAV_EASING),
+                    targetOffset = { it / HORIZONTAL_OFFSET_DIVISOR }
                 )
         },
         popEnterTransition = {
-            fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) +
+            fadeIn(tween(STANDARD_DURATION, easing = NAV_EASING)) +
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(300, easing = FastOutSlowInEasing),
-                    initialOffset = { it / 4 }
+                    animationSpec = tween(STANDARD_DURATION, easing = NAV_EASING),
+                    initialOffset = { it / HORIZONTAL_OFFSET_DIVISOR }
                 )
         },
         popExitTransition = {
-            fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing)) +
+            fadeOut(tween(STANDARD_DURATION, easing = NAV_EASING)) +
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(300, easing = FastOutSlowInEasing),
-                    targetOffset = { it / 4 }
+                    animationSpec = tween(STANDARD_DURATION, easing = NAV_EASING),
+                    targetOffset = { it / HORIZONTAL_OFFSET_DIVISOR }
                 )
         }
     ) {
         composable(
             route = Screen.Home.route,
-            enterTransition = { fadeIn(tween(300)) },
-            exitTransition = { fadeOut(tween(200)) },
-            popEnterTransition = { fadeIn(tween(300)) },
-            popExitTransition = { fadeOut(tween(200)) }
+            enterTransition = { standardFade() },
+            exitTransition = { standardFadeOut() },
+            popEnterTransition = { standardFade() },
+            popExitTransition = { standardFadeOut() }
         ) {
             HomeScreen(
                 onStartSetup = { navController.navigate(Screen.Setup.route) },
@@ -103,17 +124,19 @@ fun OpenAnchorNavHost(
         composable(
             route = Screen.Setup.route,
             enterTransition = {
-                fadeIn(tween(350)) + slideIntoContainer(
+                fadeIn(tween(SHEET_DURATION)) + slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(350, easing = FastOutSlowInEasing),
-                    initialOffset = { it / 3 }
+                    animationSpec = tween(SHEET_DURATION, easing = NAV_EASING),
+                    initialOffset = { it / VERTICAL_OFFSET_DIVISOR }
                 )
             },
+            exitTransition = { standardFadeOut(SHEET_DURATION) },
+            popEnterTransition = { standardFade(SHEET_DURATION) },
             popExitTransition = {
-                fadeOut(tween(250)) + slideOutOfContainer(
+                fadeOut(tween(SHEET_DURATION)) + slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(350, easing = FastOutSlowInEasing),
-                    targetOffset = { it / 3 }
+                    animationSpec = tween(SHEET_DURATION, easing = NAV_EASING),
+                    targetOffset = { it / VERTICAL_OFFSET_DIVISOR }
                 )
             }
         ) {
@@ -131,32 +154,64 @@ fun OpenAnchorNavHost(
             route = Screen.Monitor.route,
             arguments = listOf(navArgument("sessionId") { type = NavType.LongType }),
             enterTransition = {
-                fadeIn(tween(400)) + slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(400, easing = FastOutSlowInEasing),
-                    initialOffset = { it / 3 }
-                )
+                if (initialState.isSheetScreen()) {
+                    fadeIn(tween(MONITOR_DURATION)) + slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(MONITOR_DURATION, easing = NAV_EASING),
+                        initialOffset = { it / VERTICAL_OFFSET_DIVISOR }
+                    )
+                } else {
+                    fadeIn(tween(STANDARD_DURATION, easing = NAV_EASING)) + slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                        animationSpec = tween(STANDARD_DURATION, easing = NAV_EASING),
+                        initialOffset = { it / HORIZONTAL_OFFSET_DIVISOR }
+                    )
+                }
             },
             exitTransition = {
-                fadeOut(tween(300)) + slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(400, easing = FastOutSlowInEasing),
-                    targetOffset = { it / 3 }
-                )
+                if (targetState.isSheetScreen()) {
+                    fadeOut(tween(MONITOR_DURATION)) + slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(MONITOR_DURATION, easing = NAV_EASING),
+                        targetOffset = { it / VERTICAL_OFFSET_DIVISOR }
+                    )
+                } else {
+                    fadeOut(tween(STANDARD_DURATION, easing = NAV_EASING)) + slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                        animationSpec = tween(STANDARD_DURATION, easing = NAV_EASING),
+                        targetOffset = { it / HORIZONTAL_OFFSET_DIVISOR }
+                    )
+                }
             },
             popEnterTransition = {
-                fadeIn(tween(400)) + slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(400, easing = FastOutSlowInEasing),
-                    initialOffset = { it / 3 }
-                )
+                if (initialState.isSheetScreen()) {
+                    fadeIn(tween(MONITOR_DURATION)) + slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(MONITOR_DURATION, easing = NAV_EASING),
+                        initialOffset = { it / VERTICAL_OFFSET_DIVISOR }
+                    )
+                } else {
+                    fadeIn(tween(STANDARD_DURATION, easing = NAV_EASING)) + slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.End,
+                        animationSpec = tween(STANDARD_DURATION, easing = NAV_EASING),
+                        initialOffset = { it / HORIZONTAL_OFFSET_DIVISOR }
+                    )
+                }
             },
             popExitTransition = {
-                fadeOut(tween(300)) + slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(400, easing = FastOutSlowInEasing),
-                    targetOffset = { it / 3 }
-                )
+                if (targetState.isSheetScreen()) {
+                    fadeOut(tween(MONITOR_DURATION)) + slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(MONITOR_DURATION, easing = NAV_EASING),
+                        targetOffset = { it / VERTICAL_OFFSET_DIVISOR }
+                    )
+                } else {
+                    fadeOut(tween(STANDARD_DURATION, easing = NAV_EASING)) + slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.End,
+                        animationSpec = tween(STANDARD_DURATION, easing = NAV_EASING),
+                        targetOffset = { it / HORIZONTAL_OFFSET_DIVISOR }
+                    )
+                }
             }
         ) { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: return@composable
