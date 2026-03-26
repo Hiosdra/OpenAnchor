@@ -1,4 +1,4 @@
-const CACHE_NAME = 'openanchor-superapp-v7';
+const CACHE_NAME = 'openanchor-superapp-v8';
 const urlsToCache = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const urlsToCache = [
   './modules/egzamin/',
   './modules/egzamin/index.html',
   './modules/egzamin/exam_questions.json',
+  './js/exam-pdf-storage.js',
   './modules/zeglowanie/',
   './modules/zeglowanie/index.html',
   './manifest.json',
@@ -26,8 +27,8 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
-  // Don't force skip waiting - let the page control when to update
 });
+
 
 // Listen for messages from the page
 self.addEventListener('message', event => {
@@ -49,7 +50,8 @@ self.addEventListener('fetch', event => {
   // Skip CDN resources - let browser cache handle them
   if (url.hostname.includes('cdn.tailwindcss.com') ||
       url.hostname.includes('cdn.jsdelivr.net') ||
-      url.hostname.includes('unpkg.com')) {
+      url.hostname.includes('unpkg.com') ||
+      url.hostname.includes('cdnjs.cloudflare.com')) {
     return;
   }
 
@@ -124,6 +126,13 @@ self.addEventListener('activate', event => {
     }).then(() => {
       // Claim clients to ensure the new service worker takes control immediately
       return self.clients.claim();
+    }).then(() => {
+      // Notify all clients to reload for the new version
+      return self.clients.matchAll({ type: 'window' }).then(clients => {
+        clients.forEach(client => {
+          client.postMessage({ type: 'SW_UPDATED', cacheName: CACHE_NAME });
+        });
+      });
     })
   );
 });
@@ -169,3 +178,4 @@ async function checkAnchorPosition() {
     throw error;
   }
 }
+

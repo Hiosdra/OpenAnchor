@@ -95,12 +95,33 @@ export function saveLeitnerState(state) {
 }
 
 /**
- * Reset all exam data
+ * Reset all exam data (internal - no confirmation)
  */
-export function resetExamData() {
+function _resetExamDataInternal() {
   localStorage.removeItem(EXAM_PROGRESS_KEY);
   localStorage.removeItem(LEARN_POSITION_KEY);
   localStorage.removeItem(LEITNER_STATE_KEY);
+}
+
+/**
+ * Reset all exam data with confirmation.
+ * @param {string} [message='Na pewno chcesz zresetować dane egzaminu?'] - Confirmation message
+ * @returns {boolean} true if reset was performed
+ */
+export function resetExamData(message) {
+  const confirmMsg = message || 'Na pewno chcesz zresetować dane egzaminu?';
+  if (typeof window !== 'undefined' && typeof window.confirm === 'function' && !window.confirm(confirmMsg)) {
+    return false;
+  }
+  _resetExamDataInternal();
+  return true;
+}
+
+/**
+ * Reset all exam data without confirmation (for programmatic use).
+ */
+export function forceResetExamData() {
+  _resetExamDataInternal();
 }
 
 /**
