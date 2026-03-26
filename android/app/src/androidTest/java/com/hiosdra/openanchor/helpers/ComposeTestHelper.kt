@@ -3,6 +3,7 @@ package com.hiosdra.openanchor.helpers
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
@@ -59,23 +60,34 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 }
 
 /**
- * Polls a condition without blocking on compose idle.
- * Uses Thread.sleep for real-time polling on emulator instrumented tests,
- * avoiding the infinite-animation idle deadlock from OceanBackground.
+ * Polls a condition with Thread.sleep, temporarily unregistering the Compose
+ * IdlingResource from Espresso so that fetchSemanticsNodes() → getRoots() →
+ * waitForIdle() → Espresso.onIdle() returns immediately instead of blocking
+ * on infinite animations (e.g. OceanBackground's rememberInfiniteTransition).
  */
 private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForCondition(
     timeoutMs: Long,
     condition: () -> Boolean
 ) {
-    val startNanos = System.nanoTime()
-    val timeoutNanos = timeoutMs * 1_000_000L
-    while (true) {
-        if (condition()) return
-        if (System.nanoTime() - startNanos > timeoutNanos) {
-            throw ComposeTimeoutException(
-                "Condition still not satisfied after $timeoutMs ms"
-            )
+    val registry = IdlingRegistry.getInstance()
+    val composeIdling = registry.resources.filter {
+        it.name.contains("Compose", ignoreCase = true)
+    }
+    composeIdling.forEach { registry.unregister(it) }
+
+    try {
+        val startNanos = System.nanoTime()
+        val timeoutNanos = timeoutMs * 1_000_000L
+        while (true) {
+            if (condition()) return
+            if (System.nanoTime() - startNanos > timeoutNanos) {
+                throw ComposeTimeoutException(
+                    "Condition still not satisfied after $timeoutMs ms"
+                )
+            }
+            Thread.sleep(100)
         }
-        Thread.sleep(100)
+    } finally {
+        composeIdling.forEach { registry.register(it) }
     }
 }
