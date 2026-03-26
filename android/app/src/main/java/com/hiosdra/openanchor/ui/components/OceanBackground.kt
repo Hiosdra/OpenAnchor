@@ -1,5 +1,6 @@
 package com.hiosdra.openanchor.ui.components
 
+import android.provider.Settings
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -10,11 +11,13 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalContext
 import kotlin.math.min
 
 // Wave colors matching PWA theme.css
@@ -35,6 +38,21 @@ fun OceanBackground(
     enabled: Boolean = true
 ) {
     if (!enabled) return
+
+    // Respect system animator duration scale (0 = animations disabled).
+    // This ensures Compose test idle detection works on CI emulators.
+    val context = LocalContext.current
+    val animatorsEnabled = remember {
+        try {
+            Settings.Global.getFloat(
+                context.contentResolver,
+                Settings.Global.ANIMATOR_DURATION_SCALE
+            ) > 0f
+        } catch (_: Settings.SettingNotFoundException) {
+            true
+        }
+    }
+    if (!animatorsEnabled) return
 
     val infiniteTransition = rememberInfiniteTransition(label = "ocean_waves")
 
