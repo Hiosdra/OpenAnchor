@@ -3,13 +3,18 @@ package com.hiosdra.openanchor.wear.data
 /**
  * Constants for Wearable Data Layer paths shared between phone and watch.
  *
- * ⚠️ DUPLICATION WARNING: These values are duplicated in the phone module at:
- *   android/app/src/main/java/com/hiosdra/openanchor/service/WearDataSender.kt
- * Any changes here MUST be mirrored there (and vice versa).
+ * ⚠️ CROSS-MODULE DUPLICATION WARNING ⚠️
+ * These constants are intentionally duplicated between two files:
+ *   - WATCH: android/wear/src/main/java/com/hiosdra/openanchor/wear/data/DataPaths.kt (this file)
+ *   - PHONE: android/app/src/main/java/com/hiosdra/openanchor/service/WearDataSender.kt
  *
- * TODO: Move these constants to a shared/common Gradle module to eliminate
- *   duplication risk. Both :app and :wear modules would depend on :shared.
+ * Both files MUST define identical paths and keys. If you change a value here,
+ * you MUST update the phone-side file as well (and vice versa).
+ *
+ * A shared Gradle module (:shared) would eliminate this duplication, but is not
+ * currently justified given the small surface area and stability of these constants.
  */
+@Suppress("KDocUnresolvedReference") // Phone-side reference is in a separate module
 object DataPaths {
     // DataItem path for monitor state sync
     const val MONITOR_STATE_PATH = "/openanchor/monitor_state"

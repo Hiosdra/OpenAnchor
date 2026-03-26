@@ -20,18 +20,19 @@ import com.hiosdra.openanchor.wear.data.WearDataRepository
  * - DataItems (MONITOR_STATE_PATH): continuous monitor state sync
  * - Messages (ALARM_TRIGGER_PATH): immediate alarm vibration trigger
  *
- * TODO: Multi-watch support — When multiple watches are paired, each watch
- *   receives all DataItems. To support role-based filtering (e.g. primary vs
- *   secondary watch), filter by source node ID in onDataChanged:
- *   1. Use NodeClient.getConnectedNodes() to discover phone node IDs
- *   2. Store a preferred phone node ID in local preferences
- *   3. In onDataChanged, check event.dataItem.uri.host against the preferred node
- *   4. Consider assigning roles (primary display, alarm-only, etc.) per watch
+ * Multi-watch architecture: When multiple watches are paired, each receives all
+ * DataItems. Source node filtering is applied here — only events from a known
+ * phone node are processed. A full role-based model (primary display vs alarm-only)
+ * would require a preferences UI and NodeClient discovery, deferred for now.
  */
 class AnchorDataListenerService : WearableListenerService() {
 
     companion object {
         private const val TAG = "AnchorDataListener"
+
+        /** Node ID of the last phone that sent us data. */
+        @Volatile
+        private var connectedPhoneNodeId: String? = null
     }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -40,16 +41,28 @@ class AnchorDataListenerService : WearableListenerService() {
         try {
             for (event in dataEvents) {
                 val uri = event.dataItem.uri
+                val sourceNodeId = uri.host
+
                 if (uri.path == DataPaths.MONITOR_STATE_PATH) {
+                    // Accept data from the first phone we see, then filter to that node
+                    if (connectedPhoneNodeId == null) {
+                        connectedPhoneNodeId = sourceNodeId
+                        Log.d(TAG, "Locked to phone node: $sourceNodeId")
+                    } else if (sourceNodeId != connectedPhoneNodeId) {
+                        Log.d(TAG, "Ignoring data from unknown node: $sourceNodeId")
+                        continue
+                    }
+
                     val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
                     val state = WearDataParser.parse(dataMap)
 
                     if (state != null) {
                         WearDataRepository.onStateReceived(state)
                         WearHapticFeedback.onAlarmStateChanged(this, state.alarmState)
+                        WearComplicationService.requestComplicationUpdate(this)
                         Log.d(TAG, "State updated: ${state.alarmState}, dist=${state.distanceMeters}m")
                     } else {
-                        Log.w(TAG, "Failed to parse DataItem from ${uri.host}")
+                        Log.w(TAG, "Failed to parse DataItem from $sourceNodeId")
                     }
                 }
             }
