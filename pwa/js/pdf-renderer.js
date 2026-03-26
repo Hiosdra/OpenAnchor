@@ -12,7 +12,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 var PdfRenderer = {
     _pdfDoc: null,
     _cache: new Map(),
-    _MAX_CACHE: 8,
+    _MAX_CACHE: 32,
+    _blobUrls: [],
 
     async loadFromBlob(blob) {
         var arrayBuffer = await blob.arrayBuffer();
@@ -64,7 +65,13 @@ var PdfRenderer = {
         var ctx = cropCanvas.getContext('2d');
         ctx.drawImage(fullPage, 0, yStart, fullPage.width, cropHeight, 0, 0, fullPage.width, cropHeight);
 
-        return cropCanvas.toDataURL('image/png');
+        return new Promise((resolve) => {
+            cropCanvas.toBlob((blob) => {
+                var url = URL.createObjectURL(blob);
+                this._blobUrls.push(url);
+                resolve(url);
+            }, 'image/png');
+        });
     },
 
     isLoaded() {
@@ -72,6 +79,8 @@ var PdfRenderer = {
     },
 
     unload() {
+        this._blobUrls.forEach(url => URL.revokeObjectURL(url));
+        this._blobUrls = [];
         if (this._pdfDoc) {
             this._pdfDoc.destroy();
             this._pdfDoc = null;
