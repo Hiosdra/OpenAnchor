@@ -6,6 +6,7 @@ import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.data.preferences.UserPreferences
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
+import com.hiosdra.openanchor.ui.theme.ThemeMode
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -42,7 +43,7 @@ class SettingsViewModelTest {
             coEvery { setDepthUnit(any()) } returns Unit
             coEvery { setLanguage(any()) } returns Unit
             coEvery { setGpsInterval(any()) } returns Unit
-            coEvery { setNightFilterEnabled(any()) } returns Unit
+            coEvery { setThemeMode(any()) } returns Unit
         }
     }
 
@@ -67,7 +68,7 @@ class SettingsViewModelTest {
             assertEquals(DepthUnit.METERS, prefs.depthUnit)
             assertEquals("en", prefs.language)
             assertEquals(3, prefs.gpsIntervalSeconds)
-            assertEquals(false, prefs.nightFilterEnabled)
+            assertEquals(ThemeMode.DARK, prefs.themeMode)
             cancel()
         }
     }
@@ -86,7 +87,7 @@ class SettingsViewModelTest {
                 depthUnit = DepthUnit.FEET,
                 language = "pl",
                 gpsIntervalSeconds = 10,
-                nightFilterEnabled = true
+                themeMode = ThemeMode.NIGHT_VISION
             )
 
             val updated = awaitItem()
@@ -94,7 +95,7 @@ class SettingsViewModelTest {
             assertEquals(DepthUnit.FEET, updated.depthUnit)
             assertEquals("pl", updated.language)
             assertEquals(10, updated.gpsIntervalSeconds)
-            assertEquals(true, updated.nightFilterEnabled)
+            assertEquals(ThemeMode.NIGHT_VISION, updated.themeMode)
             cancel()
         }
     }
@@ -148,15 +149,15 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `setNightFilterEnabled calls preferencesManager`() = runTest {
+    fun `setThemeMode calls preferencesManager`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel = createViewModel()
         advanceUntilIdle()
 
-        viewModel.setNightFilterEnabled(true)
+        viewModel.setThemeMode(ThemeMode.NIGHT_VISION)
         advanceUntilIdle()
 
-        coVerify { preferencesManager.setNightFilterEnabled(true) }
+        coVerify { preferencesManager.setThemeMode(ThemeMode.NIGHT_VISION) }
     }
 
     @Test
@@ -169,14 +170,14 @@ class SettingsViewModelTest {
         viewModel.setDepthUnit(DepthUnit.FEET)
         viewModel.setLanguage("pl")
         viewModel.setGpsInterval(10)
-        viewModel.setNightFilterEnabled(true)
+        viewModel.setThemeMode(ThemeMode.NIGHT_VISION)
         advanceUntilIdle()
 
         coVerify { preferencesManager.setDistanceUnit(DistanceUnit.FEET) }
         coVerify { preferencesManager.setDepthUnit(DepthUnit.FEET) }
         coVerify { preferencesManager.setLanguage("pl") }
         coVerify { preferencesManager.setGpsInterval(10) }
-        coVerify { preferencesManager.setNightFilterEnabled(true) }
+        coVerify { preferencesManager.setThemeMode(ThemeMode.NIGHT_VISION) }
     }
 
     @Test

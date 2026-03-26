@@ -28,7 +28,7 @@ class ThemeTest {
     @Test
     fun `theme renders content without night filter`() {
         composeRule.setContent {
-            OpenAnchorTheme(nightFilterEnabled = false) {
+            OpenAnchorTheme(themeMode = ThemeMode.DARK) {
                 Text("Hello")
             }
         }
@@ -38,7 +38,7 @@ class ThemeTest {
     @Test
     fun `theme renders content with night filter enabled`() {
         composeRule.setContent {
-            OpenAnchorTheme(nightFilterEnabled = true) {
+            OpenAnchorTheme(themeMode = ThemeMode.NIGHT_VISION) {
                 Text("Night mode")
             }
         }
@@ -86,7 +86,7 @@ class ThemeTest {
         var nightFilter: Boolean? = null
 
         composeRule.setContent {
-            OpenAnchorTheme(nightFilterEnabled = false) {
+            OpenAnchorTheme(themeMode = ThemeMode.DARK) {
                 nightFilter = LocalNightFilterEnabled.current
                 Text("Default")
             }
@@ -101,7 +101,7 @@ class ThemeTest {
         var nightFilter: Boolean? = null
 
         composeRule.setContent {
-            OpenAnchorTheme(nightFilterEnabled = true) {
+            OpenAnchorTheme(themeMode = ThemeMode.NIGHT_VISION) {
                 nightFilter = LocalNightFilterEnabled.current
                 Text("Night")
             }
@@ -114,7 +114,7 @@ class ThemeTest {
     @Test
     fun `theme with night filter wraps content in Box with overlay`() {
         composeRule.setContent {
-            OpenAnchorTheme(nightFilterEnabled = true) {
+            OpenAnchorTheme(themeMode = ThemeMode.NIGHT_VISION) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Text("Wrapped content")
                 }
