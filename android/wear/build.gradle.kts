@@ -57,6 +57,16 @@ dependencies {
     implementation(libs.wear.compose.foundation)
     implementation(libs.wear.compose.material)
 
+    // Compose Material (LinearProgressIndicator)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation("androidx.compose.material:material")
+
+    // Ambient mode (Horologist)
+    implementation(libs.horologist.compose.ambient)
+
+    // Watch face complications
+    implementation(libs.wear.watchface.complications.data)
+
     // Splash screen (required for Wear OS)
     implementation(libs.core.splashscreen)
 
