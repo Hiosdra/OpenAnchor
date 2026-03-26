@@ -157,7 +157,7 @@ class PairedDashboardScreenTest {
         }
 
         composeRule.onNodeWithText("WARNING").assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -176,7 +176,7 @@ class PairedDashboardScreenTest {
         }
 
         composeRule.onNodeWithText("ALARM").assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -213,7 +213,7 @@ class PairedDashboardScreenTest {
             PairedDashboardScreen(onDisconnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performClick()
+        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performScrollTo().performClick()
         verify { vm.dismissAlarm() }
     }
 
@@ -254,8 +254,8 @@ class PairedDashboardScreenTest {
             PairedDashboardScreen(onDisconnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText("2.3 kn").assertIsDisplayed()
-        composeRule.onNodeWithText("180°").assertIsDisplayed()
+        composeRule.onNodeWithText("2.3 kn").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("180°").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -409,7 +409,7 @@ class PairedDashboardScreenTest {
         composeRule.waitForIdle()
 
         composeRule.onNodeWithText("ALARM").assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performScrollTo().assertIsDisplayed()
     }
 
     // ── Disconnect icon click ───────────────────────────────────────────
@@ -508,7 +508,7 @@ class PairedDashboardScreenTest {
             PairedDashboardScreen(onDisconnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText("3.5 kn").assertIsDisplayed()
+        composeRule.onNodeWithText("3.5 kn").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("COG").assertDoesNotExist()
     }
 
@@ -527,7 +527,7 @@ class PairedDashboardScreenTest {
             PairedDashboardScreen(onDisconnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText("270°").assertIsDisplayed()
+        composeRule.onNodeWithText("270°").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("SOG").assertDoesNotExist()
     }
 
@@ -550,7 +550,7 @@ class PairedDashboardScreenTest {
             PairedDashboardScreen(onDisconnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performScrollTo().assertIsDisplayed()
 
         state.value = state.value.copy(alarmState = AlarmState.SAFE, distanceToAnchor = 10.0)
         composeRule.waitForIdle()
@@ -583,13 +583,13 @@ class PairedDashboardScreenTest {
         composeRule.waitForIdle()
 
         composeRule.onNodeWithText("WARNING").assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performScrollTo().assertIsDisplayed()
 
         state.value = state.value.copy(alarmState = AlarmState.ALARM, distanceToAnchor = 60.0)
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithText("ALARM").assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).assertIsDisplayed()
+        composeRule.onNodeWithText("ALARM").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performScrollTo().assertIsDisplayed()
     }
 
     // ── WARNING dismiss click ───────────────────────────────────────────
@@ -609,7 +609,7 @@ class PairedDashboardScreenTest {
             PairedDashboardScreen(onDisconnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performClick()
+        composeRule.onNodeWithText(string(R.string.dismiss_alarm)).performScrollTo().performClick()
         verify { vm.dismissAlarm() }
     }
 
