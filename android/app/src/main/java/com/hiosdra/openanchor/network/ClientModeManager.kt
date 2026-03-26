@@ -76,6 +76,7 @@ class ClientModeManager @Inject constructor(
         data object HeartbeatTimeout : ClientModeEvent()
         data class ServerCommand(val command: String) : ClientModeEvent()
         data class ServerGpsReport(val payload: AndroidGpsReportPayload) : ClientModeEvent()
+        data class AlarmSendFailed(val reason: String, val message: String, val alarmState: AlarmState) : ClientModeEvent()
     }
 
     /**
@@ -250,17 +251,18 @@ class ClientModeManager @Inject constructor(
             cog = cog
         )
 
-        if (wsClient.isConnected) {
-            wsClient.sendStateUpdate(StateUpdatePayload(
-                currentPos = LatLng(position.latitude, position.longitude),
-                gpsAccuracy = position.accuracy,
-                distanceToAnchor = distanceToAnchor,
-                alarmState = alarmState.name,
-                sog = sog,
-                cog = cog,
-                batteryLevel = batteryLevel,
-                isCharging = isCharging
-            ))
+        val sent = wsClient.sendStateUpdate(StateUpdatePayload(
+            currentPos = LatLng(position.latitude, position.longitude),
+            gpsAccuracy = position.accuracy,
+            distanceToAnchor = distanceToAnchor,
+            alarmState = alarmState.name,
+            sog = sog,
+            cog = cog,
+            batteryLevel = batteryLevel,
+            isCharging = isCharging
+        ))
+        if (!sent) {
+            Log.w(TAG, "STATE_UPDATE send failed — connection lost")
         }
     }
 
@@ -268,12 +270,14 @@ class ClientModeManager @Inject constructor(
      * Send TRIGGER_ALARM to the server.
      */
     fun triggerAlarm(reason: String, message: String, alarmState: AlarmState) {
-        if (wsClient.isConnected) {
-            wsClient.sendTriggerAlarm(TriggerAlarmPayload(
-                reason = reason,
-                message = message,
-                alarmState = alarmState.name
-            ))
+        val sent = wsClient.sendTriggerAlarm(TriggerAlarmPayload(
+            reason = reason,
+            message = message,
+            alarmState = alarmState.name
+        ))
+        if (!sent) {
+            Log.w(TAG, "TRIGGER_ALARM send failed — connection lost, emitting local fallback")
+            _events.tryEmit(ClientModeEvent.AlarmSendFailed(reason, message, alarmState))
         }
     }
 

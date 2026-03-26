@@ -69,7 +69,7 @@ self.addEventListener('fetch', event => {
         if (!isStaticAsset) {
           // Optionally update the cache in the background for HTML/JS/CSS
           fetch(event.request).then(networkResponse => {
-            if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
+            if (!networkResponse || networkResponse.status !== 200) {
               return;
             }
             const responseToCache = networkResponse.clone();
@@ -87,7 +87,7 @@ self.addEventListener('fetch', event => {
 
       // Not in cache – fetch from network and cache the response
       return fetch(event.request).then(networkResponse => {
-        if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
+        if (!networkResponse || networkResponse.status !== 200) {
           return networkResponse;
         }
 

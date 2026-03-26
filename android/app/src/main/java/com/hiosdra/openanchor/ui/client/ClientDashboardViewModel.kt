@@ -74,16 +74,18 @@ class ClientDashboardViewModel @Inject constructor(
 
         // Observe service monitor state for battery
         viewModelScope.launch {
-            serviceBinder.serviceInstance.collect { service ->
-                service?.monitorState?.collect { monitorState ->
-                    _uiState.update { ui ->
-                        ui.copy(
-                            localBatteryLevel = monitorState.localBatteryLevel,
-                            localBatteryCharging = monitorState.localBatteryCharging
-                        )
+            serviceBinder.serviceInstance
+                .filterNotNull()
+                .collectLatest { service ->
+                    service.monitorState.collect { monitorState ->
+                        _uiState.update { ui ->
+                            ui.copy(
+                                localBatteryLevel = monitorState.localBatteryLevel,
+                                localBatteryCharging = monitorState.localBatteryCharging
+                            )
+                        }
                     }
                 }
-            }
         }
 
         // Observe client mode events for server info
