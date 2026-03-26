@@ -24,7 +24,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     text: String,
     timeoutMs: Long = 5000
 ): SemanticsNodeInteraction {
-    waitUntil(timeoutMs) {
+    waitForCondition(timeoutMs) {
         onAllNodesWithText(text, substring = true, ignoreCase = true)
             .fetchSemanticsNodes()
             .isNotEmpty()
@@ -36,7 +36,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     tag: String,
     timeoutMs: Long = 5000
 ): SemanticsNodeInteraction {
-    waitUntil(timeoutMs) {
+    waitForCondition(timeoutMs) {
         onAllNodesWithTag(tag)
             .fetchSemanticsNodes()
             .isNotEmpty()
@@ -56,4 +56,33 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
         // Node may not be in a scrollable container (e.g. wizard steps)
     }
     return this
+}
+
+/**
+ * Polls a condition with manual clock advancement.
+ * Unlike [waitUntil], this does not call waitForIdle() with auto-advance,
+ * which would block indefinitely when infinite animations (e.g. OceanBackground) are present.
+ */
+private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForCondition(
+    timeoutMs: Long,
+    condition: () -> Boolean
+) {
+    val startNanos = System.nanoTime()
+    val timeoutNanos = timeoutMs * 1_000_000L
+    val savedAutoAdvance = mainClock.autoAdvance
+    mainClock.autoAdvance = false
+    try {
+        while (true) {
+            mainClock.advanceTimeBy(32)
+            waitForIdle()
+            if (condition()) return
+            if (System.nanoTime() - startNanos > timeoutNanos) {
+                throw ComposeTimeoutException(
+                    "Condition still not satisfied after $timeoutMs ms"
+                )
+            }
+        }
+    } finally {
+        mainClock.autoAdvance = savedAutoAdvance
+    }
 }
