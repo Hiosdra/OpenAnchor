@@ -66,6 +66,7 @@ dependencies {
 
     // Watch face complications
     implementation(libs.wear.watchface.complications.data)
+    implementation(libs.wear.watchface.complications.data.ktx)
 
     // Splash screen (required for Wear OS)
     implementation(libs.core.splashscreen)

@@ -90,6 +90,7 @@ wear-compose-foundation = { group = "androidx.wear.compose", name = "compose-fou
 wear-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "wearComposeMaterial" }
 wear-compose-ui-tooling = { group = "androidx.wear.compose", name = "compose-ui-tooling", version.ref = "wearCompose" }
 wear-watchface-complications-data = { group = "androidx.wear.watchface", name = "watchface-complications-data-source", version.ref = "wearWatchfaceComplications" }
+wear-watchface-complications-data-ktx = { group = "androidx.wear.watchface", name = "watchface-complications-data-source-ktx", version.ref = "wearWatchfaceComplications" }
 horologist-compose-layout = { group = "com.google.android.horologist", name = "horologist-compose-layout", version.ref = "horologistComposeLayout" }
 core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 

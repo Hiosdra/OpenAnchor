@@ -10,7 +10,7 @@ import com.google.android.horologist.compose.ambient.AmbientAware
 import com.google.android.horologist.compose.ambient.AmbientState
 
 /** CompositionLocal providing the current ambient state to child composables. */
-val LocalAmbientState = compositionLocalOf { AmbientState.Interactive }
+val LocalAmbientState = compositionLocalOf<AmbientState> { AmbientState.Interactive }
 
 class WearMainActivity : ComponentActivity() {
 

@@ -106,6 +106,8 @@ class UiScreenSmokeTest {
     fun historyScreen_rendersSessionList() {
         val populatedViewModel = mockk<HistoryViewModel>(relaxed = true)
         every { populatedViewModel.sessions } returns MutableStateFlow(listOf(sampleSession(alarmTriggered = true)))
+        every { populatedViewModel.searchQuery } returns MutableStateFlow("")
+        every { populatedViewModel.deleteError } returns MutableStateFlow(false)
 
         composeRule.setContentWithTheme {
             HistoryScreen(
@@ -123,6 +125,8 @@ class UiScreenSmokeTest {
     fun historyScreen_rendersEmptyState() {
         val emptyViewModel = mockk<HistoryViewModel>(relaxed = true)
         every { emptyViewModel.sessions } returns MutableStateFlow(emptyList())
+        every { emptyViewModel.searchQuery } returns MutableStateFlow("")
+        every { emptyViewModel.deleteError } returns MutableStateFlow(false)
 
         composeRule.setContentWithTheme {
             HistoryScreen(
