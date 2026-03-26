@@ -2629,17 +2629,8 @@
                 'ALARM': I18N.t.alarmAlarm
             };
 
-            const icons = {
-                'SAFE': '⚓',
-                'CAUTION': '🌊',
-                'WARNING': '⚠️',
-                'ALARM': '🚨'
-            };
-
             bar.classList.add(`alarm-bar-${this.state.alarmState.toLowerCase()}`);
-            const icon = icons[this.state.alarmState] || '';
-            const label = labels[this.state.alarmState] || this.state.alarmState;
-            text.textContent = `${icon} ${label}`;
+            text.textContent = labels[this.state.alarmState] || this.state.alarmState;
 
             // Distance info
             if (this.state.distance > 0) {
@@ -2651,8 +2642,9 @@
             // Announce alarm state changes to screen readers
             const srAnnounce = document.getElementById('sr-alarm-announce');
             if (srAnnounce) {
+                const label = labels[this.state.alarmState] || this.state.alarmState;
                 srAnnounce.textContent = '';
-                setTimeout(() => { srAnnounce.textContent = `${icon} ${label}`; }, 100);
+                setTimeout(() => { srAnnounce.textContent = label; }, 100);
             }
         }
 
