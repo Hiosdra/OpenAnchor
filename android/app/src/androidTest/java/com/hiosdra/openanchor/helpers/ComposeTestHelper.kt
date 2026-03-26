@@ -57,3 +57,28 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
     }
     return this
 }
+
+/**
+ * If the permission onboarding screen is visible, dismiss it by clicking "Skip for now".
+ * Call this after activity launch and before any test assertions on Home screen content.
+ */
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
+    try {
+        waitUntil(3000) {
+            onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty() ||
+            onAllNodesWithText("OpenAnchor", substring = true, ignoreCase = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+        val skipNodes = onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
+            .fetchSemanticsNodes()
+        if (skipNodes.isNotEmpty()) {
+            onNodeWithText("Skip for now", substring = true, ignoreCase = true).performClick()
+            waitForIdle()
+        }
+    } catch (_: ComposeTimeoutException) {
+        // Neither onboarding nor home appeared — proceed anyway
+    }
+}

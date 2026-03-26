@@ -32,6 +32,7 @@ class HistoryDetailScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToHistory()
     }
 

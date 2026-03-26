@@ -32,6 +32,7 @@ class SettingsScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToSettings()
     }
 

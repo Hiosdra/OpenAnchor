@@ -35,6 +35,7 @@ class QRCodeScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToQRCodeScreen()
     }
 

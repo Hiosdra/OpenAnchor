@@ -32,6 +32,7 @@ class AdvisorScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToAdvisor()
     }
 

@@ -32,6 +32,7 @@ class LogbookScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToLogbook()
     }
 

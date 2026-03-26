@@ -37,6 +37,7 @@ class WeatherScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
     }
 
     @Test

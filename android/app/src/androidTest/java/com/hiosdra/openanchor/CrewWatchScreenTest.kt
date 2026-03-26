@@ -32,6 +32,7 @@ class CrewWatchScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToCrewWatch()
     }
 

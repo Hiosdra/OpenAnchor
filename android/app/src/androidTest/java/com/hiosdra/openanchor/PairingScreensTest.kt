@@ -35,6 +35,7 @@ class PairingScreensTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
     }
 
     // ── Helpers ──────────────────────────────────────────────────────

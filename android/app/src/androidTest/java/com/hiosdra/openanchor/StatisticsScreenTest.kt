@@ -32,6 +32,7 @@ class StatisticsScreenTest {
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToStatistics()
     }
 

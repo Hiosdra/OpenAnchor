@@ -53,6 +53,7 @@ class ExamQuizScreenTest {
     fun setUp() {
         provisionDummyPdf()
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToExamQuiz()
     }
 
