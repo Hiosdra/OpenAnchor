@@ -16,8 +16,17 @@ async function clickAndNavigate(
 }
 
 test.describe('Module Navigation Flow', () => {
+  // Dismiss update/install banners that may overlay cards in full-suite runs
+  const dismissBanners = async (page: import('@playwright/test').Page) => {
+    await page.evaluate(() => {
+      document.getElementById('updateBanner')?.remove();
+      document.getElementById('installBanner')?.remove();
+    });
+  };
+
   test('dashboard → egzamin → dashboard', async ({ page }) => {
     await page.goto(MODULES.dashboard, { waitUntil: 'domcontentloaded' });
+    await dismissBanners(page);
     await expect(page).toHaveTitle(/OpenAnchor/);
 
     // Navigate to Egzamin
@@ -53,17 +62,14 @@ test.describe('Module Navigation Flow', () => {
     await expect(page).toHaveTitle(/OpenAnchor/);
   });
 
-  test('dashboard → wachtownik (beta) → dashboard', async ({
-    setLocalStorage,
-  }) => {
-    const page = await setLocalStorage(MODULES.dashboard, [
-      { key: STORAGE_KEYS.betaMode, value: 'true' },
-    ]);
+  test('dashboard → wachtownik → dashboard', async ({ page }) => {
+    await page.goto(MODULES.dashboard, { waitUntil: 'domcontentloaded' });
+    await dismissBanners(page);
 
-    await expect(page.locator('#wachtownikModule')).toBeVisible();
+    await expect(page.locator('.module-card.card-watch')).toBeVisible();
 
     // Navigate to Wachtownik
-    await clickAndNavigate(page, '#wachtownikModule', '**/modules/wachtownik/**');
+    await clickAndNavigate(page, '.module-card.card-watch', '**/modules/wachtownik/**');
     await expect(page).toHaveTitle(/Wachtownik/);
 
     // Navigate back
@@ -122,6 +128,24 @@ test.describe('Module Independence', () => {
 });
 
 test.describe('Egzamin State Persistence', () => {
+  // Stub PDF storage/renderer so egzamin module skips ImportPdfScreen
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/js/exam-pdf-storage.js', async route => {
+      const response = await route.fetch();
+      const body = await response.text();
+      await route.fulfill({
+        body: body + '\n; isPdfImported = async function() { return true; };',
+        contentType: 'application/javascript',
+      });
+    });
+    await page.route('**/js/pdf-renderer.js', async route => {
+      await route.fulfill({
+        body: 'var PdfRenderer = { async loadFromBlob() { return 1; }, isLoaded() { return true; }, async renderQuestion() { return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="; }, unload() {} };',
+        contentType: 'application/javascript',
+      });
+    });
+  });
+
   test('exam progress survives navigation to dashboard and back', async ({
     page,
   }) => {
@@ -134,6 +158,12 @@ test.describe('Egzamin State Persistence', () => {
 
     // Navigate to dashboard
     await clickAndNavigate(page, 'a.oa-back-btn', '**/index.html');
+
+    // Dismiss banners that may overlay cards
+    await page.evaluate(() => {
+      document.getElementById('updateBanner')?.remove();
+      document.getElementById('installBanner')?.remove();
+    });
 
     // Navigate back to egzamin
     await clickAndNavigate(page, '.module-card.card-exam', '**/modules/egzamin/**');
