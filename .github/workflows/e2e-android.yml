@@ -17,8 +17,12 @@ permissions:
 
 jobs:
   e2e:
-    name: Android Instrumented Tests
+    name: Android Instrumented Tests (shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1]
     defaults:
       run:
         working-directory: ./android
@@ -38,13 +42,34 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build APKs
-        run: ./gradlew assembleDebug assembleDebugAndroidTest --no-daemon --stacktrace
+        run: ./gradlew assembleDebug assembleDebugAndroidTest --stacktrace
 
       - name: Enable KVM group permissions
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-api-31-x86_64-google_apis
+
+      - name: Create AVD snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: echo "AVD snapshot generated for caching."
 
       - name: Run instrumented tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -53,19 +78,23 @@ jobs:
           arch: x86_64
           target: google_apis
           working-directory: android
+          force-avd-creation: false
           disable-animations: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
             adb shell settings put global window_animation_scale 0.0
             adb shell settings put global transition_animation_scale 0.0
             adb shell settings put global animator_duration_scale 0.0
-            ./gradlew connectedDebugAndroidTest --no-daemon --stacktrace || ./gradlew connectedDebugAndroidTest --no-daemon --stacktrace
+            ./gradlew connectedDebugAndroidTest \
+              --stacktrace \
+              -Pandroid.testInstrumentationRunnerArguments.numShards=2 \
+              -Pandroid.testInstrumentationRunnerArguments.shardIndex=${{ matrix.shard }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: android-e2e-test-results
+          name: android-e2e-test-results-shard-${{ matrix.shard }}
           path: |
             android/app/build/reports/androidTests/
             android/app/build/outputs/androidTest-results/
