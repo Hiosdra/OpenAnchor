@@ -88,7 +88,14 @@ test.describe('Service Worker', () => {
 
 test.describe('PWA Manifest', () => {
   test('manifest link is present in dashboard', async ({ page }) => {
-    await page.goto(MODULES.dashboard, { waitUntil: 'domcontentloaded' });
+    await page.goto(MODULES.dashboard, { waitUntil: 'load' });
+    // Wait for potential SW controllerchange → reload cycle
+    try {
+      await page.waitForNavigation({ timeout: 2000 });
+      await page.waitForLoadState('load');
+    } catch {
+      // No SW-triggered reload — page is stable
+    }
 
     const manifestHref = await page.evaluate(() => {
       const link = document.querySelector('link[rel="manifest"]');
