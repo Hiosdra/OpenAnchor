@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -270,7 +271,7 @@ private fun MonitoringContent(state: WearMonitorState) {
         wasGpsBad.value = isGpsBad
     }
 
-    gpsBad = isGpsBad
+    SideEffect { gpsBad = isGpsBad }
     val gpsColor = if (isGpsBad) AlarmRed else TextGrey
 
     Column(

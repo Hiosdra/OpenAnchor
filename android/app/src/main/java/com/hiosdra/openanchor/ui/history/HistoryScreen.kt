@@ -50,7 +50,7 @@ fun HistoryScreen(
                 title = { Text(stringResource(R.string.history)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -64,12 +64,12 @@ fun HistoryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Search by date or location…") },
+                placeholder = { Text(stringResource(R.string.search_history_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { viewModel.setSearchQuery("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear search")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear_search))
                         }
                     }
                 },
@@ -82,7 +82,7 @@ fun HistoryScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (searchQuery.isNotEmpty()) "No matching sessions"
+                        text = if (searchQuery.isNotEmpty()) stringResource(R.string.no_matching_sessions)
                                else stringResource(R.string.no_history),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

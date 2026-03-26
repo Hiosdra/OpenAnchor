@@ -80,7 +80,7 @@ fun MonitorScreen(
     // Connection status banner for paired/client mode
     Column {
         AnimatedVisibility(
-            visible = (uiState.isPairedMode || uiState.isActive) && !uiState.peerConnected && uiState.isPairedMode
+            visible = uiState.isPairedMode && uiState.isActive && !uiState.peerConnected
         ) {
             Surface(
                 color = WarningOrange,
@@ -99,7 +99,7 @@ fun MonitorScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Peer disconnected",
+                        text = stringResource(R.string.peer_disconnected),
                         color = Color.White,
                         style = MaterialTheme.typography.labelMedium
                     )

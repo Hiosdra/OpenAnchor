@@ -77,9 +77,13 @@ class AlarmEngine @Inject constructor(
     }
 
     fun reset() {
+        resetCounters()
+        _currentState.set(AlarmState.SAFE)
+    }
+
+    private fun resetCounters() {
         violationCount.set(0)
         firstViolationTime.set(0L)
-        _currentState.set(AlarmState.SAFE)
     }
 
     /**
@@ -91,7 +95,8 @@ class AlarmEngine @Inject constructor(
     fun processExternalAlarm(externalState: AlarmState): AlarmState {
         _currentState.set(externalState)
         when (externalState) {
-            AlarmState.SAFE, AlarmState.CAUTION -> reset()
+            AlarmState.SAFE -> reset()
+            AlarmState.CAUTION -> resetCounters()
             AlarmState.WARNING, AlarmState.ALARM -> { /* keep state */ }
         }
         return externalState

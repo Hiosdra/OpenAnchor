@@ -45,7 +45,7 @@ fun HistoryDetailScreen(
     // Show snackbar for export results
     LaunchedEffect(state.exportError, state.exportSuccess) {
         if (state.exportError) {
-            snackbarHostState.showSnackbar("GPX export failed")
+            snackbarHostState.showSnackbar(context.getString(R.string.gpx_export_failed))
         }
     }
 
@@ -70,7 +70,7 @@ fun HistoryDetailScreen(
                 title = { Text(stringResource(R.string.session_details)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {

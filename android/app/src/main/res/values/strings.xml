@@ -65,6 +65,7 @@
     <string name="cancel">Cancel</string>
     <string name="gps_accuracy_format">GPS: \u00B1%1$s m</string>
     <string name="gps_signal_lost">GPS SIGNAL LOST</string>
+    <string name="peer_disconnected">Peer disconnected</string>
 
     <!-- History -->
     <string name="no_history">No anchoring history yet</string>
@@ -72,6 +73,9 @@
     <string name="delete_session_title">Delete Session?</string>
     <string name="delete_session_message">This will permanently delete this anchoring session and all track data.</string>
     <string name="delete">Delete</string>
+    <string name="search_history_placeholder">Search by date or location…</string>
+    <string name="clear_search">Clear search</string>
+    <string name="no_matching_sessions">No matching sessions</string>
 
     <!-- History Detail -->
     <string name="session_details">Session Details</string>
@@ -83,6 +87,8 @@
     <string name="alarms_triggered">Alarms triggered</string>
     <string name="export_gpx">Export GPX</string>
     <string name="export_gpx_error">Failed to export GPX file</string>
+    <string name="back">Back</string>
+    <string name="gpx_export_failed">GPX export failed</string>
 
     <!-- Settings -->
     <string name="distance_unit">Distance unit</string>

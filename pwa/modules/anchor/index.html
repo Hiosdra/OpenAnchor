@@ -2799,7 +2799,10 @@
             // Validate accuracy to prevent NaN propagation
             const rawAccuracy = position.coords.accuracy;
             const accuracy = (rawAccuracy >= 0 && isFinite(rawAccuracy)) ? rawAccuracy : null;
-            this.state.accuracy = accuracy;
+            if (accuracy !== null) {
+                this.state.accuracy = accuracy;
+            }
+            // When accuracy is invalid, keep previous valid value
 
             if (position.coords.speed !== null) {
                 this.state.sog = position.coords.speed * GeoUtils.MPS2KNOTS;

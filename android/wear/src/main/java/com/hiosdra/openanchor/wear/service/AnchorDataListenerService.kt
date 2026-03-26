@@ -98,7 +98,7 @@ class AnchorDataListenerService : WearableListenerService() {
         val timings = longArrayOf(0, 500, 200, 500, 200, 500, 200, 500, 200, 500)
         val amplitudes = intArrayOf(0, 255, 0, 255, 0, 255, 0, 255, 0, 255)
 
-        // repeat=-1 was infinite; use 0 to repeat from index 0 and cancel after timeout
+        // repeat=0 loops pattern from index 0; cancel after timeout to prevent battery drain
         val effect = VibrationEffect.createWaveform(timings, amplitudes, 0)
         vibrator.vibrate(effect)
 
