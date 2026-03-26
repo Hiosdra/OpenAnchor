@@ -24,11 +24,13 @@ class StandaloneMonitorManager @Inject constructor(
         private const val TAG = "StandaloneMonitorMgr"
         private const val GPS_WATCHDOG_TIMEOUT_MS = 60_000L
         private const val GPS_WATCHDOG_CHECK_INTERVAL_MS = 10_000L
+        private const val DB_WRITE_INTERVAL_MS = 5_000L
     }
 
     private var monitoringJob: Job? = null
     private var gpsWatchdogJob: Job? = null
     private var lastGpsFixTime: Long = System.currentTimeMillis()
+    private var lastDbWriteTime: Long = 0L
 
     fun startMonitoring(
         sessionId: Long,
@@ -40,6 +42,7 @@ class StandaloneMonitorManager @Inject constructor(
         monitoringJob = scope.launch {
             val session = repository.getSessionById(sessionId) ?: return@launch
             val zone = session.zone
+            lastDbWriteTime = 0L
 
             monitorState.value = MonitorState(
                 isActive = true,
@@ -59,7 +62,13 @@ class StandaloneMonitorManager @Inject constructor(
                 lastGpsFixTime = System.currentTimeMillis()
                 val result = gpsProcessor.processPosition(position, session.anchorPosition, zone, sessionId)
 
-                repository.insertTrackPoint(result.trackPoint)
+                // Throttle DB writes: every 5s or on alarm state changes
+                val now = System.currentTimeMillis()
+                val alarmStateChanged = result.alarmState != monitorState.value.alarmState
+                if (now - lastDbWriteTime > DB_WRITE_INTERVAL_MS || alarmStateChanged) {
+                    repository.insertTrackPoint(result.trackPoint)
+                    lastDbWriteTime = now
+                }
 
                 val previousAlarmState = monitorState.value.alarmState
                 val transition = alarmHandler.handleAlarmTransition(result.alarmState, previousAlarmState, alarmPlayer.isPlaying())

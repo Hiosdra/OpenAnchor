@@ -38,7 +38,7 @@ class GpsProcessor @Inject constructor(
         sessionId: Long
     ): GpsProcessingResult {
         val distance = GeoCalculations.distanceMeters(position, anchorPosition)
-        val zoneResult = GeoCalculations.checkZone(position, zone)
+        val zoneResult = GeoCalculations.checkZone(position, zone, distance)
         val alarmState = alarmEngine.processReading(zoneResult)
 
         // Compute SOG and COG from consecutive positions

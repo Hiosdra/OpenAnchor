@@ -17,6 +17,9 @@ interface TrackPointDao {
     @Query("SELECT * FROM track_points WHERE sessionId = :sessionId ORDER BY timestamp ASC")
     fun getTrackPointsForSession(sessionId: Long): Flow<List<TrackPointEntity>>
 
+    @Query("SELECT * FROM (SELECT * FROM track_points WHERE sessionId = :sessionId ORDER BY timestamp DESC LIMIT :limit) ORDER BY timestamp ASC")
+    fun getRecentTrackPointsForSession(sessionId: Long, limit: Int): Flow<List<TrackPointEntity>>
+
     @Query("SELECT * FROM track_points WHERE sessionId = :sessionId ORDER BY timestamp ASC")
     suspend fun getTrackPointsForSessionOnce(sessionId: Long): List<TrackPointEntity>
 
