@@ -18,6 +18,8 @@ async function clickAndNavigate(
 test.describe('Module Navigation Flow', () => {
   // Dismiss update/install banners that may overlay cards in full-suite runs
   const dismissBanners = async (page: import('@playwright/test').Page) => {
+    // Wait for any SW-triggered navigation/reload to settle before manipulating DOM
+    await page.waitForLoadState('load');
     await page.evaluate(() => {
       document.getElementById('updateBanner')?.remove();
       document.getElementById('installBanner')?.remove();

@@ -59,9 +59,9 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 }
 
 /**
- * Polls a condition with manual clock advancement.
- * Unlike [waitUntil], this does not call waitForIdle() with auto-advance,
- * which would block indefinitely when infinite animations (e.g. OceanBackground) are present.
+ * Polls a condition without blocking on compose idle.
+ * Uses Thread.sleep for real-time polling on emulator instrumented tests,
+ * avoiding the infinite-animation idle deadlock from OceanBackground.
  */
 private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForCondition(
     timeoutMs: Long,
@@ -69,20 +69,13 @@ private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<
 ) {
     val startNanos = System.nanoTime()
     val timeoutNanos = timeoutMs * 1_000_000L
-    val savedAutoAdvance = mainClock.autoAdvance
-    mainClock.autoAdvance = false
-    try {
-        while (true) {
-            mainClock.advanceTimeBy(32)
-            waitForIdle()
-            if (condition()) return
-            if (System.nanoTime() - startNanos > timeoutNanos) {
-                throw ComposeTimeoutException(
-                    "Condition still not satisfied after $timeoutMs ms"
-                )
-            }
+    while (true) {
+        if (condition()) return
+        if (System.nanoTime() - startNanos > timeoutNanos) {
+            throw ComposeTimeoutException(
+                "Condition still not satisfied after $timeoutMs ms"
+            )
         }
-    } finally {
-        mainClock.autoAdvance = savedAutoAdvance
+        Thread.sleep(100)
     }
 }
