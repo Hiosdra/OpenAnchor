@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.R
 import com.hiosdra.openanchor.domain.model.AlarmState
@@ -55,6 +56,7 @@ import com.hiosdra.openanchor.ui.statistics.StatisticsScreen
 import com.hiosdra.openanchor.ui.statistics.StatisticsUiState
 import com.hiosdra.openanchor.ui.statistics.StatisticsViewModel
 import com.hiosdra.openanchor.data.preferences.UserPreferences
+import com.hiosdra.openanchor.ui.theme.ThemeMode
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
 import com.hiosdra.openanchor.domain.model.LogbookEntry
@@ -148,7 +150,7 @@ class UiScreenSmokeTest {
                 depthUnit = DepthUnit.METERS,
                 language = "pl",
                 gpsIntervalSeconds = 7,
-                nightFilterEnabled = true
+                themeMode = ThemeMode.NIGHT_VISION
             )
         )
 
@@ -296,7 +298,7 @@ class UiScreenSmokeTest {
         }
 
         composeRule.onNodeWithText("WARNING").assertIsDisplayed()
-        composeRule.onNodeWithText(composeRule.string(R.string.dismiss_alarm)).assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.string(R.string.dismiss_alarm)).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -322,7 +324,7 @@ class UiScreenSmokeTest {
 
         composeRule.onNodeWithText("ALARM").assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.string(R.string.paired_disconnect_title)).assertIsDisplayed()
-        composeRule.onNodeWithText(composeRule.string(R.string.dismiss_alarm)).assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.string(R.string.dismiss_alarm)).performScrollTo().assertIsDisplayed()
     }
 
     @Test

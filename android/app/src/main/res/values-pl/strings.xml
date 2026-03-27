@@ -93,6 +93,11 @@
     <string name="night_filter">Czerwony filtr nocny</string>
     <string name="night_filter_desc">Wyświetla całą aplikację wyłącznie w czerwonych tonach, aby chronić widzenie nocne. Zalecane po zmroku.</string>
     <string name="night_filter_toggle">Włącz tryb czerwonego światła</string>
+    <string name="theme_mode">Motyw</string>
+    <string name="theme_mode_desc">Wybierz wygląd aplikacji. Tryb nocny używa czerwonego filtra, aby chronić widzenie nocne.</string>
+    <string name="theme_dark">\uD83C\uDF19 Ciemny</string>
+    <string name="theme_light">☀\uFE0F Jasny</string>
+    <string name="theme_night">\uD83D\uDD34 Noc</string>
     <string name="open_source_notice">Alarm kotwiczny open source dla żeglarzy. Bezpieczeństwo przede wszystkim.</string>
 
     <!-- Statistics -->
@@ -239,4 +244,27 @@
     <string name="leitner_continue">Kontynuuj sesję</string>
     <string name="leitner_finish_session">Zakończ sesję</string>
     <string name="leitner_remaining">Pozostało: %1$d</string>
+
+    <!-- Accessibility descriptions -->
+    <string name="a11y_alarm_state_announcement">Stan alarmu: %1$s</string>
+    <string name="a11y_map_description">Mapa pozycji kotwicy z aktualną lokalizacją i strefą bezpieczeństwa</string>
+    <string name="a11y_connection_status_connected">Status połączenia: połączono</string>
+    <string name="a11y_connection_status_disconnected">Status połączenia: rozłączono</string>
+    <string name="a11y_bearing_arrow_description">Strzałka wskazująca kotwicę pod kątem %1$s stopni</string>
+    <string name="a11y_drift_warning_icon">Ostrzeżenie o dryfowaniu kotwicy</string>
+
+    <!-- Permission Onboarding -->
+    <string name="permission_onboarding_title">Witaj w OpenAnchor</string>
+    <string name="permission_onboarding_subtitle">Zanim zaczniemy, aplikacja potrzebuje kilku uprawnień, aby zapewnić Ci bezpieczeństwo na kotwicy.</string>
+    <string name="permission_onboarding_location_name">Lokalizacja</string>
+    <string name="permission_onboarding_location_desc">Wymagana do monitorowania pozycji kotwicy i wykrywania dryfowania.</string>
+    <string name="permission_onboarding_bg_location_name">Lokalizacja w tle</string>
+    <string name="permission_onboarding_bg_location_desc">Utrzymuje monitoring, gdy ekran jest wyłączony lub aplikacja działa w tle.</string>
+    <string name="permission_onboarding_notifications_name">Powiadomienia</string>
+    <string name="permission_onboarding_notifications_desc">Natychmiast ostrzega, gdy kotwica zaczyna dryfować.</string>
+    <string name="permission_onboarding_camera_name">Aparat</string>
+    <string name="permission_onboarding_camera_desc">Służy do skanowania kodów QR podczas parowania z innym urządzeniem.</string>
+    <string name="permission_onboarding_grant">Przyznaj uprawnienia</string>
+    <string name="permission_onboarding_skip">Pomiń na razie</string>
+    <string name="permission_onboarding_granted">Przyznano</string>
 </resources>

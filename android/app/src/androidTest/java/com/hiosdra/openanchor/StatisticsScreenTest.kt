@@ -26,17 +26,19 @@ class StatisticsScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToStatistics()
     }
 
     private fun navigateToStatistics() {
-        composeTestRule.waitForText("OpenAnchor", timeoutMs = 10_000)
+        composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
         try {
             composeTestRule.onNodeWithText("Statistics", substring = true).performScrollTo()
         } catch (_: Exception) {

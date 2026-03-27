@@ -16,11 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
@@ -39,6 +45,17 @@ fun PairedDashboardScreen(
     viewModel: PairedDashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Announce alarm state changes to screen readers
+    val view = LocalView.current
+    val context = LocalContext.current
+    LaunchedEffect(uiState.alarmState) {
+        if (uiState.alarmState != AlarmState.SAFE) {
+            view.announceForAccessibility(
+                context.getString(R.string.a11y_alarm_state_announcement, uiState.alarmState.name)
+            )
+        }
+    }
 
     // Navigate back when disconnected
     LaunchedEffect(uiState.serverRunning) {
@@ -139,7 +156,8 @@ fun PairedDashboardScreen(
                     label = stringResource(R.string.paired_connection),
                     value = if (uiState.peerConnected) stringResource(R.string.paired_connection_ok)
                     else stringResource(R.string.paired_connection_lost),
-                    valueColor = if (uiState.peerConnected) SafeGreen else AlarmRed
+                    valueColor = if (uiState.peerConnected) SafeGreen else AlarmRed,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
                 )
 
                 // GPS accuracy
@@ -236,7 +254,8 @@ private fun AlarmStateBar(alarmState: AlarmState, bgColor: Color) {
         modifier = Modifier
             .fillMaxWidth()
             .background(bgColor)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .semantics { liveRegion = LiveRegionMode.Polite },
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -263,7 +282,8 @@ private fun DistanceDisplay(distance: Double, alarmState: AlarmState) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = 16.dp)
+            .semantics { liveRegion = LiveRegionMode.Polite },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -358,7 +378,8 @@ private fun PairedMapSection(uiState: PairedDashboardUiState) {
             zoomLevel = 17.0,
             markers = markers,
             circles = circles,
-            polylines = emptyList()
+            polylines = emptyList(),
+            mapContentDescription = stringResource(R.string.a11y_map_description)
         )
     }
 }

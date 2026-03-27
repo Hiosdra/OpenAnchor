@@ -31,23 +31,25 @@ class WeatherScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
     }
 
     @Test
     fun homeScreen_loadsSuccessfully() {
-        composeTestRule.waitForText("OpenAnchor", timeoutMs = 10_000)
+        composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 
     @Test
     fun setupScreen_isReachableForWeatherPrerequisite() {
-        composeTestRule.waitForText("OpenAnchor", timeoutMs = 10_000)
+        composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 5_000).performClick()
         composeTestRule.waitForText("Anchor Position", timeoutMs = 5_000)
         composeTestRule.assertTextDisplayed("Anchor Position")

@@ -24,7 +24,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +55,16 @@ fun MonitorScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showStopDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    // Announce alarm state changes to screen readers
+    val view = LocalView.current
+    LaunchedEffect(uiState.alarmState) {
+        if (uiState.alarmState != AlarmState.SAFE) {
+            view.announceForAccessibility(
+                context.getString(R.string.a11y_alarm_state_announcement, uiState.alarmState.name)
+            )
+        }
+    }
 
     LaunchedEffect(sessionId) {
         viewModel.startMonitoring(sessionId)
@@ -276,7 +291,8 @@ private fun MapMonitorView(
                 zoomLevel = 17.0,
                 markers = markers,
                 circles = circles,
-                polylines = trackLine + anchorLine
+                polylines = trackLine + anchorLine,
+                mapContentDescription = stringResource(R.string.a11y_map_description)
             )
         }
 
@@ -288,7 +304,9 @@ private fun MapMonitorView(
                 .padding(top = 48.dp, start = 16.dp, end = 16.dp)
         ) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().semantics {
+                    liveRegion = LiveRegionMode.Polite
+                },
                 colors = CardDefaults.cardColors(containerColor = statusColor.copy(alpha = 0.9f))
             ) {
                 Row(
@@ -438,7 +456,8 @@ private fun SimpleMonitorView(
                 text = uiState.alarmState.name,
                 style = MaterialTheme.typography.headlineLarge,
                 color = statusColor,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
             )
 
             // GPS signal lost warning
@@ -478,7 +497,8 @@ private fun SimpleMonitorView(
                 text = "%.0f".format(uiState.distanceToAnchor),
                 fontSize = 96.sp,
                 fontWeight = FontWeight.Bold,
-                color = statusColor
+                color = statusColor,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
             )
             Text(
                 text = "meters",
@@ -549,10 +569,10 @@ private fun SimpleMonitorView(
                         onOpenWeather(it.latitude.toFloat(), it.longitude.toFloat())
                     }
                 }) {
-                    Icon(Icons.Default.Cloud, contentDescription = null, tint = OceanBlue)
+                    Icon(Icons.Default.Cloud, contentDescription = stringResource(R.string.weather_title), tint = OceanBlue)
                 }
                 OutlinedButton(onClick = onSharePosition) {
-                    Icon(Icons.Default.Share, contentDescription = null, tint = TextGrey)
+                    Icon(Icons.Default.Share, contentDescription = stringResource(R.string.share_position), tint = TextGrey)
                 }
                 OutlinedButton(
                     onClick = onStop,
@@ -696,7 +716,7 @@ private fun DriftWarningBanner(
                 ) {
                     Icon(
                         Icons.Default.Warning,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.a11y_drift_warning_icon),
                         tint = Color.White,
                         modifier = Modifier.size(28.dp)
                     )
@@ -737,7 +757,8 @@ private fun BearingArrow(
     color: Color,
     modifier: Modifier = Modifier
 ) {
-    Canvas(modifier = modifier) {
+    val arrowDescription = stringResource(R.string.a11y_bearing_arrow_description, "%.0f".format(bearingDegrees))
+    Canvas(modifier = modifier.semantics { contentDescription = arrowDescription }) {
         val w = size.width
         val h = size.height
         val cx = w / 2f

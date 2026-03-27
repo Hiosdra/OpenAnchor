@@ -26,17 +26,19 @@ class LogbookScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToLogbook()
     }
 
     private fun navigateToLogbook() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("AI Logbook", substring = true).performScrollTo()
         composeTestRule.waitForText("AI Logbook").performClick()
         composeTestRule.waitForText("AI Logbook", timeoutMs = 5_000)
@@ -77,7 +79,7 @@ class LogbookScreenTest {
     @Test
     fun logbookScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 

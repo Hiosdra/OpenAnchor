@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
+import com.hiosdra.openanchor.helpers.skipOnboardingIfPresent
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -32,17 +33,19 @@ class HistoryScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToHistory()
     }
 
     private fun navigateToHistory() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("History", substring = true).performScrollTo()
         composeTestRule.waitForText("History").performClick()
         composeTestRule.waitForIdle()
@@ -67,7 +70,7 @@ class HistoryScreenTest {
     @Test
     fun historyScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 

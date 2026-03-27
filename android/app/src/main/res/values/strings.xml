@@ -99,6 +99,11 @@
     <string name="night_filter">Red Night Filter</string>
     <string name="night_filter_desc">Renders the entire app in red tones only to preserve night vision. Recommended for use after dark.</string>
     <string name="night_filter_toggle">Enable red light mode</string>
+    <string name="theme_mode">Theme</string>
+    <string name="theme_mode_desc">Choose app appearance. Night mode uses a red filter to preserve night vision.</string>
+    <string name="theme_dark">\uD83C\uDF19 Dark</string>
+    <string name="theme_light">☀\uFE0F Light</string>
+    <string name="theme_night">\uD83D\uDD34 Night</string>
     <string name="open_source_notice">Open source anchor alarm for sailors. Safety first.</string>
 
     <!-- Statistics -->
@@ -332,4 +337,27 @@
     <string name="permissions_background_location_message">OpenAnchor needs background location access to:\n\n• Continue monitoring your position when the app is minimized\n• Alert you if the boat drifts while you\'re asleep or using other apps\n• Ensure the anchor alarm works 24/7 for your safety\n\nThis permission is essential for reliable anchor monitoring.</string>
     <string name="permissions_notifications_title">Notifications Permission</string>
     <string name="permissions_notifications_message">OpenAnchor needs notification permission to:\n\n• Show persistent notification during anchor monitoring\n• Alert you immediately if anchor drag is detected\n• Display distance and GPS status updates\n• Provide warnings when entering the buffer zone\n\nNotifications are critical for anchor alarm safety.</string>
+
+    <!-- Permission Onboarding -->
+    <string name="permission_onboarding_title">Welcome to OpenAnchor</string>
+    <string name="permission_onboarding_subtitle">Before we start, the app needs a few permissions to keep you safe at anchor.</string>
+    <string name="permission_onboarding_location_name">Location</string>
+    <string name="permission_onboarding_location_desc">Required to monitor your anchor position and detect drift.</string>
+    <string name="permission_onboarding_bg_location_name">Background Location</string>
+    <string name="permission_onboarding_bg_location_desc">Keeps monitoring active when the screen is off or app is in background.</string>
+    <string name="permission_onboarding_notifications_name">Notifications</string>
+    <string name="permission_onboarding_notifications_desc">Alerts you immediately if your anchor is dragging.</string>
+    <string name="permission_onboarding_camera_name">Camera</string>
+    <string name="permission_onboarding_camera_desc">Used to scan QR codes when pairing with another device.</string>
+    <string name="permission_onboarding_grant">Grant Permissions</string>
+    <string name="permission_onboarding_skip">Skip for now</string>
+    <string name="permission_onboarding_granted">Granted</string>
+
+    <!-- Accessibility descriptions -->
+    <string name="a11y_alarm_state_announcement">Alarm state: %1$s</string>
+    <string name="a11y_map_description">Anchor position map showing current location and safe zone</string>
+    <string name="a11y_connection_status_connected">Connection status: connected</string>
+    <string name="a11y_connection_status_disconnected">Connection status: disconnected</string>
+    <string name="a11y_bearing_arrow_description">Arrow pointing toward anchor at %1$s degrees</string>
+    <string name="a11y_drift_warning_icon">Anchor drag warning</string>
 </resources>

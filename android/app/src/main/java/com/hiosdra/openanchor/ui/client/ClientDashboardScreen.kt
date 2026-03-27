@@ -15,11 +15,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
@@ -32,6 +38,17 @@ fun ClientDashboardScreen(
     viewModel: ClientDashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Announce alarm state changes to screen readers
+    val view = LocalView.current
+    val context = LocalContext.current
+    LaunchedEffect(uiState.alarmState) {
+        if (uiState.alarmState != AlarmState.SAFE) {
+            view.announceForAccessibility(
+                context.getString(R.string.a11y_alarm_state_announcement, uiState.alarmState.name)
+            )
+        }
+    }
 
     // Navigate back when disconnected and not active
     LaunchedEffect(uiState.isConnected) {
@@ -51,6 +68,10 @@ fun ClientDashboardScreen(
                 title = { Text(stringResource(R.string.client_dashboard_title)) },
                 actions = {
                     // Connection indicator
+                    val connectionDescription = if (uiState.isConnected)
+                        stringResource(R.string.a11y_connection_status_connected)
+                    else
+                        stringResource(R.string.a11y_connection_status_disconnected)
                     Box(
                         modifier = Modifier
                             .padding(end = 8.dp)
@@ -60,6 +81,10 @@ fun ClientDashboardScreen(
                                 if (uiState.isConnected) Color(0xFF4CAF50)
                                 else Color(0xFFF44336)
                             )
+                            .semantics {
+                                contentDescription = connectionDescription
+                                liveRegion = LiveRegionMode.Polite
+                            }
                     )
                     IconButton(onClick = { viewModel.showDisconnectDialog() }) {
                         Icon(Icons.Default.LinkOff, contentDescription = stringResource(R.string.paired_disconnect))
@@ -78,7 +103,9 @@ fun ClientDashboardScreen(
         ) {
             // === Alarm State Banner ===
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().semantics {
+                    liveRegion = LiveRegionMode.Polite
+                },
                 colors = CardDefaults.cardColors(containerColor = alarmColor.copy(alpha = 0.15f))
             ) {
                 Column(
@@ -243,7 +270,7 @@ fun ClientDashboardScreen(
                     ) {
                         Icon(
                             Icons.Default.Warning,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.a11y_drift_warning_icon),
                             tint = Color(0xFFF44336)
                         )
                         Spacer(modifier = Modifier.width(12.dp))

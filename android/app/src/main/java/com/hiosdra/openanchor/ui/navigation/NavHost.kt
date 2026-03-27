@@ -26,6 +26,7 @@ import com.hiosdra.openanchor.ui.logbook.LogbookScreen
 import com.hiosdra.openanchor.ui.monitor.MonitorScreen
 import com.hiosdra.openanchor.ui.paired.PairedDashboardScreen
 import com.hiosdra.openanchor.ui.pairing.QRCodeScreen
+import com.hiosdra.openanchor.ui.permissions.PermissionOnboardingScreen
 import com.hiosdra.openanchor.ui.settings.SettingsScreen
 import com.hiosdra.openanchor.ui.setup.SetupScreen
 import com.hiosdra.openanchor.ui.statistics.StatisticsScreen
@@ -90,6 +91,16 @@ fun OpenAnchorNavHost(
                 )
         }
     ) {
+        composable(Screen.PermissionOnboarding.route) {
+            PermissionOnboardingScreen(
+                onComplete = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.PermissionOnboarding.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(
             route = Screen.Home.route,
             enterTransition = { standardFade() },

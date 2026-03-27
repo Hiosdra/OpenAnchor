@@ -26,17 +26,19 @@ class CrewWatchScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToCrewWatch()
     }
 
     private fun navigateToCrewWatch() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("Crew Watch", substring = true).performScrollTo()
         composeTestRule.waitForText("Crew Watch").performClick()
         composeTestRule.waitForText("Watch schedule and timer")
@@ -106,7 +108,7 @@ class CrewWatchScreenTest {
     @Test
     fun crewWatchScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Cancel").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 }

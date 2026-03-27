@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
+import com.hiosdra.openanchor.ui.theme.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,7 +20,7 @@ data class UserPreferences(
     val depthUnit: DepthUnit = DepthUnit.METERS,
     val language: String = "en",
     val gpsIntervalSeconds: Int = 3,
-    val nightFilterEnabled: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.DARK,
     val geminiApiKey: String? = null
 )
 
@@ -34,10 +35,21 @@ class PreferencesManager @Inject constructor(
         val LANGUAGE = stringPreferencesKey("language")
         val GPS_INTERVAL = intPreferencesKey("gps_interval_seconds")
         val NIGHT_FILTER = booleanPreferencesKey("night_filter_enabled")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
         val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
+        val HAS_SEEN_PERMISSION_ONBOARDING = booleanPreferencesKey("has_seen_permission_onboarding")
+    }
+
+    val hasSeenPermissionOnboarding: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.HAS_SEEN_PERMISSION_ONBOARDING] ?: false
     }
 
     val preferences: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
+        // Migrate legacy night_filter_enabled → themeMode
+        val themeMode = prefs[Keys.THEME_MODE]?.let {
+            try { ThemeMode.valueOf(it) } catch (_: Exception) { ThemeMode.DARK }
+        } ?: if (prefs[Keys.NIGHT_FILTER] == true) ThemeMode.NIGHT_VISION else ThemeMode.DARK
+
         UserPreferences(
             distanceUnit = prefs[Keys.DISTANCE_UNIT]?.let {
                 try { DistanceUnit.valueOf(it) } catch (_: Exception) { DistanceUnit.METERS }
@@ -47,7 +59,7 @@ class PreferencesManager @Inject constructor(
             } ?: DepthUnit.METERS,
             language = prefs[Keys.LANGUAGE] ?: "en",
             gpsIntervalSeconds = prefs[Keys.GPS_INTERVAL] ?: 3,
-            nightFilterEnabled = prefs[Keys.NIGHT_FILTER] ?: false,
+            themeMode = themeMode,
             geminiApiKey = prefs[Keys.GEMINI_API_KEY]
         )
     }
@@ -68,11 +80,19 @@ class PreferencesManager @Inject constructor(
         context.dataStore.edit { it[Keys.GPS_INTERVAL] = seconds }
     }
 
-    suspend fun setNightFilterEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[Keys.NIGHT_FILTER] = enabled }
+    suspend fun setThemeMode(mode: ThemeMode) {
+        context.dataStore.edit {
+            it[Keys.THEME_MODE] = mode.name
+            // Clear legacy key when migrating
+            it.remove(Keys.NIGHT_FILTER)
+        }
     }
 
     suspend fun setGeminiApiKey(key: String) {
         context.dataStore.edit { it[Keys.GEMINI_API_KEY] = key }
+    }
+
+    suspend fun setHasSeenPermissionOnboarding() {
+        context.dataStore.edit { it[Keys.HAS_SEEN_PERMISSION_ONBOARDING] = true }
     }
 }

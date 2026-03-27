@@ -6,6 +6,7 @@ import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.data.preferences.UserPreferences
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
+import com.hiosdra.openanchor.ui.theme.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +38,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { preferencesManager.setGpsInterval(seconds) }
     }
 
-    fun setNightFilterEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferencesManager.setNightFilterEnabled(enabled) }
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch { preferencesManager.setThemeMode(mode) }
     }
 }

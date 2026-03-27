@@ -29,7 +29,8 @@ class ExamQuizScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     // Minimal valid PDF so ExamPdfStorage.isPdfAvailable() returns true
@@ -53,6 +54,7 @@ class ExamQuizScreenTest {
     fun setUp() {
         provisionDummyPdf()
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToExamQuiz()
     }
 
@@ -62,7 +64,7 @@ class ExamQuizScreenTest {
     }
 
     private fun navigateToExamQuiz() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("Exam Quiz").performScrollTo().performClick()
         composeTestRule.waitForText("Categories", timeoutMs = 10_000)
     }
@@ -75,9 +77,7 @@ class ExamQuizScreenTest {
     private fun navigateToLearnMode() {
         scrollToTextInList("Learn Mode")
         composeTestRule.onNodeWithText("Learn Mode").performClick()
-        composeTestRule.waitUntil(10_000) {
-            composeTestRule.onAllNodesWithText("#", substring = true).fetchSemanticsNodes().isNotEmpty()
-        }
+        composeTestRule.waitForText("#", timeoutMs = 10_000)
     }
 
     // --- Menu tests ---
@@ -231,6 +231,6 @@ class ExamQuizScreenTest {
     @Test
     fun examQuiz_backNavigationReturnsHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
     }
 }

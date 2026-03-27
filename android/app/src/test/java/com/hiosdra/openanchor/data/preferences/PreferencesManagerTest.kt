@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
+import com.hiosdra.openanchor.ui.theme.ThemeMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -34,7 +35,7 @@ class PreferencesManagerTest {
         assertEquals(DepthUnit.METERS, prefs.depthUnit)
         assertEquals("en", prefs.language)
         assertEquals(3, prefs.gpsIntervalSeconds)
-        assertFalse(prefs.nightFilterEnabled)
+        assertEquals(ThemeMode.DARK, prefs.themeMode)
         assertNull(prefs.geminiApiKey)
     }
 
@@ -45,23 +46,23 @@ class PreferencesManagerTest {
             depthUnit = DepthUnit.FEET,
             language = "pl",
             gpsIntervalSeconds = 10,
-            nightFilterEnabled = true,
+            themeMode = ThemeMode.NIGHT_VISION,
             geminiApiKey = "test-key"
         )
         assertEquals(DistanceUnit.NAUTICAL_MILES, prefs.distanceUnit)
         assertEquals(DepthUnit.FEET, prefs.depthUnit)
         assertEquals("pl", prefs.language)
         assertEquals(10, prefs.gpsIntervalSeconds)
-        assertTrue(prefs.nightFilterEnabled)
+        assertEquals(ThemeMode.NIGHT_VISION, prefs.themeMode)
         assertEquals("test-key", prefs.geminiApiKey)
     }
 
     @Test
     fun `UserPreferences copy works`() {
         val original = UserPreferences()
-        val copied = original.copy(language = "de", nightFilterEnabled = true)
+        val copied = original.copy(language = "de", themeMode = ThemeMode.NIGHT_VISION)
         assertEquals("de", copied.language)
-        assertTrue(copied.nightFilterEnabled)
+        assertEquals(ThemeMode.NIGHT_VISION, copied.themeMode)
         assertEquals(DistanceUnit.METERS, copied.distanceUnit) // unchanged
     }
 
@@ -103,10 +104,10 @@ class PreferencesManagerTest {
     }
 
     @Test
-    fun `setNightFilterEnabled and read back`() = runBlocking {
-        manager.setNightFilterEnabled(true)
+    fun `setThemeMode and read back`() = runBlocking {
+        manager.setThemeMode(ThemeMode.NIGHT_VISION)
         val prefs = manager.preferences.first()
-        assertTrue(prefs.nightFilterEnabled)
+        assertEquals(ThemeMode.NIGHT_VISION, prefs.themeMode)
     }
 
     @Test
@@ -122,7 +123,7 @@ class PreferencesManagerTest {
         manager.setDepthUnit(DepthUnit.FEET)
         manager.setLanguage("de")
         manager.setGpsInterval(5)
-        manager.setNightFilterEnabled(true)
+        manager.setThemeMode(ThemeMode.NIGHT_VISION)
         manager.setGeminiApiKey("key-abc")
 
         val prefs = manager.preferences.first()
@@ -130,7 +131,7 @@ class PreferencesManagerTest {
         assertEquals(DepthUnit.FEET, prefs.depthUnit)
         assertEquals("de", prefs.language)
         assertEquals(5, prefs.gpsIntervalSeconds)
-        assertTrue(prefs.nightFilterEnabled)
+        assertEquals(ThemeMode.NIGHT_VISION, prefs.themeMode)
         assertEquals("key-abc", prefs.geminiApiKey)
     }
 }

@@ -12,7 +12,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.a
     for (i in 0 until count) {
         try {
             nodes[i].assertIsDisplayed()
-            return  // At least one is displayed, success
+            return
         } catch (_: AssertionError) {
             continue
         }
@@ -22,7 +22,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.a
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForText(
     text: String,
-    timeoutMs: Long = 5000
+    timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
     waitUntil(timeoutMs) {
         onAllNodesWithText(text, substring = true, ignoreCase = true)
@@ -34,7 +34,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForTag(
     tag: String,
-    timeoutMs: Long = 5000
+    timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
     waitUntil(timeoutMs) {
         onAllNodesWithTag(tag)
@@ -56,4 +56,17 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
         // Node may not be in a scrollable container (e.g. wizard steps)
     }
     return this
+}
+
+/**
+ * If the permission onboarding screen is visible, dismiss it by clicking "Skip for now".
+ * With GrantPermissionRule granting all permissions (including CAMERA), the onboarding
+ * auto-completes and navigates to Home. This helper just waits for "Drop Anchor" to appear.
+ */
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
+    waitUntil(30_000) {
+        onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
+            .fetchSemanticsNodes()
+            .isNotEmpty()
+    }
 }

@@ -26,17 +26,19 @@ class AdvisorScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToAdvisor()
     }
 
     private fun navigateToAdvisor() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("AI Advisor", substring = true).performScrollTo()
         composeTestRule.waitForText("AI Advisor").performClick()
         composeTestRule.waitForText("AI Advisor", timeoutMs = 5_000)
@@ -85,7 +87,7 @@ class AdvisorScreenTest {
     @Test
     fun advisorScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 

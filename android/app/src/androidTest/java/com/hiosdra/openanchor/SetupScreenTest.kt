@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
 import com.hiosdra.openanchor.helpers.tryPerformScrollTo
+import com.hiosdra.openanchor.helpers.skipOnboardingIfPresent
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -36,12 +37,14 @@ class SetupScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToSetup()
     }
 
@@ -175,7 +178,7 @@ class SetupScreenTest {
     @Test
     fun setup_backFromStep1ReturnsToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().assertIsDisplayed()
     }
 }

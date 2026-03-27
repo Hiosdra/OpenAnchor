@@ -9,6 +9,7 @@ import com.hiosdra.openanchor.data.preferences.UserPreferences
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
 import com.hiosdra.openanchor.ui.theme.OpenAnchorTheme
+import com.hiosdra.openanchor.ui.theme.ThemeMode
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,7 @@ class SettingsScreenTest {
                 depthUnit = DepthUnit.METERS,
                 language = "pl",
                 gpsIntervalSeconds = 7,
-                nightFilterEnabled = true
+                themeMode = ThemeMode.NIGHT_VISION
             )
         )
         val viewModel = mockk<SettingsViewModel>(relaxed = true)

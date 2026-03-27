@@ -1,6 +1,7 @@
 package com.hiosdra.openanchor.ui.navigation
 
 sealed class Screen(val route: String) {
+    data object PermissionOnboarding : Screen("permission_onboarding")
     data object Home : Screen("home")
     data object Setup : Screen("setup")
     data object Monitor : Screen("monitor/{sessionId}") {

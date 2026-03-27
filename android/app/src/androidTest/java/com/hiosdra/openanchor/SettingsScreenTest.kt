@@ -26,17 +26,19 @@ class SettingsScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        composeTestRule.skipOnboardingIfPresent()
         navigateToSettings()
     }
 
     private fun navigateToSettings() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithContentDescription("Settings").performClick()
         composeTestRule.waitForText("Language", timeoutMs = 5_000)
     }
@@ -66,15 +68,16 @@ class SettingsScreenTest {
 
     @Test
     fun settingsScreen_displaysNightFilter() {
-        composeTestRule.onNodeWithText("Red Night Filter").performScrollTo()
-        composeTestRule.assertTextDisplayed("Red Night Filter")
-        composeTestRule.assertTextDisplayed("Enable red light mode")
+        composeTestRule.onNodeWithText("Theme").performScrollTo()
+        composeTestRule.assertTextDisplayed("Theme")
+        composeTestRule.assertTextDisplayed("Choose app appearance")
     }
 
     @Test
     fun settingsScreen_nightFilterToggleClickable() {
-        composeTestRule.onNodeWithText("Enable red light mode").performScrollTo()
-        composeTestRule.onNodeWithText("Enable red light mode").performClick()
+        composeTestRule.onNodeWithText("Theme").performScrollTo()
+        // Theme mode uses segmented buttons; verify one is clickable
+        composeTestRule.onNodeWithText("Dark", substring = true).performClick()
         composeTestRule.waitForIdle()
     }
 
@@ -92,6 +95,6 @@ class SettingsScreenTest {
     @Test
     fun settingsScreen_backNavigationReturnsHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
     }
 }

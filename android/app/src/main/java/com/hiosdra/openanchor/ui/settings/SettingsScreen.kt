@@ -7,9 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
 import com.hiosdra.openanchor.domain.model.DepthUnit
 import com.hiosdra.openanchor.domain.model.DistanceUnit
+import com.hiosdra.openanchor.ui.theme.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,35 +124,33 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Night Filter
+            // Theme Mode
             Text(
-                text = stringResource(R.string.night_filter),
+                text = stringResource(R.string.theme_mode),
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = stringResource(R.string.night_filter_desc),
+                text = stringResource(R.string.theme_mode_desc),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.night_filter_toggle),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Switch(
-                    checked = prefs.nightFilterEnabled,
-                    onCheckedChange = { viewModel.setNightFilterEnabled(it) },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color(0xFFFF0000),
-                        checkedTrackColor = Color(0xFF660000)
-                    )
-                )
+            val themeModes = listOf(
+                ThemeMode.DARK to stringResource(R.string.theme_dark),
+                ThemeMode.LIGHT to stringResource(R.string.theme_light),
+                ThemeMode.NIGHT_VISION to stringResource(R.string.theme_night)
+            )
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                themeModes.forEachIndexed { index, (mode, label) ->
+                    SegmentedButton(
+                        selected = prefs.themeMode == mode,
+                        onClick = { viewModel.setThemeMode(mode) },
+                        shape = SegmentedButtonDefaults.itemShape(index, themeModes.size)
+                    ) {
+                        Text(label)
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
