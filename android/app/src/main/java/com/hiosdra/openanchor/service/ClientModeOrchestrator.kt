@@ -214,6 +214,15 @@ class ClientModeOrchestrator @Inject constructor(
             is ClientModeManager.ClientModeEvent.ServerGpsReport -> {
                 Log.i(TAG, "Server GPS report: zone=${event.payload.zoneCheckResult}")
             }
+            is ClientModeManager.ClientModeEvent.AlarmSendFailed -> {
+                if (monitorState.value.alarmState == event.alarmState) {
+                    Log.w(TAG, "Alarm send failed — triggering local alarm: ${event.reason}")
+                    alarmPlayer.startAlarm()
+                    scope.launch { wearDataSender.sendAlarmTrigger() }
+                    monitorState.value = monitorState.value.copy(alarmState = event.alarmState)
+                    onUpdateNotification("ALARM (offline): ${event.reason}", event.alarmState)
+                }
+            }
         }
     }
 
