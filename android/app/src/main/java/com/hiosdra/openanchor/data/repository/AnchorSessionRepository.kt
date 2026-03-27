@@ -30,6 +30,7 @@ interface AnchorSessionRepository {
     // ── Track point queries ─────────────────────────────────────────
 
     fun observeTrackPoints(sessionId: Long): Flow<List<TrackPoint>>
+    fun observeRecentTrackPoints(sessionId: Long, limit: Int = 500): Flow<List<TrackPoint>>
     suspend fun getTrackPointsOnce(sessionId: Long): List<TrackPoint>
     suspend fun getTrackPointCount(sessionId: Long): Int
 

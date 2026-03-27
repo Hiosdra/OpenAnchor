@@ -63,15 +63,19 @@ class AdvisorViewModel @Inject constructor(
 
         // Observe active session for context
         viewModelScope.launch {
-            sessionRepository.observeActiveSession().collect { session ->
-                currentSession = session
-                if (session != null) {
-                    // Also fetch recent track points
-                    sessionRepository.observeTrackPoints(session.id).collect { points ->
-                        recentTrackPoints = points.takeLast(20)
+            sessionRepository.observeActiveSession()
+                .flatMapLatest { session ->
+                    if (session != null) {
+                        sessionRepository.observeRecentTrackPoints(session.id, 20)
+                            .map { points -> session to points }
+                    } else {
+                        flowOf(null to emptyList())
                     }
                 }
-            }
+                .collect { (session, points) ->
+                    currentSession = session
+                    recentTrackPoints = points
+                }
         }
     }
 

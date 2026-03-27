@@ -55,7 +55,10 @@ class ExamPdfStorage @Inject constructor(
                 val hash = computeSha256(tempFile)
                 val valid = hash == EXPECTED_PDF_HASH
 
-                tempFile.renameTo(file)
+                if (!tempFile.renameTo(file)) {
+                    tempFile.delete()
+                    throw java.io.IOException("Failed to save PDF: rename from ${tempFile.path} to ${file.path} failed")
+                }
 
                 val pageCount = countPages(file)
 

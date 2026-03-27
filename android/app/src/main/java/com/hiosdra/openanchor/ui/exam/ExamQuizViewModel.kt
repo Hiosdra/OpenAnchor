@@ -417,6 +417,7 @@ class ExamQuizViewModel @Inject constructor(
     }
 
     fun finishExam() {
+        if (_examFinished.value) return
         val questions = _examQuestions.value
         val answers = _examAnswers.value
         val timeTaken = EXAM_TIME_MINUTES * 60 - _examTimeLeft.value

@@ -78,8 +78,17 @@ fun WearMonitorScreen() {
         contentAlignment = Alignment.Center
     ) {
         if (isAmbient) {
-            // Ambient mode: simplified white-on-black layout
-            AmbientContent(state, isConnected)
+            // Ambient mode: throttle recomposition to every 10 seconds
+            val lastAmbientUpdate = remember { mutableLongStateOf(0L) }
+            val throttledState = remember { mutableStateOf(state) }
+            LaunchedEffect(state) {
+                val now = System.currentTimeMillis()
+                if (now - lastAmbientUpdate.longValue > 10_000L) {
+                    throttledState.value = state
+                    lastAmbientUpdate.longValue = now
+                }
+            }
+            AmbientContent(throttledState.value, isConnected)
         } else {
             Box(
                 modifier = Modifier
@@ -241,7 +250,7 @@ private fun GpsLostContent(state: WearMonitorState) {
 @Composable
 private fun MonitoringContent(state: WearMonitorState) {
     val context = LocalContext.current
-    val stateColor = alarmStateColor(state.alarmState)
+    val stateColor = remember(state.alarmState) { alarmStateColor(state.alarmState) }
 
     // UX 2: Tap to cycle info mode (0=distance, 1=accuracy, 2=combined)
     var infoMode by remember { mutableIntStateOf(0) }
