@@ -30,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
 import com.hiosdra.openanchor.domain.model.AlarmState
+import com.hiosdra.openanchor.ui.components.AlarmStatusBadge
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,16 +115,9 @@ fun ClientDashboardScreen(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = uiState.alarmState.name,
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 36.sp
-                        ),
-                        color = alarmColor
-                    )
+                    AlarmStatusBadge(alarmState = uiState.alarmState)
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
                         text = "%.0f m".format(uiState.distanceToAnchor),

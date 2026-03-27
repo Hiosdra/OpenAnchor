@@ -1,6 +1,7 @@
 package com.hiosdra.openanchor.ui.paired
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,6 +18,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,11 +33,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
+import com.hiosdra.openanchor.ui.components.GlassCard
 import com.hiosdra.openanchor.domain.model.AlarmState
 import com.hiosdra.openanchor.domain.model.AnchorZone
+import com.hiosdra.openanchor.ui.components.AlarmStatusBadge
 import com.hiosdra.openanchor.ui.components.MapCircle
 import com.hiosdra.openanchor.ui.components.MapMarker
 import com.hiosdra.openanchor.ui.components.OsmMapView
+import com.hiosdra.openanchor.ui.components.icon
 import com.hiosdra.openanchor.ui.theme.*
 import org.osmdroid.util.GeoPoint
 
@@ -46,14 +52,18 @@ fun PairedDashboardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Announce alarm state changes to screen readers
+    // Announce alarm state changes to screen readers and provide haptic feedback
     val view = LocalView.current
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     LaunchedEffect(uiState.alarmState) {
         if (uiState.alarmState != AlarmState.SAFE) {
             view.announceForAccessibility(
                 context.getString(R.string.a11y_alarm_state_announcement, uiState.alarmState.name)
             )
+        }
+        if (uiState.alarmState == AlarmState.WARNING || uiState.alarmState == AlarmState.ALARM) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
 
@@ -250,6 +260,7 @@ private fun AlarmStateBar(alarmState: AlarmState, bgColor: Color) {
         AlarmState.WARNING -> "WARNING"
         AlarmState.ALARM -> "ALARM"
     }
+    val textColor = if (alarmState == AlarmState.WARNING) Color.Black else Color.White
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,12 +269,24 @@ private fun AlarmStateBar(alarmState: AlarmState, bgColor: Color) {
             .semantics { liveRegion = LiveRegionMode.Polite },
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = if (alarmState == AlarmState.WARNING) Color.Black else Color.White
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = alarmState.icon(),
+                contentDescription = null,
+                tint = textColor,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+        }
     }
 }
 
@@ -279,6 +302,12 @@ private fun DistanceDisplay(distance: Double, alarmState: AlarmState) {
         label = "dist_color"
     )
 
+    val animatedDistance by animateFloatAsState(
+        targetValue = distance.toFloat(),
+        animationSpec = OaAnimations.quickSpring,
+        label = "distance"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -287,7 +316,7 @@ private fun DistanceDisplay(distance: Double, alarmState: AlarmState) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = String.format(java.util.Locale.US, "%.0f", distance),
+            text = String.format(java.util.Locale.US, "%.0f", animatedDistance.toDouble()),
             fontSize = 72.sp,
             fontWeight = FontWeight.Bold,
             color = color
@@ -392,16 +421,9 @@ private fun StatusCard(
     modifier: Modifier = Modifier,
     valueColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
+    GlassCard(modifier = modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

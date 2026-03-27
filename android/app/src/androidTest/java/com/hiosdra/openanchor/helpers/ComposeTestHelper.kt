@@ -59,9 +59,10 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 }
 
 /**
- * If the permission onboarding screen is visible, dismiss it by clicking "Skip for now".
  * With GrantPermissionRule granting all permissions (including CAMERA), the onboarding
  * auto-completes and navigates to Home. This helper just waits for "Drop Anchor" to appear.
+ * OceanBackground's infinite animations are disabled on CI (animator_duration_scale=0),
+ * so standard waitUntil works correctly.
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
     waitUntil(30_000) {

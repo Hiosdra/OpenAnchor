@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hiosdra.openanchor.R
 import com.hiosdra.openanchor.domain.model.AnchorSession
+import com.hiosdra.openanchor.ui.components.GlassCard
 import com.hiosdra.openanchor.ui.theme.AlarmRed
 import com.hiosdra.openanchor.ui.theme.SafeGreen
 import java.text.SimpleDateFormat
@@ -140,14 +142,13 @@ private fun SessionCard(
         )
     }
 
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+    GlassCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
