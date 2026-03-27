@@ -1,27 +1,47 @@
 package com.hiosdra.openanchor.wear.data
 
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.hiosdra.openanchor.wear.data.db.WearConnectionHistoryDao
+import com.hiosdra.openanchor.wear.data.db.WearConnectionHistoryEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Manages connection state between the watch and the phone.
  *
  * Tracks whether the phone is connected by monitoring data-layer activity.
  * Automatically marks as disconnected if no data arrives within [CONNECTION_TIMEOUT_MS].
+ * Supports multi-watch pairing via authorized phone node tracking in DataStore.
  */
-object WearConnectionManager {
+@Singleton
+class WearConnectionManager @Inject constructor(
+    private val connectionHistoryDao: WearConnectionHistoryDao,
+    private val dataStore: DataStore<Preferences>
+) {
 
-    private const val TAG = "WearConnectionManager"
-    private const val CONNECTION_TIMEOUT_MS = 30_000L
+    companion object {
+        private const val TAG = "WearConnectionManager"
+        internal const val CONNECTION_TIMEOUT_MS = 30_000L
+        internal val AUTHORIZED_PHONE_NODE_ID_KEY =
+            stringPreferencesKey("authorized_phone_node_id")
+    }
 
     private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
@@ -29,6 +49,54 @@ object WearConnectionManager {
     val connected: StateFlow<Boolean> = _connected.asStateFlow()
 
     private var watchdogJob: Job? = null
+
+    @Volatile
+    private var cachedAuthorizedNodeId: String? = null
+
+    val authorizedPhoneNodeIdFlow: Flow<String?> =
+        dataStore.data.map { it[AUTHORIZED_PHONE_NODE_ID_KEY] }
+
+    init {
+        scope.launch {
+            cachedAuthorizedNodeId = dataStore.data.first()[AUTHORIZED_PHONE_NODE_ID_KEY]
+        }
+    }
+
+    /**
+     * Check whether a phone node is authorized to send data.
+     * Returns true if no phone is authorized yet (first-come) or if the node matches.
+     */
+    fun isNodeAuthorized(nodeId: String): Boolean {
+        val authorized = cachedAuthorizedNodeId
+        return authorized == null || authorized == nodeId
+    }
+
+    /**
+     * Authorize a phone node to send data. Persists to DataStore and records connection history.
+     */
+    fun authorizeNode(nodeId: String, displayName: String) {
+        cachedAuthorizedNodeId = nodeId
+        scope.launch {
+            dataStore.edit { it[AUTHORIZED_PHONE_NODE_ID_KEY] = nodeId }
+            connectionHistoryDao.insert(
+                WearConnectionHistoryEntity(
+                    phoneNodeId = nodeId,
+                    phoneDisplayName = displayName,
+                    connectedAt = System.currentTimeMillis()
+                )
+            )
+        }
+    }
+
+    /** Clear phone authorization for re-pairing. */
+    suspend fun clearAuthorization() {
+        cachedAuthorizedNodeId = null
+        dataStore.edit { it.remove(AUTHORIZED_PHONE_NODE_ID_KEY) }
+        val active = connectionHistoryDao.getActiveConnection()
+        if (active != null) {
+            connectionHistoryDao.updateDisconnectTime(active.id, System.currentTimeMillis())
+        }
+    }
 
     /** Call when any valid data is received from the phone. */
     fun markDataReceived() {

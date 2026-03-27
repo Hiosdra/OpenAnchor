@@ -11,7 +11,10 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 import com.hiosdra.openanchor.wear.data.DataPaths
+import com.hiosdra.openanchor.wear.data.WearConnectionManager
 import com.hiosdra.openanchor.wear.data.WearDataRepository
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Background service that receives DataItems and Messages from the phone app
@@ -20,20 +23,20 @@ import com.hiosdra.openanchor.wear.data.WearDataRepository
  * - DataItems (MONITOR_STATE_PATH): continuous monitor state sync
  * - Messages (ALARM_TRIGGER_PATH): immediate alarm vibration trigger
  *
- * Multi-watch architecture: When multiple watches are paired, each receives all
- * DataItems. Source node filtering is applied here — only events from a known
- * phone node are processed. A full role-based model (primary display vs alarm-only)
- * would require a preferences UI and NodeClient discovery, deferred for now.
+ * Multi-watch architecture: Uses [WearConnectionManager] for authorized phone
+ * node tracking. Only data from the authorized phone is processed.
  */
+@AndroidEntryPoint
 class AnchorDataListenerService : WearableListenerService() {
 
     companion object {
         private const val TAG = "AnchorDataListener"
-
-        /** Node ID of the last phone that sent us data. */
-        @Volatile
-        private var connectedPhoneNodeId: String? = null
     }
+
+    @Inject lateinit var dataRepository: WearDataRepository
+    @Inject lateinit var dataParser: WearDataParser
+    @Inject lateinit var hapticFeedback: WearHapticFeedback
+    @Inject lateinit var connectionManager: WearConnectionManager
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         super.onDataChanged(dataEvents)
@@ -41,24 +44,23 @@ class AnchorDataListenerService : WearableListenerService() {
         try {
             for (event in dataEvents) {
                 val uri = event.dataItem.uri
-                val sourceNodeId = uri.host
+                val sourceNodeId = uri.host ?: continue
 
                 if (uri.path == DataPaths.MONITOR_STATE_PATH) {
-                    // Accept data from the first phone we see, then filter to that node
-                    if (connectedPhoneNodeId == null) {
-                        connectedPhoneNodeId = sourceNodeId
-                        Log.d(TAG, "Locked to phone node: $sourceNodeId")
-                    } else if (sourceNodeId != connectedPhoneNodeId) {
-                        Log.d(TAG, "Ignoring data from unknown node: $sourceNodeId")
+                    if (!connectionManager.isNodeAuthorized(sourceNodeId)) {
+                        Log.d(TAG, "Ignoring data from unauthorized node: $sourceNodeId")
                         continue
                     }
 
+                    // Auto-authorize on first connection
+                    connectionManager.authorizeNode(sourceNodeId, sourceNodeId)
+
                     val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
-                    val state = WearDataParser.parse(dataMap)
+                    val state = dataParser.parse(dataMap)
 
                     if (state != null) {
-                        WearDataRepository.onStateReceived(state)
-                        WearHapticFeedback.onAlarmStateChanged(this, state.alarmState)
+                        dataRepository.onStateReceived(state)
+                        hapticFeedback.onAlarmStateChanged(this, state.alarmState)
                         WearComplicationService.requestComplicationUpdate(this)
                         Log.d(TAG, "State updated: ${state.alarmState}, dist=${state.distanceMeters}m")
                     } else {
@@ -94,15 +96,12 @@ class AnchorDataListenerService : WearableListenerService() {
             return
         }
 
-        // Strong repeating pattern: vibrate 500ms, pause 200ms (no infinite repeat)
         val timings = longArrayOf(0, 500, 200, 500, 200, 500, 200, 500, 200, 500)
         val amplitudes = intArrayOf(0, 255, 0, 255, 0, 255, 0, 255, 0, 255)
 
-        // repeat=0 loops pattern from index 0; cancel after timeout to prevent battery drain
         val effect = VibrationEffect.createWaveform(timings, amplitudes, 0)
         vibrator.vibrate(effect)
 
-        // Cancel vibration after 15 seconds to prevent battery drain
         android.os.Handler(mainLooper).postDelayed({ vibrator.cancel() }, 15_000L)
     }
 }
