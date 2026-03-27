@@ -19,6 +19,7 @@ function mockCanvas() {
     height: 0,
     getContext: vi.fn(() => ctx),
     toDataURL: vi.fn(() => 'data:image/png;base64,MOCK'),
+    toBlob: vi.fn((cb) => cb(new Blob(['mock'], { type: 'image/png' }))),
     _ctx: ctx,
   };
 }
@@ -43,10 +44,20 @@ function mockPdfDoc(numPages = 5) {
 describe('PdfRenderer', () => {
   let canvases;
   let origCreateElement;
+  let origCreateObjectURL, origRevokeObjectURL;
 
   beforeEach(() => {
     PdfRenderer._pdfDoc = null;
     PdfRenderer._cache.clear();
+    PdfRenderer._blobUrls = [];
+
+    // Save originals before overwriting
+    origCreateObjectURL = globalThis.URL.createObjectURL;
+    origRevokeObjectURL = globalThis.URL.revokeObjectURL;
+
+    // Mock URL.createObjectURL / revokeObjectURL
+    globalThis.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+    globalThis.URL.revokeObjectURL = vi.fn();
 
     canvases = [];
     origCreateElement = document.createElement.bind(document);
@@ -64,6 +75,8 @@ describe('PdfRenderer', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    globalThis.URL.createObjectURL = origCreateObjectURL;
+    globalThis.URL.revokeObjectURL = origRevokeObjectURL;
   });
 
   // --- loadFromBlob ---
@@ -171,13 +184,13 @@ describe('PdfRenderer', () => {
     });
 
     it('should evict oldest entry when cache exceeds _MAX_CACHE', async () => {
-      for (let i = 0; i < 8; i++) await PdfRenderer.renderPage(i, 2.0);
-      expect(PdfRenderer._cache.size).toBe(8);
+      for (let i = 0; i < 32; i++) await PdfRenderer.renderPage(i, 2.0);
+      expect(PdfRenderer._cache.size).toBe(32);
 
-      await PdfRenderer.renderPage(8, 2.0);
-      expect(PdfRenderer._cache.size).toBe(8);
+      await PdfRenderer.renderPage(32, 2.0);
+      expect(PdfRenderer._cache.size).toBe(32);
       expect(PdfRenderer._cache.has('0_2')).toBe(false);
-      expect(PdfRenderer._cache.has('8_2')).toBe(true);
+      expect(PdfRenderer._cache.has('32_2')).toBe(true);
     });
 
     it('should use _getScale when scale is omitted', async () => {
@@ -198,9 +211,15 @@ describe('PdfRenderer', () => {
       canvases = [];
     });
 
-    it('should return a data URL', async () => {
+    it('should return a blob URL', async () => {
       const result = await PdfRenderer.renderQuestion(0, 100, 300, 600, 2.0);
-      expect(result).toBe('data:image/png;base64,MOCK');
+      expect(result).toBe('blob:mock-url');
+      expect(URL.createObjectURL).toHaveBeenCalled();
+    });
+
+    it('should track blob URLs for cleanup', async () => {
+      await PdfRenderer.renderQuestion(0, 100, 300, 600, 2.0);
+      expect(PdfRenderer._blobUrls).toContain('blob:mock-url');
     });
 
     it('should create a crop canvas with correct dimensions', async () => {
@@ -250,11 +269,15 @@ describe('PdfRenderer', () => {
       pdfjsLib.getDocument.mockReturnValue({ promise: Promise.resolve(doc) });
       await PdfRenderer.loadFromBlob(new Blob(['pdf']));
       PdfRenderer._cache.set('k', 'v');
+      PdfRenderer._blobUrls.push('blob:test1', 'blob:test2');
 
       PdfRenderer.unload();
       expect(doc.destroy).toHaveBeenCalled();
       expect(PdfRenderer._pdfDoc).toBeNull();
       expect(PdfRenderer._cache.size).toBe(0);
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test1');
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test2');
+      expect(PdfRenderer._blobUrls).toEqual([]);
     });
 
     it('should not throw when no PDF is loaded', () => {

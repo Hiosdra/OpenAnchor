@@ -1,30 +1,31 @@
-const CACHE_NAME = 'openanchor-superapp-v8';
-const urlsToCache = [
+const CACHE_NAME = 'openanchor-superapp-v9';
+
+// Core assets — always pre-cached on install
+const coreUrls = [
   './',
   './index.html',
-  './modules/anchor/',
-  './modules/anchor/index.html',
-  './modules/wachtownik/',
-  './modules/wachtownik/index.html',
-  './modules/egzamin/',
-  './modules/egzamin/index.html',
-  './modules/egzamin/exam_questions.json',
-  './js/exam-pdf-storage.js',
-  './modules/zeglowanie/',
-  './modules/zeglowanie/index.html',
   './manifest.json',
+  './js/dashboard.js',
   './assets/icon-192x192.png',
   './assets/icon-512x512.png',
   './assets/icon.svg'
 ];
 
-// Install service worker
+// Module URLs — cached on demand when user opens them
+const moduleUrls = {
+  anchor: ['./modules/anchor/', './modules/anchor/index.html'],
+  wachtownik: ['./modules/wachtownik/', './modules/wachtownik/index.html'],
+  egzamin: ['./modules/egzamin/', './modules/egzamin/index.html', './modules/egzamin/exam_questions.json', './js/exam-pdf-storage.js', './js/pdf-renderer.js'],
+  zeglowanie: ['./modules/zeglowanie/', './modules/zeglowanie/index.html'],
+};
+
+// Install service worker — only cache core assets for fast startup
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('OpenAnchor SW: cache opened');
-        return cache.addAll(urlsToCache);
+        console.log('OpenAnchor SW: caching core assets');
+        return cache.addAll(coreUrls);
       })
   );
 });
@@ -35,6 +36,14 @@ self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     // When user clicks update button, activate the new service worker immediately
     event.waitUntil(self.skipWaiting());
+  }
+  if (event.data && event.data.type === 'CACHE_MODULE') {
+    const urls = moduleUrls[event.data.module];
+    if (urls) {
+      event.waitUntil(
+        caches.open(CACHE_NAME).then(cache => cache.addAll(urls))
+      );
+    }
   }
 });
 
@@ -69,7 +78,7 @@ self.addEventListener('fetch', event => {
         if (!isStaticAsset) {
           // Optionally update the cache in the background for HTML/JS/CSS
           fetch(event.request).then(networkResponse => {
-            if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
+            if (!networkResponse || networkResponse.status !== 200) {
               return;
             }
             const responseToCache = networkResponse.clone();
@@ -87,7 +96,7 @@ self.addEventListener('fetch', event => {
 
       // Not in cache – fetch from network and cache the response
       return fetch(event.request).then(networkResponse => {
-        if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
+        if (!networkResponse || networkResponse.status !== 200) {
           return networkResponse;
         }
 

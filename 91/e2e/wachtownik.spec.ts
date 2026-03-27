@@ -332,6 +332,14 @@ test.describe('State Persistence', () => {
     await scrollClick(page.getByRole('button', { name: 'Add person' }));
     await expect(page.getByText('Persistence')).toBeVisible();
 
+    // localStorage writes are debounced — wait for save to flush
+    await page.waitForFunction(() => {
+      const saved = localStorage.getItem('sailingSchedulePro');
+      if (!saved) return false;
+      const state = JSON.parse(saved);
+      return state.crew.some((c: { name: string }) => c.name === 'Persistence');
+    }, { timeout: 5000 });
+
     const saved = await page.evaluate(() => localStorage.getItem('sailingSchedulePro'));
     expect(saved).toBeTruthy();
     const state = JSON.parse(saved!);
