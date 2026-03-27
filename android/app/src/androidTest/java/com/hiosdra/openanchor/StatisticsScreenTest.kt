@@ -44,7 +44,7 @@ class StatisticsScreenTest {
             // Scroll may not be needed if Statistics is already visible
         }
         composeTestRule.waitForText("Statistics", timeoutMs = 5_000).performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
     }
 
     // --- 1. Navigation ---

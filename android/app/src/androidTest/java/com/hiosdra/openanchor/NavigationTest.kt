@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
+import com.hiosdra.openanchor.helpers.safeWaitForIdle
 import com.hiosdra.openanchor.helpers.skipOnboardingIfPresent
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -47,14 +48,14 @@ class NavigationTest {
     private fun scrollToAndClick(text: String) {
         composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
         composeTestRule.waitForText(text).performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
     }
 
     private fun navigateBack() {
         Espresso.pressBack()
-        composeTestRule.waitForIdle()
+        composeTestRule.safeWaitForIdle()
     }
 
     // ── 1. Home Screen is Start Destination ──────────────────────────
