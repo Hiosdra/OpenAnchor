@@ -10,7 +10,7 @@ import {
   calculateSOG,
   calculateCOG,
   isValidCoordinates
-} from '../js/anchor-utils.js';
+} from '../src/modules/anchor/geo-utils';
 
 describe('Anchor Utils - GPS Calculations', () => {
   describe('calculateDistance', () => {

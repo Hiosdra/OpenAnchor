@@ -1,6 +1,13 @@
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@shared': resolve(__dirname, 'src/shared'),
+      '@modules': resolve(__dirname, 'src/modules'),
+    },
+  },
   test: {
     globals: true,
     environment: 'happy-dom',
@@ -9,7 +16,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'json-summary'],
-      include: ['js/**/*.js'],
+      include: ['src/**/*.ts', 'src/**/*.tsx', 'js/**/*.js'],
       exclude: ['node_modules/**', 'tests/**'],
       thresholds: {
         lines: 90,

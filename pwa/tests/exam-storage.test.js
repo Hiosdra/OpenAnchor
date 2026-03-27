@@ -12,7 +12,7 @@ import {
   resetExamData,
   calculateStats,
   calculateCategoryStats
-} from '../js/exam-storage.js';
+} from '../src/modules/egzamin/exam-storage';
 
 describe('Exam Storage - Progress Management', () => {
   beforeEach(() => {

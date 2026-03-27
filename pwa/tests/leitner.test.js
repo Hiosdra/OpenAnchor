@@ -9,7 +9,7 @@ import {
   getLeitnerStats,
   getNextReviewDate,
   updateLeitnerState
-} from '../js/leitner.js';
+} from '../src/modules/egzamin/leitner';
 
 describe('Leitner System - Spaced Repetition', () => {
   describe('initializeLeitnerQuestion', () => {

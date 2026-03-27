@@ -8,7 +8,7 @@ vi.hoisted(() => {
   };
 });
 
-import { PdfRenderer } from '../js/pdf-renderer.js';
+import { PdfRenderer } from '../src/modules/egzamin/pdf-renderer';
 
 // --- helpers ---
 

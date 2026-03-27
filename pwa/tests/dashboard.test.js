@@ -9,7 +9,7 @@ import {
   closeSettings,
   closeSettingsOnBackdrop,
   openModule
-} from '../js/dashboard.js';
+} from '../src/modules/dashboard/index';
 
 describe('Dashboard - Beta Mode Management', () => {
   beforeEach(() => {

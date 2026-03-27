@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { SyncQueue } from '../js/sync-queue.js';
+import { SyncQueue } from '../src/shared/storage/sync-queue';
 
 describe('SyncQueue', () => {
   let queue;

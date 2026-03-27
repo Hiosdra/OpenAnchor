@@ -8,7 +8,7 @@ import {
   deletePdf,
   computeSha256,
   verifyPdfHash,
-} from '../js/exam-pdf-storage.js';
+} from '../src/shared/storage/indexed-db';
 
 // --- IndexedDB mock ---
 function createMockIDB() {

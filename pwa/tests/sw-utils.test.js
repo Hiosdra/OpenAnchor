@@ -8,7 +8,7 @@ import {
   hideUpdateBanner,
   handleUpdateClick,
   forceUpdate
-} from '../js/sw-utils.js';
+} from '../src/service-worker/sw-utils';
 
 describe('Service Worker Utils', () => {
   describe('isServiceWorkerSupported', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { StorageUtils } from '../js/storage-utils.js';
+import { StorageUtils } from '../src/shared/storage/local-storage';
 
 // The setup.js mock lacks length/key() needed by StorageUtils.keys().
 // Provide a full localStorage mock for these tests.
