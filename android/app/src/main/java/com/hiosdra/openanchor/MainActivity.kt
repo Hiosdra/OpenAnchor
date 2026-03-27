@@ -25,7 +25,7 @@ import com.hiosdra.openanchor.data.preferences.PreferencesManager
 import com.hiosdra.openanchor.ui.navigation.OpenAnchorNavHost
 import com.hiosdra.openanchor.ui.navigation.Screen
 import com.hiosdra.openanchor.ui.theme.OpenAnchorTheme
-import com.hiosdra.openanchor.ui.theme.ThemeMode
+import com.hiosdra.openanchor.domain.model.ThemeMode
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

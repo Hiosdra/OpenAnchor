@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -25,3 +26,23 @@ dependencyResolutionManagement {
 rootProject.name = "OpenAnchor"
 include(":app")
 include(":wear")
+
+// Core modules
+include(":core:domain")
+include(":core:data")
+include(":core:network")
+include(":core:ui")
+include(":core:testing")
+
+// Feature modules
+include(":feature:exam")
+include(":feature:monitor")
+include(":feature:history")
+include(":feature:settings")
+include(":feature:pairing")
+include(":feature:crewwatch")
+include(":feature:weather")
+include(":feature:advisor")
+include(":feature:logbook")
+include(":feature:statistics")
+include(":feature:home")
