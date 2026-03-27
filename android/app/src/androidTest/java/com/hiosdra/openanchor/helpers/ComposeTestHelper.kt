@@ -68,7 +68,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.s
             onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
                 .fetchSemanticsNodes()
                 .isNotEmpty() ||
-            onAllNodesWithText("OpenAnchor", substring = true, ignoreCase = true)
+            onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
@@ -76,7 +76,12 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.s
             .fetchSemanticsNodes()
         if (skipNodes.isNotEmpty()) {
             onNodeWithText("Skip for now", substring = true, ignoreCase = true).performClick()
-            waitForIdle()
+            // Wait for Home screen to appear after onboarding dismissal
+            waitUntil(5000) {
+                onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
+                    .fetchSemanticsNodes()
+                    .isNotEmpty()
+            }
         }
     } catch (_: ComposeTimeoutException) {
         // Neither onboarding nor home appeared — proceed anyway
