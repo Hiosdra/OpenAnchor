@@ -106,9 +106,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.wear.compose.ui.tooling)
 
-    // Android Test (runner required by default testInstrumentationRunner)
-    androidTestImplementation(libs.androidx.junit)
-
     // Test
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
