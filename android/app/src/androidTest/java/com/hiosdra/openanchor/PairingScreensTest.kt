@@ -13,6 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
+import com.hiosdra.openanchor.helpers.safeWaitForIdle
 
 @Ignore("Requires camera hardware not available on CI emulator")
 @HiltAndroidTest
@@ -29,7 +30,8 @@ class PairingScreensTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before

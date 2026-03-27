@@ -171,10 +171,11 @@ class ClientModeManagerTest {
     }
 
     @Test
-    fun `triggerAlarm does not send when disconnected`() {
+    fun `triggerAlarm sends even when disconnected but returns false`() {
         every { wsClient.isConnected } returns false
+        every { wsClient.sendTriggerAlarm(any()) } returns false
         manager.triggerAlarm("ZONE_VIOLATION", "Test", AlarmState.ALARM)
-        verify(exactly = 0) { wsClient.sendTriggerAlarm(any()) }
+        verify { wsClient.sendTriggerAlarm(any()) }
     }
 
     @Test

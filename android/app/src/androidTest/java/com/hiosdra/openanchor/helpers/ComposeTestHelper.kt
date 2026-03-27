@@ -19,14 +19,13 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.s
 }
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
-    unregisterComposeIdling()
     val nodes = onAllNodesWithText(text, substring = true, ignoreCase = true)
     val count = nodes.fetchSemanticsNodes().size
     if (count == 0) throw AssertionError("No nodes found with text containing '$text'")
     for (i in 0 until count) {
         try {
             nodes[i].assertIsDisplayed()
-            return  // At least one is displayed, success
+            return
         } catch (_: AssertionError) {
             continue
         }
@@ -73,31 +72,15 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 }
 
 /**
- * If the permission onboarding screen is visible, dismiss it by clicking "Skip for now".
- * Call this after activity launch and before any test assertions on Home screen content.
+ * With GrantPermissionRule granting all permissions (including CAMERA), the onboarding
+ * auto-completes and navigates to Home. This helper waits for "Drop Anchor" to appear,
+ * using waitForCondition to avoid blocking on OceanBackground's infinite animations.
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
-    try {
-        waitForCondition(15_000) {
-            onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty() ||
-            onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-        val skipNodes = onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
+    waitForCondition(30_000) {
+        onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
             .fetchSemanticsNodes()
-        if (skipNodes.isNotEmpty()) {
-            onNodeWithText("Skip for now", substring = true, ignoreCase = true).performClick()
-            waitForCondition(10_000) {
-                onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
-                    .fetchSemanticsNodes()
-                    .isNotEmpty()
-            }
-        }
-    } catch (_: ComposeTimeoutException) {
-        // Neither onboarding nor home appeared — proceed anyway
+            .isNotEmpty()
     }
 }
 

@@ -96,6 +96,16 @@ fun PermissionOnboardingScreen(
         onComplete()
     }
 
+    // Auto-complete if all permissions are already granted (e.g. returning user, test setup)
+    LaunchedEffect(Unit) {
+        val perms = checkAllPermissions(context)
+        if (perms.locationGranted && perms.backgroundLocationGranted &&
+            perms.notificationsGranted && perms.cameraGranted
+        ) {
+            completeOnboarding()
+        }
+    }
+
     val locationLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {

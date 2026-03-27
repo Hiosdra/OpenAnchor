@@ -55,6 +55,9 @@ class RoomAnchorSessionRepository @Inject constructor(
     override fun observeTrackPoints(sessionId: Long): Flow<List<TrackPoint>> =
         trackPointDao.getTrackPointsForSession(sessionId).map { list -> list.map { it.toDomain() } }
 
+    override fun observeRecentTrackPoints(sessionId: Long, limit: Int): Flow<List<TrackPoint>> =
+        trackPointDao.getRecentTrackPointsForSession(sessionId, limit).map { list -> list.map { it.toDomain() } }
+
     override suspend fun getTrackPointsOnce(sessionId: Long): List<TrackPoint> =
         trackPointDao.getTrackPointsForSessionOnce(sessionId).map { it.toDomain() }
 

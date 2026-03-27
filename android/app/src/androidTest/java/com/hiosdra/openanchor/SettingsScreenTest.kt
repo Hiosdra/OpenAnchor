@@ -11,6 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
+import com.hiosdra.openanchor.helpers.safeWaitForIdle
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -26,7 +27,8 @@ class SettingsScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
@@ -67,15 +69,16 @@ class SettingsScreenTest {
 
     @Test
     fun settingsScreen_displaysNightFilter() {
-        composeTestRule.onNodeWithText("Red Night Filter").performScrollTo()
-        composeTestRule.assertTextDisplayed("Red Night Filter")
-        composeTestRule.assertTextDisplayed("Enable red light mode")
+        composeTestRule.onNodeWithText("Theme").performScrollTo()
+        composeTestRule.assertTextDisplayed("Theme")
+        composeTestRule.assertTextDisplayed("Choose app appearance")
     }
 
     @Test
     fun settingsScreen_nightFilterToggleClickable() {
-        composeTestRule.onNodeWithText("Enable red light mode").performScrollTo()
-        composeTestRule.onNodeWithText("Enable red light mode").performClick()
+        composeTestRule.onNodeWithText("Theme").performScrollTo()
+        // Theme mode uses segmented buttons; verify one is clickable
+        composeTestRule.onNodeWithText("Dark", substring = true).performClick()
         composeTestRule.safeWaitForIdle()
     }
 
