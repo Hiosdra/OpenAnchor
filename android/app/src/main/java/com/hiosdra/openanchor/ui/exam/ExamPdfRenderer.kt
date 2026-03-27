@@ -59,12 +59,16 @@ class ExamPdfRenderer @Inject constructor(
         val cropFraction = (question.cropYEnd - question.cropYStart) / question.pageHeight.toFloat()
         val effectiveScale = if (cropFraction < 0.5f) (scale * 0.75f).coerceAtLeast(1f) else scale
 
+        if (question.cropYStart < 0 || question.cropYEnd <= question.cropYStart || question.pageHeight <= 0) return null
+
         val fullPage = renderPage(question.pdfPage, effectiveScale) ?: return null
 
         val scaleRatio = fullPage.height.toFloat() / question.pageHeight
         val yStart = (question.cropYStart * scaleRatio).toInt().coerceAtLeast(0)
         val yEnd = (question.cropYEnd * scaleRatio).toInt().coerceAtMost(fullPage.height)
         val cropHeight = (yEnd - yStart).coerceAtLeast(1)
+
+        if (yStart + cropHeight > fullPage.height || cropHeight <= 0) return null
 
         return Bitmap.createBitmap(fullPage, 0, yStart, fullPage.width, cropHeight)
     }

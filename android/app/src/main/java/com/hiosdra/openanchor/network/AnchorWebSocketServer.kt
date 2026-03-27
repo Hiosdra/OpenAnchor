@@ -11,6 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
@@ -42,7 +43,7 @@ class AnchorWebSocketServer @Inject constructor(
     private var clientSession: WebSocketServerSession? = null
     private var heartbeatJob: Job? = null
     private var heartbeatWatchdogJob: Job? = null
-    private var lastPeerPingTime: Long = 0L
+    private val lastPeerPingTime = AtomicLong(0L)
     private var serverScope: CoroutineScope? = null
 
     // Server state flow
@@ -153,7 +154,7 @@ class AnchorWebSocketServer @Inject constructor(
             }
 
             clientSession = session
-            lastPeerPingTime = System.currentTimeMillis()
+            lastPeerPingTime.set(System.currentTimeMillis())
         }
 
         _serverState.value = _serverState.value.copy(clientConnected = true)
@@ -171,7 +172,7 @@ class AnchorWebSocketServer @Inject constructor(
                         val message = parser.parseInbound(text)
                         if (message != null) {
                             if (message is ProtocolMessageParser.InboundMessage.Ping) {
-                                lastPeerPingTime = System.currentTimeMillis()
+                                lastPeerPingTime.set(System.currentTimeMillis())
                             }
                             _inboundMessages.emit(message)
                         }
@@ -219,7 +220,7 @@ class AnchorWebSocketServer @Inject constructor(
         heartbeatWatchdogJob = scope.launch(Dispatchers.IO) {
             while (isActive) {
                 delay(HEARTBEAT_INTERVAL_MS)
-                val elapsed = System.currentTimeMillis() - lastPeerPingTime
+                val elapsed = System.currentTimeMillis() - lastPeerPingTime.get()
                 _serverState.value = _serverState.value.copy(lastHeartbeatAge = elapsed)
                 if (elapsed > HEARTBEAT_TIMEOUT_MS) {
                     Log.w(TAG, "Heartbeat timeout! Peer not responding for ${elapsed}ms")

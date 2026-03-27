@@ -4,6 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import okhttp3.*
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,7 +38,7 @@ class AnchorWebSocketClient @Inject constructor(
     private var heartbeatJob: Job? = null
     private var heartbeatWatchdogJob: Job? = null
     private var reconnectJob: Job? = null
-    private var lastPeerPingTime: Long = 0L
+    private val lastPeerPingTime = AtomicLong(0L)
     private var reconnectAttempt = 0
     private var intentionalDisconnect = false
     private var currentUrl: String? = null
@@ -109,7 +110,7 @@ class AnchorWebSocketClient @Inject constructor(
         webSocket = okHttpClient.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 Log.i(TAG, "Connected to server: $url")
-                lastPeerPingTime = System.currentTimeMillis()
+                lastPeerPingTime.set(System.currentTimeMillis())
                 reconnectAttempt = 0
                 _clientState.value = _clientState.value.copy(
                     isConnected = true,
@@ -159,7 +160,7 @@ class AnchorWebSocketClient @Inject constructor(
 
             when (type) {
                 "PING" -> {
-                    lastPeerPingTime = System.currentTimeMillis()
+                    lastPeerPingTime.set(System.currentTimeMillis())
                     _inboundMessages.tryEmit(ServerMessage.Ping(
                         root.get("timestamp")?.asLong ?: System.currentTimeMillis()
                     ))
@@ -237,7 +238,7 @@ class AnchorWebSocketClient @Inject constructor(
         heartbeatWatchdogJob = scope.launch {
             while (isActive) {
                 delay(HEARTBEAT_INTERVAL_MS)
-                val elapsed = System.currentTimeMillis() - lastPeerPingTime
+                val elapsed = System.currentTimeMillis() - lastPeerPingTime.get()
                 _clientState.value = _clientState.value.copy(lastHeartbeatAge = elapsed)
                 if (elapsed > HEARTBEAT_TIMEOUT_MS) {
                     Log.w(TAG, "Heartbeat timeout! Server not responding for ${elapsed}ms")
@@ -266,15 +267,15 @@ class AnchorWebSocketClient @Inject constructor(
     /**
      * Send a STATE_UPDATE message (telemetry) to the server.
      */
-    fun sendStateUpdate(payload: StateUpdatePayload) {
-        send(parser.buildStateUpdate(payload))
+    fun sendStateUpdate(payload: StateUpdatePayload): Boolean {
+        return send(parser.buildStateUpdate(payload))
     }
 
     /**
      * Send a TRIGGER_ALARM message to the server.
      */
-    fun sendTriggerAlarm(payload: TriggerAlarmPayload) {
-        send(parser.buildTriggerAlarm(payload))
+    fun sendTriggerAlarm(payload: TriggerAlarmPayload): Boolean {
+        return send(parser.buildTriggerAlarm(payload))
     }
 
     /**
