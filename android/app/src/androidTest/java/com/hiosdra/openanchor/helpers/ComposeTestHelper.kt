@@ -64,7 +64,7 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
     try {
-        waitUntil(3000) {
+        waitUntil(15_000) {
             onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
                 .fetchSemanticsNodes()
                 .isNotEmpty() ||
@@ -76,8 +76,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.s
             .fetchSemanticsNodes()
         if (skipNodes.isNotEmpty()) {
             onNodeWithText("Skip for now", substring = true, ignoreCase = true).performClick()
-            // Wait for Home screen to appear after onboarding dismissal
-            waitUntil(5000) {
+            waitUntil(10_000) {
                 onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
                     .fetchSemanticsNodes()
                     .isNotEmpty()

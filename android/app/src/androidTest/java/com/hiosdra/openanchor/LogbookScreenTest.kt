@@ -37,7 +37,7 @@ class LogbookScreenTest {
     }
 
     private fun navigateToLogbook() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("AI Logbook", substring = true).performScrollTo()
         composeTestRule.waitForText("AI Logbook").performClick()
         composeTestRule.waitForText("AI Logbook", timeoutMs = 5_000)
@@ -78,7 +78,7 @@ class LogbookScreenTest {
     @Test
     fun logbookScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 

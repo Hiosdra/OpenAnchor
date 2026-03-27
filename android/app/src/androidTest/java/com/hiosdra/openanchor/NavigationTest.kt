@@ -45,7 +45,7 @@ class NavigationTest {
     // ── Helpers ──────────────────────────────────────────────────────
 
     private fun scrollToAndClick(text: String) {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
@@ -85,7 +85,7 @@ class NavigationTest {
 
     @Test
     fun navigateToSettings() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithContentDescription("Settings").performClick()
         composeTestRule.waitForText("Language", timeoutMs = 5_000)
     }
@@ -142,7 +142,7 @@ class NavigationTest {
 
     @Test
     fun backFromSettings_returnsHome() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithContentDescription("Settings").performClick()
         composeTestRule.waitForText("Language", timeoutMs = 5_000)
         navigateBack()

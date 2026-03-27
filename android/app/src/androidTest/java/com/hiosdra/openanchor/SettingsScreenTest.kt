@@ -37,7 +37,7 @@ class SettingsScreenTest {
     }
 
     private fun navigateToSettings() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithContentDescription("Settings").performClick()
         composeTestRule.waitForText("Language", timeoutMs = 5_000)
     }
@@ -93,6 +93,6 @@ class SettingsScreenTest {
     @Test
     fun settingsScreen_backNavigationReturnsHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
     }
 }

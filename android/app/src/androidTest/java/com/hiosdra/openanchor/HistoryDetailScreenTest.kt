@@ -37,7 +37,7 @@ class HistoryDetailScreenTest {
     }
 
     private fun navigateToHistory() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("History", substring = true).performScrollTo()
         composeTestRule.waitForText("History").performClick()
         composeTestRule.waitForText("No anchoring history yet")
@@ -57,7 +57,7 @@ class HistoryDetailScreenTest {
     @Test
     fun historyScreen_emptyState_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 

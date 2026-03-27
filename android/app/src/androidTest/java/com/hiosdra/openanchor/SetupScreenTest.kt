@@ -177,7 +177,7 @@ class SetupScreenTest {
     @Test
     fun setup_backFromStep1ReturnsToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().assertIsDisplayed()
     }
 }

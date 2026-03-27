@@ -37,7 +37,7 @@ class AdvisorScreenTest {
     }
 
     private fun navigateToAdvisor() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("AI Advisor", substring = true).performScrollTo()
         composeTestRule.waitForText("AI Advisor").performClick()
         composeTestRule.waitForText("AI Advisor", timeoutMs = 5_000)
@@ -86,7 +86,7 @@ class AdvisorScreenTest {
     @Test
     fun advisorScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 

@@ -63,7 +63,7 @@ class ExamQuizScreenTest {
     }
 
     private fun navigateToExamQuiz() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("Exam Quiz").performScrollTo().performClick()
         composeTestRule.waitForText("Categories", timeoutMs = 10_000)
     }
@@ -232,6 +232,6 @@ class ExamQuizScreenTest {
     @Test
     fun examQuiz_backNavigationReturnsHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
     }
 }

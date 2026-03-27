@@ -37,7 +37,7 @@ class StatisticsScreenTest {
     }
 
     private fun navigateToStatistics() {
-        composeTestRule.waitForText("OpenAnchor", timeoutMs = 10_000)
+        composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
         try {
             composeTestRule.onNodeWithText("Statistics", substring = true).performScrollTo()
         } catch (_: Exception) {

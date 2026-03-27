@@ -37,7 +37,7 @@ class CrewWatchScreenTest {
     }
 
     private fun navigateToCrewWatch() {
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText("Crew Watch", substring = true).performScrollTo()
         composeTestRule.waitForText("Crew Watch").performClick()
         composeTestRule.waitForText("Watch schedule and timer")
@@ -107,7 +107,7 @@ class CrewWatchScreenTest {
     @Test
     fun crewWatchScreen_backNavigatesToHome() {
         composeTestRule.onNodeWithContentDescription("Cancel").performClick()
-        composeTestRule.waitForText("OpenAnchor")
+        composeTestRule.waitForText("Drop Anchor")
         composeTestRule.assertTextDisplayed("OpenAnchor")
     }
 }
