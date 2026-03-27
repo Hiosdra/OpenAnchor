@@ -68,15 +68,16 @@ class SettingsScreenTest {
 
     @Test
     fun settingsScreen_displaysNightFilter() {
-        composeTestRule.onNodeWithText("Red Night Filter").performScrollTo()
-        composeTestRule.assertTextDisplayed("Red Night Filter")
-        composeTestRule.assertTextDisplayed("Enable red light mode")
+        composeTestRule.onNodeWithText("Theme").performScrollTo()
+        composeTestRule.assertTextDisplayed("Theme")
+        composeTestRule.assertTextDisplayed("Choose app appearance")
     }
 
     @Test
     fun settingsScreen_nightFilterToggleClickable() {
-        composeTestRule.onNodeWithText("Enable red light mode").performScrollTo()
-        composeTestRule.onNodeWithText("Enable red light mode").performClick()
+        composeTestRule.onNodeWithText("Theme").performScrollTo()
+        // Theme mode uses segmented buttons; verify one is clickable
+        composeTestRule.onNodeWithText("Dark", substring = true).performClick()
         composeTestRule.waitForIdle()
     }
 
