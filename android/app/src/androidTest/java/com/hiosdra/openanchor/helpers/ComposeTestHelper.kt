@@ -22,9 +22,9 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.a
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForText(
     text: String,
-    timeoutMs: Long = 5000
+    timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
-    waitUntil(timeoutMs) {
+    waitForCondition(timeoutMs) {
         onAllNodesWithText(text, substring = true, ignoreCase = true)
             .fetchSemanticsNodes()
             .isNotEmpty()
@@ -34,9 +34,9 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForTag(
     tag: String,
-    timeoutMs: Long = 5000
+    timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
-    waitUntil(timeoutMs) {
+    waitForCondition(timeoutMs) {
         onAllNodesWithTag(tag)
             .fetchSemanticsNodes()
             .isNotEmpty()
@@ -59,12 +59,34 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 }
 
 /**
+ * Polls a condition with Thread.sleep instead of relying on Compose idle state.
+ * The onboarding screen with permission checks and DataStore loading can keep
+ * Compose busy, causing waitUntil to never evaluate the condition.
+ */
+private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForCondition(
+    timeoutMs: Long,
+    condition: () -> Boolean
+) {
+    val startNanos = System.nanoTime()
+    val timeoutNanos = timeoutMs * 1_000_000L
+    while (true) {
+        if (condition()) return
+        if (System.nanoTime() - startNanos > timeoutNanos) {
+            throw ComposeTimeoutException(
+                "Condition still not satisfied after $timeoutMs ms"
+            )
+        }
+        Thread.sleep(100)
+    }
+}
+
+/**
  * If the permission onboarding screen is visible, dismiss it by clicking "Skip for now".
  * Call this after activity launch and before any test assertions on Home screen content.
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
     try {
-        waitUntil(15_000) {
+        waitForCondition(15_000) {
             onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
                 .fetchSemanticsNodes()
                 .isNotEmpty() ||
@@ -76,7 +98,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.s
             .fetchSemanticsNodes()
         if (skipNodes.isNotEmpty()) {
             onNodeWithText("Skip for now", substring = true, ignoreCase = true).performClick()
-            waitUntil(10_000) {
+            waitForCondition(10_000) {
                 onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
                     .fetchSemanticsNodes()
                     .isNotEmpty()
