@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
-import com.hiosdra.openanchor.helpers.safeWaitForIdle
 
 @Ignore("Requires camera hardware not available on CI emulator")
 @HiltAndroidTest
@@ -45,9 +44,9 @@ class QRCodeScreenTest {
 
     private fun scrollToAndClick(text: String) {
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
     }
 
     private fun navigateToQRCodeScreen() {
@@ -99,14 +98,14 @@ class QRCodeScreenTest {
     @Test
     fun qrCodeScreen_backNavigation_returnsToHome() {
         Espresso.pressBack()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 
     @Test
     fun qrCodeScreen_backButton_returnsToHome() {
         composeTestRule.onNodeWithContentDescription("Cancel").performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 }

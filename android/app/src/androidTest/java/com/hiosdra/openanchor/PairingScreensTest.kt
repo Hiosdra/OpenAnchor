@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
-import com.hiosdra.openanchor.helpers.safeWaitForIdle
 
 @Ignore("Requires camera hardware not available on CI emulator")
 @HiltAndroidTest
@@ -45,9 +44,9 @@ class PairingScreensTest {
     private fun scrollToAndClick(text: String) {
         composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -108,7 +107,7 @@ class PairingScreensTest {
     fun scanQRScreen_backNavigation_returnsToHome() {
         navigateToScanQRScreen()
         Espresso.pressBack()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 
@@ -116,7 +115,7 @@ class PairingScreensTest {
     fun scanQRScreen_backButton_returnsToHome() {
         navigateToScanQRScreen()
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 

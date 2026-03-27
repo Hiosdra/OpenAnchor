@@ -3,20 +3,7 @@ package com.hiosdra.openanchor.helpers
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-
-/**
- * Unregisters Compose IdlingResources from Espresso and waits a short time.
- * Replaces composeTestRule.waitForIdle() which blocks forever when infinite
- * animations are present (OceanBackground, rememberPulsingAlpha).
- */
-fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.safeWaitForIdle(
-    delayMs: Long = 500
-) {
-    unregisterComposeIdling()
-    Thread.sleep(delayMs)
-}
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
     val nodes = onAllNodesWithText(text, substring = true, ignoreCase = true)
@@ -37,7 +24,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     text: String,
     timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
-    waitForCondition(timeoutMs) {
+    waitUntil(timeoutMs) {
         onAllNodesWithText(text, substring = true, ignoreCase = true)
             .fetchSemanticsNodes()
             .isNotEmpty()
@@ -49,7 +36,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     tag: String,
     timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
-    waitForCondition(timeoutMs) {
+    waitUntil(timeoutMs) {
         onAllNodesWithTag(tag)
             .fetchSemanticsNodes()
             .isNotEmpty()
@@ -73,49 +60,14 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 
 /**
  * With GrantPermissionRule granting all permissions (including CAMERA), the onboarding
- * auto-completes and navigates to Home. This helper waits for "Drop Anchor" to appear,
- * using waitForCondition to avoid blocking on OceanBackground's infinite animations.
+ * auto-completes and navigates to Home. This helper just waits for "Drop Anchor" to appear.
+ * OceanBackground's infinite animations are disabled on CI (animator_duration_scale=0),
+ * so standard waitUntil works correctly.
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
-    waitForCondition(30_000) {
+    waitUntil(30_000) {
         onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
             .fetchSemanticsNodes()
             .isNotEmpty()
-    }
-}
-
-/**
- * Permanently unregisters Compose IdlingResources from Espresso.
- * Safe to call multiple times (no-op if already unregistered).
- */
-private fun unregisterComposeIdling() {
-    val registry = IdlingRegistry.getInstance()
-    registry.resources
-        .filter { it.name.contains("Compose", ignoreCase = true) }
-        .forEach { registry.unregister(it) }
-}
-
-/**
- * Polls a condition with Thread.sleep, permanently unregistering the Compose
- * IdlingResource from Espresso so that ALL Compose test operations (including
- * fetchSemanticsNodes, performClick, performScrollTo, assertIsDisplayed) bypass
- * the idle check that blocks on infinite animations (OceanBackground).
- */
-private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForCondition(
-    timeoutMs: Long,
-    condition: () -> Boolean
-) {
-    unregisterComposeIdling()
-
-    val startNanos = System.nanoTime()
-    val timeoutNanos = timeoutMs * 1_000_000L
-    while (true) {
-        if (condition()) return
-        if (System.nanoTime() - startNanos > timeoutNanos) {
-            throw ComposeTimeoutException(
-                "Condition still not satisfied after $timeoutMs ms"
-            )
-        }
-        Thread.sleep(100)
     }
 }

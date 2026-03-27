@@ -11,7 +11,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
-import com.hiosdra.openanchor.helpers.safeWaitForIdle
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -79,7 +78,7 @@ class SettingsScreenTest {
         composeTestRule.onNodeWithText("Theme").performScrollTo()
         // Theme mode uses segmented buttons; verify one is clickable
         composeTestRule.onNodeWithText("Dark", substring = true).performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
     }
 
     @Test
