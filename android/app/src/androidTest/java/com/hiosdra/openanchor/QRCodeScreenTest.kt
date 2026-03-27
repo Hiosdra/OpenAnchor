@@ -29,7 +29,8 @@ class QRCodeScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
@@ -43,9 +44,9 @@ class QRCodeScreenTest {
 
     private fun scrollToAndClick(text: String) {
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
     }
 
     private fun navigateToQRCodeScreen() {
@@ -97,14 +98,14 @@ class QRCodeScreenTest {
     @Test
     fun qrCodeScreen_backNavigation_returnsToHome() {
         Espresso.pressBack()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 
     @Test
     fun qrCodeScreen_backButton_returnsToHome() {
         composeTestRule.onNodeWithContentDescription("Cancel").performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 }

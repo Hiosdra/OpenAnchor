@@ -3,31 +3,16 @@ package com.hiosdra.openanchor.helpers
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 
-/**
- * Unregisters Compose IdlingResources from Espresso and waits a short time.
- * Replaces composeTestRule.waitForIdle() which blocks forever when
- * Compose considers itself busy (DataStore loading, permission checks,
- * navigation transitions).
- */
-fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.safeWaitForIdle(
-    delayMs: Long = 500
-) {
-    unregisterComposeIdling()
-    Thread.sleep(delayMs)
-}
-
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
-    unregisterComposeIdling()
     val nodes = onAllNodesWithText(text, substring = true, ignoreCase = true)
     val count = nodes.fetchSemanticsNodes().size
     if (count == 0) throw AssertionError("No nodes found with text containing '$text'")
     for (i in 0 until count) {
         try {
             nodes[i].assertIsDisplayed()
-            return  // At least one is displayed, success
+            return
         } catch (_: AssertionError) {
             continue
         }
@@ -39,7 +24,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     text: String,
     timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
-    waitForCondition(timeoutMs) {
+    waitUntil(timeoutMs) {
         onAllNodesWithText(text, substring = true, ignoreCase = true)
             .fetchSemanticsNodes()
             .isNotEmpty()
@@ -51,7 +36,7 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     tag: String,
     timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
-    waitForCondition(timeoutMs) {
+    waitUntil(timeoutMs) {
         onAllNodesWithTag(tag)
             .fetchSemanticsNodes()
             .isNotEmpty()
@@ -75,64 +60,13 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 
 /**
  * If the permission onboarding screen is visible, dismiss it by clicking "Skip for now".
- * Call this after activity launch and before any test assertions on Home screen content.
+ * With GrantPermissionRule granting all permissions (including CAMERA), the onboarding
+ * auto-completes and navigates to Home. This helper just waits for "Drop Anchor" to appear.
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
-    try {
-        waitForCondition(15_000) {
-            onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty() ||
-            onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-        val skipNodes = onAllNodesWithText("Skip for now", substring = true, ignoreCase = true)
+    waitUntil(30_000) {
+        onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
             .fetchSemanticsNodes()
-        if (skipNodes.isNotEmpty()) {
-            onNodeWithText("Skip for now", substring = true, ignoreCase = true).performClick()
-            waitForCondition(10_000) {
-                onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
-                    .fetchSemanticsNodes()
-                    .isNotEmpty()
-            }
-        }
-    } catch (_: ComposeTimeoutException) {
-        // Neither onboarding nor home appeared — proceed anyway
-    }
-}
-
-/**
- * Permanently unregisters Compose IdlingResources from Espresso.
- * Safe to call multiple times (no-op if already unregistered).
- */
-private fun unregisterComposeIdling() {
-    val registry = IdlingRegistry.getInstance()
-    registry.resources
-        .filter { it.name.contains("Compose", ignoreCase = true) }
-        .forEach { registry.unregister(it) }
-}
-
-/**
- * Polls a condition with Thread.sleep, permanently unregistering the Compose
- * IdlingResource from Espresso so that fetchSemanticsNodes, performClick,
- * performScrollTo, and assertIsDisplayed bypass the idle check.
- */
-private fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForCondition(
-    timeoutMs: Long,
-    condition: () -> Boolean
-) {
-    unregisterComposeIdling()
-
-    val startNanos = System.nanoTime()
-    val timeoutNanos = timeoutMs * 1_000_000L
-    while (true) {
-        if (condition()) return
-        if (System.nanoTime() - startNanos > timeoutNanos) {
-            throw ComposeTimeoutException(
-                "Condition still not satisfied after $timeoutMs ms"
-            )
-        }
-        Thread.sleep(100)
+            .isNotEmpty()
     }
 }

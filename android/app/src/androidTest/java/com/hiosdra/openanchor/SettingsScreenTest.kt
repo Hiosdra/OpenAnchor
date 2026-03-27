@@ -26,7 +26,8 @@ class SettingsScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
@@ -76,7 +77,7 @@ class SettingsScreenTest {
     fun settingsScreen_nightFilterToggleClickable() {
         composeTestRule.onNodeWithText("Enable red light mode").performScrollTo()
         composeTestRule.onNodeWithText("Enable red light mode").performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
     }
 
     @Test

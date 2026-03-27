@@ -29,7 +29,8 @@ class PairingScreensTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
@@ -43,9 +44,9 @@ class PairingScreensTest {
     private fun scrollToAndClick(text: String) {
         composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -106,7 +107,7 @@ class PairingScreensTest {
     fun scanQRScreen_backNavigation_returnsToHome() {
         navigateToScanQRScreen()
         Espresso.pressBack()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 
@@ -114,7 +115,7 @@ class PairingScreensTest {
     fun scanQRScreen_backButton_returnsToHome() {
         navigateToScanQRScreen()
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
     }
 

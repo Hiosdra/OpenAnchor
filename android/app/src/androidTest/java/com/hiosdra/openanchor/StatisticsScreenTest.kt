@@ -26,7 +26,8 @@ class StatisticsScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     @Before
@@ -44,7 +45,7 @@ class StatisticsScreenTest {
             // Scroll may not be needed if Statistics is already visible
         }
         composeTestRule.waitForText("Statistics", timeoutMs = 5_000).performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
     }
 
     // --- 1. Navigation ---

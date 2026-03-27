@@ -29,7 +29,8 @@ class ExamQuizScreenTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.CAMERA
     )
 
     // Minimal valid PDF so ExamPdfStorage.isPdfAvailable() returns true
@@ -137,14 +138,14 @@ class ExamQuizScreenTest {
     @Test
     fun learnMode_displaysNavigationButtons() {
         navigateToLearnMode()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.assertTextDisplayed("Previous")
     }
 
     @Test
     fun learnMode_displaysAnswerOptions() {
         navigateToLearnMode()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         // Answer buttons are labeled A, B, C
         composeTestRule.assertTextDisplayed("A")
         composeTestRule.assertTextDisplayed("B")
@@ -154,9 +155,9 @@ class ExamQuizScreenTest {
     @Test
     fun learnMode_canClickAnswer() {
         navigateToLearnMode()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("A").performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         // After selecting, the Next button should appear
         composeTestRule.assertTextDisplayed("Next")
     }
@@ -164,10 +165,10 @@ class ExamQuizScreenTest {
     @Test
     fun learnMode_canNavigateNext() {
         navigateToLearnMode()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
         // Click Skip/Next to advance without answering
         composeTestRule.onNodeWithText("Skip").performClick()
-        composeTestRule.safeWaitForIdle()
+        composeTestRule.waitForIdle()
     }
 
     @Test
