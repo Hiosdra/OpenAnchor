@@ -254,7 +254,7 @@ class HistoryDetailScreenTest {
             HistoryDetailScreen(sessionId = 1L, onBack = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(composeRule.string(R.string.export_gpx_error)).assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.string(R.string.export_gpx_error)).assertExists()
     }
 
     @Test

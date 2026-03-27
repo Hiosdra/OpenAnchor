@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.hiosdra.openanchor.network.AnchorWebSocketServer
 import com.hiosdra.openanchor.network.PairedModeManager
-import com.hiosdra.openanchor.service.ServiceBinder
+import com.hiosdra.openanchor.service.ServiceBinderApi
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,7 +29,7 @@ class PairedDashboardViewModelTest {
 
     private lateinit var pairedModeManager: PairedModeManager
     private lateinit var wsServer: AnchorWebSocketServer
-    private lateinit var serviceBinder: ServiceBinder
+    private lateinit var serviceBinder: ServiceBinderApi
     private lateinit var pairedStateFlow: MutableStateFlow<PairedModeManager.PairedState>
     private lateinit var serverStateFlow: MutableStateFlow<AnchorWebSocketServer.ServerState>
     private lateinit var eventsFlow: MutableSharedFlow<PairedModeManager.PairedEvent>

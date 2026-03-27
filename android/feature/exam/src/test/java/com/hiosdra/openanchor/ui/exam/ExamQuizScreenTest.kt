@@ -90,6 +90,7 @@ class ExamQuizScreenTest {
 
         state.value = leitnerOverviewState()
         composeRule.waitForIdle()
+        scrollTo("Box 1")
         composeRule.onNodeWithText("Box 1").assertIsDisplayed()
 
         state.value = leitnerSessionState()

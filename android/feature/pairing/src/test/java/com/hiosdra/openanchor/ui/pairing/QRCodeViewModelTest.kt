@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.hiosdra.openanchor.network.AnchorWebSocketServer
 import com.hiosdra.openanchor.network.HotspotManager
-import com.hiosdra.openanchor.service.ServiceBinder
+import com.hiosdra.openanchor.service.ServiceBinderApi
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,7 +29,7 @@ class QRCodeViewModelTest {
 
     private lateinit var hotspotManager: HotspotManager
     private lateinit var wsServer: AnchorWebSocketServer
-    private lateinit var serviceBinder: ServiceBinder
+    private lateinit var serviceBinder: ServiceBinderApi
 
     private lateinit var hotspotStateFlow: MutableStateFlow<HotspotManager.HotspotState>
     private lateinit var serverStateFlow: MutableStateFlow<AnchorWebSocketServer.ServerState>

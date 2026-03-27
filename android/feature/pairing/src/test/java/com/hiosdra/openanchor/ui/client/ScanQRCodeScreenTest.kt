@@ -45,7 +45,7 @@ class ScanQRCodeScreenTest {
             ScanQRCodeScreen(onBack = {}, onConnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(string(R.string.pairing_or)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.pairing_or)).performScrollTo().assertIsDisplayed()
     }
 
     // ── Scanned step ────────────────────────────────────────────────────
@@ -65,8 +65,8 @@ class ScanQRCodeScreenTest {
 
         composeRule.onNodeWithText(string(R.string.client_scanned_title)).assertIsDisplayed()
         composeRule.onNodeWithText("ws://192.168.1.10:8080").assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.client_connect)).assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.client_rescan)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.client_connect)).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.client_rescan)).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -84,8 +84,8 @@ class ScanQRCodeScreenTest {
             ScanQRCodeScreen(onBack = {}, onConnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText("BoatNet").assertIsDisplayed()
-        composeRule.onNodeWithText("anchor123").assertIsDisplayed()
+        composeRule.onNodeWithText("BoatNet").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("anchor123").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -136,7 +136,7 @@ class ScanQRCodeScreenTest {
             ScanQRCodeScreen(onBack = {}, onConnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(string(R.string.client_rescan)).performClick()
+        composeRule.onNodeWithText(string(R.string.client_rescan)).performScrollTo().performClick()
         verify { vm.resetToScanning() }
     }
 
@@ -392,7 +392,7 @@ class ScanQRCodeScreenTest {
             ScanQRCodeScreen(onBack = {}, onConnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(string(R.string.pairing_wifi_password)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.pairing_wifi_password)).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -409,7 +409,7 @@ class ScanQRCodeScreenTest {
             ScanQRCodeScreen(onBack = {}, onConnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(string(R.string.client_connect_wifi_hint)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.client_connect_wifi_hint)).performScrollTo().assertIsDisplayed()
     }
 
     @Test

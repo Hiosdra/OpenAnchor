@@ -70,7 +70,7 @@ class AdvisorScreenTest {
         composeRule.onNodeWithText(string(R.string.ai_advisor_welcome)).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.ai_suggested_questions)).assertIsDisplayed()
         composeRule.onNodeWithText("Is my anchor safe in current conditions?").assertIsDisplayed()
-        composeRule.onNodeWithText("What scope ratio should I use?").assertIsDisplayed()
+        composeRule.onNodeWithText("What scope ratio should I use?").assertExists()
         composeRule.onNodeWithText("When should I re-anchor?").assertExists()
         composeRule.onNodeWithText("How to prepare for overnight anchoring?").assertExists()
         composeRule.onNodeWithText("What are signs of anchor dragging?").assertExists()

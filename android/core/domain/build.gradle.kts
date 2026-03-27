@@ -1,5 +1,6 @@
 plugins {
     id("openanchor.android.library")
+    id("openanchor.android.test")
 }
 
 android {

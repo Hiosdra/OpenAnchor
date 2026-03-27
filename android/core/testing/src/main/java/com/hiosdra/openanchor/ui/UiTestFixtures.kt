@@ -8,19 +8,19 @@ import com.hiosdra.openanchor.domain.model.TrackPoint
 import com.hiosdra.openanchor.network.AndroidGpsReportPayload
 import com.hiosdra.openanchor.network.LatLng
 
-internal fun samplePosition(
+fun samplePosition(
     latitude: Double = 54.0,
     longitude: Double = 18.0,
     accuracy: Float = 5f
 ) = Position(latitude = latitude, longitude = longitude, accuracy = accuracy, timestamp = 1L)
 
-internal fun sampleZone() = AnchorZone.Circle(
+fun sampleZone() = AnchorZone.Circle(
     anchorPosition = samplePosition(),
     radiusMeters = 35.0,
     bufferRadiusMeters = 50.0
 )
 
-internal fun sampleSession(
+fun sampleSession(
     id: Long = 1L,
     alarmTriggered: Boolean = false
 ) = AnchorSession(
@@ -33,7 +33,7 @@ internal fun sampleSession(
     alarmCount = if (alarmTriggered) 1 else 0
 )
 
-internal fun sampleTrackPoint(sessionId: Long = 1L, isAlarm: Boolean = false) = TrackPoint(
+fun sampleTrackPoint(sessionId: Long = 1L, isAlarm: Boolean = false) = TrackPoint(
     id = 1L,
     sessionId = sessionId,
     position = samplePosition(54.01, 18.01),
@@ -42,7 +42,7 @@ internal fun sampleTrackPoint(sessionId: Long = 1L, isAlarm: Boolean = false) = 
     alarmState = if (isAlarm) AlarmState.ALARM.name else AlarmState.SAFE.name
 )
 
-internal fun sampleServerGpsReport() = AndroidGpsReportPayload(
+fun sampleServerGpsReport() = AndroidGpsReportPayload(
     pos = LatLng(54.01, 18.01),
     accuracy = 4.5f,
     distanceToAnchor = 22.0,

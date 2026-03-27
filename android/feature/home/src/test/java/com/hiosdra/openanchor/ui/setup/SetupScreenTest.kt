@@ -155,14 +155,14 @@ class SetupScreenTest {
     fun `radius step with sector zone shows inner circle hint`() {
         state.value = SetupState(currentStep = SetupStep.RADIUS, zoneType = ZoneType.SECTOR)
         setScreen()
-        composeRule.onNodeWithText(composeRule.string(R.string.radius_inner_circle_hint)).assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.string(R.string.radius_inner_circle_hint)).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun `radius step shows buffer zone toggle`() {
         state.value = SetupState(currentStep = SetupStep.RADIUS)
         setScreen()
-        composeRule.onNodeWithText(composeRule.string(R.string.use_buffer_zone)).assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.string(R.string.use_buffer_zone)).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -251,8 +251,8 @@ class SetupScreenTest {
             sectorBearingDeg = "180"
         )
         setScreen()
-        composeRule.onNodeWithText(composeRule.string(R.string.sector_radius)).assertIsDisplayed()
-        composeRule.onNodeWithText("40 m").assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.string(R.string.sector_radius)).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("40 m").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -263,8 +263,8 @@ class SetupScreenTest {
             bufferRadiusMeters = "60"
         )
         setScreen()
-        composeRule.onNodeWithText(composeRule.string(R.string.buffer_radius_label)).assertIsDisplayed()
-        composeRule.onNodeWithText("60 m").assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.string(R.string.buffer_radius_label)).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("60 m").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -274,7 +274,7 @@ class SetupScreenTest {
             error = "Failed to create session"
         )
         setScreen()
-        composeRule.onNodeWithText("Failed to create session").assertIsDisplayed()
+        composeRule.onNodeWithText("Failed to create session").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -284,7 +284,7 @@ class SetupScreenTest {
             chainLengthM = "42"
         )
         setScreen()
-        composeRule.onNodeWithText("42 m").assertIsDisplayed()
+        composeRule.onNodeWithText("42 m").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -294,7 +294,7 @@ class SetupScreenTest {
             depthM = "7"
         )
         setScreen()
-        composeRule.onNodeWithText("7 m").assertIsDisplayed()
+        composeRule.onNodeWithText("7 m").performScrollTo().assertIsDisplayed()
     }
 
     // ── Navigation ──

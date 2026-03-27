@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.hiosdra.openanchor.network.AnchorWebSocketClient
 import com.hiosdra.openanchor.network.ClientModeManager
-import com.hiosdra.openanchor.service.ServiceBinder
+import com.hiosdra.openanchor.service.ServiceBinderApi
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -30,7 +30,7 @@ class ScanQRCodeViewModelTest {
 
     private lateinit var wsClient: AnchorWebSocketClient
     private lateinit var clientModeManager: ClientModeManager
-    private lateinit var serviceBinder: ServiceBinder
+    private lateinit var serviceBinder: ServiceBinderApi
     private lateinit var clientStateFlow: MutableStateFlow<AnchorWebSocketClient.ClientState>
 
     @Before

@@ -3,7 +3,8 @@ package com.hiosdra.openanchor.ui.client
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.hiosdra.openanchor.network.ClientModeManager
-import com.hiosdra.openanchor.service.ServiceBinder
+import com.hiosdra.openanchor.service.ServiceBinderApi
+import com.hiosdra.openanchor.service.MonitorState
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +28,7 @@ class ClientDashboardViewModelTest {
     val instantExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var clientModeManager: ClientModeManager
-    private lateinit var serviceBinder: ServiceBinder
+    private lateinit var serviceBinder: ServiceBinderApi
     private lateinit var clientModeStateFlow: MutableStateFlow<ClientModeManager.ClientModeState>
     private lateinit var eventsFlow: MutableSharedFlow<ClientModeManager.ClientModeEvent>
 
@@ -40,7 +41,7 @@ class ClientDashboardViewModelTest {
 
         every { clientModeManager.clientModeState } returns clientModeStateFlow
         every { clientModeManager.events } returns eventsFlow
-        every { serviceBinder.serviceInstance } returns MutableStateFlow(null)
+        every { serviceBinder.monitorState } returns MutableStateFlow(MonitorState())
     }
 
     @After

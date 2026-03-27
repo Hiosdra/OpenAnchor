@@ -100,6 +100,8 @@ class CrewWatchScreenTest {
             CrewWatchScreen(onBack = {}, viewModel = vm)
         }
 
+        composeRule.onNode(hasScrollToNodeAction())
+            .performScrollToNode(hasText(string(R.string.crew_watch_start)))
         composeRule.onNodeWithText(string(R.string.crew_watch_start)).assertIsDisplayed()
     }
 
@@ -119,6 +121,8 @@ class CrewWatchScreenTest {
         }
 
         // Start button should be enabled with crew members
+        composeRule.onNode(hasScrollToNodeAction())
+            .performScrollToNode(hasText(string(R.string.crew_watch_start)))
         composeRule.onNodeWithText(string(R.string.crew_watch_start)).assertIsDisplayed()
     }
 
@@ -135,6 +139,8 @@ class CrewWatchScreenTest {
             CrewWatchScreen(onBack = {}, viewModel = vm)
         }
 
+        composeRule.onNode(hasScrollToNodeAction())
+            .performScrollToNode(hasText(string(R.string.crew_watch_start)))
         composeRule.onNodeWithText(string(R.string.crew_watch_start)).performClick()
         verify { vm.startWatch() }
     }
@@ -342,6 +348,8 @@ class CrewWatchScreenTest {
 
         // When no crew, the add crew member field should be in the LazyColumn
         // At minimum the start button should be visible
+        composeRule.onNode(hasScrollToNodeAction())
+            .performScrollToNode(hasText(string(R.string.crew_watch_start)))
         composeRule.onNodeWithText(string(R.string.crew_watch_start)).assertIsDisplayed()
     }
 
@@ -403,6 +411,8 @@ class CrewWatchScreenTest {
         }
 
         composeRule.onNodeWithText(string(R.string.crew_watch_subtitle)).assertIsDisplayed()
+        composeRule.onNode(hasScrollToNodeAction())
+            .performScrollToNode(hasText(string(R.string.crew_watch_start)))
         composeRule.onNodeWithText(string(R.string.crew_watch_start)).assertIsDisplayed()
 
         state.value = CrewWatchUiState(

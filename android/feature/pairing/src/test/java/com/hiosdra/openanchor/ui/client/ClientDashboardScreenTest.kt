@@ -36,7 +36,7 @@ class ClientDashboardScreenTest {
         }
 
         composeRule.onNodeWithText("SAFE").assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.paired_connection_lost)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.paired_connection_lost)).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.client_dashboard_title)).assertIsDisplayed()
     }
 
@@ -57,7 +57,7 @@ class ClientDashboardScreenTest {
             ClientDashboardScreen(onDisconnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText(string(R.string.paired_connection_ok)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.paired_connection_ok)).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("±5 m").assertIsDisplayed()
     }
 
@@ -222,7 +222,7 @@ class ClientDashboardScreenTest {
             ClientDashboardScreen(onDisconnected = {}, viewModel = vm)
         }
 
-        composeRule.onNodeWithText("82%").assertIsDisplayed()
+        composeRule.onNodeWithText("82%").performScrollTo().assertIsDisplayed()
     }
 
     // ── Server GPS report ───────────────────────────────────────────────

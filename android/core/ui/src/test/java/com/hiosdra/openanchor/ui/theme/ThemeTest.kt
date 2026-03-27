@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import com.hiosdra.openanchor.domain.model.ThemeMode
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test

@@ -555,7 +555,7 @@ class PairedDashboardScreenTest {
         state.value = state.value.copy(alarmState = AlarmState.SAFE, distanceToAnchor = 10.0)
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithText("SAFE").assertIsDisplayed()
+        composeRule.onNodeWithText("SAFE").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.dismiss_alarm)).assertDoesNotExist()
     }
 

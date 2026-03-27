@@ -4,12 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.hiosdra.openanchor.data.compass.CompassProvider
 import com.hiosdra.openanchor.data.repository.AnchorSessionRepository
-import com.hiosdra.openanchor.service.ServiceBinder
-import com.hiosdra.openanchor.service.AnchorMonitorService
+import com.hiosdra.openanchor.service.ServiceBinderApi
 import com.hiosdra.openanchor.service.MonitorState
 import com.hiosdra.openanchor.domain.model.AlarmState
 import com.hiosdra.openanchor.domain.model.Position
-import com.hiosdra.openanchor.domain.model.AnchorZone
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,19 +30,19 @@ class MonitorViewModelTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var serviceBinder: ServiceBinder
+    private lateinit var serviceBinder: ServiceBinderApi
     private lateinit var compassProvider: CompassProvider
     private lateinit var repository: AnchorSessionRepository
-    private lateinit var serviceFlow: MutableStateFlow<AnchorMonitorService?>
+    private lateinit var monitorStateFlow: MutableStateFlow<MonitorState>
 
     @Before
     fun setup() {
+        monitorStateFlow = MutableStateFlow(MonitorState())
         serviceBinder = mockk(relaxed = true)
         compassProvider = mockk(relaxed = true)
         repository = mockk(relaxed = true)
-        serviceFlow = MutableStateFlow(null)
 
-        every { serviceBinder.serviceInstance } returns serviceFlow
+        every { serviceBinder.monitorState } returns monitorStateFlow
         every { compassProvider.isAvailable } returns false
     }
 
@@ -185,16 +183,7 @@ class MonitorViewModelTest {
     fun `service state updates propagate to uiState`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
 
-        val monitorStateFlow = MutableStateFlow(MonitorState())
-        val service = mockk<AnchorMonitorService>(relaxed = true) {
-            every { monitorState } returns monitorStateFlow
-        }
-
         val vm = MonitorViewModel(serviceBinder, compassProvider, repository)
-        advanceUntilIdle()
-
-        // Simulate service binding
-        serviceFlow.value = service
         advanceUntilIdle()
 
         val anchorPos = Position(54.35, 18.65)
