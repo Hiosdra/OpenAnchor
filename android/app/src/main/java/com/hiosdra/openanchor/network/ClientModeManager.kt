@@ -37,6 +37,7 @@ class ClientModeManager @Inject constructor(
 
     private var collectionJob: Job? = null
     private var stateUpdateJob: Job? = null
+    private var alarmSendFailedEmitted = false
 
     // Client mode state exposed to the service and UI
     private val _clientModeState = MutableStateFlow(ClientModeState())
@@ -251,18 +252,24 @@ class ClientModeManager @Inject constructor(
             cog = cog
         )
 
-        val sent = wsClient.sendStateUpdate(StateUpdatePayload(
-            currentPos = LatLng(position.latitude, position.longitude),
-            gpsAccuracy = position.accuracy,
-            distanceToAnchor = distanceToAnchor,
-            alarmState = alarmState.name,
-            sog = sog,
-            cog = cog,
-            batteryLevel = batteryLevel,
-            isCharging = isCharging
-        ))
-        if (!sent) {
-            Log.w(TAG, "STATE_UPDATE send failed — connection lost")
+        if (alarmState != AlarmState.ALARM) {
+            alarmSendFailedEmitted = false
+        }
+
+        if (wsClient.isConnected) {
+            val sent = wsClient.sendStateUpdate(StateUpdatePayload(
+                currentPos = LatLng(position.latitude, position.longitude),
+                gpsAccuracy = position.accuracy,
+                distanceToAnchor = distanceToAnchor,
+                alarmState = alarmState.name,
+                sog = sog,
+                cog = cog,
+                batteryLevel = batteryLevel,
+                isCharging = isCharging
+            ))
+            if (!sent) {
+                Log.w(TAG, "STATE_UPDATE send failed — connection lost")
+            }
         }
     }
 
@@ -275,7 +282,8 @@ class ClientModeManager @Inject constructor(
             message = message,
             alarmState = alarmState.name
         ))
-        if (!sent) {
+        if (!sent && !alarmSendFailedEmitted) {
+            alarmSendFailedEmitted = true
             Log.w(TAG, "TRIGGER_ALARM send failed — connection lost, emitting local fallback")
             _events.tryEmit(ClientModeEvent.AlarmSendFailed(reason, message, alarmState))
         }

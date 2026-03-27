@@ -30,7 +30,6 @@ class StandaloneMonitorManager @Inject constructor(
     private var monitoringJob: Job? = null
     private var gpsWatchdogJob: Job? = null
     private val lastGpsFixTime = AtomicLong(System.currentTimeMillis())
-    private var lastDbWriteTime: Long = 0L
 
     fun startMonitoring(
         sessionId: Long,

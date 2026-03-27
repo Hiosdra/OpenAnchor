@@ -157,11 +157,10 @@ class ClientModeManagerTest {
     }
 
     @Test
-    fun `updateTelemetry sends even when disconnected but returns false`() {
+    fun `updateTelemetry does not send when disconnected`() {
         every { wsClient.isConnected } returns false
-        every { wsClient.sendStateUpdate(any()) } returns false
         manager.updateTelemetry(Position(54.36, 18.66), 25.0, AlarmState.SAFE)
-        verify { wsClient.sendStateUpdate(any()) }
+        verify(exactly = 0) { wsClient.sendStateUpdate(any()) }
     }
 
     @Test
