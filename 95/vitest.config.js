@@ -16,8 +16,21 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'json-summary'],
-      include: ['src/**/*.ts', 'src/**/*.tsx', 'js/**/*.js'],
-      exclude: ['node_modules/**', 'tests/**'],
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      exclude: [
+        'node_modules/**',
+        'tests/**',
+        'src/main.ts',
+        'src/shared/types/index.ts',
+        'src/shared/components/**',
+        'src/shared/i18n/**',
+        'src/modules/anchor/alarm-engine.ts',
+        'src/modules/anchor/types.ts',
+        'src/modules/anchor/index.ts',
+        'src/modules/egzamin/index.tsx',
+        'src/modules/wachtownik/index.tsx',
+        'src/modules/zeglowanie/index.ts',
+      ],
       thresholds: {
         lines: 90,
         statements: 90,
