@@ -56,24 +56,29 @@ object GeoCalculations {
      * Check zone status with multi-level support (INSIDE / BUFFER / OUTSIDE).
      */
     fun checkZone(boatPosition: Position, zone: AnchorZone): ZoneCheckResult {
+        val distance = distanceMeters(boatPosition, zone.anchorPosition)
+        return checkZone(boatPosition, zone, distance)
+    }
+
+    /**
+     * Check zone status using a pre-computed distance to avoid redundant Haversine calculations.
+     */
+    fun checkZone(boatPosition: Position, zone: AnchorZone, precomputedDistance: Double): ZoneCheckResult {
         return when (zone) {
             is AnchorZone.Circle -> {
-                val distance = distanceMeters(boatPosition, zone.anchorPosition)
                 when {
-                    distance <= zone.radiusMeters -> ZoneCheckResult.INSIDE
-                    zone.bufferRadiusMeters != null && distance <= zone.bufferRadiusMeters -> ZoneCheckResult.BUFFER
+                    precomputedDistance <= zone.radiusMeters -> ZoneCheckResult.INSIDE
+                    zone.bufferRadiusMeters != null && precomputedDistance <= zone.bufferRadiusMeters -> ZoneCheckResult.BUFFER
                     else -> ZoneCheckResult.OUTSIDE
                 }
             }
 
             is AnchorZone.SectorWithCircle -> {
-                val distance = distanceMeters(boatPosition, zone.anchorPosition)
-
                 // Inside small circle = always safe
-                if (distance <= zone.radiusMeters) return ZoneCheckResult.INSIDE
+                if (precomputedDistance <= zone.radiusMeters) return ZoneCheckResult.INSIDE
 
                 // Inside sector = safe if within sector radius AND within sector angle
-                if (distance <= zone.sectorRadiusMeters) {
+                if (precomputedDistance <= zone.sectorRadiusMeters) {
                     val bearing = bearingDegrees(zone.anchorPosition, boatPosition)
                     val angleDiff = angleDifference(bearing, zone.sectorBearingDeg)
                     if (angleDiff <= zone.sectorHalfAngleDeg) return ZoneCheckResult.INSIDE
@@ -84,11 +89,11 @@ object GeoCalculations {
                 if (bufferR != null) {
                     // Buffer for sector: use sectorRadiusMeters + buffer margin as outer limit
                     val sectorBufferRadius = zone.sectorRadiusMeters + (bufferR - zone.radiusMeters)
-                    if (distance <= zone.radiusMeters + (bufferR - zone.radiusMeters)) {
+                    if (precomputedDistance <= zone.radiusMeters + (bufferR - zone.radiusMeters)) {
                         // Inside the circle's buffer
                         return ZoneCheckResult.BUFFER
                     }
-                    if (distance <= sectorBufferRadius) {
+                    if (precomputedDistance <= sectorBufferRadius) {
                         val bearing = bearingDegrees(zone.anchorPosition, boatPosition)
                         val angleDiff = angleDifference(bearing, zone.sectorBearingDeg)
                         if (angleDiff <= zone.sectorHalfAngleDeg) return ZoneCheckResult.BUFFER

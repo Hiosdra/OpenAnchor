@@ -2279,6 +2279,28 @@
         }
     }
 
+    // Throttle utility – limits fn execution to at most once per `ms` milliseconds
+    function throttle(fn, ms) {
+        let last = 0, timer = null;
+        function throttled(...args) {
+            const now = Date.now();
+            clearTimeout(timer);
+            if (now - last >= ms) {
+                last = now;
+                return fn.apply(this, args);
+            }
+            timer = setTimeout(() => {
+                last = Date.now();
+                fn.apply(this, args);
+            }, ms - (now - last));
+        }
+        throttled.cancel = function() {
+            clearTimeout(timer);
+            timer = null;
+        };
+        return throttled;
+    }
+
     // ==========================================
     // 4. MAIN APP CORE (v2 with persistence + 4-level alarm)
     // ==========================================
@@ -2324,6 +2346,10 @@
             // Store GPS watch ID for cleanup
             this.gpsWatchId = null;
 
+            // RAF guard for batched DOM updates
+            this._rafPending = false;
+            this._smRafPending = false;
+
             // Cache frequently accessed DOM elements
             this._els = {
                 alarmStateBar: document.getElementById('alarm-state-bar'),
@@ -2337,6 +2363,17 @@
                 activeWatchBanner: document.getElementById('active-watch-banner'),
                 activeWatchName: document.getElementById('active-watch-name'),
                 watchBadge: document.getElementById('watch-badge'),
+                // Simple monitor elements
+                simpleMonitorOverlay: document.getElementById('simple-monitor-overlay'),
+                smDistance: document.getElementById('sm-distance'),
+                smUnitLabel: document.getElementById('sm-unit-label'),
+                smSog: document.getElementById('sm-sog'),
+                smCog: document.getElementById('sm-cog'),
+                smAccuracy: document.getElementById('sm-accuracy'),
+                smGpsLost: document.getElementById('sm-gps-lost'),
+                smAlarmLabel: document.getElementById('sm-alarm-label'),
+                smDismissAlarm: document.getElementById('sm-dismiss-alarm'),
+                warningText: document.getElementById('warning-text'),
             };
 
             // Debounced schedule save
@@ -2733,18 +2770,19 @@
                 const gpsOptions = this._batterySaverActive
                     ? { enableHighAccuracy: false, maximumAge: 5000, timeout: 10000 }
                     : { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 };
+                this._throttledOnPosition = throttle((pos) => this._onPosition(pos), 500);
                 this.gpsWatchId = navigator.geolocation.watchPosition(
-                    (pos) => this._onPosition(pos),
+                    this._throttledOnPosition,
                     (err) => {
-                        document.getElementById('no-signal-overlay').classList.remove('hidden');
+                        this._els.noSignalOverlay.classList.remove('hidden');
                         if (err.code === 1) {
-                            document.getElementById('warning-text').textContent = I18N.t.gpsPermDenied
+                            this._els.warningText.textContent = I18N.t.gpsPermDenied
                                 + ' ' + (I18N.t.gpsPermDeniedHelp || 'Check browser Site Settings to re-enable location access.');
                             UI.showModal('warning-modal');
                         } else if (err.code === 2 || err.code === 3) {
                             // Position unavailable or timeout - trigger GPS loss alarm if anchored
-                            document.getElementById('gps-status-text').textContent = I18N.t.gpsLost || 'GPS Lost';
-                            document.getElementById('gps-status').classList.replace('text-green-500', 'text-red-500');
+                            this._els.gpsStatusText.textContent = I18N.t.gpsLost || 'GPS Lost';
+                            this._els.gpsStatus.classList.replace('text-green-500', 'text-red-500');
                             if (this.state.isAnchored && !this.state.gpsSignalLost) {
                                 this.state.gpsSignalLost = true;
                                 this.gpsWatchdogAlerted = true;
@@ -2761,7 +2799,7 @@
                     },
                     gpsOptions
                 );
-            } else document.getElementById('no-signal-overlay').classList.remove('hidden');
+            } else this._els.noSignalOverlay.classList.remove('hidden');
         }
 
         _checkBatterySaver() {
@@ -2787,6 +2825,7 @@
         }
 
         _cleanupGPS() {
+            if (this._throttledOnPosition) this._throttledOnPosition.cancel();
             if (this.gpsWatchId !== null) {
                 navigator.geolocation.clearWatch(this.gpsWatchId);
                 this.gpsWatchId = null;
@@ -2812,8 +2851,8 @@
 
             if (!this.state.hasGpsFix) {
                 this.state.hasGpsFix = true;
-                document.getElementById('no-signal-overlay').classList.add('hidden');
-                document.getElementById('main-btn').disabled = false; document.getElementById('offset-btn').disabled = false;
+                this._els.noSignalOverlay.classList.add('hidden');
+                this._els.mainBtn.disabled = false; this._els.offsetBtn.disabled = false;
             }
 
             // Recover from GPS signal lost - auto-dismiss modal
@@ -2823,9 +2862,9 @@
                 UI.hideModal('gps-lost-modal');
             }
 
-            document.getElementById('gps-status-text').textContent = I18N.t.gpsOk;
-            document.getElementById('gps-status').classList.replace('text-yellow-500', 'text-green-500');
-            document.getElementById('gps-status').classList.replace('text-red-500', 'text-green-500');
+            this._els.gpsStatusText.textContent = I18N.t.gpsOk;
+            this._els.gpsStatus.classList.replace('text-yellow-500', 'text-green-500');
+            this._els.gpsStatus.classList.replace('text-red-500', 'text-green-500');
 
             this.mapCtrl.updateBoat(this.state.currentPos, this.state.accuracy, this.state.cog, !this.state.isAnchored && this.state.mapAutoCenter);
             this.state.track.push(this.state.currentPos);
@@ -2856,8 +2895,13 @@
         }
 
         _syncUI() {
-            UI.updateDashboard(GeoUtils.formatDist(this.state.distance, this.state.unit), this.state.sog, this.state.cog, GeoUtils.formatDist(this.state.accuracy, this.state.unit), this.state.unit, this.state.isAnchored);
-            (this._els.sectorBadge || document.getElementById('sector-badge')).classList.toggle('hidden', !this.state.sectorEnabled);
+            if (this._rafPending) return;
+            this._rafPending = true;
+            requestAnimationFrame(() => {
+                this._rafPending = false;
+                UI.updateDashboard(GeoUtils.formatDist(this.state.distance, this.state.unit), this.state.sog, this.state.cog, GeoUtils.formatDist(this.state.accuracy, this.state.unit), this.state.unit, this.state.isAnchored);
+                this._els.sectorBadge.classList.toggle('hidden', !this.state.sectorEnabled);
+            });
         }
 
         _checkWatchTimer() {
@@ -3778,34 +3822,39 @@ SAFETY: ...`;
         // ==========================================
         _updateSimpleMonitor() {
             if (!this._simpleMonitorActive) return;
+            if (this._smRafPending) return;
+            this._smRafPending = true;
 
-            const overlay = document.getElementById('simple-monitor-overlay');
-            const dist = this.state.isAnchored ? GeoUtils.formatDist(this.state.distance, this.state.unit) : '--';
-            const lbl = this.state.unit === 'm' ? I18N.t.smUnit : I18N.t.smUnitFt;
+            requestAnimationFrame(() => {
+                this._smRafPending = false;
+                const els = this._els;
+                const dist = this.state.isAnchored ? GeoUtils.formatDist(this.state.distance, this.state.unit) : '--';
+                const lbl = this.state.unit === 'm' ? I18N.t.smUnit : I18N.t.smUnitFt;
 
-            document.getElementById('sm-distance').textContent = dist;
-            document.getElementById('sm-unit-label').textContent = lbl;
-            document.getElementById('sm-sog').textContent = this.state.sog.toFixed(1);
-            document.getElementById('sm-cog').textContent = this.state.cog !== null ? Math.round(this.state.cog) + '°' : '---';
-            document.getElementById('sm-accuracy').textContent = GeoUtils.formatDist(this.state.accuracy, this.state.unit);
+                els.smDistance.textContent = dist;
+                els.smUnitLabel.textContent = lbl;
+                els.smSog.textContent = this.state.sog.toFixed(1);
+                els.smCog.textContent = this.state.cog !== null ? Math.round(this.state.cog) + '°' : '---';
+                els.smAccuracy.textContent = GeoUtils.formatDist(this.state.accuracy, this.state.unit);
 
-            // GPS lost warning
-            document.getElementById('sm-gps-lost').classList.toggle('hidden', !this.state.gpsSignalLost);
+                // GPS lost warning
+                els.smGpsLost.classList.toggle('hidden', !this.state.gpsSignalLost);
 
-            // Alarm state colors
-            const stateColors = { 'SAFE': 'green', 'CAUTION': 'yellow', 'WARNING': 'orange', 'ALARM': 'red' };
-            const stateLabels = { 'SAFE': 'SAFE', 'CAUTION': 'CAUTION', 'WARNING': 'WARNING', 'ALARM': 'ALARM' };
-            const color = stateColors[this.state.alarmState] || 'green';
+                // Alarm state colors
+                const stateColors = { 'SAFE': 'green', 'CAUTION': 'yellow', 'WARNING': 'orange', 'ALARM': 'red' };
+                const stateLabels = { 'SAFE': 'SAFE', 'CAUTION': 'CAUTION', 'WARNING': 'WARNING', 'ALARM': 'ALARM' };
+                const color = stateColors[this.state.alarmState] || 'green';
 
-            document.getElementById('sm-alarm-label').textContent = stateLabels[this.state.alarmState] || 'SAFE';
-            document.getElementById('sm-alarm-label').className = `text-lg font-bold uppercase tracking-widest mb-2 text-${color}-500`;
-            document.getElementById('sm-distance').className = `text-[120px] leading-none font-bold tabular-nums text-${color}-500`;
+                els.smAlarmLabel.textContent = stateLabels[this.state.alarmState] || 'SAFE';
+                els.smAlarmLabel.className = `text-lg font-bold uppercase tracking-widest mb-2 text-${color}-500`;
+                els.smDistance.className = `text-[120px] leading-none font-bold tabular-nums text-${color}-500`;
 
-            // Background
-            overlay.className = `fixed inset-0 z-[5500] flex flex-col simple-monitor-bg-${this.state.alarmState.toLowerCase()}`;
+                // Background
+                els.simpleMonitorOverlay.className = `fixed inset-0 z-[5500] flex flex-col simple-monitor-bg-${this.state.alarmState.toLowerCase()}`;
 
-            // Dismiss alarm button visibility
-            document.getElementById('sm-dismiss-alarm').classList.toggle('hidden', this.state.alarmState !== 'ALARM');
+                // Dismiss alarm button visibility
+                els.smDismissAlarm.classList.toggle('hidden', this.state.alarmState !== 'ALARM');
+            });
         }
 
         // ==========================================
