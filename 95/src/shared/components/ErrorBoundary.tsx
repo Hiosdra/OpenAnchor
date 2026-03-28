@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <div style={{ padding: '2rem', textAlign: 'center' }}>
           <h2>Coś poszło nie tak</h2>
           <p>{this.state.error?.message}</p>
-          <button onClick={() => this.setState({ hasError: false, error: null })}>
+          <button type="button" onClick={() => this.setState({ hasError: false, error: null })}>
             Spróbuj ponownie
           </button>
         </div>

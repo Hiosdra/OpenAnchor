@@ -1,5 +1,5 @@
 /**
- * PdfRenderer - PDF page rendering singleton with LRU cache.
+ * PdfRenderer - PDF page rendering singleton with in-memory FIFO page cache.
  *
  * Migrated from js/pdf-renderer.js
  *
@@ -110,8 +110,20 @@ export const PdfRenderer = {
 };
 
 // Clear PDF cache when tab is hidden to reduce memory pressure
-document.addEventListener('visibilitychange', function () {
-  if (document.hidden && PdfRenderer._cache.size > 0) {
-    PdfRenderer._cache.clear();
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  const w = window as any;
+  if (!w.__pdfRendererVisibilityListenerRegistered) {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && PdfRenderer._cache.size > 0) {
+        PdfRenderer._cache.clear();
+      }
+    });
+    w.__pdfRendererVisibilityListenerRegistered = true;
   }
-});
+}
+
+if ((import.meta as any).hot) {
+  (import.meta as any).hot.dispose(() => {
+    (window as any).__pdfRendererVisibilityListenerRegistered = false;
+  });
+}
