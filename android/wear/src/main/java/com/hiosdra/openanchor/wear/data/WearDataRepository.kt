@@ -32,8 +32,7 @@ class WearDataRepository @Inject constructor(
 ) {
 
     internal var ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-    private val scope: CoroutineScope
-        get() = CoroutineScope(ioDispatcher + SupervisorJob())
+    private val scope by lazy { CoroutineScope(SupervisorJob() + ioDispatcher) }
 
     private companion object {
         const val TAG = "WearDataRepository"

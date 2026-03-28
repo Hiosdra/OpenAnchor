@@ -9,6 +9,7 @@ import com.hiosdra.openanchor.wear.data.db.WearTrackPointEntity
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -52,7 +53,7 @@ class WearDataRepositoryTest {
 
         // Create a mock connectionManager
         connectionManager = mockk(relaxed = true)
-        coEvery { connectionManager.connected } returns kotlinx.coroutines.flow.MutableStateFlow(false)
+        every { connectionManager.connected } returns kotlinx.coroutines.flow.MutableStateFlow(false)
 
         repository = WearDataRepository(
             stateHolder = stateHolder,
@@ -204,7 +205,7 @@ class WearDataRepositoryTest {
 
     @Test
     fun `screenState should return Connecting when not connected and no history`() {
-        coEvery { connectionManager.connected } returns kotlinx.coroutines.flow.MutableStateFlow(false)
+        every { connectionManager.connected } returns kotlinx.coroutines.flow.MutableStateFlow(false)
         val screenState = repository.screenState()
         assertEquals(WearScreenState.Connecting, screenState)
     }

@@ -1,6 +1,7 @@
 package com.hiosdra.openanchor.wear.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class WearScreenStateTest {
@@ -81,9 +82,5 @@ class WearScreenStateTest {
 
         assertTrue(result is WearScreenState.Monitoring)
         assertEquals(WearAlarmState.ALARM, (result as WearScreenState.Monitoring).alarmState)
-    }
-
-    private fun assertTrue(condition: Boolean) {
-        org.junit.Assert.assertTrue(condition)
     }
 }

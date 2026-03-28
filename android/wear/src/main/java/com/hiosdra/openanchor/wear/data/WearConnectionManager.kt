@@ -51,6 +51,9 @@ class WearConnectionManager @Inject constructor(
     private var watchdogJob: Job? = null
 
     @Volatile
+    private var isLoaded = false
+
+    @Volatile
     private var cachedAuthorizedNodeId: String? = null
 
     val authorizedPhoneNodeIdFlow: Flow<String?> =
@@ -59,30 +62,47 @@ class WearConnectionManager @Inject constructor(
     init {
         scope.launch {
             cachedAuthorizedNodeId = dataStore.data.first()[AUTHORIZED_PHONE_NODE_ID_KEY]
+            isLoaded = true
         }
     }
 
     /**
      * Check whether a phone node is authorized to send data.
+     * Returns false until the cached authorization is loaded from DataStore.
      * Returns true if no phone is authorized yet (first-come) or if the node matches.
      */
     fun isNodeAuthorized(nodeId: String): Boolean {
+        if (!isLoaded) return false // Don't accept data until we know who's authorized
         val authorized = cachedAuthorizedNodeId
         return authorized == null || authorized == nodeId
     }
 
     /**
      * Authorize a phone node to send data. Persists to DataStore and records connection history.
+     * Idempotent: no-op if the same node is already authorized.
+     * Closes the previous active connection when switching to a different node.
      */
     fun authorizeNode(nodeId: String, displayName: String) {
+        if (cachedAuthorizedNodeId == nodeId) return // Already authorized
+
         cachedAuthorizedNodeId = nodeId
         scope.launch {
+            val now = System.currentTimeMillis()
+
             dataStore.edit { it[AUTHORIZED_PHONE_NODE_ID_KEY] = nodeId }
+
+            // Close any existing active connection from a different node
+            connectionHistoryDao.getActiveConnection()?.let { active ->
+                if (active.phoneNodeId != nodeId) {
+                    connectionHistoryDao.updateDisconnectTime(active.id, now)
+                }
+            }
+
             connectionHistoryDao.insert(
                 WearConnectionHistoryEntity(
                     phoneNodeId = nodeId,
                     phoneDisplayName = displayName,
-                    connectedAt = System.currentTimeMillis()
+                    connectedAt = now
                 )
             )
         }
