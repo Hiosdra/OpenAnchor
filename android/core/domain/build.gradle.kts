@@ -10,5 +10,5 @@ android {
 dependencies {
     implementation(libs.kotlinx.coroutines.android)
     // Allow @Inject in domain classes
-    implementation("javax.inject:javax.inject:1")
+    implementation(libs.javax.inject)
 }

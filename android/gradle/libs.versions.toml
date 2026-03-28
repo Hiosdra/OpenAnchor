@@ -36,6 +36,7 @@ mockk = "1.14.9"
 coroutinesTest = "1.10.2"
 robolectric = "4.15"
 turbine = "1.2.0"
+javaxInject = "1"
 
 [libraries]
 # Core
@@ -129,6 +130,9 @@ robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
+
+# Dependency Injection (lightweight)
+javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" }
 
 # Gradle plugins (for build-logic)
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }

@@ -238,8 +238,7 @@ fun ClientDashboardScreen(
                             Text("Distance: %.0f m".format(report.distanceToAnchor))
                             Text("Zone: ${report.zoneCheckResult}")
                         }
-                        if (report.batteryLevel != null) {
-                            val bl = report.batteryLevel!!
+                        report.batteryLevel?.let { bl ->
                             Text(
                                 text = stringResource(R.string.peer_battery, bl),
                                 style = MaterialTheme.typography.bodySmall
@@ -277,15 +276,13 @@ fun ClientDashboardScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             uiState.serverGpsReport?.let { report ->
-                                if (report.driftBearingDeg != null) {
-                                    val db = report.driftBearingDeg!!
+                                report.driftBearingDeg?.let { db ->
                                     Text(
                                         stringResource(R.string.drift_direction, db),
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }
-                                if (report.driftSpeedMps != null) {
-                                    val ds = report.driftSpeedMps!!
+                                report.driftSpeedMps?.let { ds ->
                                     Text(
                                         stringResource(R.string.drift_speed, ds * 60),
                                         style = MaterialTheme.typography.bodySmall

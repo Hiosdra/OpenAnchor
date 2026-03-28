@@ -12,10 +12,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
 
-    testImplementation(project(":core:testing"))
-}
-
-// Additional dependencies
-dependencies {
     implementation(libs.osmdroid)
+
+    testImplementation(project(":core:testing"))
 }

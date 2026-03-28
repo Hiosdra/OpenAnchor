@@ -8,13 +8,12 @@ import android.os.IBinder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,7 +33,6 @@ class ServiceBinder @Inject constructor(
     override val monitorState: StateFlow<MonitorState> = _monitorState.asStateFlow()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private var monitorCollectJob: Job? = null
 
     private val _serviceInstance = MutableStateFlow<AnchorMonitorService?>(null)
     val serviceInstance: StateFlow<AnchorMonitorService?> = _serviceInstance.asStateFlow()
@@ -42,10 +40,10 @@ class ServiceBinder @Inject constructor(
     init {
         // Propagate service monitorState to the interface's monitorState
         scope.launch {
-            _serviceInstance.filterNotNull().collectLatest { svc ->
-                svc.monitorState.collect { state ->
-                    _monitorState.value = state
-                }
+            _serviceInstance.flatMapLatest { svc ->
+                svc?.monitorState ?: flowOf(MonitorState())
+            }.collect { state ->
+                _monitorState.value = state
             }
         }
     }

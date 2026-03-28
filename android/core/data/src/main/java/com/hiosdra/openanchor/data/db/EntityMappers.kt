@@ -48,10 +48,12 @@ fun AnchorSession.toEntity(): AnchorSessionEntity {
             sectorBearing = null
         }
         is AnchorZone.SectorWithCircle -> {
+            // Single cast needed: smart cast doesn't work across module boundaries
+            val sector = zone as AnchorZone.SectorWithCircle
             zoneTypeStr = "SECTOR"
-            sectorRadius = (zone as AnchorZone.SectorWithCircle).sectorRadiusMeters
-            sectorAngle = (zone as AnchorZone.SectorWithCircle).sectorHalfAngleDeg
-            sectorBearing = (zone as AnchorZone.SectorWithCircle).sectorBearingDeg
+            sectorRadius = sector.sectorRadiusMeters
+            sectorAngle = sector.sectorHalfAngleDeg
+            sectorBearing = sector.sectorBearingDeg
         }
     }
 
