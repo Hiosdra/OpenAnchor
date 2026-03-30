@@ -49,7 +49,7 @@ export async function loadPdfBlob(): Promise<Blob | null> {
       request.onsuccess = () => {
         resolve(request.result ? (request.result as PdfStorageRecord).blob : null);
       };
-      request.onerror = () => { reject(request.error); };
+      request.onerror = () => { db.close(); reject(request.error); };
       tx.oncomplete = () => { db.close(); };
       tx.onerror = () => { db.close(); };
     });
@@ -68,7 +68,7 @@ export async function loadPdfMeta(): Promise<PdfMetadata | null> {
       request.onsuccess = () => {
         resolve(request.result ? (request.result as PdfStorageRecord).metadata : null);
       };
-      request.onerror = () => { reject(request.error); };
+      request.onerror = () => { db.close(); reject(request.error); };
       tx.oncomplete = () => { db.close(); };
       tx.onerror = () => { db.close(); };
     });
