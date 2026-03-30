@@ -23,8 +23,10 @@ interface PdfDocument {
   destroy: () => void;
 }
 
-// Configure pdf.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// Configure pdf.js worker (guard against duplicate init during HMR)
+if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
 
 export const PdfRenderer = {
   _pdfDoc: null as PdfDocument | null,

@@ -92,7 +92,7 @@ export function calculateSOG(positions: Position[]): number {
   const distance = calculateDistance(pos1.lat, pos1.lon, pos2.lat, pos2.lon);
   const timeSeconds = (pos2.timestamp - pos1.timestamp) / 1000;
 
-  if (timeSeconds === 0) {
+  if (timeSeconds < 0.5) {
     return 0;
   }
 
