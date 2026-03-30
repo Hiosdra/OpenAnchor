@@ -132,7 +132,7 @@ jobs:
           retention-days: 30
 
       - name: Publish Android test report
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         if: always()
         with:
           name: Android Unit Tests
@@ -352,13 +352,13 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download PWA coverage
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: pwa-coverage
           path: pwa-coverage
 
       - name: Download Android coverage
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: android-coverage
           path: android-coverage
@@ -449,7 +449,7 @@ jobs:
           echo "_Coverage thresholds enforced: PWA ≥ 90% lines/statements/functions/branches (vitest), Android ≥ 90% lines (JaCoCo, after exclusions). Build fails if breached._" >> coverage-comment.md
 
       - name: Comment PR with coverage
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: coverage-report
           path: coverage-comment.md
