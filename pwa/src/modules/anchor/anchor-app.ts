@@ -1354,7 +1354,7 @@ export class AnchorApp {
       this.alertCtrl.initPermissions();
       let d = parseFloat((document.getElementById('offset-dist') as HTMLInputElement).value) || 0;
       if (this.state.unit === 'ft') d = d / GeoUtils.M2FT;
-      this._setAnchor(GeoUtils.getDestinationPoint(this.state.currentPos.lat, this.state.currentPos.lng, d, parseFloat((document.getElementById('offset-bearing') as HTMLInputElement).value) || 0));
+      this._setAnchor(GeoUtils.getDestinationPoint(this.state.currentPos.lat, this.state.currentPos.lng, d, parseFloat((document.getElementById('offset-bearing') as HTMLInputElement).value) || 0) as unknown as L.LatLng);
       UI.hideModal('offset-modal');
     });
 

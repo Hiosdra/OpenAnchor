@@ -4,8 +4,12 @@
  * Migrated from js/anchor-utils.js and modules/anchor/index.html inline script.
  */
 
-import L from 'leaflet';
 import type { AlarmStates, AlarmStateValue, Position } from '../../shared/types/index';
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
 
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3; // Earth's radius in meters
@@ -141,7 +145,7 @@ export class GeoUtils {
     return Math.round(unit === 'ft' ? meters * this.M2FT : meters);
   }
 
-  static getDestinationPoint(lat: number, lng: number, distance: number, bearing: number): L.LatLng {
+  static getDestinationPoint(lat: number, lng: number, distance: number, bearing: number): LatLng {
     const R = 6371e3;
     const brng = (bearing * Math.PI) / 180;
     const lat1 = (lat * Math.PI) / 180;
@@ -155,10 +159,10 @@ export class GeoUtils {
         Math.sin(brng) * Math.sin(distance / R) * Math.cos(lat1),
         Math.cos(distance / R) - Math.sin(lat1) * Math.sin(lat2)
       );
-    return L.latLng((lat2 * 180) / Math.PI, (lon2 * 180) / Math.PI);
+    return { lat: (lat2 * 180) / Math.PI, lng: (lon2 * 180) / Math.PI };
   }
 
-  static getBearing(start: L.LatLng, end: L.LatLng): number {
+  static getBearing(start: LatLng, end: LatLng): number {
     const lat1 = (start.lat * Math.PI) / 180;
     const lat2 = (end.lat * Math.PI) / 180;
     const lon1 = (start.lng * Math.PI) / 180;
@@ -169,12 +173,12 @@ export class GeoUtils {
   }
 
   static getSectorPolygonPoints(
-    center: L.LatLng,
+    center: LatLng,
     radiusMeters: number,
     bearing: number,
     width: number
-  ): L.LatLng[] {
-    const points: L.LatLng[] = [];
+  ): LatLng[] {
+    const points: LatLng[] = [];
     const startAngle = bearing - width / 2;
     for (let i = 0; i <= 30; i++) {
       points.push(this.getDestinationPoint(center.lat, center.lng, radiusMeters, startAngle + (width * i) / 30));

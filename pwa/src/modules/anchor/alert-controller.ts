@@ -78,7 +78,7 @@ export class AlertController {
   triggerNotification(msg: string) {
     if ('Notification' in window && Notification.permission === 'granted') {
       navigator.serviceWorker.ready
-        .then((reg) => reg.showNotification(I18N.t.notifTitle, { body: msg, vibrate: [500, 200, 500] }))
+        .then((reg) => reg.showNotification(I18N.t.notifTitle, { body: msg, vibrate: [500, 200, 500] } as NotificationOptions))
         .catch(() => new Notification(I18N.t.notifTitle, { body: msg }));
     }
   }
