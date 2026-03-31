@@ -1,12 +1,9 @@
 /**
- * OpenAnchor PWA - Main entry point
+ * OpenAnchor PWA - Main entry point (Vite)
  *
- * This is the Vite entry point for the dashboard.
- * Module-specific entry points are in their respective directories.
+ * Initializes the dashboard: theme, SW updates, PWA install banner, module navigation.
  */
 
-import './shared/types/index';
+import { initDashboard } from './modules/dashboard/dashboard-ui';
 
-// Dashboard will be initialized when the full migration from index.html is complete.
-// For now, this file serves as the Vite entry point.
-console.log('OpenAnchor PWA initialized');
+initDashboard();

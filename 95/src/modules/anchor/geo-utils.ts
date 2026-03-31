@@ -1,10 +1,15 @@
 /**
  * Anchor Alarm module - GPS calculations and alarm logic
  *
- * Migrated from js/anchor-utils.js
+ * Migrated from js/anchor-utils.js and modules/anchor/index.html inline script.
  */
 
 import type { AlarmStates, AlarmStateValue, Position } from '../../shared/types/index';
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
 
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3; // Earth's radius in meters
@@ -124,4 +129,60 @@ export function isValidCoordinates(lat: number, lon: number): boolean {
     !isNaN(lat) &&
     !isNaN(lon)
   );
+}
+
+/**
+ * GeoUtils — UI-facing geo utility class used by the anchor module UI.
+ *
+ * Provides unit conversion, destination-point calculation, bearing helpers,
+ * and sector polygon generation for Leaflet map overlays.
+ */
+export class GeoUtils {
+  static M2FT = 3.28084;
+  static MPS2KNOTS = 1.94384;
+
+  static formatDist(meters: number, unit: string): number {
+    return Math.round(unit === 'ft' ? meters * this.M2FT : meters);
+  }
+
+  static getDestinationPoint(lat: number, lng: number, distance: number, bearing: number): LatLng {
+    const R = 6371e3;
+    const brng = (bearing * Math.PI) / 180;
+    const lat1 = (lat * Math.PI) / 180;
+    const lon1 = (lng * Math.PI) / 180;
+    const lat2 = Math.asin(
+      Math.sin(lat1) * Math.cos(distance / R) + Math.cos(lat1) * Math.sin(distance / R) * Math.cos(brng)
+    );
+    const lon2 =
+      lon1 +
+      Math.atan2(
+        Math.sin(brng) * Math.sin(distance / R) * Math.cos(lat1),
+        Math.cos(distance / R) - Math.sin(lat1) * Math.sin(lat2)
+      );
+    return { lat: (lat2 * 180) / Math.PI, lng: (lon2 * 180) / Math.PI };
+  }
+
+  static getBearing(start: LatLng, end: LatLng): number {
+    const lat1 = (start.lat * Math.PI) / 180;
+    const lat2 = (end.lat * Math.PI) / 180;
+    const lon1 = (start.lng * Math.PI) / 180;
+    const lon2 = (end.lng * Math.PI) / 180;
+    const y = Math.sin(lon2 - lon1) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+  }
+
+  static getSectorPolygonPoints(
+    center: LatLng,
+    radiusMeters: number,
+    bearing: number,
+    width: number
+  ): LatLng[] {
+    const points: LatLng[] = [];
+    const startAngle = bearing - width / 2;
+    for (let i = 0; i <= 30; i++) {
+      points.push(this.getDestinationPoint(center.lat, center.lng, radiusMeters, startAngle + (width * i) / 30));
+    }
+    return points;
+  }
 }

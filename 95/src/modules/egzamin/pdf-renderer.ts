@@ -2,34 +2,21 @@
  * PdfRenderer - PDF page rendering singleton with in-memory FIFO page cache.
  *
  * Migrated from js/pdf-renderer.js
- *
- * Note: This module requires pdfjsLib to be available globally (loaded via CDN or npm).
- * In the Vite build, pdf.js would be imported as a proper dependency.
  */
 
-declare const pdfjsLib: {
-  GlobalWorkerOptions: { workerSrc: string };
-  getDocument: (params: { data: ArrayBuffer }) => { promise: Promise<PdfDocument> };
-};
+import * as pdfjsLib from 'pdfjs-dist';
+import type { PDFDocumentProxy } from 'pdfjs-dist';
 
-interface PdfPage {
-  getViewport: (params: { scale: number }) => { width: number; height: number };
-  render: (params: { canvasContext: CanvasRenderingContext2D; viewport: { width: number; height: number }; annotationMode: number }) => { promise: Promise<void> };
-}
-
-interface PdfDocument {
-  numPages: number;
-  getPage: (pageNumber: number) => Promise<PdfPage>;
-  destroy: () => void;
-}
-
-// Configure pdf.js worker (guard against duplicate init during HMR)
+// Configure pdf.js worker using the npm package (guard against duplicate init during HMR)
 if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.mjs',
+    import.meta.url
+  ).toString();
 }
 
 export const PdfRenderer = {
-  _pdfDoc: null as PdfDocument | null,
+  _pdfDoc: null as PDFDocumentProxy | null,
   _cache: new Map<string, HTMLCanvasElement>(),
   _MAX_CACHE: 32,
   _blobUrls: [] as string[],
@@ -58,7 +45,7 @@ export const PdfRenderer = {
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     const ctx = canvas.getContext('2d')!;
-    await page.render({ canvasContext: ctx, viewport: viewport, annotationMode: 0 }).promise;
+    await page.render({ canvasContext: ctx, viewport: viewport, annotationMode: 0 } as Parameters<typeof page.render>[0]).promise;
 
     if (this._cache.size >= this._MAX_CACHE) {
       const firstKey = this._cache.keys().next().value;
@@ -113,19 +100,28 @@ export const PdfRenderer = {
 
 // Clear PDF cache when tab is hidden to reduce memory pressure
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  const w = window as any;
+  const w = window as unknown as {
+    __pdfRendererVisibilityListenerRegistered?: boolean;
+    __pdfRendererVisibilityListener?: () => void;
+  };
+
   if (!w.__pdfRendererVisibilityListenerRegistered) {
-    document.addEventListener('visibilitychange', () => {
+    w.__pdfRendererVisibilityListener = () => {
       if (document.hidden && PdfRenderer._cache.size > 0) {
         PdfRenderer._cache.clear();
       }
-    });
+    };
+    document.addEventListener('visibilitychange', w.__pdfRendererVisibilityListener);
     w.__pdfRendererVisibilityListenerRegistered = true;
-  }
-}
 
-if ((import.meta as any).hot) {
-  (import.meta as any).hot.dispose(() => {
-    (window as any).__pdfRendererVisibilityListenerRegistered = false;
-  });
+    if ((import.meta as any).hot) {
+      (import.meta as any).hot.dispose(() => {
+        if (w.__pdfRendererVisibilityListener) {
+          document.removeEventListener('visibilitychange', w.__pdfRendererVisibilityListener);
+        }
+        w.__pdfRendererVisibilityListenerRegistered = false;
+        w.__pdfRendererVisibilityListener = undefined;
+      });
+    }
+  }
 }
