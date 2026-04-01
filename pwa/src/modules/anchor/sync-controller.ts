@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { createIcons } from 'lucide';
+import { createIcons, icons } from 'lucide';
 import { I18N } from './i18n';
 import { UI } from './ui-utils';
 import type { AnchorApp } from './anchor-app';
@@ -102,7 +102,7 @@ export class SyncController {
       document.getElementById('warning-title')!.innerHTML = `<i data-lucide="wifi-off" class="text-orange-500"></i> ${I18N.t.wsConnLost}`;
       document.getElementById('warning-text')!.textContent = I18N.t.wsConnLostBody;
       UI.showModal('warning-modal');
-      createIcons();
+      createIcons({ icons });
       this._closeSocket();
       this._onClose();
     }

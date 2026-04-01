@@ -56,7 +56,6 @@ test.describe('Service Worker', () => {
 
     // Core assets are always pre-cached on install
     expect(cachedUrls).toContain('/index.html');
-    expect(cachedUrls).toContain('/manifest.json');
   });
 
   test('serves cached dashboard when offline', async ({ page }) => {

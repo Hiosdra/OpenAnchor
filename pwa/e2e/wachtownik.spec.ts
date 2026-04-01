@@ -13,7 +13,7 @@ const waitForApp = async (page: import('@playwright/test').Page) => {
 
 /** Scroll element to viewport center (avoids sticky header occlusion) then click */
 const scrollClick = async (locator: import('@playwright/test').Locator) => {
-  await locator.evaluate(el => el.scrollIntoView({ block: 'center' }));
+  await locator.scrollIntoViewIfNeeded();
   await locator.click();
 };
 
