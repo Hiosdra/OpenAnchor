@@ -28,7 +28,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npx http-server . -p 8081 -s -c-1',
+    command: 'npm run build && npx vite preview --port 8081',
     port: 8081,
     reuseExistingServer: !process.env.CI,
   },
