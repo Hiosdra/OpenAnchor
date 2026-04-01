@@ -1,9 +1,9 @@
-import { createIcons } from 'lucide';
+import { createIcons, icons } from 'lucide';
 import { I18N } from './i18n';
 
 export const UI = {
   init() {
-    createIcons();
+    createIcons({ icons });
     this._bindGlobalEvents();
   },
 

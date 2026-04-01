@@ -12,43 +12,54 @@ const waitForApp = async (page: import('@playwright/test').Page) => {
 };
 
 // Stub PDF storage and renderer so the egzamin module skips the ImportPdfScreen.
-// Without these stubs, the module blocks on PDF import and all tests timeout.
-test.beforeEach(async ({ page }) => {
-  // Intercept exam-pdf-storage.js and append stubs so isPdfImported() returns true
-  await page.route('**/js/exam-pdf-storage.js', async route => {
-    const response = await route.fetch();
-    const body = await response.text();
-    const stubbed = body + `\n;
-      // --- E2E test stubs ---
-      isPdfImported = async function() { return true; };
-      loadPdfBlob = async function() { return new Blob(['fake-pdf'], { type: 'application/pdf' }); };
-    `;
-    await route.fulfill({ body: stubbed, contentType: 'application/javascript' });
-  });
+// After Vite migration, JS is bundled — we patch isPdfImported, loadFromBlob, and renderQuestion.
+const PLACEHOLDER_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
 
-  // Replace pdf-renderer.js entirely with a lightweight stub
-  await page.route('**/js/pdf-renderer.js', async route => {
-    const PLACEHOLDER_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
-    const stub = `
-      var PdfRenderer = {
-        _pdfDoc: { numPages: 200 },
-        _cache: new Map(),
-        _MAX_CACHE: 8,
-        async loadFromBlob() { return 200; },
-        _getScale() { return 2.0; },
-        async renderPage() {
-          var c = document.createElement('canvas');
-          c.width = 100; c.height = 100;
-          return c;
-        },
-        async renderQuestion() {
-          return '${PLACEHOLDER_PNG}';
-        },
-        isLoaded() { return true; },
-        unload() { this._pdfDoc = null; this._cache.clear(); }
-      };
-    `;
-    await route.fulfill({ body: stub, contentType: 'application/javascript' });
+test.beforeEach(async ({ page }) => {
+  // Block SW so controllerchange doesn't interrupt navigation
+  await page.route('**/sw.js', route => route.abort());
+
+  // Patch the bundled egzamin JS to skip PDF initialization.
+  // The bundle has 2 .loadFromBlob calls: import handler (sets false) and init block (sets true).
+  // We replace the init block (the one with !0/true) to directly set pdfLoaded=true.
+  await page.route('**/assets/egzamin-*.js', async route => {
+    const response = await route.fetch();
+    let body = await response.text();
+
+    // Find the init block: second occurrence of .loadFromBlob(
+    const first = body.indexOf('.loadFromBlob(');
+    const second = first !== -1 ? body.indexOf('.loadFromBlob(', first + 1) : -1;
+    if (second !== -1) {
+      const searchStart = body.lastIndexOf('if(await ', second);
+      let depth = 0, blockEnd = searchStart;
+      for (let i = searchStart; i < body.length; i++) {
+        if (body[i] === '{') depth++;
+        if (body[i] === '}') { depth--; if (depth === 0) { blockEnd = i + 1; break; } }
+      }
+      const block = body.substring(searchStart, blockEnd);
+      const rvArr = block.match(/await (\w+)\.loadFromBlob/);
+      const svArr = block.match(/,(\w+)\(!0\)/);
+      if (rvArr && svArr) {
+        const rv = rvArr[1];
+        const sv = svArr[1];
+        const stub = `${rv}._pdfDoc={numPages:200,getPage:async()=>({getViewport:()=>({width:100,height:100}),render:()=>({promise:Promise.resolve()})})};${rv}._cache=new Map();${sv}(!0)`;
+        body = body.substring(0, searchStart) + stub + body.substring(blockEnd);
+      }
+    }
+
+    // Stub renderQuestion: replace entire method body with a stub that returns placeholder
+    const rqStart = body.indexOf('renderQuestion(e,t,n,r,i){');
+    if (rqStart !== -1) {
+      const bodyStart = body.indexOf('{', rqStart);
+      let depth = 0, bodyEnd = bodyStart;
+      for (let i = bodyStart; i < body.length; i++) {
+        if (body[i] === '{') depth++;
+        if (body[i] === '}') { depth--; if (depth === 0) { bodyEnd = i + 1; break; } }
+      }
+      body = body.substring(0, bodyStart) + `{return'${PLACEHOLDER_PNG}'}` + body.substring(bodyEnd);
+    }
+
+    await route.fulfill({ body, contentType: 'application/javascript' });
   });
 });
 
@@ -640,24 +651,19 @@ test.describe('Leitner Mode', () => {
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
 
-    // Pre-seed Leitner state with only 1 question due (fetch questions from JSON)
-    await page.evaluate(async () => {
-      const res = await fetch('exam_questions.json');
-      const questions: { id: string }[] = await res.json();
-      if (!questions || questions.length === 0) return;
-
-      // Set all questions to box 5 recently reviewed except the first one (box 1, long ago)
+    // Pre-seed Leitner state with only 1 question due.
+    // Questions are bundled in Vite builds with numeric IDs 1..330.
+    await page.evaluate(() => {
       const boxes: Record<string, { box: number; lastReview: number; reviewCount: number }> = {};
-      questions.forEach((q, i) => {
+      for (let i = 0; i < 330; i++) {
+        const id = String(i + 1);
         if (i === 0) {
-          boxes[q.id] = { box: 1, lastReview: 0, reviewCount: 0 };
+          boxes[id] = { box: 1, lastReview: 0, reviewCount: 0 };
         } else {
-          boxes[q.id] = { box: 5, lastReview: Date.now(), reviewCount: 5 };
+          boxes[id] = { box: 5, lastReview: Date.now(), reviewCount: 5 };
         }
-      });
-
-      const leitnerState = { boxes };
-      localStorage.setItem('openanchor_leitner', JSON.stringify(leitnerState));
+      }
+      localStorage.setItem('openanchor_leitner', JSON.stringify({ boxes }));
     });
 
     // Reload to pick up seeded state

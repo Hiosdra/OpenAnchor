@@ -9,7 +9,7 @@
 import L from 'leaflet';
 import { marked } from 'marked';
 import { Html5Qrcode } from 'html5-qrcode';
-import { createIcons } from 'lucide';
+import { createIcons, icons } from 'lucide';
 import { I18N } from './i18n';
 import { GeoUtils } from './geo-utils';
 import { AlarmEngine } from './alarm-engine';
@@ -811,7 +811,7 @@ export class AnchorApp {
       });
       list.appendChild(div);
     });
-    createIcons();
+    createIcons({ icons });
     this._checkSchedule();
   }
 
@@ -901,7 +901,7 @@ export class AnchorApp {
               `;
               logbookEntries.appendChild(div);
             }
-            createIcons();
+            createIcons({ icons });
           }
         } catch (_) { /* ignore */ }
       }
@@ -1003,7 +1003,7 @@ export class AnchorApp {
     loadBubble.className = 'flex justify-start';
     loadBubble.innerHTML = `<div class="bg-slate-700 text-slate-300 text-sm px-3 py-2 rounded-xl rounded-bl-sm max-w-[85%] flex items-center gap-2"><i data-lucide="loader-2" class="animate-spin w-4 h-4 text-purple-400"></i> <span class="text-xs">${I18N.t.aiAnalyzing}</span></div>`;
     chatArea.appendChild(loadBubble);
-    createIcons();
+    createIcons({ icons });
     input.value = '';
     askBtn.disabled = true;
     chatArea.scrollTop = chatArea.scrollHeight;
@@ -1030,7 +1030,7 @@ export class AnchorApp {
 
     const response = await this.aiCtrl.askWithContext(question, systemPrompt, fullContext, weatherContext);
     loadBubble.innerHTML = `<div class="bg-slate-700 text-slate-300 text-sm px-3 py-2 rounded-xl rounded-bl-sm max-w-[85%] prose prose-sm prose-invert max-w-none leading-relaxed">${marked.parse(response)}<div class="text-[9px] text-slate-500 mt-1 italic">${I18N.t.aiDisclaimer}</div></div>`;
-    createIcons();
+    createIcons({ icons });
     askBtn.disabled = false;
     chatArea.scrollTop = chatArea.scrollHeight;
     document.getElementById('ai-context-badge')!.classList.toggle('hidden', !this.state.isAnchored);
@@ -1047,7 +1047,7 @@ export class AnchorApp {
     const chatArea = document.getElementById('ai-chat-area')!;
     chatArea.innerHTML = `<div id="ai-chat-placeholder" class="text-slate-500 text-xs text-center py-6"><i data-lucide="message-circle" class="w-8 h-8 mx-auto mb-2 opacity-50"></i><p data-i18n="aiChatPlaceholder">${I18N.t.aiChatPlaceholder || 'Ask a question...'}</p></div>`;
     document.getElementById('ai-clear-chat-btn')!.classList.add('hidden');
-    createIcons();
+    createIcons({ icons });
   }
 
   private async _generateLogbookEntry() {
@@ -1092,7 +1092,7 @@ export class AnchorApp {
       document.getElementById('ai-summary-raw')!.classList.remove('hidden');
       document.getElementById('ai-summary-raw')!.textContent = `"${response.replace(/"/g, '')}"`;
     }
-    createIcons();
+    createIcons({ icons });
   }
 
   private _parseLogbookResponse(response: string) {
@@ -1454,7 +1454,7 @@ export class AnchorApp {
       document.getElementById('sm-toggle-nightred')!.innerHTML = this._simpleMonitorRedFilter
         ? `<i data-lucide="sun" class="w-4 h-4 inline mr-1"></i> ${I18N.t.smNormalFilter}`
         : `<i data-lucide="sun-dim" class="w-4 h-4 inline mr-1"></i> ${I18N.t.smRedFilter}`;
-      createIcons();
+      createIcons({ icons });
     });
 
     // QR Scanner

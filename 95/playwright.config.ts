@@ -16,6 +16,7 @@ export default defineConfig({
 
   use: {
     baseURL: 'http://localhost:8081',
+    locale: 'en-US',
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
   },
@@ -28,7 +29,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npx http-server . -p 8081 -s -c-1',
+    command: 'npm run build && npx vite preview --port 8081',
     port: 8081,
     reuseExistingServer: !process.env.CI,
   },

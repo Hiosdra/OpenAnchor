@@ -300,6 +300,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'btn.delete': 'Delete',
     'btn.dogWatches': 'Add Dog Watches (16-20)',
     'btn.addSlot': 'Add watch slot',
+    'btn.addPerson': 'Add person',
     'btn.importConfig': 'Import configuration',
     'btn.exportConfig': 'Export configuration',
     'common.day': 'Day',
