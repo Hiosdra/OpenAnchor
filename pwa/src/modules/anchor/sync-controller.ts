@@ -2,6 +2,7 @@ import L from 'leaflet';
 import { createIcons, icons } from 'lucide';
 import { I18N } from './i18n';
 import { UI } from './ui-utils';
+import { ReconnectStrategy } from './reconnect-strategy';
 import type { AnchorApp } from './anchor-app';
 
 export class SyncController {
@@ -13,9 +14,7 @@ export class SyncController {
   private syncInterval: ReturnType<typeof setInterval> | null = null;
   lastPeerPingTime: number | null = null;
   peerConnectionLost = false;
-  private _reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private _reconnectAttempts = 0;
-  private _intentionalDisconnect = false;
+  private _reconnect = new ReconnectStrategy();
   private _lastSentStateHash: string | null = null;
 
   constructor(appContext: AnchorApp) {
@@ -24,9 +23,7 @@ export class SyncController {
   }
 
   connect(url: string) {
-    this._intentionalDisconnect = false;
-    this._reconnectAttempts = 0;
-    if (this._reconnectTimer) clearTimeout(this._reconnectTimer);
+    this._reconnect.reset();
     if (this.ws) this._closeSocket();
     this.url = url;
     localStorage.setItem('anchor_ws_url', url);
@@ -47,9 +44,7 @@ export class SyncController {
   }
 
   disconnect(reason = 'USER_DISCONNECT') {
-    this._intentionalDisconnect = true;
-    if (this._reconnectTimer) clearTimeout(this._reconnectTimer);
-    this._reconnectAttempts = 0;
+    this._reconnect.markIntentional();
     if (this.ws) {
       if (this.isConnected) this.send('DISCONNECT', { reason });
       this._closeSocket();
@@ -110,7 +105,7 @@ export class SyncController {
 
   private _onOpen() {
     this.isConnected = true;
-    this._reconnectAttempts = 0;
+    this._reconnect.onConnected();
     this.lastPeerPingTime = Date.now();
     this.peerConnectionLost = false;
     document.getElementById('ws-status-icon')!.classList.replace('text-slate-600', 'text-green-400');
@@ -159,26 +154,21 @@ export class SyncController {
     if (this.pingInterval) clearInterval(this.pingInterval);
     if (this.syncInterval) clearInterval(this.syncInterval);
 
-    if (!this._intentionalDisconnect && this.url) {
-      this._scheduleReconnect();
+    if (this.url) {
+      const delay = this._reconnect.schedule(() => {
+        if (!this.isConnected && this.url) {
+          console.log(`WS: reconnecting to ${this.url}`);
+          this._doConnect();
+        }
+      });
+      if (delay !== null) {
+        console.log(`WS: scheduling reconnect #${this._reconnect.attempts} in ${delay}ms`);
+      }
     }
   }
 
   private _onError(e: Event) {
     console.warn('WS Error', e);
-  }
-
-  private _scheduleReconnect() {
-    if (this._reconnectTimer) clearTimeout(this._reconnectTimer);
-    const delay = Math.min(2000 * Math.pow(2, this._reconnectAttempts), 30000);
-    this._reconnectAttempts++;
-    console.log(`WS: scheduling reconnect #${this._reconnectAttempts} in ${delay}ms`);
-    this._reconnectTimer = setTimeout(() => {
-      if (!this.isConnected && !this._intentionalDisconnect && this.url) {
-        console.log(`WS: reconnecting to ${this.url}`);
-        this._doConnect();
-      }
-    }, delay);
   }
 
   private _onMessage(event: MessageEvent) {
