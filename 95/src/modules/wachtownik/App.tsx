@@ -1,6 +1,7 @@
 // @ts-nocheck
 // TODO: Add full TypeScript types to this large component (mechanically extracted from inline JSX)
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import LZString from 'lz-string';
 import type { CrewMember, WatchSlot, DaySchedule, ScheduleSlot, Locale, DashboardData, AbsoluteSlot, AppState } from './types';
 import {
   ROLES,
@@ -105,14 +106,8 @@ function App() {
             return;
           }
 
-          // Ensure LZString library is available
-          if (typeof window.LZString === 'undefined' || !window.LZString || typeof window.LZString.decompressFromEncodedURIComponent !== 'function') {
-            console.error("Biblioteka LZString nie jest dostępna - nie można zdekompresować danych z linku współdzielenia");
-            return;
-          }
-
           const compressed = encoded.substring(2); // Remove 'c:' prefix
-          const decompressed = window.LZString.decompressFromEncodedURIComponent(compressed);
+          const decompressed = LZString.decompressFromEncodedURIComponent(compressed);
 
           if (decompressed == null) {
             console.error("Nieudana dekompresja danych z linku współdzielenia");
@@ -415,7 +410,7 @@ function App() {
 
   const addCrew = () => {
     if (newCrewName.trim() && crew.length < 15) {
-      setCrew([...crew, { id: Math.random().toString(36).substr(2,9), name: newCrewName.trim(), role: newCrewRole }]);
+      setCrew([...crew, { id: Math.random().toString(36).slice(2, 11), name: newCrewName.trim(), role: newCrewRole }]);
       setNewCrewName('');
     }
   };
@@ -426,7 +421,7 @@ function App() {
   };
 
 
-  const addSlot = () => setSlots([...slots, { id: Math.random().toString(36).substr(2, 9), start: '12:00', end: '16:00', reqCrew: 1 }]);
+  const addSlot = () => setSlots([...slots, { id: Math.random().toString(36).slice(2, 11), start: '12:00', end: '16:00', reqCrew: 1 }]);
   const removeSlot = (id) => setSlots(slots.filter(s => s.id !== id));
 
   const validateSlotTime = (id, field, value) => {
@@ -507,7 +502,7 @@ function App() {
     const template = WATCH_TEMPLATES[templateKey];
     if (template) {
       const newSlots = template.slots.map((slot, index) => ({
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).slice(2, 11),
         ...slot
       }));
       setSlots(newSlots);
@@ -1235,22 +1230,13 @@ function App() {
     }
 
     // For regular sharing, use LZ-String compression
-    // Check if LZ-String compression is available
-    if (window.LZString && typeof window.LZString.compressToEncodedURIComponent === 'function') {
-      try {
-        // Use LZ-String compression for much smaller URLs
-        const compressed = window.LZString.compressToEncodedURIComponent(jsonState);
-        // Add 'c:' prefix to indicate compressed format
-        return `${baseUrl}#${prefix}=c:${compressed}`;
-      } catch (e) {
-        console.error('LZString compression failed:', e);
-        // Fall through to error - compression is required
-      }
+    try {
+      const compressed = LZString.compressToEncodedURIComponent(jsonState);
+      return `${baseUrl}#${prefix}=c:${compressed}`;
+    } catch (e) {
+      console.error('LZString compression failed:', e);
+      return baseUrl;
     }
-
-    // If LZString is not available, show error message
-    console.error('LZString library not loaded - cannot create share URL');
-    return baseUrl; // Return base URL as fallback
   };
 
   const handleShare = (readOnly = false) => {

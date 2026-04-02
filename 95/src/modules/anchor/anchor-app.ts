@@ -956,9 +956,11 @@ export class AnchorApp {
     }
     gpx += `    </trkseg></trk>\n</gpx>`;
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([gpx], { type: 'application/gpx+xml' }));
+    const url = URL.createObjectURL(new Blob([gpx], { type: 'application/gpx+xml' }));
+    a.href = url;
     a.download = `openanchor_${startDate.toISOString().slice(0, 10)}_${startDate.toISOString().slice(11, 16).replace(':', '')}.gpx`;
     a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   }
 
   private _exportSessionCSV(session: any, points: TrackPoint[]) {
@@ -967,9 +969,11 @@ export class AnchorApp {
     const header = 'timestamp,lat,lon,accuracy,distance,alarmState\n';
     const rows = points.map((p) => `${new Date(p.timestamp).toISOString()},${p.lat},${p.lng},${p.accuracy || ''},${p.distance || ''},${p.alarmState || 'SAFE'}`).join('\n');
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([header + rows], { type: 'text/csv' }));
+    const url = URL.createObjectURL(new Blob([header + rows], { type: 'text/csv' }));
+    a.href = url;
     a.download = `openanchor_${startDate.toISOString().slice(0, 10)}_${startDate.toISOString().slice(11, 16).replace(':', '')}.csv`;
     a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   }
 
   _formatDuration(ms: number): string {
