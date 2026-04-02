@@ -193,18 +193,23 @@ export class SessionDB {
 
   async getStats(): Promise<SessionStats> {
     const sessions = await this.getAllSessions();
-    const completed = sessions.filter((s) => s.endTime);
-    const totalAlarms = completed.reduce((sum, s) => sum + (s.alarmCount || 0), 0);
-    const totalDuration = completed.reduce((sum, s) => sum + ((s.endTime || 0) - s.startTime), 0);
-    const maxDist = completed.reduce((max, s) => Math.max(max, s.maxDistance || 0), 0);
-    const maxSog = completed.reduce((max, s) => Math.max(max, s.maxSog || 0), 0);
-    return {
-      totalSessions: completed.length,
-      totalAlarms,
-      totalDuration,
-      maxDistance: maxDist,
-      maxSog,
-      avgDuration: completed.length > 0 ? totalDuration / completed.length : 0,
-    };
+    return calculateSessionStats(sessions);
   }
+}
+
+/** Pure stats calculation — extracted for testability. */
+export function calculateSessionStats(sessions: AnchorSession[]): SessionStats {
+  const completed = sessions.filter((s) => s.endTime);
+  const totalAlarms = completed.reduce((sum, s) => sum + (s.alarmCount || 0), 0);
+  const totalDuration = completed.reduce((sum, s) => sum + ((s.endTime || 0) - s.startTime), 0);
+  const maxDist = completed.reduce((max, s) => Math.max(max, s.maxDistance || 0), 0);
+  const maxSog = completed.reduce((max, s) => Math.max(max, s.maxSog || 0), 0);
+  return {
+    totalSessions: completed.length,
+    totalAlarms,
+    totalDuration,
+    maxDistance: maxDist,
+    maxSog,
+    avgDuration: completed.length > 0 ? totalDuration / completed.length : 0,
+  };
 }
