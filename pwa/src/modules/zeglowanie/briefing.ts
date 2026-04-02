@@ -1,4 +1,5 @@
 import { briefingLists, type BriefingType } from './data';
+import { briefingStorageKey, STORAGE_KEYS } from './storage-keys';
 
 let currentBriefingType: BriefingType = 'zero';
 
@@ -23,7 +24,7 @@ function loadBriefingChecklistState(): void {
   document.querySelectorAll<HTMLLIElement>('.briefing-content .checklist-item').forEach((item) => {
     const itemId = item.dataset.item!;
     const briefingType = item.dataset.briefingType!;
-    const storageKey = `briefing-${briefingType}-${itemId}`;
+    const storageKey = briefingStorageKey(briefingType, itemId);
     const isChecked = localStorage.getItem(storageKey) === 'true';
 
     if (isChecked) {
@@ -34,8 +35,7 @@ function loadBriefingChecklistState(): void {
 }
 
 function saveBriefingChecklistState(itemId: string, briefingType: string, isChecked: boolean): void {
-  const storageKey = `briefing-${briefingType}-${itemId}`;
-  localStorage.setItem(storageKey, String(isChecked));
+  localStorage.setItem(briefingStorageKey(briefingType, itemId), String(isChecked));
 }
 
 export function renderBriefingChecklist(): void {
@@ -80,7 +80,7 @@ export function switchBriefingType(briefingType: BriefingType): void {
     content.classList.toggle('active', content.id === `briefing-${briefingType}`);
   });
 
-  localStorage.setItem('zeglowanie_selected_briefing_type', briefingType);
+  localStorage.setItem(STORAGE_KEYS.BRIEFING_TYPE, briefingType);
   renderBriefingChecklist();
 }
 
@@ -93,7 +93,7 @@ export function resetBriefingChecklist(briefingType: BriefingType): void {
 
     document.querySelectorAll<HTMLLIElement>(selector).forEach((item) => {
       const itemId = item.dataset.item!;
-      const storageKey = `briefing-${briefingType}-${itemId}`;
+      const storageKey = briefingStorageKey(briefingType, itemId);
 
       item.classList.remove('checked');
       item.querySelector<HTMLDivElement>('.checklist-checkbox')!.classList.remove('checked');
@@ -103,7 +103,7 @@ export function resetBriefingChecklist(briefingType: BriefingType): void {
 }
 
 export function initBriefing(): void {
-  const saved = localStorage.getItem('zeglowanie_selected_briefing_type') as BriefingType | null;
+  const saved = localStorage.getItem(STORAGE_KEYS.BRIEFING_TYPE) as BriefingType | null;
   currentBriefingType = saved ?? 'zero';
 
   document.querySelectorAll<HTMLButtonElement>('.cruise-btn[data-briefing]').forEach((btn) => {
