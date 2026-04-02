@@ -18,7 +18,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const menuId = useRef(`dropdown-menu-${Math.random().toString(36).substr(2, 9)}`);
+  const menuId = useRef(`dropdown-menu-${Math.random().toString(36).slice(2, 11)}`);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
