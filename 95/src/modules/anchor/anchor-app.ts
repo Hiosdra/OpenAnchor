@@ -21,12 +21,18 @@ import { SyncController } from './sync-controller';
 import { UI } from './ui-utils';
 import { throttle } from './ui-utils';
 import type { TrackPoint } from './session-db';
-
-interface ScheduleItem {
-  start: string;
-  end: string;
-  person: string;
-}
+import {
+  formatDuration,
+  degToCompass,
+  buildGPX,
+  buildCSV,
+  parseLogbookResponse,
+  findActiveScheduleSlot,
+  timeToMinutes,
+  isGpsSignalLost,
+  shouldActivateBatterySaver,
+  type ScheduleItem,
+} from './anchor-utils';
 
 interface CachedElements {
   alarmStateBar: HTMLElement | null;
@@ -338,7 +344,7 @@ export class AnchorApp {
   private _checkGpsWatchdog() {
     if (!this.state.isAnchored || !this.state.hasGpsFix) return;
     const elapsed = Date.now() - this.lastGpsFixTime;
-    const signalLost = elapsed > this.GPS_WATCHDOG_TIMEOUT;
+    const signalLost = isGpsSignalLost(elapsed, this.GPS_WATCHDOG_TIMEOUT);
 
     if (signalLost && !this.state.gpsSignalLost) {
       this.state.gpsSignalLost = true;
@@ -365,7 +371,7 @@ export class AnchorApp {
   private _checkBatterySaver() {
     const level = this.alertCtrl.lastKnownBatteryLevel;
     const charging = this.alertCtrl.lastKnownChargingState;
-    const shouldSave = level !== undefined && level <= 0.3 && !charging;
+    const shouldSave = shouldActivateBatterySaver(level, charging);
 
     if (shouldSave && !this._batterySaverActive) {
       this._batterySaverActive = true;
@@ -775,19 +781,7 @@ export class AnchorApp {
     }
     const now = new Date();
     const currentVal = now.getHours() * 60 + now.getMinutes();
-    let activePerson: ScheduleItem | null = null;
-
-    for (const item of this.state.schedule) {
-      const [startH, startM] = item.start.split(':').map(Number);
-      const [endH, endM] = item.end.split(':').map(Number);
-      const startVal = startH * 60 + startM;
-      const endVal = endH * 60 + endM;
-      const isActive = startVal < endVal ? currentVal >= startVal && currentVal < endVal : currentVal >= startVal || currentVal < endVal;
-      if (isActive) {
-        activePerson = item;
-        break;
-      }
-    }
+    const activePerson = findActiveScheduleSlot(this.state.schedule, currentVal);
 
     if (activePerson) {
       document.getElementById('active-watch-name')!.textContent = activePerson.person;
@@ -947,14 +941,9 @@ export class AnchorApp {
   }
 
   private _exportSessionGPX(session: any, points: TrackPoint[]) {
-    if (points.length === 0) return;
+    const gpx = buildGPX(session, points);
+    if (!gpx) return;
     const startDate = new Date(session.startTime);
-    let gpx = `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="OpenAnchor PWA"\n  xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>OpenAnchor Session ${startDate.toISOString()}</name><time>${startDate.toISOString()}</time></metadata>\n  <wpt lat="${session.anchorLat}" lon="${session.anchorLng}"><name>Anchor</name><desc>Anchor position, radius=${session.radius}m</desc><time>${startDate.toISOString()}</time><sym>Anchor</sym></wpt>\n  <trk><name>Boat Track</name><trkseg>\n`;
-    for (const p of points) {
-      const time = new Date(p.timestamp).toISOString();
-      gpx += `      <trkpt lat="${p.lat}" lon="${p.lng}"><time>${time}</time>${p.accuracy && p.accuracy > 0 ? `<hdop>${p.accuracy.toFixed(1)}</hdop>` : ''}${p.alarmState === 'ALARM' ? '<name>ALARM</name>' : ''}</trkpt>\n`;
-    }
-    gpx += `    </trkseg></trk>\n</gpx>`;
     const a = document.createElement('a');
     const url = URL.createObjectURL(new Blob([gpx], { type: 'application/gpx+xml' }));
     a.href = url;
@@ -964,12 +953,11 @@ export class AnchorApp {
   }
 
   private _exportSessionCSV(session: any, points: TrackPoint[]) {
-    if (points.length === 0) return;
+    const csv = buildCSV(points);
+    if (!csv) return;
     const startDate = new Date(session.startTime);
-    const header = 'timestamp,lat,lon,accuracy,distance,alarmState\n';
-    const rows = points.map((p) => `${new Date(p.timestamp).toISOString()},${p.lat},${p.lng},${p.accuracy || ''},${p.distance || ''},${p.alarmState || 'SAFE'}`).join('\n');
     const a = document.createElement('a');
-    const url = URL.createObjectURL(new Blob([header + rows], { type: 'text/csv' }));
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
     a.href = url;
     a.download = `openanchor_${startDate.toISOString().slice(0, 10)}_${startDate.toISOString().slice(11, 16).replace(':', '')}.csv`;
     a.click();
@@ -977,9 +965,7 @@ export class AnchorApp {
   }
 
   _formatDuration(ms: number): string {
-    const h = Math.floor(ms / 3600000);
-    const m = Math.floor((ms % 3600000) / 60000);
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    return formatDuration(ms);
   }
 
   // ==========================================
@@ -1100,13 +1086,7 @@ export class AnchorApp {
   }
 
   private _parseLogbookResponse(response: string) {
-    const summaryMatch = response.match(/SUMMARY:\s*(.+?)(?=\n|LOG:)/si);
-    const logMatch = response.match(/LOG:\s*(.+?)(?=SAFETY:)/si);
-    const safetyMatch = response.match(/SAFETY:\s*(.+?)$/si);
-    if (summaryMatch && logMatch) {
-      return { summary: summaryMatch[1].trim(), logEntry: logMatch[1].trim(), safetyNote: safetyMatch ? safetyMatch[1].trim() : '' };
-    }
-    return null;
+    return parseLogbookResponse(response);
   }
 
   private async _saveLogbookEntry() {
@@ -1129,7 +1109,7 @@ export class AnchorApp {
     if (!this.db.db) return;
     try {
       const s = await this.db.getStats();
-      const fmtDur = (ms: number) => { if (!ms || ms <= 0) return '0h'; const h = Math.floor(ms / 3600000); const m = Math.floor((ms % 3600000) / 60000); return h > 0 ? `${h}h ${m}m` : `${m}m`; };
+      const fmtDur = (ms: number) => { if (!ms || ms <= 0) return '0h'; return formatDuration(ms); };
       document.getElementById('stats-sessions')!.textContent = String(s.totalSessions || 0);
       document.getElementById('stats-alarms')!.textContent = String(s.totalAlarms || 0);
       document.getElementById('stats-duration')!.textContent = fmtDur(s.totalDuration);
@@ -1202,8 +1182,7 @@ export class AnchorApp {
   }
 
   private _degToCompass(deg: number): string {
-    const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    return dirs[Math.round(deg / 45) % 8];
+    return degToCompass(deg);
   }
 
   private _renderBarChart(containerId: string, primaryValues: number[], secondaryValues: number[], unit: string) {
