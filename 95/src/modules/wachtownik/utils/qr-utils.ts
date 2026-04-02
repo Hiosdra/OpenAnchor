@@ -3,8 +3,10 @@ import QRCode from 'qrcode';
 
 import type { AppState } from '../types';
 
-export function buildShareUrl(state: AppState, readOnly = false): string {
-  const baseUrl = `${window.location.origin}${window.location.pathname}`;
+/**
+ * Core URL building logic, separated from window.location for testability.
+ */
+export function buildShareUrlCore(baseUrl: string, state: AppState, readOnly = false): string {
   const jsonState = JSON.stringify(state);
   const prefix = readOnly ? 'share-readonly' : 'share';
 
@@ -22,6 +24,11 @@ export function buildShareUrl(state: AppState, readOnly = false): string {
 
   console.error('LZString compression failed - cannot create share URL');
   return baseUrl;
+}
+
+export function buildShareUrl(state: AppState, readOnly = false): string {
+  const baseUrl = `${window.location.origin}${window.location.pathname}`;
+  return buildShareUrlCore(baseUrl, state, readOnly);
 }
 
 export async function generateQRCode(
