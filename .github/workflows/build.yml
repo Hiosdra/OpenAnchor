@@ -226,8 +226,8 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f "pwa/sw.js" ]; then
-            echo "Error: pwa/sw.js not found"
+          if [ ! -f "pwa/public/sw.js" ]; then
+            echo "Error: pwa/public/sw.js not found"
             exit 1
           fi
 
@@ -259,7 +259,7 @@ jobs:
           echo "Validating service worker JavaScript syntax..."
 
           # Check for syntax errors
-          node --check pwa/sw.js
+          node --check pwa/public/sw.js
 
           echo "Service worker syntax is valid ✓"
 
