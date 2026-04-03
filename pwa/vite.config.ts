@@ -3,8 +3,10 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 import { resolve } from 'path';
 import { build as esbuild, type BuildOptions } from 'esbuild';
+import istanbul from 'vite-plugin-istanbul';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const isCoverageBuild = process.env.VITE_COVERAGE === 'true';
 const normalizeBasePath = (basePath?: string): string => {
   if (!basePath) return '/';
   const trimmed = basePath.trim();
@@ -49,12 +51,33 @@ function serviceWorkerPlugin(): PluginOption {
   };
 }
 
+const plugins: PluginOption[] = [react(), serviceWorkerPlugin()];
+
+if (isCoverageBuild) {
+  plugins.push(
+    istanbul({
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      exclude: [
+        'src/service-worker/**',
+        'tests/**',
+        'e2e/**',
+        'node_modules/**',
+      ],
+      extension: ['.ts', '.tsx'],
+      requireEnv: true,
+      forceBuildInstrument: true,
+      checkProd: false,
+    }),
+  );
+}
+
 export default defineConfig({
   base: normalizeBasePath(process.env.VITE_BASE_PATH),
-  plugins: [react(), serviceWorkerPlugin()],
+  plugins,
   root: '.',
   build: {
     outDir: 'dist',
+    sourcemap: isCoverageBuild,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),

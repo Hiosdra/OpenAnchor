@@ -1,4 +1,7 @@
 e2e-results/
+e2e-coverage/
+e2e-coverage-comment.md
+.nyc_output/
 playwright-report/
 test-results/
 node_modules/
