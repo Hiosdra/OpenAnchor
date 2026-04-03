@@ -206,9 +206,33 @@ describe('egzamin/entry.tsx', () => {
 });
 
 describe('wachtownik/entry.tsx', () => {
+  let capturedLoad: EventListener | null = null;
+  const origAddEventListener = window.addEventListener.bind(window);
+  const originalServiceWorkerDescriptor = Object.getOwnPropertyDescriptor(window.navigator, 'serviceWorker');
+
   beforeEach(() => {
     vi.resetModules();
     mockCreateRoot.mockClear();
+    capturedLoad = null;
+
+    vi.spyOn(window, 'addEventListener').mockImplementation((type: string, listener: any, options?: any) => {
+      if (type === 'load') {
+        capturedLoad = listener;
+      } else {
+        origAddEventListener(type, listener, options);
+      }
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (originalServiceWorkerDescriptor) {
+      Object.defineProperty(window.navigator, 'serviceWorker', originalServiceWorkerDescriptor);
+    } else {
+      delete (window.navigator as Partial<Navigator> & { serviceWorker?: unknown }).serviceWorker;
+    }
+    const root = document.getElementById('root');
+    if (root) root.remove();
   });
 
   it('creates a React root and renders when container exists', async () => {
@@ -225,6 +249,32 @@ describe('wachtownik/entry.tsx', () => {
     expect(mockRender).toHaveBeenCalledOnce();
 
     container.remove();
+  });
+
+  it('registers the service worker on window load and polls for updates', async () => {
+    const update = vi.fn();
+    const register = vi.fn().mockResolvedValue({
+      scope: 'http://localhost/',
+      update,
+    });
+    Object.defineProperty(window.navigator, 'serviceWorker', {
+      configurable: true,
+      value: { register },
+    });
+    const setIntervalSpy = vi.spyOn(window, 'setInterval');
+
+    await import('../src/modules/wachtownik/entry');
+
+    expect(capturedLoad).toBeTypeOf('function');
+    capturedLoad!(new Event('load'));
+    await Promise.resolve();
+
+    expect(register).toHaveBeenCalledWith('../../sw.js');
+    expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 60_000);
+
+    const refreshRegistration = setIntervalSpy.mock.calls[0]?.[0] as (() => void) | undefined;
+    refreshRegistration?.();
+    expect(update).toHaveBeenCalledOnce();
   });
 
   it('does not throw when container is missing', async () => {
