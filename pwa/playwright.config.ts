@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const isDev = process.env.E2E_DEV === 'true';
+const port = isDev ? 5173 : 8081;
+
 export default defineConfig({
   testDir: './e2e',
   outputDir: './e2e-results/artifacts',
@@ -15,7 +18,7 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL: 'http://localhost:8081',
+    baseURL: `http://localhost:${port}`,
     locale: 'en-US',
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
@@ -29,8 +32,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run build && npx vite preview --port 8081',
-    port: 8081,
+    command: isDev ? 'npm run dev -- --port 5173' : 'npm run build && npx vite preview --port 8081',
+    port,
     reuseExistingServer: !process.env.CI,
   },
 });

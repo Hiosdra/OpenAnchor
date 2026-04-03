@@ -5,6 +5,7 @@
  * Loaded as <script type="module"> from modules/anchor/index.html.
  */
 
+import './styles.css';
 import { I18N } from './i18n';
 import { ConnectionStatus } from './connection-status';
 import { OnboardingController } from './ui-utils';

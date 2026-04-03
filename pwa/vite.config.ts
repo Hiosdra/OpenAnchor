@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 import { resolve } from 'path';
+import { build as esbuild, type BuildOptions } from 'esbuild';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const normalizeBasePath = (basePath?: string): string => {
@@ -11,9 +12,46 @@ const normalizeBasePath = (basePath?: string): string => {
   return `/${trimmed.replace(/^\/+|\/+$/g, '')}/`;
 };
 
+const swEntryPoint = resolve(__dirname, 'src/service-worker/sw.ts');
+
+function serviceWorkerBuildOptions(outfile: string, minify: boolean): BuildOptions {
+  return {
+    entryPoints: [swEntryPoint],
+    bundle: true,
+    outfile,
+    format: 'iife',
+    target: 'es2020',
+    minify,
+  };
+}
+
+function serviceWorkerPlugin(): PluginOption {
+  return {
+    name: 'service-worker-build',
+    async writeBundle() {
+      await esbuild(serviceWorkerBuildOptions(resolve(__dirname, 'dist/sw.js'), true));
+    },
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url === '/sw.js') {
+          const { buildSync } = await import('esbuild');
+          const result = buildSync({
+            ...serviceWorkerBuildOptions('sw.js', false),
+            write: false,
+          });
+          res.setHeader('Content-Type', 'application/javascript');
+          res.end(result.outputFiles![0].text);
+          return;
+        }
+        next();
+      });
+    },
+  };
+}
+
 export default defineConfig({
   base: normalizeBasePath(process.env.VITE_BASE_PATH),
-  plugins: [react()],
+  plugins: [react(), serviceWorkerPlugin()],
   root: '.',
   build: {
     outDir: 'dist',

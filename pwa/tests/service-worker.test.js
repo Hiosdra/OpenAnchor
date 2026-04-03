@@ -1,9 +1,16 @@
-import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { runInNewContext } from 'node:vm';
 import { describe, it, expect, vi } from 'vitest';
+import { buildSync } from 'esbuild';
 
-const swSource = readFileSync(resolve(process.cwd(), 'public/sw.js'), 'utf8');
+const swCompiled = buildSync({
+  entryPoints: [resolve(process.cwd(), 'src/service-worker/sw.ts')],
+  bundle: true,
+  write: false,
+  format: 'iife',
+  target: 'es2020',
+});
+const swSource = swCompiled.outputFiles[0].text;
 const CACHE_NAME = 'openanchor-superapp-v10';
 
 function createServiceWorkerEnvironment() {
@@ -43,7 +50,7 @@ function createServiceWorkerEnvironment() {
     },
   };
 
-  runInNewContext(swSource, context, { filename: 'public/sw.js' });
+  runInNewContext(swSource, context, { filename: 'src/service-worker/sw.ts' });
 
   return {
     ...context,

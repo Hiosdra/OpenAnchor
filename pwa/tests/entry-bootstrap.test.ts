@@ -302,16 +302,10 @@ describe('zeglowanie/entry.ts', () => {
     mockResetChecklistSection.mockClear();
   });
 
-  it('exposes window functions for onclick handlers', async () => {
+  it('sets theme on documentElement from localStorage', async () => {
+    localStorage.setItem('openanchor-theme', 'light');
     await import('../src/modules/zeglowanie/entry');
-
-    expect(typeof window.switchSection).toBe('function');
-    expect(typeof window.switchCruiseType).toBe('function');
-    expect(typeof window.resetChecklist).toBe('function');
-    expect(typeof window.switchBriefingType).toBe('function');
-    expect(typeof window.resetBriefingChecklist).toBe('function');
-    expect(typeof window.switchChecklistType).toBe('function');
-    expect(typeof window.resetChecklistSection).toBe('function');
+    expect(document.documentElement.dataset.theme).toBe('light');
   });
 
   it('initializes all modules on DOMContentLoaded', async () => {
@@ -326,9 +320,17 @@ describe('zeglowanie/entry.ts', () => {
     expect(mockInitChecklists).toHaveBeenCalled();
   });
 
-  it('window.switchSection delegates to the module function', async () => {
+  it('delegates click events via data-action attributes', async () => {
     await import('../src/modules/zeglowanie/entry');
-    window.switchSection('briefing');
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+
+    const btn = document.createElement('button');
+    btn.dataset.action = 'switchSection';
+    btn.dataset.arg = 'briefing';
+    document.body.appendChild(btn);
+
+    btn.click();
     expect(mockSwitchSection).toHaveBeenCalledWith('briefing');
+    btn.remove();
   });
 });
