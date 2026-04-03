@@ -85,7 +85,7 @@ function App() {
 
       <header className={`oa-header print:bg-white print:text-black print:shadow-none print:p-0 print:mb-6 ${isNightMode ? 'bg-zinc-950/90 border-b border-red-900/20' : ''}`}>
         <a href="../../index.html" title={t('title.backToMenu', userLocale)} aria-label={t('aria.backToMenu', userLocale)} className="oa-back-btn print:hidden">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           <span>Menu</span>
         </a>
         <h1 className="oa-header-title">{t('heading.appTitle', userLocale)}</h1>

@@ -1,5 +1,6 @@
 import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath, URL } from 'node:url';
 import { resolve } from 'path';
 import { build as esbuild, type BuildOptions } from 'esbuild';
@@ -51,7 +52,7 @@ function serviceWorkerPlugin(): PluginOption {
   };
 }
 
-const plugins: PluginOption[] = [react(), serviceWorkerPlugin()];
+const plugins: PluginOption[] = [tailwindcss(), react(), serviceWorkerPlugin()];
 
 if (isCoverageBuild) {
   plugins.push(

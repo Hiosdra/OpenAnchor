@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../../../styles/theme.css";
 
 /* Module-specific styles only - base styles in theme.css */
 
