@@ -241,8 +241,8 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f "pwa/public/sw.js" ]; then
-            echo "Error: pwa/public/sw.js not found"
+          if [ ! -f "pwa/src/service-worker/sw.ts" ]; then
+            echo "Error: pwa/src/service-worker/sw.ts not found"
             exit 1
           fi
 
@@ -269,14 +269,20 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Validate service worker syntax
+      - name: Validate service worker build source
         run: |
-          echo "Validating service worker JavaScript syntax..."
+          echo "Validating service worker build source..."
 
-          # Check for syntax errors
-          node --check pwa/public/sw.js
+          ESBUILD_VERSION=$(node -p "require('./pwa/package.json').devDependencies.esbuild")
+          npx --yes --package "esbuild@${ESBUILD_VERSION}" esbuild pwa/src/service-worker/sw.ts \
+            --bundle \
+            --format=iife \
+            --target=es2020 \
+            --outfile=/tmp/openanchor-sw.js >/dev/null
+          node --check /tmp/openanchor-sw.js
+          rm -f /tmp/openanchor-sw.js
 
-          echo "Service worker syntax is valid ✓"
+          echo "Service worker build source is valid ✓"
 
       - name: Validate index.html
         run: |

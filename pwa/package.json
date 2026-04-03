@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && tsc --noEmit -p src/service-worker/tsconfig.json && vite build",
+    "build": "npm run typecheck:app && npm run typecheck:service-worker && vite build",
+    "typecheck:app": "tsc --noEmit -p tsconfig.app.json",
+    "typecheck:service-worker": "tsc --noEmit -p src/service-worker/tsconfig.json",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
