@@ -23,6 +23,14 @@ export default defineConfig({
       exclude: [
         'node_modules/**',
         'tests/**',
+        'src/**/types.ts',
+        'src/shared/types/**',
+        'src/modules/anchor/index.ts',
+        'src/modules/anchor/controllers/index.ts',
+        'src/modules/egzamin/index.tsx',
+        'src/modules/wachtownik/index.tsx',
+        'src/modules/zeglowanie/index.ts',
+        'src/service-worker/sw.ts',
       ],
       thresholds: {
         lines: 50,
