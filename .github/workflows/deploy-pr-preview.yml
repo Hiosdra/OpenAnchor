@@ -27,6 +27,23 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: pwa/package-lock.json
+
+      - name: Install PWA dependencies
+        working-directory: ./pwa
+        run: npm ci
+
+      - name: Build PWA
+        working-directory: ./pwa
+        env:
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/${{ github.event.pull_request.number }}/
+        run: npm run build
+
       - name: Checkout gh-pages branch
         id: checkout-ghpages
         uses: actions/checkout@v6
@@ -76,8 +93,8 @@ jobs:
           rm -rf "${TARGET_DIR}"
           mkdir -p "${TARGET_DIR}"
 
-          # Copy PWA files to the PR subdirectory
-          cp -r pwa/* "${TARGET_DIR}/"
+          # Copy the built PWA to the PR subdirectory
+          cp -r pwa/dist/. "${TARGET_DIR}/"
 
           echo "Deployed PWA to ${TARGET_DIR}"
 

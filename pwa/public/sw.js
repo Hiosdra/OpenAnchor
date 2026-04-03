@@ -56,8 +56,8 @@ self.addEventListener('fetch', event => {
 
   if (event.request.method !== 'GET') return;
 
-  // Hashed assets (/assets/*) are immutable — cache-first, no revalidation needed
-  if (url.pathname.startsWith('/assets/')) {
+  // Hashed assets (.../assets/*) are immutable — cache-first, no revalidation needed
+  if (url.pathname.includes('/assets/')) {
     event.respondWith(
       caches.match(event.request).then(cached => {
         if (cached) return cached;
@@ -92,7 +92,7 @@ self.addEventListener('fetch', event => {
         return networkResponse;
       }).catch(() => {
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html') || caches.match('./');
+          return caches.match('./index.html').then(response => response || caches.match('./'));
         }
         return new Response('', { status: 503, statusText: 'Service Unavailable' });
       });

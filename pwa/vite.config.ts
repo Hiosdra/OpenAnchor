@@ -4,8 +4,15 @@ import { fileURLToPath, URL } from 'node:url';
 import { resolve } from 'path';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const normalizeBasePath = (basePath?: string): string => {
+  if (!basePath) return '/';
+  const trimmed = basePath.trim();
+  if (!trimmed || trimmed === '/') return '/';
+  return `/${trimmed.replace(/^\/+|\/+$/g, '')}/`;
+};
 
 export default defineConfig({
+  base: normalizeBasePath(process.env.VITE_BASE_PATH),
   plugins: [react()],
   root: '.',
   build: {
