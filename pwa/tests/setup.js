@@ -28,9 +28,12 @@ global.console = {
   error: vi.fn(),
 };
 
-// Mock navigator for service worker tests
+// Mock navigator for service worker tests — preserve getter-based props like userAgent
+const origNav = global.navigator;
+const userAgent = origNav?.userAgent || 'Mozilla/5.0 (happy-dom)';
 global.navigator = {
   ...global.navigator,
+  userAgent,
   serviceWorker: {
     register: vi.fn(),
     controller: null,
