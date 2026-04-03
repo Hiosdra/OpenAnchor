@@ -140,11 +140,32 @@ export class SessionDB {
   }
 
   async deleteSession(id: number): Promise<void> {
-    const store = this._tx('trackpoints', 'readwrite');
-    const idx = store.index('sessionId');
-    const points = await this._req(idx.getAll(id));
-    for (const p of points) store.delete((p as TrackPoint).id!);
-    await this._req(this._tx('sessions', 'readwrite').delete(id));
+    return new Promise((resolve, reject) => {
+      const tx = this.db!.transaction(['trackpoints', 'sessions', 'logbook'], 'readwrite');
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+
+      const trackStore = tx.objectStore('trackpoints');
+      const sessionStore = tx.objectStore('sessions');
+      const logStore = tx.objectStore('logbook');
+
+      // Delete trackpoints for this session
+      const trackIdx = trackStore.index('sessionId');
+      const trackReq = trackIdx.getAll(id);
+      trackReq.onsuccess = () => {
+        for (const p of trackReq.result) trackStore.delete((p as TrackPoint).id!);
+      };
+
+      // Delete logbook entries for this session
+      const logIdx = logStore.index('sessionId');
+      const logReq = logIdx.getAll(id);
+      logReq.onsuccess = () => {
+        for (const e of logReq.result) logStore.delete((e as LogbookEntry).id!);
+      };
+
+      // Delete the session itself
+      sessionStore.delete(id);
+    });
   }
 
   async addTrackPoint(point: Omit<TrackPoint, 'id'>): Promise<number> {

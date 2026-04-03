@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { EgzaminQuestion } from '../types';
 import { PdfRenderer } from '../pdf-renderer';
 import { CategoryBadge } from './CategoryBadge';
@@ -12,9 +12,17 @@ export function QuestionImageCard({ question }: QuestionImageCardProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [zoomed, setZoomed] = useState(false);
+  const blobUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+
+    // Revoke previous blob URL to prevent memory leaks
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+
     setLoading(true);
     setError(false);
     setImageDataUrl(null);
@@ -23,8 +31,11 @@ export function QuestionImageCard({ question }: QuestionImageCardProps) {
       PdfRenderer.renderQuestion(question.pdfPage, question.cropYStart, question.cropYEnd, question.pageHeight)
         .then(dataUrl => {
           if (!cancelled) {
+            blobUrlRef.current = dataUrl;
             setImageDataUrl(dataUrl);
             setLoading(false);
+          } else if (dataUrl) {
+            URL.revokeObjectURL(dataUrl);
           }
         })
         .catch(() => {
@@ -38,7 +49,13 @@ export function QuestionImageCard({ question }: QuestionImageCardProps) {
       setLoading(false);
     }
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
   }, [question.id, question.pdfPage, question.cropYStart, question.cropYEnd, question.pageHeight]);
 
   return (

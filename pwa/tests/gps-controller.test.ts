@@ -69,6 +69,7 @@ describe('GPSController', () => {
 
   beforeEach(() => {
     setupDom();
+    vi.spyOn(globalThis, 'requestAnimationFrame').mockImplementation((cb) => { cb(0); return 0; });
     state = makeState();
     alertCtrl = makeMockAlert();
     syncCtrl = makeMockSync();
@@ -78,6 +79,7 @@ describe('GPSController', () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     cleanDom();
   });
 
@@ -174,7 +176,7 @@ describe('GPSController', () => {
       expect(els.smDistance.textContent).toBe('');
     });
 
-    it('updates display when active and anchored', async () => {
+    it('updates display when active and anchored', () => {
       state.isAnchored = true;
       state.distance = 25;
       state.sog = 1.5;
@@ -184,32 +186,26 @@ describe('GPSController', () => {
 
       ctrl.updateSimpleMonitor(true);
 
-      // requestAnimationFrame is async in happy-dom
-      await new Promise(r => setTimeout(r, 50));
-
       expect(els.smDistance.textContent).toBe('25');
       expect(els.smSog.textContent).toBe('1.5');
       expect(els.smCog.textContent).toBe('180°');
     });
 
-    it('shows -- for distance when not anchored', async () => {
+    it('shows -- for distance when not anchored', () => {
       state.isAnchored = false;
       ctrl.updateSimpleMonitor(true);
-      await new Promise(r => setTimeout(r, 50));
       expect(els.smDistance.textContent).toBe('--');
     });
 
-    it('shows GPS lost indicator when signal lost', async () => {
+    it('shows GPS lost indicator when signal lost', () => {
       state.gpsSignalLost = true;
       ctrl.updateSimpleMonitor(true);
-      await new Promise(r => setTimeout(r, 50));
       expect(els.smGpsLost.classList.contains('hidden')).toBe(false);
     });
 
-    it('shows ALARM dismiss button when in alarm state', async () => {
+    it('shows ALARM dismiss button when in alarm state', () => {
       state.alarmState = 'ALARM';
       ctrl.updateSimpleMonitor(true);
-      await new Promise(r => setTimeout(r, 50));
       expect(els.smDismissAlarm.classList.contains('hidden')).toBe(false);
     });
   });

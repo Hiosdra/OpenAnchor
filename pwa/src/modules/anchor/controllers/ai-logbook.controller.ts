@@ -3,6 +3,7 @@
  */
 
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import { createIcons, icons } from 'lucide';
 import type { AppState } from '../anchor-app';
 import type { SessionDB } from '../session-db';
@@ -69,7 +70,8 @@ export class AILogbookController {
     const systemPrompt = `You are an expert sailing advisor specializing in anchoring safety.\nYou provide concise, actionable advice for sailors.\nAlways consider safety as the top priority.\nIf you don't know something, say so — never make up navigational data.\nKeep answers under 300 words unless detailed analysis is needed.\nAnswer in the same language the sailor uses.`;
 
     const response = await this.aiCtrl.askWithContext(question, systemPrompt, fullContext, weatherContext);
-    loadBubble.innerHTML = `<div class="bg-slate-700 text-slate-300 text-sm px-3 py-2 rounded-xl rounded-bl-sm max-w-[85%] prose prose-sm prose-invert max-w-none leading-relaxed">${marked.parse(response)}<div class="text-[9px] text-slate-500 mt-1 italic">${I18N.t.aiDisclaimer}</div></div>`;
+    const sanitizedHtml = DOMPurify.sanitize(marked.parse(response) as string);
+    loadBubble.innerHTML = `<div class="bg-slate-700 text-slate-300 text-sm px-3 py-2 rounded-xl rounded-bl-sm max-w-[85%] prose prose-sm prose-invert max-w-none leading-relaxed">${sanitizedHtml}<div class="text-[9px] text-slate-500 mt-1 italic">${I18N.t.aiDisclaimer}</div></div>`;
     createIcons({ icons });
     askBtn.disabled = false;
     chatArea.scrollTop = chatArea.scrollHeight;

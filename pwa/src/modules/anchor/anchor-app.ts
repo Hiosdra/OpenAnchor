@@ -165,6 +165,10 @@ export class AnchorApp {
     this.alertCtrl = new AlertController();
     this.aiCtrl = new AIController();
     this.syncCtrl = new SyncController(this);
+    this.alertCtrl.configureBatteryCallbacks(
+      () => this.state.isAnchored,
+      (data) => this.syncCtrl?.send('TRIGGER_ALARM', data),
+    );
 
     this._els = {
       alarmStateBar: document.getElementById('alarm-state-bar'),

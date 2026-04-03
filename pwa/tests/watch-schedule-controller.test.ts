@@ -75,11 +75,16 @@ describe('WatchScheduleController', () => {
   });
 
   describe('debouncedSaveSchedule', () => {
-    it('saves schedule to localStorage after debounce', async () => {
-      state.schedule = [{ start: '08:00', end: '12:00', person: 'Bob' }];
-      ctrl.debouncedSaveSchedule();
-      await new Promise((r) => setTimeout(r, 350));
-      expect(JSON.parse(localStorage.getItem('anchor_schedule')!)).toEqual(state.schedule);
+    it('saves schedule to localStorage after debounce', () => {
+      vi.useFakeTimers();
+      try {
+        state.schedule = [{ start: '08:00', end: '12:00', person: 'Bob' }];
+        ctrl.debouncedSaveSchedule();
+        vi.advanceTimersByTime(350);
+        expect(JSON.parse(localStorage.getItem('anchor_schedule')!)).toEqual(state.schedule);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

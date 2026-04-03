@@ -19,9 +19,19 @@ export class AlertController {
   lastKnownChargingState = false;
   private _batteryRef: BatteryManager | null = null;
   private _batteryCheck: (() => void) | null = null;
+  private _isAnchored: (() => boolean) | null = null;
+  private _onBatteryWarning: ((data: { reason: string; message: string; alarmState: string }) => void) | null = null;
 
   constructor() {
     this._initBatteryMonitor();
+  }
+
+  configureBatteryCallbacks(
+    isAnchored: () => boolean,
+    onBatteryWarning: (data: { reason: string; message: string; alarmState: string }) => void,
+  ) {
+    this._isAnchored = isAnchored;
+    this._onBatteryWarning = onBatteryWarning;
   }
 
   initPermissions() {
@@ -130,19 +140,17 @@ export class AlertController {
           if (
             b.level <= 0.15 &&
             !b.charging &&
-            (window as any).app?.state?.isAnchored &&
+            this._isAnchored?.() &&
             !this.batteryWarningShown
           ) {
             this.batteryWarningShown = true;
             UI.showModal('battery-modal');
             this.playBeep('square');
-            if ((window as any).app?.syncCtrl) {
-              (window as any).app.syncCtrl.send('TRIGGER_ALARM', {
-                reason: 'LOW_BATTERY',
-                message: 'iPad battery critically low!',
-                alarmState: 'WARNING',
-              });
-            }
+            this._onBatteryWarning?.({
+              reason: 'LOW_BATTERY',
+              message: 'iPad battery critically low!',
+              alarmState: 'WARNING',
+            });
           }
           if (b.charging) this.batteryWarningShown = false;
         };

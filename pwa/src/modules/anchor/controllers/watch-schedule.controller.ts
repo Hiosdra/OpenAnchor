@@ -80,7 +80,8 @@ export class WatchScheduleController {
     this.state.schedule.forEach((item, index) => {
       const div = document.createElement('div');
       div.className = 'flex justify-between items-center bg-slate-800 p-2 rounded border border-slate-700 text-xs';
-      div.innerHTML = `<span class="text-blue-400 font-mono">${item.start} - ${item.end}</span><span class="text-white font-bold truncate px-2">${item.person}</span><button class="text-red-400 hover:text-red-300 transition-colors" data-idx="${index}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`;
+      div.innerHTML = `<span class="text-blue-400 font-mono">${item.start} - ${item.end}</span><span class="text-white font-bold truncate px-2 schedule-person"></span><button class="text-red-400 hover:text-red-300 transition-colors" data-idx="${index}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`;
+      div.querySelector('.schedule-person')!.textContent = item.person;
       div.querySelector('button')!.addEventListener('click', (e) => {
         this.state.schedule.splice(Number((e.currentTarget as HTMLElement).dataset.idx), 1);
         this.debouncedSaveSchedule();
