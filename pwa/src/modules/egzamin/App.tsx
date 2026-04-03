@@ -5,8 +5,7 @@ import { MODES } from './constants';
 import type { Mode } from './constants';
 import { getDueQuestions } from './helpers';
 import { loadProgress, saveProgress, loadLeitnerState, saveLeitnerState } from './exam-storage';
-import { isPdfImported, loadPdfBlob, deletePdf } from '../../shared/storage/indexed-db';
-import { PdfRenderer } from './pdf-renderer';
+import { initializeEgzaminPdf, clearEgzaminPdf } from './pdf-runtime';
 
 import { ImportPdfScreen } from './components/ImportPdfScreen';
 import { MenuScreen } from './components/MenuScreen';
@@ -36,14 +35,7 @@ export function App({ questions }: AppProps) {
   useEffect(() => {
     async function init() {
       try {
-        const imported = await isPdfImported();
-        if (imported) {
-          const blob = await loadPdfBlob();
-          if (blob) {
-            await PdfRenderer.loadFromBlob(blob);
-            setPdfReady(true);
-          }
-        }
+        setPdfReady(await initializeEgzaminPdf());
       } catch (err) {
         console.error('Failed to initialize PDF:', err);
       }
@@ -53,8 +45,7 @@ export function App({ questions }: AppProps) {
   }, []);
 
   const handleChangePdf = useCallback(async () => {
-    PdfRenderer.unload();
-    await deletePdf();
+    await clearEgzaminPdf();
     setPdfReady(false);
   }, []);
 

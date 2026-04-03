@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { EgzaminQuestion } from '../types';
-import { PdfRenderer } from '../pdf-renderer';
+import { renderEgzaminQuestion } from '../pdf-runtime';
 import { CategoryBadge } from './CategoryBadge';
 
 interface QuestionImageCardProps {
   question: EgzaminQuestion;
+}
+
+function revokeRenderedImage(url: string | null): void {
+  if (url?.startsWith('blob:')) {
+    URL.revokeObjectURL(url);
+  }
 }
 
 export function QuestionImageCard({ question }: QuestionImageCardProps) {
@@ -19,7 +25,7 @@ export function QuestionImageCard({ question }: QuestionImageCardProps) {
 
     // Revoke previous blob URL to prevent memory leaks
     if (blobUrlRef.current) {
-      URL.revokeObjectURL(blobUrlRef.current);
+      revokeRenderedImage(blobUrlRef.current);
       blobUrlRef.current = null;
     }
 
@@ -27,32 +33,37 @@ export function QuestionImageCard({ question }: QuestionImageCardProps) {
     setError(false);
     setImageDataUrl(null);
 
-    if (PdfRenderer.isLoaded()) {
-      PdfRenderer.renderQuestion(question.pdfPage, question.cropYStart, question.cropYEnd, question.pageHeight)
-        .then(dataUrl => {
-          if (!cancelled) {
+    renderEgzaminQuestion({
+      questionId: question.id,
+      pageIndex: question.pdfPage,
+      cropYStart: question.cropYStart,
+      cropYEnd: question.cropYEnd,
+      pageHeight: question.pageHeight,
+    })
+      .then((dataUrl) => {
+        if (!cancelled) {
+          if (dataUrl) {
             blobUrlRef.current = dataUrl;
             setImageDataUrl(dataUrl);
-            setLoading(false);
-          } else if (dataUrl) {
-            URL.revokeObjectURL(dataUrl);
-          }
-        })
-        .catch(() => {
-          if (!cancelled) {
+          } else {
             setError(true);
-            setLoading(false);
           }
-        });
-    } else {
-      setError(true);
-      setLoading(false);
-    }
+          setLoading(false);
+        } else {
+          revokeRenderedImage(dataUrl);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError(true);
+          setLoading(false);
+        }
+      });
 
     return () => {
       cancelled = true;
       if (blobUrlRef.current) {
-        URL.revokeObjectURL(blobUrlRef.current);
+        revokeRenderedImage(blobUrlRef.current);
         blobUrlRef.current = null;
       }
     };

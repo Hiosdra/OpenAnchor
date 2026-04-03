@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { MODULES, STORAGE_KEYS } from './helpers.js';
+import { MODULES, STORAGE_KEYS, installEgzaminPdfTestHook } from './helpers.js';
 
 const EGZAMIN_URL = MODULES.egzamin;
 
@@ -11,56 +11,10 @@ const waitForApp = async (page: import('@playwright/test').Page) => {
   }, { timeout: 15_000 });
 };
 
-// Stub PDF storage and renderer so the egzamin module skips the ImportPdfScreen.
-// After Vite migration, JS is bundled — we patch isPdfImported, loadFromBlob, and renderQuestion.
-const PLACEHOLDER_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
-
 test.beforeEach(async ({ page }) => {
   // Block SW so controllerchange doesn't interrupt navigation
   await page.route('**/sw.js', route => route.abort());
-
-  // Patch the bundled egzamin JS to skip PDF initialization.
-  // The bundle has 2 .loadFromBlob calls: import handler (sets false) and init block (sets true).
-  // We replace the init block (the one with !0/true) to directly set pdfLoaded=true.
-  await page.route('**/assets/egzamin-*.js', async route => {
-    const response = await route.fetch();
-    let body = await response.text();
-
-    // Find the init block: second occurrence of .loadFromBlob(
-    const first = body.indexOf('.loadFromBlob(');
-    const second = first !== -1 ? body.indexOf('.loadFromBlob(', first + 1) : -1;
-    if (second !== -1) {
-      const searchStart = body.lastIndexOf('if(await ', second);
-      let depth = 0, blockEnd = searchStart;
-      for (let i = searchStart; i < body.length; i++) {
-        if (body[i] === '{') depth++;
-        if (body[i] === '}') { depth--; if (depth === 0) { blockEnd = i + 1; break; } }
-      }
-      const block = body.substring(searchStart, blockEnd);
-      const rvArr = block.match(/await (\w+)\.loadFromBlob/);
-      const svArr = block.match(/,(\w+)\(!0\)/);
-      if (rvArr && svArr) {
-        const rv = rvArr[1];
-        const sv = svArr[1];
-        const stub = `${rv}._pdfDoc={numPages:200,getPage:async()=>({getViewport:()=>({width:100,height:100}),render:()=>({promise:Promise.resolve()})})};${rv}._cache=new Map();${sv}(!0)`;
-        body = body.substring(0, searchStart) + stub + body.substring(blockEnd);
-      }
-    }
-
-    // Stub renderQuestion: replace entire method body with a stub that returns placeholder
-    const rqStart = body.indexOf('renderQuestion(e,t,n,r,i){');
-    if (rqStart !== -1) {
-      const bodyStart = body.indexOf('{', rqStart);
-      let depth = 0, bodyEnd = bodyStart;
-      for (let i = bodyStart; i < body.length; i++) {
-        if (body[i] === '{') depth++;
-        if (body[i] === '}') { depth--; if (depth === 0) { bodyEnd = i + 1; break; } }
-      }
-      body = body.substring(0, bodyStart) + `{return'${PLACEHOLDER_PNG}'}` + body.substring(bodyEnd);
-    }
-
-    await route.fulfill({ body, contentType: 'application/javascript' });
-  });
+  await installEgzaminPdfTestHook(page);
 });
 
 // ==========================================

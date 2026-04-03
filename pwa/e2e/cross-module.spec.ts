@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { MODULES, STORAGE_KEYS } from './helpers.js';
+import { MODULES, STORAGE_KEYS, installEgzaminPdfTestHook } from './helpers.js';
 
 /** Click an element and wait for navigation to complete. */
 async function clickAndNavigate(
@@ -147,46 +147,9 @@ test.describe('Module Independence', () => {
 });
 
 test.describe('Egzamin State Persistence', () => {
-  // Stub PDF-related functions in the egzamin bundle
   test.beforeEach(async ({ page }) => {
     await page.route('**/sw.js', route => route.abort());
-    await page.route('**/assets/egzamin-*.js', async route => {
-      const response = await route.fetch();
-      let body = await response.text();
-
-      const first = body.indexOf('.loadFromBlob(');
-      const second = first !== -1 ? body.indexOf('.loadFromBlob(', first + 1) : -1;
-      if (second !== -1) {
-        const searchStart = body.lastIndexOf('if(await ', second);
-        let depth = 0, blockEnd = searchStart;
-        for (let i = searchStart; i < body.length; i++) {
-          if (body[i] === '{') depth++;
-          if (body[i] === '}') { depth--; if (depth === 0) { blockEnd = i + 1; break; } }
-        }
-        const block = body.substring(searchStart, blockEnd);
-        const rvArr = block.match(/await (\w+)\.loadFromBlob/);
-        const svArr = block.match(/,(\w+)\(!0\)/);
-        if (rvArr && svArr) {
-          const rv = rvArr[1];
-          const sv = svArr[1];
-          const stub = `${rv}._pdfDoc={numPages:200,getPage:async()=>({getViewport:()=>({width:100,height:100}),render:()=>({promise:Promise.resolve()})})};${rv}._cache=new Map();${sv}(!0)`;
-          body = body.substring(0, searchStart) + stub + body.substring(blockEnd);
-        }
-      }
-
-      const rqStart = body.indexOf('renderQuestion(e,t,n,r,i){');
-      if (rqStart !== -1) {
-        const bodyStart = body.indexOf('{', rqStart);
-        let depth = 0, bodyEnd = bodyStart;
-        for (let i = bodyStart; i < body.length; i++) {
-          if (body[i] === '{') depth++;
-          if (body[i] === '}') { depth--; if (depth === 0) { bodyEnd = i + 1; break; } }
-        }
-        body = body.substring(0, bodyStart) + `{return'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='}` + body.substring(bodyEnd);
-      }
-
-      await route.fulfill({ body, contentType: 'application/javascript' });
-    });
+    await installEgzaminPdfTestHook(page);
   });
 
   test('exam progress survives navigation to dashboard and back', async ({
