@@ -1,5 +1,4 @@
 import L from 'leaflet';
-// @ts-expect-error -- CSS import handled by Vite
 import 'leaflet/dist/leaflet.css';
 import { GeoUtils } from './geo-utils';
 

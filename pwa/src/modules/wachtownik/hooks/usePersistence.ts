@@ -157,7 +157,14 @@ export function usePersistence(
       }
     };
     window.addEventListener('beforeunload', flushSave);
-    return () => window.removeEventListener('beforeunload', flushSave);
+    return () => {
+      window.removeEventListener('beforeunload', flushSave);
+      // Flush pending save on component unmount
+      if (pendingSaveRef.current) {
+        localStorage.setItem('sailingSchedulePro', JSON.stringify(pendingSaveRef.current));
+        pendingSaveRef.current = null;
+      }
+    };
   }, []);
 
   // Auto-save when state changes

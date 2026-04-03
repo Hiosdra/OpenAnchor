@@ -186,6 +186,30 @@ describe('SessionController', () => {
     expect(ctrl.trackBufferLength).toBeLessThanOrEqual(1000);
   });
 
+  it('bufferTrackPoint triggers emergency flush above warn threshold', () => {
+    (state as any).sessionId = 1;
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // Fill buffer to just above 800 (the warn threshold)
+    for (let i = 0; i < 801; i++) {
+      ctrl.bufferTrackPoint({ sessionId: 1, lat: i, lng: 0, accuracy: null, timestamp: i, distance: 0, alarmState: 'SAFE' });
+    }
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('emergency flush'));
+    expect(db.addTrackPointsBatch).toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it('bufferTrackPoint logs warning when dropping oldest points', () => {
+    // No sessionId → flushTrackPoints is a no-op, so buffer won't drain
+    (state as any).sessionId = null;
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    for (let i = 0; i < 1050; i++) {
+      ctrl.bufferTrackPoint({ sessionId: 1, lat: i, lng: 0, accuracy: null, timestamp: i, distance: 0, alarmState: 'SAFE' });
+    }
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Dropping'));
+    expect(ctrl.trackBufferLength).toBeLessThanOrEqual(1000);
+    warnSpy.mockRestore();
+  });
+
   it('setAnchor initializes anchored state and creates session', async () => {
     const pos = { lat: 50, lng: 14 } as any;
     state.currentPos = pos;

@@ -98,10 +98,6 @@ export function initChecklists(): void {
     saved && saved in checklistData ? (saved as ChecklistType) : 'morning';
   currentChecklistType = validType;
 
-  if (!checklistData[saved as ChecklistType]) {
-    localStorage.setItem('zeglowanie_selected_checklist_type', 'morning');
-  }
-
   document.querySelectorAll<HTMLButtonElement>('.cruise-btn[data-checklist]').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.checklist === currentChecklistType);
   });

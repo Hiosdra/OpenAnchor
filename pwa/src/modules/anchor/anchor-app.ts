@@ -237,6 +237,7 @@ export class AnchorApp {
       if (this.sessionCtrl.hasBufferedPoints && this.state.sessionId && this.db.db) {
         this.sessionCtrl.flushTrackPoints();
       }
+      this.gpsCtrl.cleanupGPS();
       if (this._smClockInterval) clearInterval(this._smClockInterval);
       if (this._tickInterval) clearInterval(this._tickInterval);
     });

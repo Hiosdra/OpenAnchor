@@ -269,7 +269,7 @@ describe('wachtownik/entry.tsx', () => {
     capturedLoad!(new Event('load'));
     await Promise.resolve();
 
-    expect(register).toHaveBeenCalledWith('../../sw.js');
+    expect(register).toHaveBeenCalledWith(import.meta.env.BASE_URL + 'sw.js');
     expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 60_000);
 
     const refreshRegistration = setIntervalSpy.mock.calls[0]?.[0] as (() => void) | undefined;

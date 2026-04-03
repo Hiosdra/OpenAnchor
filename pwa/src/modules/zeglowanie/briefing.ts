@@ -1,5 +1,5 @@
 import { briefingLists, type BriefingType } from './data';
-import { briefingStorageKey, STORAGE_KEYS } from './storage-keys';
+import { briefingStorageKey, isValidBriefingType, STORAGE_KEYS } from './storage-keys';
 
 let currentBriefingType: BriefingType = 'zero';
 
@@ -103,8 +103,8 @@ export function resetBriefingChecklist(briefingType: BriefingType): void {
 }
 
 export function initBriefing(): void {
-  const saved = localStorage.getItem(STORAGE_KEYS.BRIEFING_TYPE) as BriefingType | null;
-  currentBriefingType = saved ?? 'zero';
+  const saved = localStorage.getItem(STORAGE_KEYS.BRIEFING_TYPE);
+  currentBriefingType = isValidBriefingType(saved) ? saved : 'zero';
 
   document.querySelectorAll<HTMLButtonElement>('.cruise-btn[data-briefing]').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.briefing === currentBriefingType);

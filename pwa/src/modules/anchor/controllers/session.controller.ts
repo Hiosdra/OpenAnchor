@@ -17,6 +17,7 @@ export class SessionController {
   private _trackPointBuffer: Omit<TrackPoint, 'id'>[] = [];
   private _trackFlushInterval: ReturnType<typeof setInterval> | null = null;
   private _TRACK_BUFFER_MAX = 1000;
+  private _TRACK_BUFFER_WARN = 800;
 
   constructor(
     private state: AppState,
@@ -123,8 +124,16 @@ export class SessionController {
 
   bufferTrackPoint(point: Omit<TrackPoint, 'id'>) {
     this._trackPointBuffer.push(point);
+    if (this._trackPointBuffer.length > this._TRACK_BUFFER_WARN) {
+      console.warn(
+        `[SessionController] Track buffer at ${this._trackPointBuffer.length}/${this._TRACK_BUFFER_MAX} — triggering emergency flush`,
+      );
+      this.flushTrackPoints();
+    }
     if (this._trackPointBuffer.length > this._TRACK_BUFFER_MAX) {
-      this._trackPointBuffer.splice(0, this._trackPointBuffer.length - this._TRACK_BUFFER_MAX);
+      const dropped = this._trackPointBuffer.length - this._TRACK_BUFFER_MAX;
+      console.warn(`[SessionController] Dropping ${dropped} oldest track points`);
+      this._trackPointBuffer.splice(0, dropped);
     }
   }
 

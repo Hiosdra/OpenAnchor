@@ -77,13 +77,22 @@ export function useExportShare(
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrError, setQrError] = useState('');
   const qrCodeRef = useRef<HTMLDivElement | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   const showToast = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToastType(type);
     setCopyStatus(msg);
-    setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setCopyStatus('');
       setToastType('success');
+      toastTimerRef.current = null;
     }, 3000);
   }, []);
 

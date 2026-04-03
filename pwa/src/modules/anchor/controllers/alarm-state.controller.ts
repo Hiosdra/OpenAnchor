@@ -13,6 +13,8 @@ import { I18N } from '../i18n';
 import { UI } from '../ui-utils';
 
 export class AlarmStateController {
+  private _alarmCount: number = 0;
+
   constructor(
     private state: AppState,
     private db: SessionDB,
@@ -91,10 +93,9 @@ export class AlarmStateController {
           message: `Yacht outside safe zone! (${distStr})`,
           alarmState: 'ALARM',
         });
+        this._alarmCount++;
         if (this.db.db && this.state.sessionId) {
-          this.db.getSession(this.state.sessionId).then((s) => {
-            if (s) this.db.updateSession(this.state.sessionId!, { alarmTriggered: true, alarmCount: (s.alarmCount || 0) + 1 });
-          });
+          this.db.updateSession(this.state.sessionId, { alarmTriggered: true, alarmCount: this._alarmCount });
         }
       } else if (newAlarmState === 'WARNING' && previousAlarmState !== 'ALARM') {
         this.alertCtrl.startForState('WARNING', I18N.t.notifVerifying, distStr);

@@ -1,4 +1,5 @@
 import { packingLists, type CruiseType } from './data';
+import { isValidCruiseType } from './storage-keys';
 
 let currentCruiseType: CruiseType = 'baltic-autumn';
 
@@ -91,8 +92,8 @@ export function resetChecklist(): void {
 }
 
 export function initPacking(): void {
-  const saved = localStorage.getItem('zeglowanie_selected_cruise_type') as CruiseType | null;
-  currentCruiseType = saved ?? 'baltic-autumn';
+  const saved = localStorage.getItem('zeglowanie_selected_cruise_type');
+  currentCruiseType = isValidCruiseType(saved) ? saved : 'baltic-autumn';
 
   document.querySelectorAll<HTMLButtonElement>('.cruise-btn[data-cruise]').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.cruise === currentCruiseType);

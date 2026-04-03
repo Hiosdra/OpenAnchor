@@ -1,6 +1,6 @@
 // @ts-nocheck
 // Slim rendering component — all logic lives in ./hooks/*
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { ROLES, WATCH_TEMPLATES, t } from './constants';
 import { Icon } from './components/Icon';
 import { Dropdown, DropdownItem } from './components/Dropdown';
@@ -58,16 +58,19 @@ function App() {
 
   const generateSchedule = () => {
     engine.generateSchedule();
-    if (engine.isGenerated || (activeCrew.length > 0 && slots.length > 0)) {
+  };
+
+  useEffect(() => {
+    if (engine.isGenerated) {
       setActiveTab('schedule');
     }
-  };
+  }, [engine.isGenerated]);
 
   useNotifications(notificationsEnabled, dashboardData, currentTime);
 
   useKeyboardShortcuts({
     activeTab, canUndo, canRedo, isReadOnly, showQRModal,
-    undo, redo, generateSchedule: engine.generateSchedule, handlePrint, setShowQRModal,
+    undo, redo, generateSchedule, handlePrint, setShowQRModal,
   });
 
   if (!isLoaded) return null;
