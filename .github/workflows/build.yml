@@ -221,8 +221,23 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f "pwa/manifest.json" ]; then
-            echo "Error: pwa/manifest.json not found"
+          if [ ! -f "pwa/public/manifest.json" ]; then
+            echo "Error: pwa/public/manifest.json not found"
+            exit 1
+          fi
+
+          if [ ! -f "pwa/public/assets/icon-192x192.png" ]; then
+            echo "Error: pwa/public/assets/icon-192x192.png not found"
+            exit 1
+          fi
+
+          if [ ! -f "pwa/public/assets/icon-512x512.png" ]; then
+            echo "Error: pwa/public/assets/icon-512x512.png not found"
+            exit 1
+          fi
+
+          if [ ! -f "pwa/public/assets/icon.svg" ]; then
+            echo "Error: pwa/public/assets/icon.svg not found"
             exit 1
           fi
 
@@ -242,7 +257,7 @@ jobs:
             sudo apt-get update && sudo apt-get install -y jq
           fi
 
-          if ! jq empty pwa/manifest.json; then
+          if ! jq empty pwa/public/manifest.json; then
             echo "Error: manifest.json is not valid JSON"
             exit 1
           fi

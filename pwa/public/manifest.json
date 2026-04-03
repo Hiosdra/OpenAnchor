@@ -2,7 +2,8 @@
   "name": "OpenAnchor - Morska Superapp",
   "short_name": "OpenAnchor",
   "description": "Morska superapp - Alert Kotwiczny GPS, Morski Grafik Wacht PRO, Egzamin ŻJ/JSM i Informacje o Żeglarstwie",
-  "start_url": "./index.html",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
@@ -11,19 +12,19 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "assets/icon-192x192.png",
+      "src": "./assets/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/icon-512x512.png",
+      "src": "./assets/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/icon.svg",
+      "src": "./assets/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
@@ -37,7 +38,7 @@
       "description": "Uruchom alert kotwiczny GPS",
       "url": "./modules/anchor/",
       "icons": [
-        { "src": "assets/icon-192x192.png", "sizes": "192x192" }
+        { "src": "./assets/icon-192x192.png", "sizes": "192x192" }
       ]
     },
     {
@@ -46,7 +47,7 @@
       "description": "Otwórz morski grafik wacht",
       "url": "./modules/wachtownik/",
       "icons": [
-        { "src": "assets/icon-192x192.png", "sizes": "192x192" }
+        { "src": "./assets/icon-192x192.png", "sizes": "192x192" }
       ]
     },
     {
@@ -55,7 +56,7 @@
       "description": "Nauka do egzaminu żeglarskiego PZŻ",
       "url": "./modules/egzamin/",
       "icons": [
-        { "src": "assets/icon-192x192.png", "sizes": "192x192" }
+        { "src": "./assets/icon-192x192.png", "sizes": "192x192" }
       ]
     },
     {
@@ -64,7 +65,7 @@
       "description": "Informacje i porady dla żeglarzy",
       "url": "./modules/zeglowanie/",
       "icons": [
-        { "src": "assets/icon-192x192.png", "sizes": "192x192" }
+        { "src": "./assets/icon-192x192.png", "sizes": "192x192" }
       ]
     }
   ]
