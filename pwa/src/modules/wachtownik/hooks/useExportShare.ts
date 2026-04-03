@@ -4,6 +4,7 @@ import type { CrewMember, DaySchedule, DashboardData, CrewStat, Locale, AppState
 import { t } from '../constants';
 import { exportScheduleToPDF } from '../utils/pdf-export';
 import { generateICSContent } from '../utils/ics-export';
+import { generateQRCode } from '../utils/qr-utils';
 
 export interface ExportShareReturn {
   copyStatus: string;
@@ -39,6 +40,22 @@ export function buildShareUrlLocal(state: AppState, readOnly = false): string {
     console.error('LZString compression failed:', e);
     return baseUrl;
   }
+}
+
+export async function renderShareQrCode(
+  container: HTMLElement,
+  appState: AppState,
+): Promise<void> {
+  container.innerHTML = '';
+
+  const url = buildShareUrlLocal(appState);
+  if (url.length > 2900) {
+    throw new Error(
+      'Grafik jest zbyt złożony do zakodowania w QR. Użyj przycisku "Udostępnij" aby skopiować link.',
+    );
+  }
+
+  await generateQRCode(container, url, appState.isNightMode);
 }
 
 export function useExportShare(
@@ -213,40 +230,25 @@ export function useExportShare(
 
   // QR code generation
   useEffect(() => {
-    if (
-      showQRModal &&
-      qrCodeRef.current &&
-      (window as unknown as { QRCode?: unknown }).QRCode
-    ) {
-      qrCodeRef.current.innerHTML = '';
-      setQrError('');
+    if (!showQRModal || !qrCodeRef.current) return;
 
-      try {
-        const url = buildShareUrlLocal(appState);
+    let isActive = true;
+    setQrError('');
 
-        if (url.length > 2900) {
-          setQrError(
-            'Grafik jest zbyt złożony do zakodowania w QR. Użyj przycisku "Udostępnij" aby skopiować link.',
-          );
-          return;
-        }
+    renderShareQrCode(qrCodeRef.current, appState).catch((error) => {
+      if (!isActive) return;
 
-        const QRCodeLib = (window as unknown as { QRCode: new (el: HTMLElement, opts: unknown) => void }).QRCode;
-        new QRCodeLib(qrCodeRef.current, {
-          text: url,
-          width: 256,
-          height: 256,
-          colorDark: appState.isNightMode ? '#000000' : '#0c4a6e',
-          colorLight: appState.isNightMode ? '#dc2626' : '#ffffff',
-          correctLevel: { M: 1 },
-        });
-      } catch (error) {
-        console.error('QR generation error:', error);
-        setQrError(
-          'Nie udało się wygenerować kodu QR. Spróbuj użyć przycisku "Udostępnij" aby skopiować link.',
-        );
-      }
-    }
+      console.error('QR generation error:', error);
+      setQrError(
+        error instanceof Error && error.message
+          ? error.message
+          : 'Nie udało się wygenerować kodu QR. Spróbuj użyć przycisku "Udostępnij" aby skopiować link.',
+      );
+    });
+
+    return () => {
+      isActive = false;
+    };
   }, [showQRModal, appState]);
 
   return {
