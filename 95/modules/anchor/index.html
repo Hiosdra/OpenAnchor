@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script>document.documentElement.dataset.theme = localStorage.getItem('openanchor-theme') || 'dark';</script>
     <title>Alert Kotwiczny (Anchor Alarm)</title>
     <link rel="icon" type="image/x-icon" href="/OpenAnchor/95/assets/favicon-ofCH8lQR.ico">
     <link rel="icon" type="image/svg+xml" href="/OpenAnchor/95/assets/icon-0bf5rVs7.svg">
@@ -15,156 +14,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/OpenAnchor/95/manifest.json">
 
-    <!-- Tailwind CSS & Plugins -->
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-
     <!-- Unified Theme -->
-    <!-- Libraries loaded via npm — see src/modules/anchor/entry.ts -->
-
-    <style>
-        /* Module-specific styles only - base styles in theme.css */
-
-        /* Night vision filter for anchor module */
-        body.night-vision {
-            transition: filter 0.3s ease;
-        }
-
-        /* === MOTYWY === */
-        .night-vision {
-            filter: grayscale(100%) sepia(100%) hue-rotate(315deg) saturate(500%) brightness(70%);
-            background-color: #000 !important;
-        }
-
-        /* === ANIMACJE === */
-        @keyframes alarmFlash {
-            0% { background-color: #ef4444; }
-            50% { background-color: #7f1d1d; }
-            100% { background-color: #ef4444; }
-        }
-        .bg-alarm-active {
-            animation: alarmFlash 1s infinite !important;
-        }
-
-        /* === MAPA LEAFLET === */
-        #map {
-            background-color: #1e293b;
-            z-index: 10;
-        }
-
-        body:not(.map-sat) .leaflet-layer,
-        body:not(.map-sat) .leaflet-control-zoom-in,
-        body:not(.map-sat) .leaflet-control-zoom-out,
-        body:not(.map-sat) .leaflet-control-attribution {
-            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-        }
-
-        .boat-icon-wrapper {
-            transition: transform 0.4s linear;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* === ALARM STATE BAR === */
-        .alarm-bar-safe { background-color: #22c55e; color: #052e16; }
-        .alarm-bar-caution { background-color: #eab308; color: #422006; animation: cautionPulse 2s infinite; }
-        .alarm-bar-warning { background-color: #f97316; color: #431407; animation: warningPulse 1.5s infinite; }
-        .alarm-bar-alarm { background-color: #ef4444; color: #450a0a; animation: alarmFlash 0.5s infinite; }
-
-        @keyframes cautionPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        @keyframes warningPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* === BUFFER ZONE === */
-        .buffer-zone { stroke-dasharray: 8, 4; }
-
-        /* === SIMPLE MONITOR (Night View) === */
-        .simple-monitor-bg-safe { background-color: #000; }
-        .simple-monitor-bg-caution { background-color: #1a1200; }
-        .simple-monitor-bg-warning { background-color: #1a1a00; }
-        .simple-monitor-bg-alarm { background-color: #1a0000; animation: alarmFlash 0.8s infinite; }
-
-        /* === WEATHER CHART === */
-        .weather-bar {
-            transition: height 0.3s ease;
-        }
-
-        /* === QR SCANNER === */
-        #qr-reader video { border-radius: 0.75rem; }
-        #qr-reader__scan_region { border-radius: 0.75rem; overflow: hidden; }
-
-        /* === KONTROLKI FORMULARZY === */
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-            margin-top: -8px;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 8px;
-            cursor: pointer;
-            background: #334155;
-            border-radius: 4px;
-        }
-
-        /* === CONNECTION STATUS INDICATOR === */
-        .connection-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            font-size: 0.65rem;
-            font-weight: 600;
-            padding: 0.15rem 0.5rem;
-            border-radius: 9999px;
-            transition: all 0.3s ease;
-            background: rgba(34,197,94,0.15);
-            color: #4ade80;
-            border: 1px solid rgba(34,197,94,0.25);
-        }
-        .connection-status--offline {
-            background: rgba(245,158,11,0.2);
-            color: #fbbf24;
-            border-color: rgba(245,158,11,0.4);
-        }
-        .connection-status__dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #4ade80;
-        }
-        .connection-status--offline .connection-status__dot {
-            background: #f59e0b;
-            animation: offlinePulse 1.5s infinite;
-        }
-        @keyframes offlinePulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-    </style>
-  <script type="module" crossorigin src="/OpenAnchor/95/assets/anchor-CKBpWwgQ.js"></script>
+    <!-- Styles & libraries loaded via npm — see src/modules/anchor/entry.ts -->
+  <script type="module" crossorigin src="/OpenAnchor/95/assets/anchor-CY3hgImS.js"></script>
   <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/rolldown-runtime-BJFoxEff.js">
-  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/theme-BupO5bjA.js">
-  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/purify.es-_lW4ITH7.js">
-  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-html5-qrcode-CDve4bmt.js">
-  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-leaflet-DgbTnSFE.js">
-  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-lucide-Dg3_hEA7.js">
-  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-marked-YsFvPhs3.js">
-  <link rel="stylesheet" crossorigin href="/OpenAnchor/95/assets/theme-DrzzbnPo.css">
+  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/modulepreload-polyfill-CXK8biUa.js">
+  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/purify.es-BOz-aDdj.js">
+  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-html5-qrcode-CM3cjHox.js">
+  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-leaflet-Bu4F0KE0.js">
+  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-lucide-CAuDx8uA.js">
+  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-marked-DhV80CVW.js">
   <link rel="stylesheet" crossorigin href="/OpenAnchor/95/assets/vendor-leaflet-vh-t_kPv.css">
+  <link rel="stylesheet" crossorigin href="/OpenAnchor/95/assets/anchor-DGmfVisb.css">
+  <link rel="stylesheet" crossorigin href="/OpenAnchor/95/assets/theme-DrzzbnPo.css">
 </head>
 <body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-y-auto" id="app-body">
 
