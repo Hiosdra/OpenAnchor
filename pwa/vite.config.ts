@@ -25,6 +25,43 @@ export default defineConfig({
         wachtownik: resolve(__dirname, 'modules/wachtownik/index.html'),
         zeglowanie: resolve(__dirname, 'modules/zeglowanie/index.html'),
       },
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('node_modules/react-dom/') || id.includes('node_modules/react/')) {
+            return 'vendor-react';
+          }
+          if (id.includes('node_modules/leaflet/')) {
+            return 'vendor-leaflet';
+          }
+          if (id.includes('node_modules/jspdf-autotable/')) {
+            return 'vendor-jspdf-autotable';
+          }
+          if (id.includes('node_modules/jspdf/')) {
+            return 'vendor-jspdf';
+          }
+          if (id.includes('node_modules/pdfjs-dist/')) {
+            return 'vendor-pdfjs';
+          }
+          if (id.includes('node_modules/html5-qrcode/')) {
+            return 'vendor-html5-qrcode';
+          }
+          if (id.includes('node_modules/qrcode/')) {
+            return 'vendor-qrcode';
+          }
+          if (id.includes('node_modules/lucide-react/')) {
+            return 'vendor-lucide-react';
+          }
+          if (id.includes('node_modules/lucide/')) {
+            return 'vendor-lucide';
+          }
+          if (id.includes('node_modules/marked/')) {
+            return 'vendor-marked';
+          }
+          if (id.includes('node_modules/html2canvas/')) {
+            return 'vendor-html2canvas';
+          }
+        },
+      },
     },
   },
   resolve: {
