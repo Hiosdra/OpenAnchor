@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   e2e:
@@ -40,8 +41,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run E2E tests
-        run: npx playwright test
+      - name: Run E2E tests with coverage
+        id: e2e-tests
+        continue-on-error: true
+        run: npm run test:e2e:coverage
+
+      - name: Generate E2E coverage comment
+        if: always()
+        run: npm run test:e2e:coverage:comment
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -50,3 +57,23 @@ jobs:
           name: playwright-report
           path: pwa/e2e-results/
           retention-days: 30
+
+      - name: Upload E2E coverage report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: pwa-e2e-coverage
+          path: pwa/e2e-coverage/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Comment PR with E2E coverage
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pwa-e2e-coverage
+          path: pwa/e2e-coverage-comment.md
+
+      - name: Fail if E2E tests failed
+        if: steps.e2e-tests.outcome == 'failure'
+        run: exit 1

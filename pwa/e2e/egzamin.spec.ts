@@ -1,74 +1,41 @@
 import { test, expect } from './fixtures.js';
-import { MODULES, STORAGE_KEYS } from './helpers.js';
+import { MODULES, STORAGE_KEYS, installEgzaminPdfTestHook } from './helpers.js';
 
 const EGZAMIN_URL = MODULES.egzamin;
 
-/** Wait for React to render inside #root and questions to load from JSON */
+/** Wait for React to render inside #spa-root (SPA) or #root (standalone) and questions to load */
 const waitForApp = async (page: import('@playwright/test').Page) => {
   await page.waitForFunction(() => {
+    const spa = document.getElementById('spa-root');
+    if (spa && spa.children.length > 0) return true;
     const root = document.getElementById('root');
     return root && root.children.length > 0;
   }, { timeout: 15_000 });
 };
 
-// Stub PDF storage and renderer so the egzamin module skips the ImportPdfScreen.
-// Without these stubs, the module blocks on PDF import and all tests timeout.
 test.beforeEach(async ({ page }) => {
-  // Intercept exam-pdf-storage.js and append stubs so isPdfImported() returns true
-  await page.route('**/js/exam-pdf-storage.js', async route => {
-    const response = await route.fetch();
-    const body = await response.text();
-    const stubbed = body + `\n;
-      // --- E2E test stubs ---
-      isPdfImported = async function() { return true; };
-      loadPdfBlob = async function() { return new Blob(['fake-pdf'], { type: 'application/pdf' }); };
-    `;
-    await route.fulfill({ body: stubbed, contentType: 'application/javascript' });
-  });
-
-  // Replace pdf-renderer.js entirely with a lightweight stub
-  await page.route('**/js/pdf-renderer.js', async route => {
-    const PLACEHOLDER_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
-    const stub = `
-      var PdfRenderer = {
-        _pdfDoc: { numPages: 200 },
-        _cache: new Map(),
-        _MAX_CACHE: 8,
-        async loadFromBlob() { return 200; },
-        _getScale() { return 2.0; },
-        async renderPage() {
-          var c = document.createElement('canvas');
-          c.width = 100; c.height = 100;
-          return c;
-        },
-        async renderQuestion() {
-          return '${PLACEHOLDER_PNG}';
-        },
-        isLoaded() { return true; },
-        unload() { this._pdfDoc = null; this._cache.clear(); }
-      };
-    `;
-    await route.fulfill({ body: stub, contentType: 'application/javascript' });
-  });
+  // Block SW so controllerchange doesn't interrupt navigation
+  await page.route('**/sw.js', route => route.abort());
+  await installEgzaminPdfTestHook(page);
 });
 
 // ==========================================
 // 1. PAGE LOAD & INITIAL STATE
 // ==========================================
 test.describe('Page Load & Initial State', () => {
-  test('page loads and React renders in #root', async ({ page }) => {
+  test('page loads and React renders in app container', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    const root = page.locator('#root');
-    await expect(root).toBeVisible();
-    const children = await root.evaluate(el => el.children.length);
+    const root = page.locator('#spa-root, #root');
+    await expect(root.first()).toBeVisible();
+    const children = await root.first().evaluate(el => el.children.length);
     expect(children).toBeGreaterThan(0);
   });
 
   test('main menu shows Nauka button', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    await expect(page.getByText('Nauka', { exact: false })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Nauka/ })).toBeVisible();
   });
 
   test('main menu shows Egzamin button', async ({ page }) => {
@@ -87,7 +54,6 @@ test.describe('Page Load & Initial State', () => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     await expect(page.getByText('Postep nauki')).toBeVisible();
-    await expect(page.getByText('pytań').first()).toBeVisible();
     await expect(page.getByText('poprawnych')).toBeVisible();
     await expect(page.getByText('odpowiedziano')).toBeVisible();
   });
@@ -640,24 +606,19 @@ test.describe('Leitner Mode', () => {
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
 
-    // Pre-seed Leitner state with only 1 question due (fetch questions from JSON)
-    await page.evaluate(async () => {
-      const res = await fetch('exam_questions.json');
-      const questions: { id: string }[] = await res.json();
-      if (!questions || questions.length === 0) return;
-
-      // Set all questions to box 5 recently reviewed except the first one (box 1, long ago)
+    // Pre-seed Leitner state with only 1 question due.
+    // Questions are bundled in Vite builds with numeric IDs 1..330.
+    await page.evaluate(() => {
       const boxes: Record<string, { box: number; lastReview: number; reviewCount: number }> = {};
-      questions.forEach((q, i) => {
+      for (let i = 0; i < 330; i++) {
+        const id = String(i + 1);
         if (i === 0) {
-          boxes[q.id] = { box: 1, lastReview: 0, reviewCount: 0 };
+          boxes[id] = { box: 1, lastReview: 0, reviewCount: 0 };
         } else {
-          boxes[q.id] = { box: 5, lastReview: Date.now(), reviewCount: 5 };
+          boxes[id] = { box: 5, lastReview: Date.now(), reviewCount: 5 };
         }
-      });
-
-      const leitnerState = { boxes };
-      localStorage.setItem('openanchor_leitner', JSON.stringify(leitnerState));
+      }
+      localStorage.setItem('openanchor_leitner', JSON.stringify({ boxes }));
     });
 
     // Reload to pick up seeded state

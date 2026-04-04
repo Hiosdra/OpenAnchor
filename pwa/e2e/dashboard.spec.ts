@@ -116,7 +116,7 @@ test.describe('Module Navigation', () => {
   test('clicking egzamin card navigates to egzamin module', async ({ page }) => {
     await page.goto(MODULES.dashboard, GOTO_OPTS);
     await page.locator('.module-card.card-exam').click();
-    await expect(page).toHaveURL(/modules\/egzamin/);
+    await expect(page).toHaveURL(/#\/egzamin/);
   });
 
   test('clicking anchor card navigates to anchor module', async ({ setLocalStorage }) => {
@@ -130,7 +130,7 @@ test.describe('Module Navigation', () => {
   test('clicking wachtownik card navigates to wachtownik module', async ({ page }) => {
     await page.goto(MODULES.dashboard, GOTO_OPTS);
     await page.locator('.module-card.card-watch').click();
-    await expect(page).toHaveURL(/modules\/wachtownik/);
+    await expect(page).toHaveURL(/#\/wachtownik/);
   });
 });
 

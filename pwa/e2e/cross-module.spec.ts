@@ -1,11 +1,11 @@
 import { test, expect } from './fixtures.js';
-import { MODULES, STORAGE_KEYS } from './helpers.js';
+import { MODULES, STORAGE_KEYS, installEgzaminPdfTestHook } from './helpers.js';
 
-/** Click an element and wait for navigation to complete. */
+/** Click an element and wait for navigation to complete. Accepts glob string or RegExp. */
 async function clickAndNavigate(
   page: import('@playwright/test').Page,
   selector: string,
-  urlPattern: string,
+  urlPattern: string | RegExp,
   options?: { force?: boolean },
 ) {
   await Promise.all([
@@ -48,12 +48,12 @@ test.describe('Module Navigation Flow', () => {
     await dismissBanners(page);
     await expect(page).toHaveTitle(/OpenAnchor/);
 
-    // Navigate to Egzamin
-    await clickAndNavigate(page, '.module-card.card-exam', '**/modules/egzamin/**');
+    // Navigate to Egzamin (SPA hash route)
+    await clickAndNavigate(page, '.module-card.card-exam', /#\/egzamin/);
     await expect(page).toHaveTitle(/Egzamin/);
 
-    // Navigate back to dashboard
-    await clickAndNavigate(page, 'a.oa-back-btn', '**/index.html');
+    // Navigate back to dashboard via module's back link
+    await clickAndNavigate(page, '.oa-back-btn', /#\/$/);
     await expect(page).toHaveTitle(/OpenAnchor/);
   });
 
@@ -87,12 +87,12 @@ test.describe('Module Navigation Flow', () => {
 
     await expect(page.locator('.module-card.card-watch')).toBeVisible();
 
-    // Navigate to Wachtownik
-    await clickAndNavigate(page, '.module-card.card-watch', '**/modules/wachtownik/**');
+    // Navigate to Wachtownik (SPA hash route)
+    await clickAndNavigate(page, '.module-card.card-watch', /#\/wachtownik/);
     await expect(page).toHaveTitle(/Wachtownik/);
 
-    // Navigate back
-    await clickAndNavigate(page, 'a.oa-back-btn', '**/index.html', { force: true });
+    // Navigate back via module's back link
+    await clickAndNavigate(page, '.oa-back-btn', /#\/$/,  { force: true });
     await expect(page).toHaveTitle(/OpenAnchor/);
   });
 });
@@ -108,8 +108,8 @@ test.describe('localStorage Persistence Across Modules', () => {
     // Beta modules should be visible
     await expect(page.locator('#anchorModule')).toBeVisible();
 
-    // Navigate to Egzamin
-    await clickAndNavigate(page, '.module-card.card-exam', '**/modules/egzamin/**');
+    // Navigate to Egzamin (SPA hash route)
+    await clickAndNavigate(page, '.module-card.card-exam', /#\/egzamin/);
 
     // Verify beta mode is still in localStorage
     const betaInEgzamin = await page.evaluate(
@@ -118,8 +118,8 @@ test.describe('localStorage Persistence Across Modules', () => {
     );
     expect(betaInEgzamin).toBe('true');
 
-    // Navigate back to dashboard
-    await clickAndNavigate(page, 'a.oa-back-btn', '**/index.html');
+    // Navigate back to dashboard via module's back link
+    await clickAndNavigate(page, '.oa-back-btn', /#\/$/);
 
     // Beta modules should still be visible
     await expect(page.locator('#anchorModule')).toBeVisible();
@@ -130,7 +130,7 @@ test.describe('Module Independence', () => {
   test('egzamin loads directly via URL', async ({ page }) => {
     await page.goto(MODULES.egzamin, { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveTitle(/Egzamin/);
-    await expect(page.locator('a.oa-back-btn')).toBeVisible();
+    await expect(page.locator('.oa-back-btn').first()).toBeVisible();
   });
 
   test('anchor loads directly via URL', async ({ page }) => {
@@ -142,27 +142,14 @@ test.describe('Module Independence', () => {
   test('wachtownik loads directly via URL', async ({ page }) => {
     await page.goto(MODULES.wachtownik, { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveTitle(/Wachtownik/);
-    await expect(page.locator('a.oa-back-btn')).toBeVisible();
+    await expect(page.locator('.oa-back-btn').first()).toBeVisible();
   });
 });
 
 test.describe('Egzamin State Persistence', () => {
-  // Stub PDF storage/renderer so egzamin module skips ImportPdfScreen
   test.beforeEach(async ({ page }) => {
-    await page.route('**/js/exam-pdf-storage.js', async route => {
-      const response = await route.fetch();
-      const body = await response.text();
-      await route.fulfill({
-        body: body + '\n; isPdfImported = async function() { return true; };',
-        contentType: 'application/javascript',
-      });
-    });
-    await page.route('**/js/pdf-renderer.js', async route => {
-      await route.fulfill({
-        body: 'var PdfRenderer = { async loadFromBlob() { return 1; }, isLoaded() { return true; }, async renderQuestion() { return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="; }, unload() {} };',
-        contentType: 'application/javascript',
-      });
-    });
+    await page.route('**/sw.js', route => route.abort());
+    await installEgzaminPdfTestHook(page);
   });
 
   test('exam progress survives navigation to dashboard and back', async ({
@@ -175,8 +162,8 @@ test.describe('Egzamin State Persistence', () => {
       localStorage.setItem(key, '5');
     }, STORAGE_KEYS.learnPosition);
 
-    // Navigate to dashboard
-    await clickAndNavigate(page, 'a.oa-back-btn', '**/index.html');
+    // Navigate to dashboard via module's back link
+    await clickAndNavigate(page, '.oa-back-btn', /#\/$/);
 
     // Dismiss banners that may overlay cards
     await page.evaluate(() => {
@@ -184,8 +171,8 @@ test.describe('Egzamin State Persistence', () => {
       document.getElementById('installBanner')?.remove();
     });
 
-    // Navigate back to egzamin
-    await clickAndNavigate(page, '.module-card.card-exam', '**/modules/egzamin/**');
+    // Navigate back to egzamin (SPA hash route)
+    await clickAndNavigate(page, '.module-card.card-exam', /#\/egzamin/);
 
     // Verify progress persisted
     const position = await page.evaluate(
@@ -232,16 +219,13 @@ test.describe('Responsive Layout', () => {
 });
 
 test.describe('Back Navigation', () => {
-  test('module pages have back button linking to dashboard', async ({
+  test('SPA module pages have back link to dashboard', async ({
     page,
   }) => {
     await page.goto(MODULES.egzamin, { waitUntil: 'domcontentloaded' });
 
-    const backBtn = page.locator('a.oa-back-btn');
+    const backBtn = page.locator('.oa-back-btn').first();
     await expect(backBtn).toBeVisible();
-
-    const href = await backBtn.getAttribute('href');
-    expect(href).toContain('index.html');
   });
 
   test('browser back button returns from module to dashboard', async ({
@@ -249,8 +233,8 @@ test.describe('Back Navigation', () => {
   }) => {
     await safeGoto(page, MODULES.dashboard);
 
-    // Navigate to Egzamin via click
-    await clickAndNavigate(page, '.module-card.card-exam', '**/modules/egzamin/**');
+    // Navigate to Egzamin via click (SPA hash route)
+    await clickAndNavigate(page, '.module-card.card-exam', /#\/egzamin/);
     await expect(page).toHaveTitle(/Egzamin/);
 
     // Use browser back

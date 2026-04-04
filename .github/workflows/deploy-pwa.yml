@@ -25,6 +25,23 @@ jobs:
         with:
           ref: master
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: pwa/package-lock.json
+
+      - name: Install PWA dependencies
+        working-directory: ./pwa
+        run: npm ci
+
+      - name: Build PWA
+        working-directory: ./pwa
+        env:
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+
       - name: Checkout gh-pages branch
         id: checkout-ghpages
         uses: actions/checkout@v6
@@ -74,8 +91,8 @@ jobs:
           find . -maxdepth 1 -type f -not -name '.git*' -delete
           find . -maxdepth 1 -type d -not -name '.' -not -name '..' -not -name '.git' -not -regex '.*/[0-9]+' -exec rm -rf {} +
 
-          # Copy PWA files to root
-          cp -r ../pwa/* .
+          # Copy the built PWA to root
+          cp -r ../pwa/dist/. .
 
           echo "Deployed PWA to gh-pages root"
 

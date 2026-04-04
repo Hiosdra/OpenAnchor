@@ -1,9 +1,12 @@
-/** Module URL paths */
+import type { Page } from '@playwright/test';
+import { EGZAMIN_PDF_TEST_HOOK } from '../src/modules/egzamin/pdf-test-hook';
+
+/** Module URL paths (SPA hash routes for egzamin/wachtownik, full-page for anchor) */
 export const MODULES = {
   dashboard: '/',
   anchor: '/modules/anchor/',
-  egzamin: '/modules/egzamin/',
-  wachtownik: '/modules/wachtownik/',
+  egzamin: '/#/egzamin',
+  wachtownik: '/#/wachtownik',
 } as const;
 
 /** Common localStorage keys used across the app */
@@ -27,3 +30,27 @@ export const ANCHOR_STRINGS = {
   meters: 'METRY',
   behind: 'Z tyłu',
 } as const;
+
+const EGZAMIN_PLACEHOLDER_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+
+export async function installEgzaminPdfTestHook(page: Page): Promise<void> {
+  await page.addInitScript(
+    ({ hookKey, placeholderPng }) => {
+      const testWindow = window as Window & {
+        [key: string]: {
+          forceReady?: boolean;
+          renderQuestion?: () => Promise<string>;
+        };
+      };
+
+      testWindow[hookKey] = {
+        forceReady: true,
+        renderQuestion: async () => placeholderPng,
+      };
+    },
+    {
+      hookKey: EGZAMIN_PDF_TEST_HOOK,
+      placeholderPng: EGZAMIN_PLACEHOLDER_PNG,
+    },
+  );
+}

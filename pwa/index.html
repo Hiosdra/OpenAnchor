@@ -16,7 +16,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="OpenAnchor">
     <meta name="description" content="Morska superapp - Alert Kotwiczny, Grafik Wacht i Egzamin ŻJ/JSM">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -739,6 +739,56 @@
         [data-theme="light"] .module-icon {
             box-shadow: 0 3px 12px rgba(0,0,0,0.10);
         }
+
+        /* ─── SPA Router ─── */
+        .router-loading {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 900;
+        }
+        .router-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: router-spin 0.7s linear infinite;
+        }
+        @keyframes router-spin { to { transform: rotate(360deg); } }
+
+        .router-back-btn {
+            position: fixed;
+            top: 0.75rem;
+            left: 0.75rem;
+            z-index: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.85rem;
+            border: none;
+            border-radius: 0.75rem;
+            background: rgba(15, 23, 42, 0.75);
+            color: #e2e8f0;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: background 0.15s ease;
+        }
+        .router-back-btn:hover { background: rgba(15, 23, 42, 0.9); }
+        [data-theme="light"] .router-back-btn {
+            background: rgba(255,255,255,0.85);
+            color: #0f172a;
+        }
+        [data-theme="light"] .router-back-btn:hover { background: rgba(255,255,255,0.95); }
+
+        #router-outlet {
+            min-height: 100dvh;
+        }
     </style>
 </head>
 <body>
@@ -771,6 +821,9 @@
         <div class="wave wave-3"></div>
     </div>
     <div class="stars"></div>
+
+    <!-- Dashboard content (hidden when a SPA module is active) -->
+    <div id="dashboard-content">
 
     <!-- App Header -->
     <header class="app-header">
@@ -1082,287 +1135,16 @@
         OpenAnchor &nbsp;·&nbsp; Morska Superapp &nbsp;·&nbsp; v2.0
     </footer>
 
-    <script type="module">
-        // Import dashboard functions from module
-        import { initBetaMode, toggleBetaMode, openSettings, closeSettings, closeSettingsOnBackdrop, openModule } from './js/dashboard.js';
+    </div><!-- /dashboard-content -->
 
-        // Expose functions to global scope for onclick handlers
-        window.toggleBetaMode = toggleBetaMode;
-        window.openSettings = openSettings;
-        window.closeSettings = closeSettings;
-        window.closeSettingsOnBackdrop = closeSettingsOnBackdrop;
-        window.openModule = openModule;
+    <!-- SPA router outlet (populated by router.ts) -->
+    <div id="router-outlet" style="display:none"></div>
 
-        // Theme management
-        function setTheme(theme) {
-            document.documentElement.dataset.theme = theme;
-            localStorage.setItem('openanchor-theme', theme);
-            updateThemeButtons();
-        }
+    <!-- Loading indicator shown during SPA module transitions -->
+    <div id="router-loading" class="router-loading" style="display:none" role="status" aria-label="Ładowanie modułu">
+        <div class="router-spinner"></div>
+    </div>
 
-        function updateThemeButtons() {
-            const current = document.documentElement.dataset.theme || 'dark';
-            document.querySelectorAll('.theme-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.themeValue === current);
-            });
-        }
-
-        window.setTheme = setTheme;
-
-        // Initialize on page load
-        window.addEventListener('load', () => {
-            initBetaMode();
-            updateThemeButtons();
-        });
-
-        // Force update functionality
-        async function forceUpdate() {
-            const btn = document.getElementById('forceUpdateBtn');
-
-            // Disable button and show loading state
-            btn.disabled = true;
-            btn.classList.add('updating');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
-                </svg>
-                Sprawdzam...
-            `;
-
-            if ('serviceWorker' in navigator) {
-                try {
-                    const registration = await navigator.serviceWorker.getRegistration();
-
-                    if (registration) {
-                        // Check if there's already a waiting service worker
-                        if (registration.waiting) {
-                            // There's a new service worker waiting
-                            btn.innerHTML = `
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
-                                    <path d="M21 3v5h-5"/>
-                                </svg>
-                                Instaluję...
-                            `;
-
-                            // Tell the new service worker to skip waiting
-                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                            // The page will reload when the new SW takes control via controllerchange event
-                            return;
-                        }
-
-                        // Force update check
-                        await registration.update();
-
-                        // Wait for the new service worker to be installed
-                        const hasUpdate = await new Promise((resolve) => {
-                            const timeout = setTimeout(() => resolve(false), 5000); // 5 second timeout
-
-                            const checkUpdate = () => {
-                                if (registration.waiting) {
-                                    clearTimeout(timeout);
-                                    resolve(true);
-                                } else if (registration.installing) {
-                                    registration.installing.addEventListener('statechange', function onStateChange(e) {
-                                        if (e.target.state === 'installed') {
-                                            e.target.removeEventListener('statechange', onStateChange);
-                                            clearTimeout(timeout);
-                                            resolve(true);
-                                        }
-                                    });
-                                } else {
-                                    // No update found after update() call
-                                    clearTimeout(timeout);
-                                    resolve(false);
-                                }
-                            };
-
-                            // Check immediately and also listen for updatefound
-                            checkUpdate();
-                            registration.addEventListener('updatefound', checkUpdate, { once: true });
-                        });
-
-                        if (hasUpdate && registration.waiting) {
-                            // There's a new service worker waiting
-                            btn.innerHTML = `
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
-                                    <path d="M21 3v5h-5"/>
-                                </svg>
-                                Instaluję...
-                            `;
-
-                            // Tell the new service worker to skip waiting
-                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-
-                            // The page will reload when the new SW takes control via controllerchange event
-                        } else {
-                            // No update available - clear caches and reload
-                            btn.innerHTML = `
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
-                                    <path d="M21 3v5h-5"/>
-                                </svg>
-                                Czyszczę cache...
-                            `;
-
-                            // Clear only this app's caches (those with the openanchor- prefix)
-                            const APP_CACHE_PREFIX = 'openanchor-';
-                            const cacheNames = await caches.keys();
-                            const appCacheNames = cacheNames.filter(name => name.startsWith(APP_CACHE_PREFIX));
-                            await Promise.all(appCacheNames.map(name => caches.delete(name)));
-
-                            // Reload the page to get fresh content
-                            window.location.reload();
-                        }
-                    } else {
-                        // No service worker registered - just reload
-                        window.location.reload();
-                    }
-                } catch (error) {
-                    console.error('Force update error:', error);
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    btn.classList.remove('updating');
-                    alert('Wystąpił błąd podczas aktualizacji. Spróbuj ponownie.');
-                }
-            } else {
-                // Service workers not supported - just reload
-                window.location.reload();
-            }
-        }
-
-        // Expose forceUpdate to global scope
-        window.forceUpdate = forceUpdate;
-
-        // ==========================================
-        // PWA Install Prompt
-        // ==========================================
-        let deferredInstallPrompt = null;
-        const installBanner = document.getElementById('installBanner');
-        const installBtn = document.getElementById('installBtn');
-        const installDismissBtn = document.getElementById('installDismissBtn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredInstallPrompt = e;
-            // Only show if not previously dismissed this session
-            if (!sessionStorage.getItem('installDismissed')) {
-                installBanner.classList.add('show');
-            }
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (!deferredInstallPrompt) return;
-            installBanner.classList.remove('show');
-            deferredInstallPrompt.prompt();
-            const { outcome } = await deferredInstallPrompt.userChoice;
-            console.log('Install prompt outcome:', outcome);
-            deferredInstallPrompt = null;
-        });
-
-        installDismissBtn.addEventListener('click', () => {
-            installBanner.classList.remove('show');
-            sessionStorage.setItem('installDismissed', 'true');
-        });
-
-        window.addEventListener('appinstalled', () => {
-            installBanner.classList.remove('show');
-            deferredInstallPrompt = null;
-            console.log('PWA installed');
-        });
-
-        // Service worker update handling
-        let newWorker;
-        let updateBanner = document.getElementById('updateBanner');
-        let updateBtn = document.getElementById('updateBtn');
-        let dismissBtn = document.getElementById('dismissBtn');
-        let refreshing = false;
-
-        // Listen for controller change (when new SW takes over) - must be outside load event
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                // Reload when new SW takes control, but prevent double reload
-                if (!refreshing) {
-                    refreshing = true;
-                    window.location.reload();
-                }
-            });
-        }
-
-        // Register service worker with update detection
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        // Check for updates periodically (every 5 minutes)
-                        setInterval(() => {
-                            registration.update();
-                        }, 300000);
-
-                        // Check if there's already a waiting service worker on page load
-                        if (registration.waiting) {
-                            newWorker = registration.waiting;
-                            showUpdateBanner();
-                        }
-
-                        // Listen for updates
-                        registration.addEventListener('updatefound', () => {
-                            newWorker = registration.installing;
-
-                            newWorker.addEventListener('statechange', () => {
-                                // When the new service worker is activated and ready
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New service worker available - show update banner
-                                    showUpdateBanner();
-                                }
-                            });
-                        });
-                    })
-                    .catch(() => {});
-            });
-        }
-
-        function showUpdateBanner() {
-            updateBanner.classList.add('show');
-        }
-
-        function hideUpdateBanner() {
-            updateBanner.classList.remove('show');
-        }
-
-        // Update button - reload to activate new service worker
-        updateBtn.addEventListener('click', () => {
-            if (newWorker) {
-                // Tell the new service worker to skip waiting
-                newWorker.postMessage({ type: 'SKIP_WAITING' });
-                // The page will reload when the new SW takes control
-            } else {
-                // Fallback: just reload
-                window.location.reload();
-            }
-        });
-
-        // Dismiss button - hide banner
-        dismissBtn.addEventListener('click', () => {
-            hideUpdateBanner();
-        });
-
-        // Handle keyboard for cards
-        document.querySelectorAll('.module-card').forEach(card => {
-            card.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    card.click();
-                }
-            });
-        });
-    </script>
+    <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

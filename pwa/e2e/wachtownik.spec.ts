@@ -6,14 +6,16 @@ import { MODULES, STORAGE_KEYS } from './helpers.js';
 
 const waitForApp = async (page: import('@playwright/test').Page) => {
   await page.waitForFunction(() => {
+    const spa = document.getElementById('spa-root');
+    if (spa && spa.children.length > 0) return true;
     const root = document.getElementById('root');
     return root && root.children.length > 0;
-  });
+  }, { timeout: 15_000 });
 };
 
 /** Scroll element to viewport center (avoids sticky header occlusion) then click */
 const scrollClick = async (locator: import('@playwright/test').Locator) => {
-  await locator.evaluate(el => el.scrollIntoView({ block: 'center' }));
+  await locator.scrollIntoViewIfNeeded();
   await locator.click();
 };
 
@@ -47,12 +49,12 @@ const buildState = (overrides: Record<string, unknown> = {}) =>
 // ─── Page Load & Initial State ───────────────────────────────────────────────
 
 test.describe('Page Load & Initial State', () => {
-  test('page loads and React renders in #root', async ({ page }) => {
+  test('page loads and React renders in app container', async ({ page }) => {
     await page.goto(MODULES.wachtownik);
     await waitForApp(page);
-    const root = page.locator('#root');
-    await expect(root).toBeVisible();
-    const children = await root.evaluate(el => el.children.length);
+    const root = page.locator('#spa-root, #root');
+    await expect(root.first()).toBeVisible();
+    const children = await root.first().evaluate(el => el.children.length);
     expect(children).toBeGreaterThan(0);
   });
 
@@ -219,11 +221,12 @@ test.describe('Schedule Slots', () => {
     await waitForApp(page);
 
     const desktopSlots = page.locator('#slots-configuration-desktop');
-    const initialRows = await desktopSlots.locator('tbody tr').count();
+    // Wait for initial slots to stabilize (default 6 slots)
+    await expect(desktopSlots.locator('tbody tr')).toHaveCount(6, { timeout: 5_000 });
 
     await scrollClick(page.getByRole('button', { name: 'Add watch slot' }));
 
-    await expect(desktopSlots.locator('tbody tr')).toHaveCount(initialRows + 1);
+    await expect(desktopSlots.locator('tbody tr')).toHaveCount(7);
   });
 
   test('time inputs have correct default values', async ({ page }) => {
@@ -240,7 +243,9 @@ test.describe('Schedule Slots', () => {
     await waitForApp(page);
 
     const desktopSlots = page.locator('#slots-configuration-desktop');
-    const initialCount = await desktopSlots.locator('tbody tr').count();
+    // Wait for initial slots to stabilize (default 6 slots)
+    await expect(desktopSlots.locator('tbody tr')).toHaveCount(6, { timeout: 5_000 });
+    const initialCount = 6;
 
     await scrollClick(desktopSlots.locator('tbody tr').last().locator('button'));
 
@@ -514,7 +519,7 @@ test.describe('Share Functionality', () => {
 
     await page.getByRole('button', { name: 'Udostępnij' }).click();
 
-    await expect(page.getByText('QR Kod')).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'QR Kod' })).toBeVisible();
     await expect(page.getByText('Link edytowalny')).toBeVisible();
     await expect(page.getByText('Link tylko do odczytu')).toBeVisible();
   });
