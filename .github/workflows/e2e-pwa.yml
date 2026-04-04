@@ -95,14 +95,14 @@ jobs:
         run: npm ci
 
       - name: Download raw coverage from shard 0
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: pwa-e2e-raw-coverage-0
           path: pwa/.nyc_output/e2e/
         continue-on-error: true
 
       - name: Download raw coverage from shard 1
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: pwa-e2e-raw-coverage-1
           path: pwa/.nyc_output/e2e/
@@ -116,7 +116,7 @@ jobs:
 
       - name: Comment PR with E2E coverage
         if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: pwa-e2e-coverage
           path: pwa/e2e-coverage-comment.md
