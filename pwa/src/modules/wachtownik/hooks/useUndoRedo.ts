@@ -58,20 +58,22 @@ export function useUndoRedo(
   isLoaded: boolean,
   isReadOnly: boolean,
 ): UndoRedoReturn {
-  const [history, setHistory] = useState<UndoRedoSnapshot[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  const historyRef = useRef<UndoRedoSnapshot[]>([]);
+  const historyIndexRef = useRef(-1);
   const isUndoRedoAction = useRef(false);
+  const [, forceRender] = useState(0);
 
-  // Track state changes
+  // Track state changes — refs avoid stale closure / infinite-loop issues
   useEffect(() => {
     if (!isLoaded || isReadOnly || isUndoRedoAction.current) {
       return;
     }
 
-    const result = pushSnapshot(history, historyIndex, state);
-    if (result.historyIndex !== historyIndex || result.history !== history) {
-      setHistory(result.history);
-      setHistoryIndex(result.historyIndex);
+    const result = pushSnapshot(historyRef.current, historyIndexRef.current, state);
+    if (result.historyIndex !== historyIndexRef.current || result.history !== historyRef.current) {
+      historyRef.current = result.history;
+      historyIndexRef.current = result.historyIndex;
+      forceRender((n) => n + 1);
     }
   }, [state.crew, state.slots, state.schedule, isLoaded, isReadOnly]);
 
@@ -83,31 +85,33 @@ export function useUndoRedo(
   }, [state.crew, state.slots, state.schedule]);
 
   const undo = useCallback(() => {
-    if (historyIndex > 0) {
+    if (historyIndexRef.current > 0) {
       isUndoRedoAction.current = true;
-      const prev = history[historyIndex - 1];
+      const prev = historyRef.current[historyIndexRef.current - 1];
       setters.setCrew(JSON.parse(JSON.stringify(prev.crew)));
       setters.setSlots(JSON.parse(JSON.stringify(prev.slots)));
       setters.setSchedule(JSON.parse(JSON.stringify(prev.schedule)));
       setters.setIsGenerated(prev.schedule && prev.schedule.length > 0);
-      setHistoryIndex(historyIndex - 1);
+      historyIndexRef.current -= 1;
+      forceRender((n) => n + 1);
     }
-  }, [historyIndex, history, setters]);
+  }, [setters]);
 
   const redo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
+    if (historyIndexRef.current < historyRef.current.length - 1) {
       isUndoRedoAction.current = true;
-      const next = history[historyIndex + 1];
+      const next = historyRef.current[historyIndexRef.current + 1];
       setters.setCrew(JSON.parse(JSON.stringify(next.crew)));
       setters.setSlots(JSON.parse(JSON.stringify(next.slots)));
       setters.setSchedule(JSON.parse(JSON.stringify(next.schedule)));
       setters.setIsGenerated(next.schedule && next.schedule.length > 0);
-      setHistoryIndex(historyIndex + 1);
+      historyIndexRef.current += 1;
+      forceRender((n) => n + 1);
     }
-  }, [historyIndex, history, setters]);
+  }, [setters]);
 
-  const canUndo = historyIndex > 0;
-  const canRedo = historyIndex < history.length - 1;
+  const canUndo = historyIndexRef.current > 0;
+  const canRedo = historyIndexRef.current < historyRef.current.length - 1;
 
   return { undo, redo, canUndo, canRedo };
 }

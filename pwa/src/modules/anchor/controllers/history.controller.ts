@@ -53,8 +53,9 @@ export class HistoryController {
         div.addEventListener('click', () => this.showReplay(session.id!));
         list.appendChild(div);
       }
-    } catch (err: any) {
-      list.innerHTML = `<div class="text-red-400 text-sm text-center py-4">${I18N.t.errPrefix} ${err.message}</div>`;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      list.innerHTML = `<div class="text-red-400 text-sm text-center py-4">${I18N.t.errPrefix} ${this._escapeHtml(msg)}</div>`;
     }
   }
 
@@ -115,8 +116,9 @@ export class HistoryController {
           this.showHistory();
         }
       };
-    } catch (err: any) {
-      info.innerHTML = `<div class="text-red-400">${I18N.t.errPrefix} ${err.message}</div>`;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      info.innerHTML = `<div class="text-red-400">${I18N.t.errPrefix} ${this._escapeHtml(msg)}</div>`;
     }
   }
 

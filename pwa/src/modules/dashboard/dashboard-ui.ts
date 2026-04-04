@@ -1,8 +1,4 @@
-/**
- * Dashboard UI - Theme, PWA install, service worker updates, force update.
- *
- * Extracted from index.html inline script.
- */
+/** Dashboard UI - Theme, PWA install, service worker updates, force update. */
 
 import {
   initBetaMode,
@@ -13,14 +9,7 @@ import {
   openModule,
 } from './index';
 
-const REFRESH_SVG = `
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-       stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-      <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
-      <path d="M21 3v5h-5"/>
-  </svg>`;
-
-// --------------- Theme ---------------
+const REFRESH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>';
 
 function setTheme(theme: string): void {
   document.documentElement.dataset.theme = theme;
@@ -35,8 +24,6 @@ function updateThemeButtons(): void {
   });
 }
 
-// --------------- Force update ---------------
-
 async function forceUpdate(): Promise<void> {
   const btn = document.getElementById('forceUpdateBtn') as HTMLButtonElement | null;
   if (!btn) return;
@@ -46,18 +33,11 @@ async function forceUpdate(): Promise<void> {
   const originalText = btn.innerHTML;
   btn.innerHTML = `${REFRESH_SVG} Sprawdzam...`;
 
-  if (!('serviceWorker' in navigator)) {
-    window.location.reload();
-    return;
-  }
+  if (!('serviceWorker' in navigator)) { window.location.reload(); return; }
 
   try {
     const registration = await navigator.serviceWorker.getRegistration();
-
-    if (!registration) {
-      window.location.reload();
-      return;
-    }
+    if (!registration) { window.location.reload(); return; }
 
     if (registration.waiting) {
       btn.innerHTML = `${REFRESH_SVG} Instaluję...`;
@@ -69,7 +49,6 @@ async function forceUpdate(): Promise<void> {
 
     const hasUpdate = await new Promise<boolean>((resolve) => {
       const timeout = setTimeout(() => resolve(false), 5000);
-
       const checkUpdate = () => {
         if (registration.waiting) {
           clearTimeout(timeout);
@@ -87,7 +66,6 @@ async function forceUpdate(): Promise<void> {
           resolve(false);
         }
       };
-
       checkUpdate();
       registration.addEventListener('updatefound', checkUpdate, { once: true });
     });
@@ -99,8 +77,7 @@ async function forceUpdate(): Promise<void> {
       btn.innerHTML = `${REFRESH_SVG} Czyszczę cache...`;
       const APP_CACHE_PREFIX = 'openanchor-';
       const cacheNames = await caches.keys();
-      const appCacheNames = cacheNames.filter((name) => name.startsWith(APP_CACHE_PREFIX));
-      await Promise.all(appCacheNames.map((name) => caches.delete(name)));
+      await Promise.all(cacheNames.filter((n) => n.startsWith(APP_CACHE_PREFIX)).map((n) => caches.delete(n)));
       window.location.reload();
     }
   } catch (error) {
@@ -112,8 +89,6 @@ async function forceUpdate(): Promise<void> {
   }
 }
 
-// --------------- PWA Install prompt ---------------
-
 function initInstallBanner(): void {
   let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
   const installBanner = document.getElementById('installBanner');
@@ -123,9 +98,7 @@ function initInstallBanner(): void {
   window.addEventListener('beforeinstallprompt', ((e: BeforeInstallPromptEvent) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    if (!sessionStorage.getItem('installDismissed')) {
-      installBanner?.classList.add('show');
-    }
+    if (!sessionStorage.getItem('installDismissed')) installBanner?.classList.add('show');
   }) as EventListener);
 
   installBtn?.addEventListener('click', async () => {
@@ -147,8 +120,6 @@ function initInstallBanner(): void {
   });
 }
 
-// --------------- Service worker registration & update banner ---------------
-
 function initServiceWorker(): void {
   if (!('serviceWorker' in navigator)) return;
 
@@ -162,39 +133,26 @@ function initServiceWorker(): void {
   const hideUpdateBanner = () => updateBanner?.classList.remove('show');
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) {
-      refreshing = true;
-      window.location.reload();
-    }
+    if (!refreshing) { refreshing = true; window.location.reload(); }
   });
 
   updateBtn?.addEventListener('click', () => {
-    if (newWorker) {
-      newWorker.postMessage({ type: 'SKIP_WAITING' });
-    } else {
-      window.location.reload();
-    }
+    if (newWorker) newWorker.postMessage({ type: 'SKIP_WAITING' });
+    else window.location.reload();
   });
 
-  dismissBtn?.addEventListener('click', () => hideUpdateBanner());
+  dismissBtn?.addEventListener('click', hideUpdateBanner);
 
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register(import.meta.env.BASE_URL + 'sw.js')
       .then((registration) => {
         setInterval(() => registration.update(), 300_000);
-
-        if (registration.waiting) {
-          newWorker = registration.waiting;
-          showUpdateBanner();
-        }
-
+        if (registration.waiting) { newWorker = registration.waiting; showUpdateBanner(); }
         registration.addEventListener('updatefound', () => {
           newWorker = registration.installing;
           newWorker?.addEventListener('statechange', () => {
-            if (newWorker?.state === 'installed' && navigator.serviceWorker.controller) {
-              showUpdateBanner();
-            }
+            if (newWorker?.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner();
           });
         });
       })
@@ -202,49 +160,23 @@ function initServiceWorker(): void {
   });
 }
 
-// --------------- Keyboard a11y for module cards ---------------
-
 function initCardKeyboard(): void {
-  document.querySelectorAll<HTMLElement>('.module-card').forEach((card) => {
+  document.querySelectorAll<HTMLElement>('.module-card').forEach((card) =>
     card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        card.click();
-      }
-    });
-  });
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
+    })
+  );
 }
-
-// --------------- Expose globals for onclick handlers & init ---------------
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
-
-declare global {
-  interface WindowEventMap {
-    beforeinstallprompt: BeforeInstallPromptEvent;
-  }
-}
+declare global { interface WindowEventMap { beforeinstallprompt: BeforeInstallPromptEvent } }
 
 export function initDashboard(): void {
-  // Expose to window for HTML onclick handlers
-  Object.assign(window, {
-    toggleBetaMode,
-    openSettings,
-    closeSettings,
-    closeSettingsOnBackdrop,
-    openModule,
-    setTheme,
-    forceUpdate,
-  });
-
-  window.addEventListener('load', () => {
-    initBetaMode();
-    updateThemeButtons();
-  });
-
+  Object.assign(window, { toggleBetaMode, openSettings, closeSettings, closeSettingsOnBackdrop, openModule, setTheme, forceUpdate });
+  window.addEventListener('load', () => { initBetaMode(); updateThemeButtons(); });
   initInstallBanner();
   initServiceWorker();
   initCardKeyboard();

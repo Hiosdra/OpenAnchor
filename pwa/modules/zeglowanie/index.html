@@ -29,43 +29,43 @@
     </button>
 
     <!-- Header -->
-    <header class="header">
+    <header class="text-center pt-20 px-4 pb-8">
         <h1 class="header-title">Informacje o Żeglarstwie</h1>
         <p class="header-subtitle">Przygotowanie do rejsu morskiego</p>
     </header>
 
     <!-- Main Content -->
-    <main class="content">
+    <main class="max-w-[800px] mx-auto px-4 pb-12">
         <!-- Section Navigation -->
         <nav class="section-nav">
             <button class="section-nav-btn active" data-section="packing" data-action="switchSection" data-arg="packing">
-                <svg class="section-nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                 </svg>
                 <span>Pakowanie</span>
             </button>
             <button class="section-nav-btn" data-section="shopping" data-action="switchSection" data-arg="shopping">
-                <svg class="section-nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                 </svg>
                 <span>Zakupy</span>
             </button>
             <button class="section-nav-btn" data-section="briefing" data-action="switchSection" data-arg="briefing">
-                <svg class="section-nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                     <circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
                 <span>Briefing</span>
             </button>
             <button class="section-nav-btn" data-section="checklists" data-action="switchSection" data-arg="checklists">
-                <svg class="section-nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
                 </svg>
                 <span>Checklisty</span>
             </button>
             <button class="section-nav-btn" data-section="knowledge" data-action="switchSection" data-arg="knowledge">
-                <svg class="section-nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                 </svg>
                 <span>Wiedza</span>
@@ -75,20 +75,20 @@
         <!-- Packing Section -->
         <div id="section-packing" class="content-section active">
             <!-- Cruise Type Selector -->
-        <div class="cruise-selector">
+        <div class="flex gap-3 mb-6 flex-wrap">
             <button class="cruise-btn active" data-cruise="baltic-autumn" data-action="switchCruiseType" data-arg="baltic-autumn">
-                <div class="cruise-btn-title">🍂 Bałtyk</div>
-                <div class="cruise-btn-subtitle">Rejs jesienny</div>
+                <div class="text-base font-bold mb-1">🍂 Bałtyk</div>
+                <div class="text-[0.8rem] opacity-70">Rejs jesienny</div>
             </button>
             <button class="cruise-btn" data-cruise="croatia-summer" data-action="switchCruiseType" data-arg="croatia-summer">
-                <div class="cruise-btn-title">☀️ Chorwacja</div>
-                <div class="cruise-btn-subtitle">Rejs wakacyjny</div>
+                <div class="text-base font-bold mb-1">☀️ Chorwacja</div>
+                <div class="text-[0.8rem] opacity-70">Rejs wakacyjny</div>
             </button>
         </div>
 
         <!-- Packing List Section -->
         <div class="section-card">
-            <h2 class="section-title">
+            <h2 class="text-xl font-bold text-blue-300 mb-4 flex items-center gap-2">
                 <span class="category-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -104,7 +104,7 @@
                 <strong>⚓ Ważne:</strong> Wszystko spakowane w miękką, składaną do płaskiego torbę/plecak - na łódce nie ma miejsca gdzie trzymać twarde lub trzymające kształt torby.
             </div>
 
-            <ul class="checklist" id="packingList">
+            <ul class="list-none p-0 m-0" id="packingList">
                 <!-- Items will be dynamically generated -->
             </ul>
 
@@ -123,9 +123,9 @@
         <!-- Shopping Section -->
         <div id="section-shopping" class="content-section">
             <div class="placeholder-section">
-                <div class="placeholder-section-icon">🛒</div>
+                <div class="text-5xl mb-4 opacity-50">🛒</div>
                 <h3 class="placeholder-section-title">Lista Zakupów i Pomysły na Dania</h3>
-                <p class="placeholder-section-text">
+                <p class="text-[0.9rem] leading-[1.6]">
                     Tutaj będzie można dodać listę zakupów na rejs oraz pomysły na posiłki.<br>
                     Sekcja dostępna w przyszłości.
                 </p>
@@ -135,21 +135,21 @@
         <!-- Briefing Section -->
         <div id="section-briefing" class="content-section">
             <!-- Briefing Type Selector -->
-            <div class="cruise-selector">
+            <div class="flex gap-3 mb-6 flex-wrap">
                 <button class="cruise-btn active" data-briefing="zero" data-action="switchBriefingType" data-arg="zero">
-                    <div class="cruise-btn-title">🎓 Briefing zerowy</div>
-                    <div class="cruise-btn-subtitle">Przed rejsem</div>
+                    <div class="text-base font-bold mb-1">🎓 Briefing zerowy</div>
+                    <div class="text-[0.8rem] opacity-70">Przed rejsem</div>
                 </button>
                 <button class="cruise-btn" data-briefing="first-day" data-action="switchBriefingType" data-arg="first-day">
-                    <div class="cruise-btn-title">⚓ Briefing pierwszy dzień</div>
-                    <div class="cruise-btn-subtitle">Pierwszy dzień</div>
+                    <div class="text-base font-bold mb-1">⚓ Briefing pierwszy dzień</div>
+                    <div class="text-[0.8rem] opacity-70">Pierwszy dzień</div>
                 </button>
             </div>
 
             <!-- Briefing Zerowy Content -->
             <div id="briefing-zero" class="briefing-content active">
                 <div class="section-card">
-                    <h2 class="section-title">
+                    <h2 class="text-xl font-bold text-blue-300 mb-4 flex items-center gap-2">
                         <span class="category-icon">🎓</span>
                         Briefing zerowy - Checklista dla prowadzącego
                     </h2>
@@ -158,7 +158,7 @@
                         <strong>📋 Instrukcja:</strong> Zaznaczaj kolejne tematy podczas przeprowadzania briefingu dla nowej załogi przed rejsem.
                     </div>
 
-                    <ul class="checklist" id="briefingZeroList">
+                    <ul class="list-none p-0 m-0" id="briefingZeroList">
                         <!-- Items will be dynamically generated -->
                     </ul>
 
@@ -176,7 +176,7 @@
             <!-- Briefing Pierwszy Dzień Content -->
             <div id="briefing-first-day" class="briefing-content">
                 <div class="section-card">
-                    <h2 class="section-title">
+                    <h2 class="text-xl font-bold text-blue-300 mb-4 flex items-center gap-2">
                         <span class="category-icon">⚓</span>
                         Briefing pierwszy dzień - Checklista dla prowadzącego
                     </h2>
@@ -185,7 +185,7 @@
                         <strong>📋 Instrukcja:</strong> Zaznaczaj kolejne tematy podczas przeprowadzania briefingu pierwszego dnia na wodzie.
                     </div>
 
-                    <ul class="checklist" id="briefingFirstDayList">
+                    <ul class="list-none p-0 m-0" id="briefingFirstDayList">
                         <!-- Items will be dynamically generated -->
                     </ul>
 
@@ -205,28 +205,28 @@
         <!-- Checklists Section -->
         <div id="section-checklists" class="content-section">
             <!-- Checklist Type Selector -->
-            <div class="cruise-selector">
+            <div class="flex gap-3 mb-6 flex-wrap">
                 <button class="cruise-btn active" data-checklist="morning" data-action="switchChecklistType" data-arg="morning">
-                    <div class="cruise-btn-title">🌅 Codziennie rano</div>
-                    <div class="cruise-btn-subtitle">Poranne czynności</div>
+                    <div class="text-base font-bold mb-1">🌅 Codziennie rano</div>
+                    <div class="text-[0.8rem] opacity-70">Poranne czynności</div>
                 </button>
                 <button class="cruise-btn" data-checklist="departure" data-action="switchChecklistType" data-arg="departure">
-                    <div class="cruise-btn-title">⚓ Wyjście z portu</div>
-                    <div class="cruise-btn-subtitle">Przed wypłynięciem</div>
+                    <div class="text-base font-bold mb-1">⚓ Wyjście z portu</div>
+                    <div class="text-[0.8rem] opacity-70">Przed wypłynięciem</div>
                 </button>
                 <button class="cruise-btn" data-checklist="mooring" data-action="switchChecklistType" data-arg="mooring">
-                    <div class="cruise-btn-title">🛟 Cumowanie</div>
-                    <div class="cruise-btn-subtitle">Wejście do portu</div>
+                    <div class="text-base font-bold mb-1">🛟 Cumowanie</div>
+                    <div class="text-[0.8rem] opacity-70">Wejście do portu</div>
                 </button>
                 <button class="cruise-btn" data-checklist="grabbag" data-action="switchChecklistType" data-arg="grabbag">
-                    <div class="cruise-btn-title">🎒 Grab bag</div>
-                    <div class="cruise-btn-subtitle">Torba ratunkowa</div>
+                    <div class="text-base font-bold mb-1">🎒 Grab bag</div>
+                    <div class="text-[0.8rem] opacity-70">Torba ratunkowa</div>
                 </button>
             </div>
 
             <!-- Checklist Content -->
             <div class="section-card">
-                <h2 class="section-title">
+                <h2 class="text-xl font-bold text-blue-300 mb-4 flex items-center gap-2">
                     <span class="category-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
                              stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -236,7 +236,7 @@
                     <span id="checklistTitle">Codziennie rano</span>
                 </h2>
 
-                <ul class="checklist" id="checklistItems">
+                <ul class="list-none p-0 m-0" id="checklistItems">
                     <!-- Items will be dynamically generated -->
                 </ul>
 
@@ -254,9 +254,9 @@
         <!-- Knowledge Section -->
         <div id="section-knowledge" class="content-section">
             <div class="placeholder-section">
-                <div class="placeholder-section-icon">📚</div>
+                <div class="text-5xl mb-4 opacity-50">📚</div>
                 <h3 class="placeholder-section-title">Wiedza Żeglarska</h3>
-                <p class="placeholder-section-text">
+                <p class="text-[0.9rem] leading-[1.6]">
                     Tutaj będą informacje żeglarskie:<br>
                     instrukcje wiązania węzłów, podstawy nawigacji, meteorologia, itp.<br>
                     Sekcja dostępna w przyszłości.

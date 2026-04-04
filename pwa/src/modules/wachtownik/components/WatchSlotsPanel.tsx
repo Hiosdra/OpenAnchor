@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Icon } from './Icon';
 import { WATCH_TEMPLATES, t } from '../constants';

@@ -9,22 +9,6 @@
     margin-bottom: 1rem;
 }
 
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #93c5fd;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.checklist {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
 .checklist-item {
     display: flex;
     align-items: flex-start;
@@ -97,11 +81,6 @@
     color: #fbbf24;
 }
 
-.header {
-    text-align: center;
-    padding: 5rem 1rem 2rem;
-}
-
 .header-title {
     font-size: 2rem;
     font-weight: 800;
@@ -115,12 +94,6 @@
 .header-subtitle {
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.95rem;
-}
-
-.content {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 1rem 3rem;
 }
 
 .reset-btn {
@@ -159,13 +132,6 @@
 }
 
 /* Cruise type selector */
-.cruise-selector {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-}
-
 .cruise-btn {
     flex: 1;
     min-width: 150px;
@@ -191,17 +157,6 @@
     border-color: #3b82f6;
     color: #93c5fd;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-}
-
-.cruise-btn-title {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0.25rem;
-}
-
-.cruise-btn-subtitle {
-    font-size: 0.8rem;
-    opacity: 0.7;
 }
 
 /* Section navigation */
@@ -246,11 +201,6 @@
     color: #93c5fd;
 }
 
-.section-nav-icon {
-    width: 16px;
-    height: 16px;
-}
-
 /* Content sections */
 .content-section {
     display: none;
@@ -269,22 +219,11 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
-.placeholder-section-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
 .placeholder-section-title {
     font-size: 1.25rem;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.7);
     margin-bottom: 0.5rem;
-}
-
-.placeholder-section-text {
-    font-size: 0.9rem;
-    line-height: 1.6;
 }
 
 /* Briefing content sections */

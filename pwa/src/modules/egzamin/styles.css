@@ -61,19 +61,6 @@
     transition: width 0.3s ease;
 }
 
-/* Category badge */
-.category-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 0.25rem 0.6rem;
-    border-radius: 999px;
-}
-
 /* Leitner box colors */
 .leitner-box-1 { --box-color: #ef4444; }
 .leitner-box-2 { --box-color: #f97316; }

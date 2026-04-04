@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Icon } from './Icon';
 import { ROLES, t } from '../constants';

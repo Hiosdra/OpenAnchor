@@ -452,7 +452,7 @@ describe('useUndoRedo hook', () => {
     });
 
     // setIsGenerated called with false (empty schedule in s1)
-    const isGenCalls = setters.setIsGenerated.mock.calls;
+    const isGenCalls = (setters.setIsGenerated as ReturnType<typeof vi.fn>).mock.calls;
     expect(isGenCalls.length).toBeGreaterThan(0);
   });
 });

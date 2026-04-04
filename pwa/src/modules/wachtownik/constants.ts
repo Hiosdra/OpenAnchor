@@ -2,6 +2,24 @@ import type { CrewMember, WatchSlot, WatchTemplate, Locale, RoleDefinition } fro
 
 export const MAX_HISTORY_SIZE = 20;
 
+function formatHour(hour: number): string {
+  const h = hour === 24 ? 24 : hour % 24;
+  return `${String(h).padStart(2, '0')}:00`;
+}
+
+function generateTimeSlots(
+  startHour: number,
+  slotDurationHours: number,
+  slotCount: number,
+  reqCrew: number,
+): { start: string; end: string; reqCrew: number }[] {
+  return Array.from({ length: slotCount }, (_, i) => ({
+    start: formatHour(startHour + i * slotDurationHours),
+    end: formatHour(startHour + (i + 1) * slotDurationHours),
+    reqCrew,
+  }));
+}
+
 export const ROLES: Record<string, RoleDefinition> = {
   CAPTAIN: { id: 'captain', label: 'Kapitan', icon: 'Shield', color: 'text-amber-500' },
   OFFICER: { id: 'officer', label: 'Oficer', icon: 'Anchor', color: 'text-sky-500' },
@@ -17,14 +35,10 @@ export const defaultCrew: CrewMember[] = [
   { id: 'c5', name: 'Piotr', role: 'cook' },
 ];
 
-export const defaultSlots: WatchSlot[] = [
-  { id: '1', start: '00:00', end: '04:00', reqCrew: 2 },
-  { id: '2', start: '04:00', end: '08:00', reqCrew: 2 },
-  { id: '3', start: '08:00', end: '12:00', reqCrew: 2 },
-  { id: '4', start: '12:00', end: '16:00', reqCrew: 2 },
-  { id: '5', start: '16:00', end: '20:00', reqCrew: 2 },
-  { id: '6', start: '20:00', end: '24:00', reqCrew: 2 },
-];
+export const defaultSlots: WatchSlot[] = generateTimeSlots(0, 4, 6, 2).map((slot, i) => ({
+  id: String(i + 1),
+  ...slot,
+}));
 
 export const WATCH_TEMPLATES: Record<string, WatchTemplate> = {
   '6x4h': {
@@ -32,47 +46,28 @@ export const WATCH_TEMPLATES: Record<string, WatchTemplate> = {
     descKey: 'template.6x4h.desc',
     minCrew: 3,
     optimalCrew: 6,
-    slots: [
-      { start: '00:00', end: '04:00', reqCrew: 2 },
-      { start: '04:00', end: '08:00', reqCrew: 2 },
-      { start: '08:00', end: '12:00', reqCrew: 2 },
-      { start: '12:00', end: '16:00', reqCrew: 2 },
-      { start: '16:00', end: '20:00', reqCrew: 2 },
-      { start: '20:00', end: '24:00', reqCrew: 2 },
-    ],
+    slots: generateTimeSlots(0, 4, 6, 2),
   },
   '3x8h': {
     nameKey: 'template.3x8h',
     descKey: 'template.3x8h.desc',
     minCrew: 3,
     optimalCrew: 6,
-    slots: [
-      { start: '00:00', end: '08:00', reqCrew: 2 },
-      { start: '08:00', end: '16:00', reqCrew: 2 },
-      { start: '16:00', end: '24:00', reqCrew: 2 },
-    ],
+    slots: generateTimeSlots(0, 8, 3, 2),
   },
   '4x6h': {
     nameKey: 'template.4x6h',
     descKey: 'template.4x6h.desc',
     minCrew: 4,
     optimalCrew: 8,
-    slots: [
-      { start: '00:00', end: '06:00', reqCrew: 2 },
-      { start: '06:00', end: '12:00', reqCrew: 2 },
-      { start: '12:00', end: '18:00', reqCrew: 2 },
-      { start: '18:00', end: '24:00', reqCrew: 2 },
-    ],
+    slots: generateTimeSlots(0, 6, 4, 2),
   },
   '2x12h': {
     nameKey: 'template.2x12h',
     descKey: 'template.2x12h.desc',
     minCrew: 2,
     optimalCrew: 4,
-    slots: [
-      { start: '06:00', end: '18:00', reqCrew: 2 },
-      { start: '18:00', end: '06:00', reqCrew: 2 },
-    ],
+    slots: generateTimeSlots(6, 12, 2, 2),
   },
   dog: {
     nameKey: 'template.dog',
@@ -107,20 +102,7 @@ export const WATCH_TEMPLATES: Record<string, WatchTemplate> = {
     descKey: 'template.racing.desc',
     minCrew: 6,
     optimalCrew: 8,
-    slots: [
-      { start: '00:00', end: '02:00', reqCrew: 3 },
-      { start: '02:00', end: '04:00', reqCrew: 3 },
-      { start: '04:00', end: '06:00', reqCrew: 3 },
-      { start: '06:00', end: '08:00', reqCrew: 3 },
-      { start: '08:00', end: '10:00', reqCrew: 3 },
-      { start: '10:00', end: '12:00', reqCrew: 3 },
-      { start: '12:00', end: '14:00', reqCrew: 3 },
-      { start: '14:00', end: '16:00', reqCrew: 3 },
-      { start: '16:00', end: '18:00', reqCrew: 3 },
-      { start: '18:00', end: '20:00', reqCrew: 3 },
-      { start: '20:00', end: '22:00', reqCrew: 3 },
-      { start: '22:00', end: '24:00', reqCrew: 3 },
-    ],
+    slots: generateTimeSlots(0, 2, 12, 3),
   },
 };
 

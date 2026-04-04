@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 interface QRModalProps {
@@ -6,7 +5,7 @@ interface QRModalProps {
   showQRModal: boolean;
   setShowQRModal: (v: boolean) => void;
   qrError: string | null;
-  qrCodeRef: React.RefObject<HTMLDivElement>;
+  qrCodeRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function QRModal({ isNightMode, showQRModal, setShowQRModal, qrError, qrCodeRef }: QRModalProps) {
@@ -28,7 +27,7 @@ export function QRModal({ isNightMode, showQRModal, setShowQRModal, qrError, qrC
         role="dialog"
         aria-modal="true"
         aria-labelledby="qr-modal-title"
-        tabIndex="-1"
+        tabIndex={-1}
       >
         <div className="flex justify-between items-center mb-4">
           <h3 id="qr-modal-title" className={`text-xl font-bold ${isNightMode ? 'text-red-500' : 'text-sky-900'}`}>

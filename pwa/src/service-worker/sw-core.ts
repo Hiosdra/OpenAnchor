@@ -44,13 +44,17 @@ export async function cacheFirstStrategy(
   const cached = await caches.match(request);
   if (cached) return cached;
 
-  const response = await fetch(request);
-  if (response && response.status === 200) {
-    const clone = response.clone();
-    const cache = await caches.open(CACHE_NAME);
-    await cache.put(request, clone);
+  try {
+    const response = await fetch(request);
+    if (response && response.status === 200) {
+      const clone = response.clone();
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, clone);
+    }
+    return response;
+  } catch {
+    return new Response('', { status: 503, statusText: 'Service Unavailable' });
   }
-  return response;
 }
 
 export async function staleWhileRevalidate(

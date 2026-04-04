@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Slim rendering component — all logic lives in ./hooks/*
 import React, { useMemo, useEffect } from 'react';
 import { t } from './constants';
@@ -58,7 +57,7 @@ function App() {
 
   const applyDogWatches = () => applyDogWatchesRaw(userLocale, showToast);
 
-  const applyTemplate = (templateKey) => {
+  const applyTemplate = (templateKey: string) => {
     applyTemplateRaw(templateKey);
     setIsGenerated(false);
   };
