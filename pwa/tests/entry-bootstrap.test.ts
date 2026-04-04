@@ -30,6 +30,9 @@ vi.mock('../src/modules/anchor/ui-utils', () => ({
 vi.mock('../src/modules/anchor/anchor-app', () => ({
   AnchorApp: mockAnchorApp,
 }));
+vi.mock('../src/modules/anchor/templates', () => ({
+  renderApp: () => '<div id="map"></div>',
+}));
 
 // ── egzamin/entry deps ──────────────────────────────────────────────────
 const mockCreateRoot = vi.fn(() => ({ render: vi.fn() }));
@@ -126,6 +129,13 @@ describe('anchor/entry.ts', () => {
     mockI18NApplyToDOM.mockClear();
     capturedDOMContentLoaded = null;
 
+    // entry.ts injects HTML into #app-root
+    if (!document.getElementById('app-root')) {
+      const el = document.createElement('div');
+      el.id = 'app-root';
+      document.body.appendChild(el);
+    }
+
     // Intercept DOMContentLoaded registration so we can call it manually
     vi.spyOn(window, 'addEventListener').mockImplementation((type: string, listener: any, options?: any) => {
       if (type === 'DOMContentLoaded') {
@@ -138,6 +148,8 @@ describe('anchor/entry.ts', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    const appRoot = document.getElementById('app-root');
+    if (appRoot) appRoot.remove();
   });
 
   it('sets theme from localStorage on import', async () => {
