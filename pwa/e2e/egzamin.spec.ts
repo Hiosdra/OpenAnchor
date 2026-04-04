@@ -415,6 +415,7 @@ test.describe('Exam Mode', () => {
   });
 
   test('can complete exam and see results', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
 
@@ -444,6 +445,7 @@ test.describe('Exam Mode', () => {
   });
 
   test('results screen shows retry button', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
@@ -464,6 +466,7 @@ test.describe('Exam Mode', () => {
   });
 
   test('results screen shows category breakdown', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
@@ -481,6 +484,7 @@ test.describe('Exam Mode', () => {
   });
 
   test('retry button starts new exam', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
@@ -834,6 +838,7 @@ test.describe('Navigation Back to Menu', () => {
   });
 
   test('can go back from results to menu', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());

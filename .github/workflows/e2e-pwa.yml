@@ -18,8 +18,12 @@ permissions:
 
 jobs:
   e2e:
-    name: PWA Playwright Tests
+    name: PWA Playwright Tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/2, 2/2]
     defaults:
       run:
         working-directory: ./pwa
@@ -44,36 +48,77 @@ jobs:
       - name: Run E2E tests with coverage
         id: e2e-tests
         continue-on-error: true
-        run: npm run test:e2e:coverage
-
-      - name: Generate E2E coverage comment
-        if: always()
-        run: npm run test:e2e:coverage:comment
+        run: npm run test:e2e:coverage -- --shard=${{ matrix.shard }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-${{ strategy.job-index }}
           path: pwa/e2e-results/
           retention-days: 30
 
-      - name: Upload E2E coverage report
+      - name: Upload E2E coverage data
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: pwa-e2e-coverage
+          name: pwa-e2e-coverage-${{ strategy.job-index }}
           path: pwa/e2e-coverage/
           retention-days: 30
           if-no-files-found: warn
 
+      - name: Fail if E2E tests failed
+        if: steps.e2e-tests.outcome == 'failure'
+        run: exit 1
+
+  e2e-report:
+    name: E2E Coverage Report
+    runs-on: ubuntu-latest
+    needs: e2e
+    if: always()
+    defaults:
+      run:
+        working-directory: ./pwa
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: pwa/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download coverage from shard 0
+        uses: actions/download-artifact@v7
+        with:
+          name: pwa-e2e-coverage-0
+          path: pwa/e2e-coverage/
+        continue-on-error: true
+
+      - name: Download coverage from shard 1
+        uses: actions/download-artifact@v7
+        with:
+          name: pwa-e2e-coverage-1
+          path: pwa/e2e-coverage-1/
+        continue-on-error: true
+
+      - name: Merge coverage data
+        run: |
+          mkdir -p e2e-coverage
+          cp -r e2e-coverage-1/* e2e-coverage/ 2>/dev/null || true
+
+      - name: Generate E2E coverage comment
+        run: npm run test:e2e:coverage:comment
+
       - name: Comment PR with E2E coverage
-        if: always() && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pwa-e2e-coverage
           path: pwa/e2e-coverage-comment.md
-
-      - name: Fail if E2E tests failed
-        if: steps.e2e-tests.outcome == 'failure'
-        run: exit 1
