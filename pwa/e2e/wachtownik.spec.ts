@@ -106,7 +106,7 @@ test.describe('Crew Management', () => {
     await waitForApp(page);
 
     const nameInput = page.getByPlaceholder('Imię...');
-    await nameInput.scrollIntoViewIfNeeded();
+    await expect(nameInput).toBeVisible();
     await nameInput.fill('Zbyszek');
     await scrollClick(page.getByRole('button', { name: 'Add person' }));
 
@@ -555,6 +555,11 @@ test.describe('Notification Toggle', () => {
     await page.goto(MODULES.wachtownik);
     await waitForApp(page);
 
+    // Wait for app to be fully interactive before mocking globals
+    const generateBtn = page.getByRole('button', { name: 'Generate watch schedule' });
+    await expect(generateBtn).toBeVisible();
+    await page.waitForLoadState('networkidle');
+
     // Mock Notification.requestPermission to auto-grant
     await page.evaluate(() => {
       (window as any).Notification = { permission: 'default', requestPermission: () => Promise.resolve('granted') };
@@ -576,6 +581,9 @@ test.describe('Notification Toggle', () => {
   test('toggling notification off restores original state', async ({ page }) => {
     await page.goto(MODULES.wachtownik);
     await waitForApp(page);
+
+    await expect(page.getByRole('button', { name: 'Generate watch schedule' })).toBeVisible();
+    await page.waitForLoadState('networkidle');
 
     await page.evaluate(() => {
       (window as any).Notification = { permission: 'default', requestPermission: () => Promise.resolve('granted') };

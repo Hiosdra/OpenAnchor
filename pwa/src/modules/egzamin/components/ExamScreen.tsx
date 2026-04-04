@@ -80,7 +80,7 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
       <Header
         title="Egzamin"
         onBack={() => {
-          if (confirm('Na pewno chcesz przerwac egzamin? Postep zostanie utracony.')) {
+          if (confirm('Na pewno chcesz przerwać egzamin? Postęp zostanie utracony.')) {
             onBack();
           }
         }}
@@ -144,7 +144,7 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
                 onClick={() => setCurrentIndex(i => i + 1)}
                 className="flex-1 py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 text-base font-bold hover:from-amber-500 hover:to-amber-400 transition-all"
               >
-                Nastepne
+                Następne
               </button>
             ) : (
               <button
@@ -157,7 +157,7 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
                 }}
                 className="flex-1 py-4 rounded-2xl bg-gradient-to-r from-green-600 to-green-500 text-base font-bold hover:from-green-500 hover:to-green-400 transition-all"
               >
-                Zakoncz ({answeredCount}/{examQuestions.length})
+                Zakończ ({answeredCount}/{examQuestions.length})
               </button>
             )}
           </div>

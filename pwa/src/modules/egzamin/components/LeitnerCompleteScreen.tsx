@@ -65,7 +65,7 @@ export function LeitnerCompleteScreen({ correct, incorrect, leitnerState, questi
             onClick={onBack}
             className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold hover:from-blue-500 hover:to-blue-400 transition-all"
           >
-            Powrot do przegladu
+            Powrót do przeglądu
           </button>
         </div>
       </div>

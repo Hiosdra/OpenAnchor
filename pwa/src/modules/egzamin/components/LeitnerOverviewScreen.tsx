@@ -32,7 +32,7 @@ export function LeitnerOverviewScreen({ questions, leitnerState, onStartSession,
           {/* Progress overview */}
           <div className="rounded-2xl bg-blue-500/10 border border-blue-500/20 p-5 mb-6">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-semibold text-blue-300">Postep Leitnera</span>
+              <span className="text-sm font-semibold text-blue-300">Postęp Leitnera</span>
               <span className="text-lg font-bold text-blue-400">{pctMastered}%</span>
             </div>
             <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-4">

@@ -20,16 +20,10 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
   const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORY_IDS);
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const filteredQuestions = useMemo(() => {
-    let result = questions.filter(q => selectedCategories.includes(q.category));
-    if (searchQuery.trim()) {
-      const query = searchQuery.trim().toLowerCase();
-      result = result.filter(q => String(q.id).toLowerCase().includes(query));
-    }
-    return result;
-  }, [questions, selectedCategories, searchQuery]);
+    return questions.filter(q => selectedCategories.includes(q.category));
+  }, [questions, selectedCategories]);
 
   const [currentIndex, setCurrentIndex] = useState(() => {
     const savedPos = loadLearnPosition();
@@ -138,17 +132,6 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
           setSelectedAnswer(null);
         }}
       />
-
-      {/* Search input */}
-      <div className="px-4 pb-2">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => { setSearchQuery(e.target.value); setCurrentIndex(0); setSelectedAnswer(null); }}
-          placeholder="Szukaj pytania..."
-          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-white/30 focus:outline-none focus:border-amber-500/50"
-        />
-      </div>
 
       {showCategoryFilter && (
         <div className="px-4 pb-2">
