@@ -50,8 +50,6 @@ export class SessionController {
     const saved = await this.db.getActiveState();
     if (!saved || !saved.isAnchored) return;
 
-    console.log('Restoring active anchor session from IndexedDB...');
-
     this.state.isAnchored = true;
     this.state.anchorPos = L.latLng(saved.anchorLat, saved.anchorLng);
     this.state.radius = saved.radius || 50;
@@ -80,7 +78,6 @@ export class SessionController {
 
     this.callbacks.recalculateZone();
     this.startTrackFlushing();
-    console.log(`Restored session #${this.state.sessionId} with ${this.state.track.length} track points.`);
   }
 
   persistActiveState() {

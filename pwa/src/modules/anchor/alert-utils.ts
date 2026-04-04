@@ -5,10 +5,6 @@
 
 /**
  * Build a human-readable notification body string.
- *
- * Mirrors the logic in AlertController.start() and battery monitor:
- *  - Battery alerts just return the reason text.
- *  - Normal alerts combine reason + formatted distance.
  */
 export function buildNotificationBody(
   reason: string,

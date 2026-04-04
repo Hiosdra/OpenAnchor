@@ -157,12 +157,12 @@ export class SyncController {
     if (this.url) {
       const delay = this._reconnect.schedule(() => {
         if (!this.isConnected && this.url) {
-          console.log(`WS: reconnecting to ${this.url}`);
+          console.warn(`WS: reconnecting to ${this.url}`);
           this._doConnect();
         }
       });
       if (delay !== null) {
-        console.log(`WS: scheduling reconnect #${this._reconnect.attempts} in ${delay}ms`);
+        console.warn(`WS: scheduling reconnect #${this._reconnect.attempts} in ${delay}ms`);
       }
     }
   }

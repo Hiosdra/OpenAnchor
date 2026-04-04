@@ -29,29 +29,37 @@ import {
   GPSController,
 } from './controllers';
 
-export interface CachedElements {
-  alarmStateBar: HTMLElement | null;
-  alarmStateText: HTMLElement | null;
-  gpsStatusText: HTMLElement | null;
-  gpsStatus: HTMLElement | null;
-  noSignalOverlay: HTMLElement | null;
-  mainBtn: HTMLButtonElement | null;
-  offsetBtn: HTMLButtonElement | null;
-  sectorBadge: HTMLElement | null;
-  activeWatchBanner: HTMLElement | null;
-  activeWatchName: HTMLElement | null;
-  watchBadge: HTMLElement | null;
-  simpleMonitorOverlay: HTMLElement | null;
-  smDistance: HTMLElement | null;
-  smUnitLabel: HTMLElement | null;
-  smSog: HTMLElement | null;
-  smCog: HTMLElement | null;
-  smAccuracy: HTMLElement | null;
-  smGpsLost: HTMLElement | null;
-  smAlarmLabel: HTMLElement | null;
-  smDismissAlarm: HTMLElement | null;
-  warningText: HTMLElement | null;
+function assertEl(id: string): HTMLElement {
+  const el = document.getElementById(id);
+  if (!el) throw new Error(`Missing element: #${id}`);
+  return el;
 }
+
+export interface CachedElements {
+  alarmStateBar: HTMLElement;
+  alarmStateText: HTMLElement;
+  gpsStatusText: HTMLElement;
+  gpsStatus: HTMLElement;
+  noSignalOverlay: HTMLElement;
+  mainBtn: HTMLButtonElement;
+  offsetBtn: HTMLButtonElement;
+  sectorBadge: HTMLElement;
+  activeWatchBanner: HTMLElement;
+  activeWatchName: HTMLElement;
+  watchBadge: HTMLElement;
+  simpleMonitorOverlay: HTMLElement;
+  smDistance: HTMLElement;
+  smUnitLabel: HTMLElement;
+  smSog: HTMLElement;
+  smCog: HTMLElement;
+  smAccuracy: HTMLElement;
+  smGpsLost: HTMLElement;
+  smAlarmLabel: HTMLElement;
+  smDismissAlarm: HTMLElement;
+  warningText: HTMLElement;
+}
+
+type EventBinding = { id: string; event: string; handler: (e?: Event) => void };
 
 export interface AppState {
   unit: string;
@@ -171,27 +179,27 @@ export class AnchorApp {
     );
 
     this._els = {
-      alarmStateBar: document.getElementById('alarm-state-bar'),
-      alarmStateText: document.getElementById('alarm-state-text'),
-      gpsStatusText: document.getElementById('gps-status-text'),
-      gpsStatus: document.getElementById('gps-status'),
-      noSignalOverlay: document.getElementById('no-signal-overlay'),
-      mainBtn: document.getElementById('main-btn') as HTMLButtonElement,
-      offsetBtn: document.getElementById('offset-btn') as HTMLButtonElement,
-      sectorBadge: document.getElementById('sector-badge'),
-      activeWatchBanner: document.getElementById('active-watch-banner'),
-      activeWatchName: document.getElementById('active-watch-name'),
-      watchBadge: document.getElementById('watch-badge'),
-      simpleMonitorOverlay: document.getElementById('simple-monitor-overlay'),
-      smDistance: document.getElementById('sm-distance'),
-      smUnitLabel: document.getElementById('sm-unit-label'),
-      smSog: document.getElementById('sm-sog'),
-      smCog: document.getElementById('sm-cog'),
-      smAccuracy: document.getElementById('sm-accuracy'),
-      smGpsLost: document.getElementById('sm-gps-lost'),
-      smAlarmLabel: document.getElementById('sm-alarm-label'),
-      smDismissAlarm: document.getElementById('sm-dismiss-alarm'),
-      warningText: document.getElementById('warning-text'),
+      alarmStateBar: assertEl('alarm-state-bar'),
+      alarmStateText: assertEl('alarm-state-text'),
+      gpsStatusText: assertEl('gps-status-text'),
+      gpsStatus: assertEl('gps-status'),
+      noSignalOverlay: assertEl('no-signal-overlay'),
+      mainBtn: assertEl('main-btn') as HTMLButtonElement,
+      offsetBtn: assertEl('offset-btn') as HTMLButtonElement,
+      sectorBadge: assertEl('sector-badge'),
+      activeWatchBanner: assertEl('active-watch-banner'),
+      activeWatchName: assertEl('active-watch-name'),
+      watchBadge: assertEl('watch-badge'),
+      simpleMonitorOverlay: assertEl('simple-monitor-overlay'),
+      smDistance: assertEl('sm-distance'),
+      smUnitLabel: assertEl('sm-unit-label'),
+      smSog: assertEl('sm-sog'),
+      smCog: assertEl('sm-cog'),
+      smAccuracy: assertEl('sm-accuracy'),
+      smGpsLost: assertEl('sm-gps-lost'),
+      smAlarmLabel: assertEl('sm-alarm-label'),
+      smDismissAlarm: assertEl('sm-dismiss-alarm'),
+      warningText: assertEl('warning-text'),
     };
 
     // Wire controllers
@@ -429,165 +437,234 @@ export class AnchorApp {
   }
 
   // ==========================================
-  // EVENT BINDINGS
+  // EVENT BINDINGS (data-driven)
   // ==========================================
+  private _getEventBindings(): EventBinding[] {
+    return [
+      { id: 'main-btn', event: 'click', handler: () => this.toggleAnchor() },
+      { id: 'stop-alarm-btn', event: 'click', handler: () => this._dismissAlarm() },
+      { id: 'night-mode-btn', event: 'click', handler: () => document.body.classList.toggle('night-vision') },
+      { id: 'unit-toggle', event: 'click', handler: () => { this.state.unit = this.state.unit === 'm' ? 'ft' : 'm'; this._syncUI(); this._persistActiveState(); } },
+      { id: 'toggle-map-layer-btn', event: 'click', handler: () => this.mapCtrl.toggleLayer() },
+      { id: 'lang-toggle', event: 'click', handler: () => { const newLang = I18N.lang === 'pl' ? 'en' : 'pl'; I18N.setLang(newLang); this._syncUI(); } },
+      { id: 'radius-slider', event: 'input', handler: (e) => this._handleRadius((e!.target as HTMLInputElement).value) },
+      { id: 'radius-number', event: 'change', handler: (e) => this._handleRadius((e!.target as HTMLInputElement).value) },
+      { id: 'center-map-btn', event: 'click', handler: () => this._handleCenterMap() },
+      { id: 'offset-btn', event: 'click', handler: () => this._handleOpenOffset() },
+      { id: 'set-bearing-behind-btn', event: 'click', handler: () => (document.getElementById('offset-bearing') as HTMLInputElement).value = this.state.cog !== null ? String(Math.round((this.state.cog + 180) % 360)) : '180' },
+      { id: 'confirm-offset-btn', event: 'click', handler: () => this._handleConfirmOffset() },
+      { id: 'check-drag-btn', event: 'click', handler: () => { UI.hideModal('drag-warning-modal'); if (this.state.currentPos) this.mapCtrl.map.setView(this.state.currentPos, 19); } },
+      { id: 'open-history-btn', event: 'click', handler: () => this.historyCtrl.showHistory() },
+      { id: 'share-pos-btn', event: 'click', handler: () => this._handleSharePosition() },
+      { id: 'start-watch-btn', event: 'click', handler: () => this._handleStartWatch() },
+      { id: 'cancel-watch-btn', event: 'click', handler: () => { this.state.watchActive = false; assertEl('watch-badge').classList.add('hidden'); UI.hideModal('watch-setup-modal'); } },
+      { id: 'watch-alert-ok-btn', event: 'click', handler: () => { UI.hideModal('watch-alert-modal'); this.state.watchEndTime = Date.now() + this.state.watchMinutes * 60000; this.state.watchActive = true; assertEl('watch-badge').classList.remove('hidden'); } },
+      { id: 'add-schedule-btn', event: 'click', handler: () => this._handleAddSchedule() },
+      { id: 'apply-calc-btn', event: 'click', handler: () => this._handleApplyCalc() },
+      { id: 'save-sector-btn', event: 'click', handler: () => this._handleSaveSector() },
+      { id: 'sector-enable', event: 'change', handler: (e) => (document.getElementById('sector-inputs') as HTMLElement).style.opacity = (e!.target as HTMLInputElement).checked ? '1' : '0.5' },
+      { id: 'ws-connect-btn', event: 'click', handler: () => { const url = (document.getElementById('ws-url-input') as HTMLInputElement).value.trim(); if (url) { this.syncCtrl.connect(url); UI.hideModal('ws-sync-modal'); } } },
+      { id: 'ws-disconnect-btn', event: 'click', handler: () => { this.syncCtrl.disconnect('USER_DISCONNECT'); UI.hideModal('ws-sync-modal'); } },
+      { id: 'open-ai-btn', event: 'click', handler: () => this._checkAiKey(() => UI.showModal('ai-modal')) },
+      { id: 'edit-api-key-btn', event: 'click', handler: () => { (document.getElementById('api-key-input') as HTMLInputElement).value = this.aiCtrl.apiKey; assertEl('clear-api-key-btn').classList.toggle('hidden', !this.aiCtrl.apiKey); UI.showModal('api-key-modal'); } },
+      { id: 'save-api-key-btn', event: 'click', handler: () => this._handleSaveApiKey() },
+      { id: 'clear-api-key-btn', event: 'click', handler: () => { this.aiCtrl.clearKey(); (document.getElementById('api-key-input') as HTMLInputElement).value = ''; assertEl('clear-api-key-btn').classList.add('hidden'); } },
+      { id: 'ai-ask-btn', event: 'click', handler: () => this.aiLogbookCtrl.handleAskAI() },
+      { id: 'ai-clear-chat-btn', event: 'click', handler: () => this.aiLogbookCtrl.clearAIChat() },
+      { id: 'ai-summary-save-btn', event: 'click', handler: () => this.aiLogbookCtrl.saveLogbookEntry() },
+      { id: 'open-stats-btn', event: 'click', handler: () => this._showStats() },
+      { id: 'open-weather-btn', event: 'click', handler: () => { UI.showModal('weather-modal'); this.weatherCtrl.fetchWeatherData(); } },
+      { id: 'simple-monitor-btn', event: 'click', handler: () => this._handleOpenSimpleMonitor() },
+      { id: 'sm-close-btn', event: 'click', handler: () => this._handleCloseSimpleMonitor() },
+      { id: 'sm-dismiss-alarm', event: 'click', handler: () => this._dismissAlarm() },
+      { id: 'sm-toggle-nightred', event: 'click', handler: () => this._handleToggleNightRed() },
+      { id: 'open-qr-scan-btn', event: 'click', handler: () => this._handleOpenQrScan() },
+      { id: 'qr-scan-close', event: 'click', handler: () => { this._stopQrScanner(); UI.hideModal('qr-scan-modal'); } },
+      { id: 'qr-scan-connect', event: 'click', handler: () => this._handleQrConnect() },
+    ];
+  }
+
   private _bindAppEvents() {
-    document.getElementById('main-btn')!.addEventListener('click', () => this.toggleAnchor());
-    document.getElementById('stop-alarm-btn')!.addEventListener('click', () => { this.alertCtrl.stop(); this.alertCtrl.isAlarming = true; setTimeout(() => (this.alertCtrl.isAlarming = false), 5000); });
-    document.getElementById('night-mode-btn')!.addEventListener('click', () => document.body.classList.toggle('night-vision'));
-    document.getElementById('unit-toggle')!.addEventListener('click', () => { this.state.unit = this.state.unit === 'm' ? 'ft' : 'm'; this._syncUI(); this._persistActiveState(); });
-    document.getElementById('toggle-map-layer-btn')!.addEventListener('click', () => this.mapCtrl.toggleLayer());
-    document.getElementById('lang-toggle')!.addEventListener('click', () => { const newLang = I18N.lang === 'pl' ? 'en' : 'pl'; I18N.setLang(newLang); this._syncUI(); });
+    for (const { id, event, handler } of this._getEventBindings()) {
+      document.getElementById(id)?.addEventListener(event, handler);
+    }
 
-    const handleRadius = (val: string) => {
-      let num = parseInt(val) || 10;
-      if (this.state.unit === 'ft') num = num / GeoUtils.M2FT;
-      if (num < 5) num = 5;
-      this.state.radius = num;
-      this.state.bufferRadius = num * 1.2;
-      UI.updateRadiusControls(GeoUtils.formatDist(num, this.state.unit), this.state.unit);
-      this._recalculateZone();
-      this._recalculate();
-      this._persistActiveState();
-      if (this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
-    };
-    document.getElementById('radius-slider')!.addEventListener('input', (e) => handleRadius((e.target as HTMLInputElement).value));
-    document.getElementById('radius-number')!.addEventListener('change', (e) => handleRadius((e.target as HTMLInputElement).value));
-
-    document.getElementById('center-map-btn')!.addEventListener('click', () => {
-      this.state.mapAutoCenter = true;
-      document.getElementById('center-map-btn')!.classList.add('hidden');
-      if (this.state.isAnchored && this.state.anchorPos) this.mapCtrl.map.setView(this.state.anchorPos);
-      else if (this.state.currentPos) this.mapCtrl.map.setView(this.state.currentPos, 18);
-    });
-
-    document.getElementById('offset-btn')!.addEventListener('click', () => { UI.showModal('offset-modal'); if (this.state.cog !== null) (document.getElementById('offset-bearing') as HTMLInputElement).value = String(Math.round((this.state.cog + 180) % 360)); });
-    document.getElementById('set-bearing-behind-btn')!.addEventListener('click', () => (document.getElementById('offset-bearing') as HTMLInputElement).value = this.state.cog !== null ? String(Math.round((this.state.cog + 180) % 360)) : '180');
-    document.getElementById('confirm-offset-btn')!.addEventListener('click', () => {
-      if (!this.state.currentPos) return;
-      this.alertCtrl.initPermissions();
-      let d = parseFloat((document.getElementById('offset-dist') as HTMLInputElement).value) || 0;
-      if (this.state.unit === 'ft') d = d / GeoUtils.M2FT;
-      this.sessionCtrl.setAnchor(GeoUtils.getDestinationPoint(this.state.currentPos.lat, this.state.currentPos.lng, d, parseFloat((document.getElementById('offset-bearing') as HTMLInputElement).value) || 0) as unknown as L.LatLng);
-      UI.hideModal('offset-modal');
-    });
-
-    document.getElementById('check-drag-btn')!.addEventListener('click', () => { UI.hideModal('drag-warning-modal'); if (this.state.currentPos) this.mapCtrl.map.setView(this.state.currentPos, 19); });
-    document.getElementById('open-history-btn')!.addEventListener('click', () => this.historyCtrl.showHistory());
-
-    document.getElementById('share-pos-btn')!.addEventListener('click', () => {
-      if (!this.state.currentPos) { document.getElementById('warning-text')!.textContent = I18N.t.shareNoGps; UI.showModal('warning-modal'); return; }
-      const url = `https://www.google.com/maps?q=${this.state.currentPos.lat},${this.state.currentPos.lng}`;
-      if (navigator.share) { navigator.share({ title: I18N.t.appTitle, text: `${I18N.t.sharePrefix} ${this.state.currentPos.lat.toFixed(5)}, ${this.state.currentPos.lng.toFixed(5)}`, url }).catch(console.error); }
-      else { document.getElementById('warning-text')!.innerHTML = `${I18N.t.shareFallback}<br><br><a href="${url}" target="_blank" class="text-blue-400 break-all">${url}</a>`; UI.showModal('warning-modal'); }
-    });
-
-    document.getElementById('start-watch-btn')!.addEventListener('click', () => { this.alertCtrl.initPermissions(); this.state.watchMinutes = parseInt((document.getElementById('watch-minutes-input') as HTMLInputElement).value) || 10; this.state.watchEndTime = Date.now() + this.state.watchMinutes * 60000; this.state.watchActive = true; document.getElementById('watch-badge')!.classList.remove('hidden'); UI.hideModal('watch-setup-modal'); });
-    document.getElementById('cancel-watch-btn')!.addEventListener('click', () => { this.state.watchActive = false; document.getElementById('watch-badge')!.classList.add('hidden'); UI.hideModal('watch-setup-modal'); });
-    document.getElementById('watch-alert-ok-btn')!.addEventListener('click', () => { UI.hideModal('watch-alert-modal'); this.state.watchEndTime = Date.now() + this.state.watchMinutes * 60000; this.state.watchActive = true; document.getElementById('watch-badge')!.classList.remove('hidden'); });
-
-    this.watchScheduleCtrl.renderScheduleList();
-    document.getElementById('add-schedule-btn')!.addEventListener('click', () => {
-      const s = (document.getElementById('schedule-start') as HTMLInputElement).value;
-      const e = (document.getElementById('schedule-end') as HTMLInputElement).value;
-      const p = (document.getElementById('schedule-name') as HTMLInputElement).value.trim();
-      if (s && e && p) { this.state.schedule.push({ start: s, end: e, person: p }); (document.getElementById('schedule-start') as HTMLInputElement).value = ''; (document.getElementById('schedule-end') as HTMLInputElement).value = ''; (document.getElementById('schedule-name') as HTMLInputElement).value = ''; this.watchScheduleCtrl.renderScheduleList(); this.watchScheduleCtrl.debouncedSaveSchedule(); }
-    });
-
-    // Calculator
+    // Calculator inputs need local references
     const calcIn = document.getElementById('calc-depth') as HTMLInputElement;
     const calcRat = document.getElementById('calc-ratio') as HTMLSelectElement;
-    const calcRes = document.getElementById('calc-chain-result')!;
-    const updateCalc = () => {
-      const depth = parseFloat(calcIn.value) || 0;
-      const ratio = parseFloat(calcRat.value) || 5;
-      const chainLength = depth * ratio;
-      const swing = chainLength > depth ? Math.sqrt(chainLength * chainLength - depth * depth) : chainLength;
-      const safeSwing = swing * 1.2;
-      calcRes.textContent = String(Math.round(safeSwing));
-      const breakdownEl = calcRes.parentElement?.querySelector('.text-slate-500');
-      if (breakdownEl) breakdownEl.textContent = I18N.fmt(I18N.t.calcBreakdown, { chain: Math.round(chainLength), swing: Math.round(swing) });
-    };
-    calcIn.addEventListener('input', updateCalc);
-    calcRat.addEventListener('change', updateCalc);
-    document.querySelector('[data-modal="calc-modal"]')!.addEventListener('click', updateCalc);
-    document.getElementById('apply-calc-btn')!.addEventListener('click', () => {
-      const totalRadius = parseFloat(calcRes.textContent!) || 0;
-      const depth = parseFloat(calcIn.value) || 0;
-      const ratio = parseFloat(calcRat.value) || 5;
-      this.state.chainLengthM = depth * ratio;
-      this.state.depthM = depth;
-      handleRadius(String(totalRadius));
-      UI.hideModal('calc-modal');
-    });
+    calcIn.addEventListener('input', () => this._updateCalc());
+    calcRat.addEventListener('change', () => this._updateCalc());
+    document.querySelector('[data-modal="calc-modal"]')?.addEventListener('click', () => this._updateCalc());
 
-    // Sector
-    document.getElementById('save-sector-btn')!.addEventListener('click', () => {
-      this.state.sectorEnabled = (document.getElementById('sector-enable') as HTMLInputElement).checked;
-      this.state.sectorBearing = parseFloat((document.getElementById('sector-bearing') as HTMLInputElement).value) || 0;
-      this.state.sectorWidth = parseFloat((document.getElementById('sector-width') as HTMLInputElement).value) || 90;
-      UI.hideModal('sector-modal'); this._syncUI(); this._recalculateZone(); this._recalculate(); this._persistActiveState();
-      if (this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
-    });
-    document.getElementById('sector-enable')!.addEventListener('change', (e) => (document.getElementById('sector-inputs') as HTMLElement).style.opacity = (e.target as HTMLInputElement).checked ? '1' : '0.5');
+    this.watchScheduleCtrl.renderScheduleList();
 
-    // WebSocket
-    document.getElementById('ws-connect-btn')!.addEventListener('click', () => { const url = (document.getElementById('ws-url-input') as HTMLInputElement).value.trim(); if (url) { this.syncCtrl.connect(url); UI.hideModal('ws-sync-modal'); } });
-    document.getElementById('ws-disconnect-btn')!.addEventListener('click', () => { this.syncCtrl.disconnect('USER_DISCONNECT'); UI.hideModal('ws-sync-modal'); });
-
-    // AI
-    const checkAiKey = (action: () => void) => { if (this.aiCtrl.apiKey) action(); else { this.aiCtrl.pendingAction = action; (document.getElementById('api-key-input') as HTMLInputElement).value = this.aiCtrl.apiKey; document.getElementById('clear-api-key-btn')!.classList.toggle('hidden', !this.aiCtrl.apiKey); UI.showModal('api-key-modal'); } };
-    document.getElementById('open-ai-btn')!.addEventListener('click', () => checkAiKey(() => UI.showModal('ai-modal')));
-    document.getElementById('edit-api-key-btn')!.addEventListener('click', () => { (document.getElementById('api-key-input') as HTMLInputElement).value = this.aiCtrl.apiKey; document.getElementById('clear-api-key-btn')!.classList.toggle('hidden', !this.aiCtrl.apiKey); UI.showModal('api-key-modal'); });
-    document.getElementById('save-api-key-btn')!.addEventListener('click', () => { const val = (document.getElementById('api-key-input') as HTMLInputElement).value.trim(); if (val) { this.aiCtrl.setKey(val); UI.hideModal('api-key-modal'); if (this.aiCtrl.pendingAction) { this.aiCtrl.pendingAction(); this.aiCtrl.pendingAction = null; } } });
-    document.getElementById('clear-api-key-btn')!.addEventListener('click', () => { this.aiCtrl.clearKey(); (document.getElementById('api-key-input') as HTMLInputElement).value = ''; document.getElementById('clear-api-key-btn')!.classList.add('hidden'); });
-    document.getElementById('ai-ask-btn')!.addEventListener('click', () => this.aiLogbookCtrl.handleAskAI());
-    document.getElementById('ai-clear-chat-btn')!.addEventListener('click', () => this.aiLogbookCtrl.clearAIChat());
-    document.getElementById('ai-summary-save-btn')!.addEventListener('click', () => this.aiLogbookCtrl.saveLogbookEntry());
-    document.getElementById('open-stats-btn')!.addEventListener('click', () => this._showStats());
-
+    // AI chat enter-to-send
     const aiChatInput = document.getElementById('ai-chat-input');
     if (aiChatInput) aiChatInput.addEventListener('keydown', (e) => { if ((e as KeyboardEvent).key === 'Enter' && !(e as KeyboardEvent).shiftKey) { e.preventDefault(); this.aiLogbookCtrl.handleAskAI(); } });
+  }
 
-    // Weather
-    document.getElementById('open-weather-btn')!.addEventListener('click', () => { UI.showModal('weather-modal'); this.weatherCtrl.fetchWeatherData(); });
+  // ==========================================
+  // HANDLER METHODS (extracted from bindings)
+  // ==========================================
+  private _dismissAlarm() {
+    this.alertCtrl.stop();
+    this.alertCtrl.isAlarming = true;
+    setTimeout(() => (this.alertCtrl.isAlarming = false), 5000);
+  }
 
-    // Simple Monitor
-    const smOverlay = document.getElementById('simple-monitor-overlay')!;
-    document.getElementById('simple-monitor-btn')!.addEventListener('click', () => {
-      this._simpleMonitorActive = true;
-      smOverlay.classList.remove('hidden'); smOverlay.classList.add('flex');
-      this.gpsCtrl.updateSimpleMonitor(this._simpleMonitorActive);
-      this._smClockInterval = setInterval(() => { const now = new Date(); document.getElementById('sm-time')!.textContent = now.toLocaleTimeString(I18N.locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }, 1000);
-    });
-    document.getElementById('sm-close-btn')!.addEventListener('click', () => { this._simpleMonitorActive = false; smOverlay.classList.add('hidden'); smOverlay.classList.remove('flex'); if (this._smClockInterval) clearInterval(this._smClockInterval); });
-    document.getElementById('sm-dismiss-alarm')!.addEventListener('click', () => { this.alertCtrl.stop(); this.alertCtrl.isAlarming = true; setTimeout(() => (this.alertCtrl.isAlarming = false), 5000); });
-    document.getElementById('sm-toggle-nightred')!.addEventListener('click', () => {
-      this._simpleMonitorRedFilter = !this._simpleMonitorRedFilter;
-      smOverlay.style.filter = this._simpleMonitorRedFilter ? 'sepia(100%) hue-rotate(-30deg) saturate(300%) brightness(40%)' : '';
-      document.getElementById('sm-toggle-nightred')!.innerHTML = this._simpleMonitorRedFilter
-        ? `<i data-lucide="sun" class="w-4 h-4 inline mr-1"></i> ${I18N.t.smNormalFilter}`
-        : `<i data-lucide="sun-dim" class="w-4 h-4 inline mr-1"></i> ${I18N.t.smRedFilter}`;
-      createIcons({ icons });
-    });
+  private _handleRadius(val: string) {
+    let num = parseInt(val) || 10;
+    if (this.state.unit === 'ft') num = num / GeoUtils.M2FT;
+    if (num < 5) num = 5;
+    this.state.radius = num;
+    this.state.bufferRadius = num * 1.2;
+    UI.updateRadiusControls(GeoUtils.formatDist(num, this.state.unit), this.state.unit);
+    this._recalculateZone();
+    this._recalculate();
+    this._persistActiveState();
+    if (this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
+  }
 
-    // QR Scanner
-    document.getElementById('open-qr-scan-btn')!.addEventListener('click', () => {
-      UI.showModal('qr-scan-modal');
-      document.getElementById('qr-scan-result')!.classList.add('hidden');
-      document.getElementById('qr-scan-error')!.classList.add('hidden');
-      document.getElementById('qr-scan-connect')!.classList.add('hidden');
-      this._qrScannedData = null;
-      this._startQrScanner();
-    });
-    document.getElementById('qr-scan-close')!.addEventListener('click', () => { this._stopQrScanner(); UI.hideModal('qr-scan-modal'); });
-    document.getElementById('qr-scan-connect')!.addEventListener('click', () => {
-      if (this._qrScannedData?.wsUrl) {
-        this.syncCtrl.connect(this._qrScannedData.wsUrl);
-        (document.getElementById('ws-url-input') as HTMLInputElement).value = this._qrScannedData.wsUrl;
-        this._stopQrScanner();
-        UI.hideModal('qr-scan-modal');
-      }
-    });
+  private _handleCenterMap() {
+    this.state.mapAutoCenter = true;
+    assertEl('center-map-btn').classList.add('hidden');
+    if (this.state.isAnchored && this.state.anchorPos) this.mapCtrl.map.setView(this.state.anchorPos);
+    else if (this.state.currentPos) this.mapCtrl.map.setView(this.state.currentPos, 18);
+  }
+
+  private _handleOpenOffset() {
+    UI.showModal('offset-modal');
+    if (this.state.cog !== null) (document.getElementById('offset-bearing') as HTMLInputElement).value = String(Math.round((this.state.cog + 180) % 360));
+  }
+
+  private _handleConfirmOffset() {
+    if (!this.state.currentPos) return;
+    this.alertCtrl.initPermissions();
+    let d = parseFloat((document.getElementById('offset-dist') as HTMLInputElement).value) || 0;
+    if (this.state.unit === 'ft') d = d / GeoUtils.M2FT;
+    this.sessionCtrl.setAnchor(GeoUtils.getDestinationPoint(this.state.currentPos.lat, this.state.currentPos.lng, d, parseFloat((document.getElementById('offset-bearing') as HTMLInputElement).value) || 0) as unknown as L.LatLng);
+    UI.hideModal('offset-modal');
+  }
+
+  private _handleSharePosition() {
+    if (!this.state.currentPos) { assertEl('warning-text').textContent = I18N.t.shareNoGps; UI.showModal('warning-modal'); return; }
+    const url = `https://www.google.com/maps?q=${this.state.currentPos.lat},${this.state.currentPos.lng}`;
+    if (navigator.share) { navigator.share({ title: I18N.t.appTitle, text: `${I18N.t.sharePrefix} ${this.state.currentPos.lat.toFixed(5)}, ${this.state.currentPos.lng.toFixed(5)}`, url }).catch(console.error); }
+    else { assertEl('warning-text').innerHTML = `${I18N.t.shareFallback}<br><br><a href="${url}" target="_blank" class="text-blue-400 break-all">${url}</a>`; UI.showModal('warning-modal'); }
+  }
+
+  private _handleStartWatch() {
+    this.alertCtrl.initPermissions();
+    this.state.watchMinutes = parseInt((document.getElementById('watch-minutes-input') as HTMLInputElement).value) || 10;
+    this.state.watchEndTime = Date.now() + this.state.watchMinutes * 60000;
+    this.state.watchActive = true;
+    assertEl('watch-badge').classList.remove('hidden');
+    UI.hideModal('watch-setup-modal');
+  }
+
+  private _handleAddSchedule() {
+    const s = (document.getElementById('schedule-start') as HTMLInputElement).value;
+    const e = (document.getElementById('schedule-end') as HTMLInputElement).value;
+    const p = (document.getElementById('schedule-name') as HTMLInputElement).value.trim();
+    if (s && e && p) {
+      this.state.schedule.push({ start: s, end: e, person: p });
+      (document.getElementById('schedule-start') as HTMLInputElement).value = '';
+      (document.getElementById('schedule-end') as HTMLInputElement).value = '';
+      (document.getElementById('schedule-name') as HTMLInputElement).value = '';
+      this.watchScheduleCtrl.renderScheduleList();
+      this.watchScheduleCtrl.debouncedSaveSchedule();
+    }
+  }
+
+  private _updateCalc() {
+    const depth = parseFloat((document.getElementById('calc-depth') as HTMLInputElement).value) || 0;
+    const ratio = parseFloat((document.getElementById('calc-ratio') as HTMLSelectElement).value) || 5;
+    const chainLength = depth * ratio;
+    const swing = chainLength > depth ? Math.sqrt(chainLength * chainLength - depth * depth) : chainLength;
+    const safeSwing = swing * 1.2;
+    const calcRes = assertEl('calc-chain-result');
+    calcRes.textContent = String(Math.round(safeSwing));
+    const breakdownEl = calcRes.parentElement?.querySelector('.text-slate-500');
+    if (breakdownEl) breakdownEl.textContent = I18N.fmt(I18N.t.calcBreakdown, { chain: Math.round(chainLength), swing: Math.round(swing) });
+  }
+
+  private _handleApplyCalc() {
+    const totalRadius = parseFloat(assertEl('calc-chain-result').textContent!) || 0;
+    const depth = parseFloat((document.getElementById('calc-depth') as HTMLInputElement).value) || 0;
+    const ratio = parseFloat((document.getElementById('calc-ratio') as HTMLSelectElement).value) || 5;
+    this.state.chainLengthM = depth * ratio;
+    this.state.depthM = depth;
+    this._handleRadius(String(totalRadius));
+    UI.hideModal('calc-modal');
+  }
+
+  private _handleSaveSector() {
+    this.state.sectorEnabled = (document.getElementById('sector-enable') as HTMLInputElement).checked;
+    this.state.sectorBearing = parseFloat((document.getElementById('sector-bearing') as HTMLInputElement).value) || 0;
+    this.state.sectorWidth = parseFloat((document.getElementById('sector-width') as HTMLInputElement).value) || 90;
+    UI.hideModal('sector-modal'); this._syncUI(); this._recalculateZone(); this._recalculate(); this._persistActiveState();
+    if (this.syncCtrl.isConnected) this.syncCtrl.sendFullSync();
+  }
+
+  private _checkAiKey(action: () => void) {
+    if (this.aiCtrl.apiKey) action();
+    else {
+      this.aiCtrl.pendingAction = action;
+      (document.getElementById('api-key-input') as HTMLInputElement).value = this.aiCtrl.apiKey;
+      assertEl('clear-api-key-btn').classList.toggle('hidden', !this.aiCtrl.apiKey);
+      UI.showModal('api-key-modal');
+    }
+  }
+
+  private _handleSaveApiKey() {
+    const val = (document.getElementById('api-key-input') as HTMLInputElement).value.trim();
+    if (val) {
+      this.aiCtrl.setKey(val);
+      UI.hideModal('api-key-modal');
+      if (this.aiCtrl.pendingAction) { this.aiCtrl.pendingAction(); this.aiCtrl.pendingAction = null; }
+    }
+  }
+
+  private _handleOpenSimpleMonitor() {
+    const smOverlay = this._els.simpleMonitorOverlay;
+    this._simpleMonitorActive = true;
+    smOverlay.classList.remove('hidden'); smOverlay.classList.add('flex');
+    this.gpsCtrl.updateSimpleMonitor(this._simpleMonitorActive);
+    this._smClockInterval = setInterval(() => { const now = new Date(); assertEl('sm-time').textContent = now.toLocaleTimeString(I18N.locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }, 1000);
+  }
+
+  private _handleCloseSimpleMonitor() {
+    const smOverlay = this._els.simpleMonitorOverlay;
+    this._simpleMonitorActive = false;
+    smOverlay.classList.add('hidden'); smOverlay.classList.remove('flex');
+    if (this._smClockInterval) clearInterval(this._smClockInterval);
+  }
+
+  private _handleToggleNightRed() {
+    const smOverlay = this._els.simpleMonitorOverlay;
+    this._simpleMonitorRedFilter = !this._simpleMonitorRedFilter;
+    smOverlay.style.filter = this._simpleMonitorRedFilter ? 'sepia(100%) hue-rotate(-30deg) saturate(300%) brightness(40%)' : '';
+    assertEl('sm-toggle-nightred').innerHTML = this._simpleMonitorRedFilter
+      ? `<i data-lucide="sun" class="w-4 h-4 inline mr-1"></i> ${I18N.t.smNormalFilter}`
+      : `<i data-lucide="sun-dim" class="w-4 h-4 inline mr-1"></i> ${I18N.t.smRedFilter}`;
+    createIcons({ icons });
+  }
+
+  private _handleOpenQrScan() {
+    UI.showModal('qr-scan-modal');
+    assertEl('qr-scan-result').classList.add('hidden');
+    assertEl('qr-scan-error').classList.add('hidden');
+    assertEl('qr-scan-connect').classList.add('hidden');
+    this._qrScannedData = null;
+    this._startQrScanner();
+  }
+
+  private _handleQrConnect() {
+    if (this._qrScannedData?.wsUrl) {
+      this.syncCtrl.connect(this._qrScannedData.wsUrl);
+      (document.getElementById('ws-url-input') as HTMLInputElement).value = this._qrScannedData.wsUrl;
+      this._stopQrScanner();
+      UI.hideModal('qr-scan-modal');
+    }
   }
 }

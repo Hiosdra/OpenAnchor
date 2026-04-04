@@ -132,8 +132,7 @@ function initInstallBanner(): void {
     if (!deferredInstallPrompt) return;
     installBanner?.classList.remove('show');
     deferredInstallPrompt.prompt();
-    const { outcome } = await deferredInstallPrompt.userChoice;
-    console.log('Install prompt outcome:', outcome);
+    await deferredInstallPrompt.userChoice;
     deferredInstallPrompt = null;
   });
 
@@ -145,7 +144,6 @@ function initInstallBanner(): void {
   window.addEventListener('appinstalled', () => {
     installBanner?.classList.remove('show');
     deferredInstallPrompt = null;
-    console.log('PWA installed');
   });
 }
 

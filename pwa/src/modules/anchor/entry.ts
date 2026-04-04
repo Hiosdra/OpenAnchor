@@ -11,11 +11,16 @@ import { I18N } from './i18n';
 import { ConnectionStatus } from './connection-status';
 import { OnboardingController } from './ui-utils';
 import { AnchorApp } from './anchor-app';
+import { renderApp } from './templates';
 
 initBackground();
 
 // Apply early theme (matches the inline script that was in <head>)
 document.documentElement.dataset.theme = localStorage.getItem('openanchor-theme') || 'dark';
+
+// Inject all application HTML into the minimal shell.
+// Module scripts run after HTML parsing, so #app-root is available here.
+document.getElementById('app-root')!.innerHTML = renderApp();
 
 // Initialize i18n (already done at module level in i18n.ts)
 // Initialize connection status
@@ -26,8 +31,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register(import.meta.env.BASE_URL + 'sw.js')
-      .then((registration) => console.log('Service Worker registered:', registration.scope))
-      .catch((err) => console.log('Service Worker registration failed:', err));
+      .catch((err) => console.error('Service Worker registration failed:', err));
   });
 }
 
