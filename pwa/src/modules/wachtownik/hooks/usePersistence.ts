@@ -81,8 +81,8 @@ export function applyLoadedState(
     );
     setters.setIsGenerated(false);
   } else {
-    if (stateToLoad.crew?.length) setters.setCrew(stateToLoad.crew);
-    if (stateToLoad.schedule?.length) setters.setSchedule(stateToLoad.schedule);
+    if (Array.isArray(stateToLoad.crew)) setters.setCrew(stateToLoad.crew);
+    if (Array.isArray(stateToLoad.schedule)) setters.setSchedule(stateToLoad.schedule);
     if (stateToLoad.isGenerated !== undefined) {
       setters.setIsGenerated(stateToLoad.isGenerated);
       if (stateToLoad.isGenerated) setters.setActiveTab('schedule');
