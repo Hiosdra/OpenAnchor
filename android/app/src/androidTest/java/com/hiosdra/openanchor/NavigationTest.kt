@@ -99,14 +99,6 @@ class NavigationTest {
         composeTestRule.waitForText("Statistics")
     }
 
-    // ── 6. Navigate to Exam Quiz ─────────────────────────────────────
-
-    @Test
-    fun navigateToExamQuiz() {
-        scrollToAndClick("Exam Quiz")
-        composeTestRule.waitForText("Exam Quiz")
-    }
-
     // ── 7. Navigate to AI Advisor ────────────────────────────────────
 
     @Test
@@ -146,14 +138,6 @@ class NavigationTest {
         composeTestRule.waitForText("Drop Anchor")
         composeTestRule.onNodeWithContentDescription("Settings").performClick()
         composeTestRule.waitForText("Language", timeoutMs = 5_000)
-        navigateBack()
-        composeTestRule.waitForText("Drop Anchor")
-    }
-
-    @Test
-    fun backFromExamQuiz_returnsHome() {
-        scrollToAndClick("Exam Quiz")
-        composeTestRule.waitForText("Exam Quiz")
         navigateBack()
         composeTestRule.waitForText("Drop Anchor")
     }

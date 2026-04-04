@@ -100,8 +100,4 @@ class ScreenTest {
         assertEquals("ai/logbook", Screen.Logbook.route)
     }
 
-    @Test
-    fun `ExamQuiz screen has correct route`() {
-        assertEquals("exam/quiz", Screen.ExamQuiz.route)
-    }
 }

@@ -1,0 +1,288 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "54868f90ef1a93ff9c0a46cf2214452a",
+    "entities": [
+      {
+        "tableName": "anchor_sessions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `anchorLat` REAL NOT NULL, `anchorLng` REAL NOT NULL, `startTime` INTEGER NOT NULL, `endTime` INTEGER, `zoneType` TEXT NOT NULL, `radiusMeters` REAL NOT NULL, `bufferRadiusMeters` REAL, `sectorRadiusMeters` REAL, `sectorHalfAngleDeg` REAL, `sectorBearingDeg` REAL, `chainLengthM` REAL, `depthM` REAL, `alarmTriggered` INTEGER NOT NULL, `alarmCount` INTEGER NOT NULL, `maxDistanceMeters` REAL NOT NULL, `maxSog` REAL NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "anchorLat",
+            "columnName": "anchorLat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "anchorLng",
+            "columnName": "anchorLng",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startTime",
+            "columnName": "startTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endTime",
+            "columnName": "endTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "zoneType",
+            "columnName": "zoneType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "radiusMeters",
+            "columnName": "radiusMeters",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bufferRadiusMeters",
+            "columnName": "bufferRadiusMeters",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "sectorRadiusMeters",
+            "columnName": "sectorRadiusMeters",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "sectorHalfAngleDeg",
+            "columnName": "sectorHalfAngleDeg",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "sectorBearingDeg",
+            "columnName": "sectorBearingDeg",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "chainLengthM",
+            "columnName": "chainLengthM",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "depthM",
+            "columnName": "depthM",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "alarmTriggered",
+            "columnName": "alarmTriggered",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alarmCount",
+            "columnName": "alarmCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxDistanceMeters",
+            "columnName": "maxDistanceMeters",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxSog",
+            "columnName": "maxSog",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "track_points",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sessionId` INTEGER NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `accuracy` REAL NOT NULL, `timestamp` INTEGER NOT NULL, `distanceToAnchor` REAL NOT NULL, `isAlarm` INTEGER NOT NULL, `alarmState` TEXT NOT NULL, FOREIGN KEY(`sessionId`) REFERENCES `anchor_sessions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionId",
+            "columnName": "sessionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "lat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lng",
+            "columnName": "lng",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accuracy",
+            "columnName": "accuracy",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "distanceToAnchor",
+            "columnName": "distanceToAnchor",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isAlarm",
+            "columnName": "isAlarm",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alarmState",
+            "columnName": "alarmState",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_track_points_sessionId",
+            "unique": false,
+            "columnNames": [
+              "sessionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_track_points_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "anchor_sessions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "logbook_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sessionId` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `summary` TEXT NOT NULL, `logEntry` TEXT NOT NULL, `safetyNote` TEXT NOT NULL, `isAiGenerated` INTEGER NOT NULL, FOREIGN KEY(`sessionId`) REFERENCES `anchor_sessions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionId",
+            "columnName": "sessionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "summary",
+            "columnName": "summary",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "logEntry",
+            "columnName": "logEntry",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "safetyNote",
+            "columnName": "safetyNote",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isAiGenerated",
+            "columnName": "isAiGenerated",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_logbook_entries_sessionId",
+            "unique": false,
+            "columnNames": [
+              "sessionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_logbook_entries_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "anchor_sessions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '54868f90ef1a93ff9c0a46cf2214452a')"
+    ]
+  }
+}

@@ -72,6 +72,23 @@ ksp {
 }
 
 dependencies {
+    // Module dependencies
+    implementation(project(":core:domain"))
+    implementation(project(":core:data"))
+    implementation(project(":core:network"))
+    implementation(project(":core:ui"))
+
+    implementation(project(":feature:monitor"))
+    implementation(project(":feature:history"))
+    implementation(project(":feature:settings"))
+    implementation(project(":feature:pairing"))
+    implementation(project(":feature:crewwatch"))
+    implementation(project(":feature:weather"))
+    implementation(project(":feature:advisor"))
+    implementation(project(":feature:logbook"))
+    implementation(project(":feature:statistics"))
+    implementation(project(":feature:home"))
+
     // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -204,8 +221,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         // Bound service lifecycle (logic extracted to GpsProcessor/AlarmHandler)
         "**/AnchorMonitorService*.class",
         "**/ServiceBinder*.class",
-        // PDF renderer uses system PdfRenderer + Bitmap (not unit-testable)
-        "**/ExamPdfRenderer*.class",
         // Service orchestrators/managers extracted from AnchorMonitorService
         // (interact with Android services, GPS, alarms — not unit-testable)
         "**/StandaloneMonitorManager*.class",
@@ -259,8 +274,6 @@ tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
         "**/MainActivity*.class",
         "**/AnchorMonitorService*.class",
         "**/ServiceBinder*.class",
-        // PDF renderer uses system PdfRenderer + Bitmap (not unit-testable)
-        "**/ExamPdfRenderer*.class",
         // Service orchestrators/managers extracted from AnchorMonitorService
         "**/StandaloneMonitorManager*.class",
         "**/PairedModeOrchestrator*.class",
