@@ -24,9 +24,6 @@ import javax.inject.Singleton
  * - Phone vibration + Wear OS vibration alarm at watch change
  * - Persistent state across config changes
  */
-// TODO: CrewWatchManager should implement CrewWatchApi (core/domain) and align
-//  state/method signatures (CrewWatchState fields, startWatch params, acknowledgeAlarm).
-//  Deferred to avoid behavior changes in this refactor PR.
 @Singleton
 class CrewWatchManager @Inject constructor(
     @ApplicationContext private val context: Context

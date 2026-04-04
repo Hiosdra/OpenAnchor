@@ -36,11 +36,10 @@ fun MonitorScreen(
     // Announce alarm state changes to screen readers and provide haptic feedback
     val view = LocalView.current
     val haptic = LocalHapticFeedback.current
+    val alarmAnnouncement = stringResource(R.string.a11y_alarm_state_announcement, uiState.alarmState.name)
     LaunchedEffect(uiState.alarmState) {
         if (uiState.alarmState != AlarmState.SAFE) {
-            view.announceForAccessibility(
-                context.getString(R.string.a11y_alarm_state_announcement, uiState.alarmState.name)
-            )
+            view.announceForAccessibility(alarmAnnouncement)
         }
         if (uiState.alarmState == AlarmState.WARNING || uiState.alarmState == AlarmState.ALARM) {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
