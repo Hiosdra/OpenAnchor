@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
+    waitForIdle()
     val nodes = onAllNodesWithText(text, substring = true, ignoreCase = true)
     val count = nodes.fetchSemanticsNodes().size
     if (count == 0) throw AssertionError("No nodes found with text containing '$text'")
@@ -25,9 +26,13 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
     waitUntil(timeoutMs) {
-        onAllNodesWithText(text, substring = true, ignoreCase = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+        try {
+            onAllNodesWithText(text, substring = true, ignoreCase = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        } catch (_: IllegalStateException) {
+            false // Compose hierarchy not ready yet, keep waiting
+        }
     }
     return onAllNodesWithText(text, substring = true, ignoreCase = true).onFirst()
 }
@@ -66,8 +71,12 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
     waitUntil(30_000) {
-        onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+        try {
+            onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        } catch (_: IllegalStateException) {
+            false // Compose hierarchy not ready yet, keep waiting
+        }
     }
 }
