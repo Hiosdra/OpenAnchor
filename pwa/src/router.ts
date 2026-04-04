@@ -77,17 +77,21 @@ export async function navigateTo(path: string): Promise<void> {
     if (route.title) document.title = route.title;
 
     _config.outlet.innerHTML = '';
-    const backBtn = Object.assign(document.createElement('button'), {
-      id: 'router-back-btn', className: 'router-back-btn',
-      innerHTML: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Powrót',
-    });
-    backBtn.setAttribute('aria-label', 'Powrót do ekranu głównego');
-    backBtn.addEventListener('click', () => push('/'));
-    _config.outlet.appendChild(backBtn);
 
     const spaRoot = document.createElement('div');
     spaRoot.id = 'spa-root';
     _config.outlet.appendChild(spaRoot);
+
+    // Intercept legacy back-to-dashboard links inside SPA modules
+    _config.outlet.addEventListener('click', (e) => {
+      const anchor = (e.target as HTMLElement).closest('a[href]');
+      if (!anchor) return;
+      const href = anchor.getAttribute('href') ?? '';
+      if (href.includes('index.html') || href === '/' || href === '../' || href === '../../') {
+        e.preventDefault();
+        push('/');
+      }
+    });
 
     mod.mount(spaRoot);
     _currentCleanup = () => mod.unmount();

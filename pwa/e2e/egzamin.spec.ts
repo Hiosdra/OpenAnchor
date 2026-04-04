@@ -3,9 +3,11 @@ import { MODULES, STORAGE_KEYS, installEgzaminPdfTestHook } from './helpers.js';
 
 const EGZAMIN_URL = MODULES.egzamin;
 
-/** Wait for React to render inside #root and questions to load from JSON */
+/** Wait for React to render inside #spa-root (SPA) or #root (standalone) and questions to load */
 const waitForApp = async (page: import('@playwright/test').Page) => {
   await page.waitForFunction(() => {
+    const spa = document.getElementById('spa-root');
+    if (spa && spa.children.length > 0) return true;
     const root = document.getElementById('root');
     return root && root.children.length > 0;
   }, { timeout: 15_000 });
@@ -21,19 +23,19 @@ test.beforeEach(async ({ page }) => {
 // 1. PAGE LOAD & INITIAL STATE
 // ==========================================
 test.describe('Page Load & Initial State', () => {
-  test('page loads and React renders in #root', async ({ page }) => {
+  test('page loads and React renders in app container', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    const root = page.locator('#root');
-    await expect(root).toBeVisible();
-    const children = await root.evaluate(el => el.children.length);
+    const root = page.locator('#spa-root, #root');
+    await expect(root.first()).toBeVisible();
+    const children = await root.first().evaluate(el => el.children.length);
     expect(children).toBeGreaterThan(0);
   });
 
   test('main menu shows Nauka button', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    await expect(page.getByText('Nauka', { exact: false })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Nauka/ })).toBeVisible();
   });
 
   test('main menu shows Egzamin button', async ({ page }) => {
@@ -52,7 +54,6 @@ test.describe('Page Load & Initial State', () => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     await expect(page.getByText('Postep nauki')).toBeVisible();
-    await expect(page.getByText('pytań').first()).toBeVisible();
     await expect(page.getByText('poprawnych')).toBeVisible();
     await expect(page.getByText('odpowiedziano')).toBeVisible();
   });

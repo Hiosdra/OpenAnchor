@@ -52,8 +52,8 @@ test.describe('Module Navigation Flow', () => {
     await clickAndNavigate(page, '.module-card.card-exam', /#\/egzamin/);
     await expect(page).toHaveTitle(/Egzamin/);
 
-    // Navigate back to dashboard via SPA back button
-    await clickAndNavigate(page, '#router-back-btn', /#\/$/);
+    // Navigate back to dashboard via module's back link
+    await clickAndNavigate(page, '.oa-back-btn', /#\/$/);
     await expect(page).toHaveTitle(/OpenAnchor/);
   });
 
@@ -91,8 +91,8 @@ test.describe('Module Navigation Flow', () => {
     await clickAndNavigate(page, '.module-card.card-watch', /#\/wachtownik/);
     await expect(page).toHaveTitle(/Wachtownik/);
 
-    // Navigate back via SPA back button
-    await clickAndNavigate(page, '#router-back-btn', /#\/$/,  { force: true });
+    // Navigate back via module's back link
+    await clickAndNavigate(page, '.oa-back-btn', /#\/$/,  { force: true });
     await expect(page).toHaveTitle(/OpenAnchor/);
   });
 });
@@ -118,8 +118,8 @@ test.describe('localStorage Persistence Across Modules', () => {
     );
     expect(betaInEgzamin).toBe('true');
 
-    // Navigate back to dashboard via SPA back button
-    await clickAndNavigate(page, '#router-back-btn', /#\/$/);
+    // Navigate back to dashboard via module's back link
+    await clickAndNavigate(page, '.oa-back-btn', /#\/$/);
 
     // Beta modules should still be visible
     await expect(page.locator('#anchorModule')).toBeVisible();
@@ -130,7 +130,7 @@ test.describe('Module Independence', () => {
   test('egzamin loads directly via URL', async ({ page }) => {
     await page.goto(MODULES.egzamin, { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveTitle(/Egzamin/);
-    await expect(page.locator('#router-back-btn')).toBeVisible();
+    await expect(page.locator('.oa-back-btn').first()).toBeVisible();
   });
 
   test('anchor loads directly via URL', async ({ page }) => {
@@ -142,7 +142,7 @@ test.describe('Module Independence', () => {
   test('wachtownik loads directly via URL', async ({ page }) => {
     await page.goto(MODULES.wachtownik, { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveTitle(/Wachtownik/);
-    await expect(page.locator('#router-back-btn')).toBeVisible();
+    await expect(page.locator('.oa-back-btn').first()).toBeVisible();
   });
 });
 
@@ -162,8 +162,8 @@ test.describe('Egzamin State Persistence', () => {
       localStorage.setItem(key, '5');
     }, STORAGE_KEYS.learnPosition);
 
-    // Navigate to dashboard via SPA back button
-    await clickAndNavigate(page, '#router-back-btn', /#\/$/);
+    // Navigate to dashboard via module's back link
+    await clickAndNavigate(page, '.oa-back-btn', /#\/$/);
 
     // Dismiss banners that may overlay cards
     await page.evaluate(() => {
@@ -219,12 +219,12 @@ test.describe('Responsive Layout', () => {
 });
 
 test.describe('Back Navigation', () => {
-  test('SPA module pages have back button for dashboard', async ({
+  test('SPA module pages have back link to dashboard', async ({
     page,
   }) => {
     await page.goto(MODULES.egzamin, { waitUntil: 'domcontentloaded' });
 
-    const backBtn = page.locator('#router-back-btn');
+    const backBtn = page.locator('.oa-back-btn').first();
     await expect(backBtn).toBeVisible();
   });
 

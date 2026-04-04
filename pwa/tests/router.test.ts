@@ -205,7 +205,7 @@ describe('router', () => {
       expect(getCurrentPath()).toBe('/');
     });
 
-    it('renders a back button in the outlet', async () => {
+    it('intercepts legacy back links in the outlet', async () => {
       const mod = fakeModule();
       const cfg = makeConfig([
         { path: '/egzamin', loader: () => Promise.resolve(mod) },
@@ -213,9 +213,14 @@ describe('router', () => {
       destroy = initRouter(cfg);
 
       await navigateTo('/egzamin');
-      const backBtn = cfg.outlet.querySelector('#router-back-btn');
-      expect(backBtn).toBeTruthy();
-      expect(backBtn?.textContent).toContain('Powrót');
+      // Simulate a legacy back link inside the mounted module
+      const link = document.createElement('a');
+      link.href = '../../index.html';
+      link.textContent = 'Back';
+      cfg.outlet.querySelector('#spa-root')!.appendChild(link);
+      link.click();
+      // Should navigate to dashboard hash
+      expect(window.location.hash).toBe('#/');
     });
 
     it('hides loading indicator after module loads', async () => {
