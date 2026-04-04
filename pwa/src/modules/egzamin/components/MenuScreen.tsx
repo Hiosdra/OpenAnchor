@@ -56,7 +56,7 @@ export function MenuScreen({ questions, progress, leitnerState, onStartLearn, on
         {/* Stats card */}
         <div className="rounded-2xl bg-white/5 border border-white/10 p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-white/70">Postep nauki</span>
+            <span className="text-sm font-semibold text-white/70">Postęp nauki</span>
             <span className="text-lg font-bold text-amber-400">{pctLearned}%</span>
           </div>
           <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-4">
@@ -115,7 +115,7 @@ export function MenuScreen({ questions, progress, leitnerState, onStartLearn, on
               </svg>
               Nauka
             </div>
-            <div className="text-xs opacity-70 mt-0.5">Przegladaj pytania z odpowiedziami</div>
+            <div className="text-xs opacity-70 mt-0.5">Przeglądaj pytania z odpowiedziami</div>
           </button>
 
           <button

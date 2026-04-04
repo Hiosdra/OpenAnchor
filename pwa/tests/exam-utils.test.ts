@@ -74,25 +74,25 @@ describe('formatExamTime', () => {
 // ---------------------------------------------------------------------------
 describe('calculateExamResults', () => {
   const questions: QuestionStub[] = [
-    { id: 1, correctAnswer: 'A' },
-    { id: 2, correctAnswer: 'B' },
-    { id: 3, correctAnswer: 'C' },
+    { id: '1', correctAnswer: 'A' },
+    { id: '2', correctAnswer: 'B' },
+    { id: '3', correctAnswer: 'C' },
   ];
 
   it('marks all correct', () => {
-    const answers = { 1: 'A', 2: 'B', 3: 'C' };
+    const answers: Record<string, string> = { '1': 'A', '2': 'B', '3': 'C' };
     const results = calculateExamResults(questions, answers);
     expect(results.every((r) => r.correct)).toBe(true);
   });
 
   it('marks all incorrect', () => {
-    const answers = { 1: 'B', 2: 'C', 3: 'A' };
+    const answers: Record<string, string> = { '1': 'B', '2': 'C', '3': 'A' };
     const results = calculateExamResults(questions, answers);
     expect(results.every((r) => !r.correct)).toBe(true);
   });
 
   it('handles mixed answers', () => {
-    const answers = { 1: 'A', 2: 'C', 3: 'C' };
+    const answers: Record<string, string> = { '1': 'A', '2': 'C', '3': 'C' };
     const results = calculateExamResults(questions, answers);
     expect(results[0].correct).toBe(true);
     expect(results[1].correct).toBe(false);
@@ -112,9 +112,9 @@ describe('calculateExamResults', () => {
   });
 
   it('preserves question id mapping', () => {
-    const answers = { 2: 'B' };
+    const answers: Record<string, string> = { '2': 'B' };
     const results = calculateExamResults(questions, answers);
-    expect(results[1].questionId).toBe(2);
+    expect(results[1].questionId).toBe('2');
     expect(results[1].userAnswer).toBe('B');
     expect(results[1].correct).toBe(true);
   });

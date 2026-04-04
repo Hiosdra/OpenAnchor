@@ -83,7 +83,7 @@ export async function navigateTo(path: string): Promise<void> {
     _config.outlet.appendChild(spaRoot);
 
     // Intercept legacy back-to-dashboard links inside SPA modules
-    _config.outlet.addEventListener('click', (e) => {
+    const clickHandler = (e: MouseEvent) => {
       const anchor = (e.target as HTMLElement).closest('a[href]');
       if (!anchor) return;
       const href = anchor.getAttribute('href') ?? '';
@@ -91,10 +91,15 @@ export async function navigateTo(path: string): Promise<void> {
         e.preventDefault();
         push('/');
       }
-    });
+    };
+    _config.outlet.addEventListener('click', clickHandler);
 
     mod.mount(spaRoot);
-    _currentCleanup = () => mod.unmount();
+    const outlet = _config.outlet;
+    _currentCleanup = () => {
+      outlet.removeEventListener('click', clickHandler);
+      mod.unmount();
+    };
   } catch (error) {
     console.error(`[Router] Failed to load module for ${path}:`, error);
     hideLoading();

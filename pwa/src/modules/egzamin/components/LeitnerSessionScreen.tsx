@@ -74,7 +74,7 @@ export function LeitnerSessionScreen({ dueQuestions, leitnerState, onUpdateLeitn
       <Header
         title="Sesja Leitner"
         onBack={() => {
-          if (confirm('Na pewno chcesz przerwac sesje? Postep zostanie zachowany.')) {
+          if (confirm('Na pewno chcesz przerwać sesję? Postęp zostanie zachowany.')) {
             onBack();
           }
         }}
@@ -130,11 +130,11 @@ export function LeitnerSessionScreen({ dueQuestions, leitnerState, onUpdateLeitn
                 onClick={handleNext}
                 className="flex-1 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 text-base font-bold hover:from-blue-500 hover:to-blue-400 transition-all"
               >
-                {currentIndex < dueQuestions.length - 1 ? 'Nastepne' : 'Zakoncz sesje'}
+                {currentIndex < dueQuestions.length - 1 ? 'Następne' : 'Zakończ sesję'}
               </button>
             ) : (
               <div className="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 text-base text-center text-white/30">
-                Wybierz odpowiedz
+                Wybierz odpowiedź
               </div>
             )}
           </div>

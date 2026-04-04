@@ -34,5 +34,6 @@ local.properties
 test-results/
 test-report/
 .playwright-mcp/
+zeglowanie-fixed.png
 android/build-logic/build/
 android/build-logic/.gradle/

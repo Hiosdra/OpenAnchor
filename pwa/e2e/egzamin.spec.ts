@@ -53,7 +53,7 @@ test.describe('Page Load & Initial State', () => {
   test('progress section is visible with stats', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    await expect(page.getByText('Postep nauki')).toBeVisible();
+    await expect(page.getByText('Postęp nauki')).toBeVisible();
     await expect(page.getByText('poprawnych')).toBeVisible();
     await expect(page.getByText('odpowiedziano')).toBeVisible();
   });
@@ -154,8 +154,8 @@ test.describe('Learn Mode', () => {
     // Should show "Pytanie 1 / N"
     await expect(page.getByText(/Pytanie 1 \//)).toBeVisible();
 
-    // Click next (shows as "Pomin" when unanswered)
-    await page.locator('button', { hasText: 'Pomin' }).click();
+    // Click next (shows as "Pomiń" when unanswered)
+    await page.locator('button', { hasText: 'Pomiń' }).click();
 
     // Should now show "Pytanie 2 / N"
     await expect(page.getByText(/Pytanie 2 \//)).toBeVisible();
@@ -168,7 +168,7 @@ test.describe('Learn Mode', () => {
     await expect(page.locator('.oa-header-title')).toHaveText('Nauka');
 
     // Navigate to question 2
-    await page.locator('button', { hasText: 'Pomin' }).click();
+    await page.locator('button', { hasText: 'Pomiń' }).click();
     await expect(page.getByText(/Pytanie 2 \//)).toBeVisible();
 
     // Go back
@@ -186,20 +186,20 @@ test.describe('Learn Mode', () => {
     await expect(prevBtn).toBeDisabled();
   });
 
-  test('answering changes Next button text from Pomin to Nastepne', async ({ page }) => {
+  test('answering changes Next button text from Pomiń to Następne', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     await page.locator('button', { hasText: 'Nauka' }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Nauka');
 
-    // Before answering: "Pomin"
-    await expect(page.locator('button', { hasText: 'Pomin' })).toBeVisible();
+    // Before answering: "Pomiń"
+    await expect(page.locator('button', { hasText: 'Pomiń' })).toBeVisible();
 
     // Answer a question
     await page.locator('.answer-btn').first().click();
 
-    // After answering: "Nastepne"
-    await expect(page.locator('button', { hasText: 'Nastepne' })).toBeVisible();
+    // After answering: "Następne"
+    await expect(page.locator('button', { hasText: 'Następne' })).toBeVisible();
   });
 
   test('can navigate through multiple questions', async ({ page }) => {
@@ -211,7 +211,7 @@ test.describe('Learn Mode', () => {
     // Navigate forward 3 questions
     for (let i = 1; i <= 3; i++) {
       await expect(page.getByText(new RegExp(`Pytanie ${i} /`))).toBeVisible();
-      await page.locator('button', { hasText: 'Pomin' }).click();
+      await page.locator('button', { hasText: 'Pomiń' }).click();
     }
     await expect(page.getByText(/Pytanie 4 \//)).toBeVisible();
   });
@@ -406,7 +406,7 @@ test.describe('Exam Mode', () => {
     await expect(page.locator('.oa-header-title')).toHaveText('Egzamin');
 
     // Navigate to next question
-    await page.locator('button', { hasText: 'Nastepne' }).click();
+    await page.locator('button', { hasText: 'Następne' }).click();
     await expect(page.getByText(/Pytanie 2 \/ 30/)).toBeVisible();
 
     // Navigate back
@@ -415,6 +415,7 @@ test.describe('Exam Mode', () => {
   });
 
   test('can complete exam and see results', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
 
@@ -427,12 +428,12 @@ test.describe('Exam Mode', () => {
     // Answer all 30 questions by clicking first answer and advancing
     for (let i = 0; i < 29; i++) {
       await page.locator('.answer-btn').first().click();
-      await page.locator('button', { hasText: 'Nastepne' }).click();
+      await page.locator('button', { hasText: 'Następne' }).click();
     }
 
-    // Answer last question and click "Zakoncz"
+    // Answer last question and click "Zakończ"
     await page.locator('.answer-btn').first().click();
-    await page.locator('button', { hasText: /Zakoncz/ }).click();
+    await page.locator('button', { hasText: /Zakończ/ }).click();
 
     // Results screen should appear
     await expect(page.locator('.oa-header-title')).toHaveText('Wyniki egzaminu');
@@ -444,6 +445,7 @@ test.describe('Exam Mode', () => {
   });
 
   test('results screen shows retry button', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
@@ -453,17 +455,18 @@ test.describe('Exam Mode', () => {
     // Quick-complete: answer all and finish
     for (let i = 0; i < 29; i++) {
       await page.locator('.answer-btn').first().click();
-      await page.locator('button', { hasText: 'Nastepne' }).click();
+      await page.locator('button', { hasText: 'Następne' }).click();
     }
     await page.locator('.answer-btn').first().click();
-    await page.locator('button', { hasText: /Zakoncz/ }).click();
+    await page.locator('button', { hasText: /Zakończ/ }).click();
 
     await expect(page.locator('.oa-header-title')).toHaveText('Wyniki egzaminu');
-    await expect(page.locator('button', { hasText: 'Sprobuj ponownie' })).toBeVisible();
-    await expect(page.locator('button', { hasText: 'Powrot do menu' })).toBeVisible();
+    await expect(page.locator('button', { hasText: 'Spróbuj ponownie' })).toBeVisible();
+    await expect(page.locator('button', { hasText: 'Powrót do menu' })).toBeVisible();
   });
 
   test('results screen shows category breakdown', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
@@ -472,15 +475,16 @@ test.describe('Exam Mode', () => {
 
     for (let i = 0; i < 29; i++) {
       await page.locator('.answer-btn').first().click();
-      await page.locator('button', { hasText: 'Nastepne' }).click();
+      await page.locator('button', { hasText: 'Następne' }).click();
     }
     await page.locator('.answer-btn').first().click();
-    await page.locator('button', { hasText: /Zakoncz/ }).click();
+    await page.locator('button', { hasText: /Zakończ/ }).click();
 
     await expect(page.getByText('Wyniki wg kategorii')).toBeVisible();
   });
 
   test('retry button starts new exam', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
@@ -489,15 +493,15 @@ test.describe('Exam Mode', () => {
 
     for (let i = 0; i < 29; i++) {
       await page.locator('.answer-btn').first().click();
-      await page.locator('button', { hasText: 'Nastepne' }).click();
+      await page.locator('button', { hasText: 'Następne' }).click();
     }
     await page.locator('.answer-btn').first().click();
-    await page.locator('button', { hasText: /Zakoncz/ }).click();
+    await page.locator('button', { hasText: /Zakończ/ }).click();
 
     await expect(page.locator('.oa-header-title')).toHaveText('Wyniki egzaminu');
 
     // Click retry
-    await page.locator('button', { hasText: 'Sprobuj ponownie' }).click();
+    await page.locator('button', { hasText: 'Spróbuj ponownie' }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Egzamin');
     await expect(page.getByText(/Pytanie 1 \/ 30/)).toBeVisible();
   });
@@ -533,7 +537,7 @@ test.describe('Leitner Mode', () => {
     await waitForApp(page);
     await page.locator('button', { hasText: 'Leitner' }).click();
 
-    await expect(page.getByText('Postep Leitnera')).toBeVisible();
+    await expect(page.getByText('Postęp Leitnera')).toBeVisible();
     await expect(page.getByText('do powtórki')).toBeVisible();
     await expect(page.getByText('opanowanych')).toBeVisible();
   });
@@ -563,7 +567,7 @@ test.describe('Leitner Mode', () => {
     expect(count).toBeGreaterThanOrEqual(3);
 
     // "Wybierz odpowiedz" prompt should be visible before answering
-    await expect(page.getByText('Wybierz odpowiedz')).toBeVisible();
+    await expect(page.getByText('Wybierz odpowiedź')).toBeVisible();
   });
 
   test('answering in Leitner shows box movement indicator', async ({ page }) => {
@@ -592,13 +596,13 @@ test.describe('Leitner Mode', () => {
     await expect(page.locator('.oa-header-title')).toHaveText('Sesja Leitner');
 
     // Before answering: "Wybierz odpowiedz" (no action button)
-    await expect(page.getByText('Wybierz odpowiedz')).toBeVisible();
+    await expect(page.getByText('Wybierz odpowiedź')).toBeVisible();
 
     // Answer
     await page.locator('.answer-btn').first().click();
 
-    // After answering: "Nastepne" or "Zakoncz sesje" button appears
-    await expect(page.locator('button', { hasText: /Nastepne|Zakoncz sesje/ })).toBeVisible();
+    // After answering: "Następne" or "Zakończ sesję" button appears
+    await expect(page.locator('button', { hasText: /Następne|Zakończ sesję/ })).toBeVisible();
   });
 
   test('completing Leitner session shows summary', async ({ page }) => {
@@ -631,12 +635,12 @@ test.describe('Leitner Mode', () => {
 
     // Answer the single question
     await page.locator('.answer-btn').first().click();
-    await page.locator('button', { hasText: /Zakoncz sesje/ }).click();
+    await page.locator('button', { hasText: /Zakończ sesję/ }).click();
 
     // Should show completion screen
     await expect(page.locator('.oa-header-title')).toHaveText('Sesja zakonczona');
     await expect(page.getByText('Rozkład pytań w pudełkach')).toBeVisible();
-    await expect(page.locator('button', { hasText: 'Powrot do przegladu' })).toBeVisible();
+    await expect(page.locator('button', { hasText: 'Powrót do przeglądu' })).toBeVisible();
   });
 });
 
@@ -654,8 +658,8 @@ test.describe('Progress Persistence', () => {
     await page.locator('.answer-btn').first().click();
 
     // Navigate to question 3
-    await page.locator('button', { hasText: 'Nastepne' }).click();
-    await page.locator('button', { hasText: 'Pomin' }).click();
+    await page.locator('button', { hasText: 'Następne' }).click();
+    await page.locator('button', { hasText: 'Pomiń' }).click();
     await expect(page.getByText(/Pytanie 3 \//)).toBeVisible();
 
     // Reload
@@ -679,7 +683,7 @@ test.describe('Progress Persistence', () => {
     // Enter learn mode and navigate to question 5
     await page.locator('button', { hasText: 'Nauka' }).click();
     for (let i = 0; i < 4; i++) {
-      await page.locator('button', { hasText: /Pomin|Nastepne/ }).click();
+      await page.locator('button', { hasText: /Pomiń|Następne/ }).click();
     }
     await expect(page.getByText(/Pytanie 5 \//)).toBeVisible();
 
@@ -834,6 +838,7 @@ test.describe('Navigation Back to Menu', () => {
   });
 
   test('can go back from results to menu', async ({ page }) => {
+    test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
     page.on('dialog', dialog => dialog.accept());
@@ -842,15 +847,15 @@ test.describe('Navigation Back to Menu', () => {
     await page.locator('button', { hasText: 'Egzamin' }).click();
     for (let i = 0; i < 29; i++) {
       await page.locator('.answer-btn').first().click();
-      await page.locator('button', { hasText: 'Nastepne' }).click();
+      await page.locator('button', { hasText: 'Następne' }).click();
     }
     await page.locator('.answer-btn').first().click();
-    await page.locator('button', { hasText: /Zakoncz/ }).click();
+    await page.locator('button', { hasText: /Zakończ/ }).click();
 
     await expect(page.locator('.oa-header-title')).toHaveText('Wyniki egzaminu');
 
-    // Click "Powrot do menu"
-    await page.locator('button', { hasText: 'Powrot do menu' }).click();
+    // Click "Powrót do menu"
+    await page.locator('button', { hasText: 'Powrót do menu' }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Egzamin ŻJ / JSM');
   });
 
@@ -924,7 +929,7 @@ test.describe('Image Zoom', () => {
     await expect(page.locator('.oa-header-title')).toHaveText('Nauka');
 
     // Skip to next question
-    await page.locator('button', { hasText: 'Pomin' }).click();
+    await page.locator('button', { hasText: 'Pomiń' }).click();
     await expect(page.getByText(/Pytanie 2 \//)).toBeVisible();
 
     // Open zoom on second question

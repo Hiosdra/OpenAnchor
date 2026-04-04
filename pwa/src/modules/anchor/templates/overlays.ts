@@ -64,7 +64,7 @@ export function onboardingHTML(): string {
         <div class="onboarding-step absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-300 opacity-0 z-0 pointer-events-none">
             <i data-lucide="battery-warning" class="w-20 h-20 text-orange-500 mb-6"></i>
             <h2 class="text-2xl font-bold text-white mb-4" data-i18n="obRules">Ważne zasady!</h2>
-            <p class="text-slate-300 text-sm leading-relaxed max-w-sm" data-i18n="obRulesBody">Telefony usypiają aplikacje w tle. <strong>Nie blokuj ekranu!</strong> Nasz system zapobiega wygaszaniu, ale dla pewności użyj <strong>Trybu Nocnego</strong> i <strong>podłącz ładowarkę</strong>.</p>
+            <p class="text-slate-300 text-sm leading-relaxed max-w-sm" data-i18n-html="obRulesBody">Telefony usypiają aplikacje w tle. <strong>Nie blokuj ekranu!</strong> Nasz system zapobiega wygaszaniu, ale dla pewności użyj <strong>Trybu Nocnego</strong> i <strong>podłącz ładowarkę</strong>.</p>
         </div>
         <div class="onboarding-step absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-300 opacity-0 z-0 pointer-events-none">
             <i data-lucide="smartphone" class="w-20 h-20 text-purple-400 mb-6"></i>

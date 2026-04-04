@@ -81,8 +81,8 @@ export function applyLoadedState(
     );
     setters.setIsGenerated(false);
   } else {
-    if (stateToLoad.crew) setters.setCrew(stateToLoad.crew);
-    if (stateToLoad.schedule) setters.setSchedule(stateToLoad.schedule);
+    if (Array.isArray(stateToLoad.crew)) setters.setCrew(stateToLoad.crew);
+    if (Array.isArray(stateToLoad.schedule)) setters.setSchedule(stateToLoad.schedule);
     if (stateToLoad.isGenerated !== undefined) {
       setters.setIsGenerated(stateToLoad.isGenerated);
       if (stateToLoad.isGenerated) setters.setActiveTab('schedule');
@@ -92,7 +92,7 @@ export function applyLoadedState(
   if (stateToLoad.slots) setters.setSlots(stateToLoad.slots);
   if (stateToLoad.days) setters.setDays(stateToLoad.days);
   if (stateToLoad.startDate) setters.setStartDate(stateToLoad.startDate);
-  if (stateToLoad.isNightMode) setters.setIsNightMode(stateToLoad.isNightMode);
+  if (stateToLoad.isNightMode !== undefined) setters.setIsNightMode(stateToLoad.isNightMode);
   if (stateToLoad.captainParticipates !== undefined)
     setters.setCaptainParticipates(stateToLoad.captainParticipates);
 

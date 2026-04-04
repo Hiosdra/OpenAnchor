@@ -55,6 +55,7 @@ export function renderChecklist(): void {
 
     const text = document.createElement('div');
     text.className = 'checklist-text';
+    // Safe: item.text is hardcoded in data.ts, never from user/external input
     text.innerHTML = item.text;
 
     li.appendChild(checkbox);
