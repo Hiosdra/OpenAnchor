@@ -52,11 +52,10 @@ class AnchorDataListenerService : WearableListenerService() {
                         continue
                     }
 
-                    // Auto-authorize on first connection (nodeId used as display name;
-                    // Node object is not available in onDataChanged)
-                    if (!connectionManager.isNodeAuthorized(sourceNodeId)) {
-                        connectionManager.authorizeNode(sourceNodeId, sourceNodeId)
-                    }
+                    // Idempotent: persists authorization on first connection,
+                    // no-op when already authorized. Node ID used as display name
+                    // because Node object is not available in onDataChanged.
+                    connectionManager.authorizeNode(sourceNodeId, sourceNodeId)
 
                     val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
                     val state = dataParser.parse(dataMap)
