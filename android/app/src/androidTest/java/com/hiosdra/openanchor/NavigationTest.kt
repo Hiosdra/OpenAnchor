@@ -2,13 +2,12 @@ package com.hiosdra.openanchor
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
 import com.hiosdra.openanchor.helpers.skipOnboardingIfPresent
+import com.hiosdra.openanchor.helpers.scrollToText
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -47,7 +46,7 @@ class NavigationTest {
 
     private fun scrollToAndClick(text: String) {
         composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
+        composeTestRule.scrollToText(text)
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
         composeTestRule.waitForIdle()

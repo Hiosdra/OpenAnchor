@@ -43,7 +43,7 @@ class PairingScreensTest {
 
     private fun scrollToAndClick(text: String) {
         composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
+        composeTestRule.scrollToText(text)
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
         composeTestRule.waitForIdle()

@@ -5,10 +5,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
 import com.hiosdra.openanchor.helpers.skipOnboardingIfPresent
+import com.hiosdra.openanchor.helpers.scrollToText
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -56,44 +56,44 @@ class HomeScreenTest {
 
     @Test
     fun homeScreen_dropAnchorButtonVisible() {
-        composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("Drop Anchor").assertIsDisplayed()
     }
 
     @Test
     fun homeScreen_historyButtonVisible() {
-        composeTestRule.onNodeWithText("History").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("History").assertIsDisplayed()
     }
 
     @Test
     fun homeScreen_statisticsButtonVisible() {
-        composeTestRule.onNodeWithText("Statistics").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("Statistics").assertIsDisplayed()
     }
 
     // --- 2. All Navigation Buttons Present ---
 
     @Test
     fun homeScreen_pairWithTabletVisible() {
-        composeTestRule.onNodeWithText("Pair with Tablet").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("Pair with Tablet").assertIsDisplayed()
     }
 
     @Test
     fun homeScreen_connectToServerVisible() {
-        composeTestRule.onNodeWithText("Connect to Server").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("Connect to Server").assertIsDisplayed()
     }
 
     @Test
     fun homeScreen_crewWatchVisible() {
-        composeTestRule.onNodeWithText("Crew Watch").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("Crew Watch").assertIsDisplayed()
     }
 
     @Test
     fun homeScreen_aiAdvisorVisible() {
-        composeTestRule.onNodeWithText("AI Advisor").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("AI Advisor").assertIsDisplayed()
     }
 
     @Test
     fun homeScreen_aiLogbookVisible() {
-        composeTestRule.onNodeWithText("AI Logbook").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("AI Logbook").assertIsDisplayed()
     }
 
     // --- 3. Conditional Buttons Hidden by Default ---
@@ -121,7 +121,7 @@ class HomeScreenTest {
 
     @Test
     fun dropAnchorButton_navigatesToSetup() {
-        composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().performClick()
+        composeTestRule.scrollToText("Drop Anchor").performClick()
         composeTestRule.waitForText("Anchor Position", timeoutMs = 5_000)
     }
 }

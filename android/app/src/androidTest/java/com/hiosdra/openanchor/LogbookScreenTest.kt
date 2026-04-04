@@ -39,7 +39,7 @@ class LogbookScreenTest {
 
     private fun navigateToLogbook() {
         composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.onNodeWithText("AI Logbook", substring = true).performScrollTo()
+        composeTestRule.scrollToText("AI Logbook")
         composeTestRule.waitForText("AI Logbook").performClick()
         composeTestRule.waitForText("AI Logbook", timeoutMs = 5_000)
     }

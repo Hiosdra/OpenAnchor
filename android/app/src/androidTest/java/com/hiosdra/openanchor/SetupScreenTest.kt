@@ -8,10 +8,10 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hiosdra.openanchor.helpers.assertTextDisplayed
 import com.hiosdra.openanchor.helpers.tryPerformScrollTo
+import com.hiosdra.openanchor.helpers.scrollToText
 import com.hiosdra.openanchor.helpers.skipOnboardingIfPresent
 import com.hiosdra.openanchor.helpers.waitForText
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -50,7 +50,7 @@ class SetupScreenTest {
 
     private fun navigateToSetup() {
         composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().performClick()
+        composeTestRule.scrollToText("Drop Anchor").performClick()
         composeTestRule.waitForText("Anchor Position")
     }
 
@@ -135,23 +135,23 @@ class SetupScreenTest {
     @Test
     fun setup_step3_chainCalculator_depthInputAppears() {
         navigateToRadiusStep()
-        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo()
+        composeTestRule.scrollToText("Calculate from chain")
         composeTestRule.onAllNodes(isToggleable()).onFirst().performClick()
         composeTestRule.waitForText("Depth (m)")
-        composeTestRule.onNodeWithText("Depth (m)").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("Depth (m)").assertIsDisplayed()
     }
 
     @Test
     fun setup_step3_chainCalculator_scopeRatioChipsVisible() {
         navigateToRadiusStep()
-        composeTestRule.onNodeWithText("Calculate from chain").performScrollTo()
+        composeTestRule.scrollToText("Calculate from chain")
         composeTestRule.onAllNodes(isToggleable()).onFirst().performClick()
         composeTestRule.waitForText("3:1 Calm")
-        composeTestRule.onNodeWithText("3:1 Calm").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("5:1 Moderate").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("7:1 Standard").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("10:1 Storm").performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithText("Manual").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("3:1 Calm").assertIsDisplayed()
+        composeTestRule.scrollToText("5:1 Moderate").assertIsDisplayed()
+        composeTestRule.scrollToText("7:1 Standard").assertIsDisplayed()
+        composeTestRule.scrollToText("10:1 Storm").assertIsDisplayed()
+        composeTestRule.scrollToText("Manual").assertIsDisplayed()
     }
 
     // --- 6. Setup Navigation ---
@@ -179,6 +179,6 @@ class SetupScreenTest {
     fun setup_backFromStep1ReturnsToHome() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.onNodeWithText("Drop Anchor").performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("Drop Anchor").assertIsDisplayed()
     }
 }

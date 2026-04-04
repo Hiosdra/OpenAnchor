@@ -39,7 +39,7 @@ class AdvisorScreenTest {
 
     private fun navigateToAdvisor() {
         composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.onNodeWithText("AI Advisor", substring = true).performScrollTo()
+        composeTestRule.scrollToText("AI Advisor")
         composeTestRule.waitForText("AI Advisor").performClick()
         composeTestRule.waitForText("AI Advisor", timeoutMs = 5_000)
     }
