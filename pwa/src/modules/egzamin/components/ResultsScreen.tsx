@@ -108,13 +108,13 @@ export function ResultsScreen({ results, timeTaken, onBack, onRetry }: ResultsSc
               onClick={onRetry}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold hover:from-amber-500 hover:to-amber-400 transition-all"
             >
-              Sprobuj ponownie
+              Spróbuj ponownie
             </button>
             <button
               onClick={onBack}
               className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-sm text-white/50 hover:bg-white/10"
             >
-              Powrot do menu
+              Powrót do menu
             </button>
           </div>
         </div>

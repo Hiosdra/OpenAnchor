@@ -277,6 +277,10 @@ export const I18N: I18NInstance = {
     document.title = this.t.appTitle;
     document.querySelectorAll('[data-i18n]').forEach((el) => {
       const key = el.getAttribute('data-i18n');
+      if (key && this.t[key]) el.textContent = this.t[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-html');
       if (key && this.t[key]) el.innerHTML = this.t[key];
     });
     document.querySelectorAll('[data-i18n-title]').forEach((el) => {

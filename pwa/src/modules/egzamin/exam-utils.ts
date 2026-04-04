@@ -31,12 +31,12 @@ export { formatExamTime } from '../../shared/utils/format';
 // -- Exam result calculation -----------------------------------------------
 
 export interface QuestionStub {
-  id: number;
+  id: string;
   correctAnswer: string;
 }
 
 export interface ExamResultEntry {
-  questionId: number;
+  questionId: string;
   userAnswer: string | null;
   correct: boolean;
 }
@@ -47,7 +47,7 @@ export interface ExamResultEntry {
  */
 export function calculateExamResults(
   questions: QuestionStub[],
-  answers: Record<number, string>,
+  answers: Record<string, string>,
 ): ExamResultEntry[] {
   return questions.map((q) => ({
     questionId: q.id,

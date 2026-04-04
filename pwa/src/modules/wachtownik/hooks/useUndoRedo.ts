@@ -25,6 +25,7 @@ const MAX_HISTORY = 20;
 
 export function snapshotsEqual(a: UndoRedoSnapshot | null, b: UndoRedoSnapshot): boolean {
   if (!a) return false;
+  if (a.crew.length !== b.crew.length || a.slots.length !== b.slots.length || a.schedule.length !== b.schedule.length) return false;
   return (
     JSON.stringify(a.crew) === JSON.stringify(b.crew) &&
     JSON.stringify(a.slots) === JSON.stringify(b.slots) &&
@@ -43,7 +44,7 @@ export function pushSnapshot(
   }
 
   let newHistory = history.slice(0, historyIndex + 1);
-  newHistory.push(JSON.parse(JSON.stringify(snapshot)));
+  newHistory.push(structuredClone(snapshot));
 
   if (newHistory.length > MAX_HISTORY) {
     newHistory = newHistory.slice(1);
@@ -88,9 +89,9 @@ export function useUndoRedo(
     if (historyIndexRef.current > 0) {
       isUndoRedoAction.current = true;
       const prev = historyRef.current[historyIndexRef.current - 1];
-      setters.setCrew(JSON.parse(JSON.stringify(prev.crew)));
-      setters.setSlots(JSON.parse(JSON.stringify(prev.slots)));
-      setters.setSchedule(JSON.parse(JSON.stringify(prev.schedule)));
+      setters.setCrew(structuredClone(prev.crew));
+      setters.setSlots(structuredClone(prev.slots));
+      setters.setSchedule(structuredClone(prev.schedule));
       setters.setIsGenerated(prev.schedule && prev.schedule.length > 0);
       historyIndexRef.current -= 1;
       forceRender((n) => n + 1);
@@ -101,9 +102,9 @@ export function useUndoRedo(
     if (historyIndexRef.current < historyRef.current.length - 1) {
       isUndoRedoAction.current = true;
       const next = historyRef.current[historyIndexRef.current + 1];
-      setters.setCrew(JSON.parse(JSON.stringify(next.crew)));
-      setters.setSlots(JSON.parse(JSON.stringify(next.slots)));
-      setters.setSchedule(JSON.parse(JSON.stringify(next.schedule)));
+      setters.setCrew(structuredClone(next.crew));
+      setters.setSlots(structuredClone(next.slots));
+      setters.setSchedule(structuredClone(next.schedule));
       setters.setIsGenerated(next.schedule && next.schedule.length > 0);
       historyIndexRef.current += 1;
       forceRender((n) => n + 1);

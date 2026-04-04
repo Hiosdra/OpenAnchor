@@ -1,4 +1,5 @@
 import type { SectionType } from './data';
+import { isValidSection } from './storage-keys';
 
 let currentSection: SectionType = 'packing';
 
@@ -21,8 +22,8 @@ export function getCurrentSection(): SectionType {
 }
 
 export function initSections(): void {
-  const saved = localStorage.getItem('zeglowanie_selected_section') as SectionType | null;
-  const section: SectionType = saved ?? 'packing';
+  const saved = localStorage.getItem('zeglowanie_selected_section');
+  const section: SectionType = isValidSection(saved) ? saved : 'packing';
   currentSection = section;
 
   document.querySelectorAll<HTMLButtonElement>('.section-nav-btn').forEach((btn) => {

@@ -212,7 +212,7 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
               onClick={handleNext}
               className="flex-1 py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 text-base font-bold hover:from-amber-500 hover:to-amber-400 transition-all"
             >
-              {selectedAnswer ? 'Nastepne' : 'Pomin'}
+              {selectedAnswer ? 'Następne' : 'Pomiń'}
             </button>
           </div>
         </div>

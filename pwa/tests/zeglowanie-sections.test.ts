@@ -62,17 +62,18 @@ describe('zeglowanie/sections', () => {
       });
     });
 
-    it('handles invalid localStorage value (no validation in code)', () => {
+    it('falls back to packing for invalid localStorage value', () => {
       localStorage.setItem('zeglowanie_selected_section', 'nonexistent');
       initSections();
 
-      expect(getCurrentSection()).toBe('nonexistent');
-      // No buttons or sections should be active
+      expect(getCurrentSection()).toBe('packing');
       document.querySelectorAll('.section-nav-btn').forEach((btn) => {
-        expect(btn.classList.contains('active')).toBe(false);
+        const shouldBeActive = (btn as HTMLButtonElement).dataset.section === 'packing';
+        expect(btn.classList.contains('active')).toBe(shouldBeActive);
       });
       document.querySelectorAll('.content-section').forEach((sec) => {
-        expect(sec.classList.contains('active')).toBe(false);
+        const shouldBeActive = sec.id === 'section-packing';
+        expect(sec.classList.contains('active')).toBe(shouldBeActive);
       });
     });
   });
