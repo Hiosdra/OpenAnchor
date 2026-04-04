@@ -1,3 +1,0 @@
-[      43ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://localhost:8084/modules/wachtownik/:0
-[      44ms] [LOG] [App] ServiceWorker registered successfully: http://localhost:8084/ @ http://localhost:8084/assets/wachtownik-BnpWyUCv.js:9
-[      78ms] [WARNING] The specified value "24:00" does not conform to the required format.  The format is "HH:mm", "HH:mm:ss" or "HH:mm:ss.SSS" where HH is 00-23, mm is 00-59, ss is 00-59, and SSS is 000-999. @ http://localhost:8084/assets/vendor-react-Cl5WToda.js:7

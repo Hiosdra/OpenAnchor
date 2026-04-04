@@ -1,6 +1,0 @@
-[      46ms] [WARNING] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation @ https://cdn.tailwindcss.com/:63
-[      92ms] [INFO] Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner. @ http://localhost:8081/:0
-[   20698ms] [LOG] [App] ServiceWorker registered successfully: http://localhost:8081/ @ http://localhost:8081/assets/wachtownik-CohC-Nya.js:9
-[   20698ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://localhost:8081/modules/wachtownik/index.html:0
-[   20725ms] [WARNING] The specified value "24:00" does not conform to the required format.  The format is "HH:mm", "HH:mm:ss" or "HH:mm:ss.SSS" where HH is 00-23, mm is 00-59, ss is 00-59, and SSS is 000-999. @ http://localhost:8081/assets/vendor-react-Cl5WToda.js:7
-[   20725ms] [WARNING] The specified value "24:00" does not conform to the required format.  The format is "HH:mm", "HH:mm:ss" or "HH:mm:ss.SSS" where HH is 00-23, mm is 00-59, ss is 00-59, and SSS is 000-999. @ http://localhost:8081/assets/vendor-react-Cl5WToda.js:7
