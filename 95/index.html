@@ -738,9 +738,61 @@
         [data-theme="light"] .module-icon {
             box-shadow: 0 3px 12px rgba(0,0,0,0.10);
         }
+
+        /* ─── SPA Router ─── */
+        .router-loading {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 900;
+        }
+        .router-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: router-spin 0.7s linear infinite;
+        }
+        @keyframes router-spin { to { transform: rotate(360deg); } }
+
+        .router-back-btn {
+            position: fixed;
+            top: 0.75rem;
+            left: 0.75rem;
+            z-index: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.85rem;
+            border: none;
+            border-radius: 0.75rem;
+            background: rgba(15, 23, 42, 0.75);
+            color: #e2e8f0;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: background 0.15s ease;
+        }
+        .router-back-btn:hover { background: rgba(15, 23, 42, 0.9); }
+        [data-theme="light"] .router-back-btn {
+            background: rgba(255,255,255,0.85);
+            color: #0f172a;
+        }
+        [data-theme="light"] .router-back-btn:hover { background: rgba(255,255,255,0.95); }
+
+        #router-outlet {
+            min-height: 100dvh;
+        }
     </style>
-  <script type="module" crossorigin src="/OpenAnchor/95/assets/main-Cerhnf9m.js"></script>
+  <script type="module" crossorigin src="/OpenAnchor/95/assets/main-Ba4eZcsh.js"></script>
   <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/modulepreload-polyfill-CXK8biUa.js">
+  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/rolldown-runtime-BJFoxEff.js">
+  <link rel="modulepreload" crossorigin href="/OpenAnchor/95/assets/vendor-jspdf-DTUaH7qj.js">
   <link rel="stylesheet" crossorigin href="/OpenAnchor/95/assets/theme-DrzzbnPo.css">
 </head>
 <body>
@@ -773,6 +825,9 @@
         <div class="wave wave-3"></div>
     </div>
     <div class="stars"></div>
+
+    <!-- Dashboard content (hidden when a SPA module is active) -->
+    <div id="dashboard-content">
 
     <!-- App Header -->
     <header class="app-header">
@@ -1083,6 +1138,16 @@
     <footer class="app-footer">
         OpenAnchor &nbsp;·&nbsp; Morska Superapp &nbsp;·&nbsp; v2.0
     </footer>
+
+    </div><!-- /dashboard-content -->
+
+    <!-- SPA router outlet (populated by router.ts) -->
+    <div id="router-outlet" style="display:none"></div>
+
+    <!-- Loading indicator shown during SPA module transitions -->
+    <div id="router-loading" class="router-loading" style="display:none" role="status" aria-label="Ładowanie modułu">
+        <div class="router-spinner"></div>
+    </div>
 
 </body>
 </html>

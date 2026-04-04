@@ -1,0 +1,1 @@
+import{r as e}from"./rolldown-runtime-BJFoxEff.js";import{n as t,r as n,t as r}from"./vendor-react-DN5Z6cN0.js";import{t as i}from"./styles-BgAh28tR.js";var a=e(n(),1),o=r(),s=t(),c=null;function l(e){c=(0,o.createRoot)(e),c.render((0,s.jsx)(a.StrictMode,{children:(0,s.jsx)(i,{})}))}function u(){c?.unmount(),c=null}export{l as mount,u as unmount};

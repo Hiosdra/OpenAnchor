@@ -1,0 +1,1 @@
+import"./rolldown-runtime-BJFoxEff.js";import{i as e,n as t,r as n,t as r}from"./exam_questions-DO6HvHU_.js";import{n as i,r as a,t as o}from"./vendor-react-DN5Z6cN0.js";a();var s=o(),c=i(),l=null;function u(i){let a=r.map(e);l=(0,s.createRoot)(i),l.render((0,c.jsx)(t,{children:(0,c.jsx)(n,{questions:a})}))}function d(){l?.unmount(),l=null}export{u as mount,d as unmount};
