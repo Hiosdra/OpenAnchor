@@ -6,10 +6,13 @@
  */
 
 import './styles.css';
+import { initBackground } from '../../shared/init-background';
 import { I18N } from './i18n';
 import { ConnectionStatus } from './connection-status';
 import { OnboardingController } from './ui-utils';
 import { AnchorApp } from './anchor-app';
+
+initBackground();
 
 // Apply early theme (matches the inline script that was in <head>)
 document.documentElement.dataset.theme = localStorage.getItem('openanchor-theme') || 'dark';

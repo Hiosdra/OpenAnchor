@@ -5,8 +5,11 @@
  */
 
 import './styles.css';
+import { initBackground } from '../../shared/init-background';
 
 import React from 'react';
+
+initBackground();
 import { createRoot } from 'react-dom/client';
 import { transformQuestion } from './constants';
 import type { RawExamQuestion } from './types';

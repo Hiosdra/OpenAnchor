@@ -1,5 +1,8 @@
 import './styles.css';
+import { initBackground } from '../../shared/init-background';
 import type { SectionType, CruiseType, BriefingType, ChecklistType } from './data';
+
+initBackground();
 import { switchSection, initSections } from './sections';
 import { switchCruiseType, resetChecklist, initPacking } from './packing';
 import { switchBriefingType, resetBriefingChecklist, initBriefing } from './briefing';
