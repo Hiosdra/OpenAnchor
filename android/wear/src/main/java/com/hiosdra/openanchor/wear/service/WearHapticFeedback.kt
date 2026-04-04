@@ -7,6 +7,8 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
 import com.hiosdra.openanchor.wear.data.WearAlarmState
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Provides haptic feedback patterns for alarm state transitions.
@@ -14,9 +16,12 @@ import com.hiosdra.openanchor.wear.data.WearAlarmState
  * Tracks the previous alarm state and triggers appropriate vibration patterns
  * when the state escalates or changes.
  */
-object WearHapticFeedback {
+@Singleton
+class WearHapticFeedback @Inject constructor() {
 
-    private const val TAG = "WearHapticFeedback"
+    private companion object {
+        const val TAG = "WearHapticFeedback"
+    }
 
     private var previousAlarmState: WearAlarmState? = null
 
@@ -56,12 +61,10 @@ object WearHapticFeedback {
                 )
             }
             previous.ordinal < newState.ordinal -> {
-                // Any other escalation: single short tap
                 Log.d(TAG, "Escalation: $previous → $newState")
                 VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE)
             }
             else -> {
-                // De-escalation: no haptic
                 Log.d(TAG, "De-escalation: $previous → $newState (no haptic)")
                 null
             }

@@ -60,7 +60,7 @@ class SettingsScreenTest {
 
     @Test
     fun settingsScreen_displaysLanguageOption() {
-        composeTestRule.onNodeWithText("Language").performScrollTo()
+        composeTestRule.scrollToText("Language")
         composeTestRule.assertTextDisplayed("Language")
         composeTestRule.assertTextDisplayed("English")
         composeTestRule.assertTextDisplayed("Polski")
@@ -68,14 +68,14 @@ class SettingsScreenTest {
 
     @Test
     fun settingsScreen_displaysNightFilter() {
-        composeTestRule.onNodeWithText("Theme").performScrollTo()
+        composeTestRule.scrollToText("Theme")
         composeTestRule.assertTextDisplayed("Theme")
         composeTestRule.assertTextDisplayed("Choose app appearance")
     }
 
     @Test
     fun settingsScreen_nightFilterToggleClickable() {
-        composeTestRule.onNodeWithText("Theme").performScrollTo()
+        composeTestRule.scrollToText("Theme")
         // Theme mode uses segmented buttons; verify one is clickable
         composeTestRule.onNodeWithText("Dark", substring = true).performClick()
         composeTestRule.waitForIdle()
@@ -83,13 +83,13 @@ class SettingsScreenTest {
 
     @Test
     fun settingsScreen_displaysGpsInterval() {
-        composeTestRule.onNodeWithText("GPS interval").performScrollTo()
+        composeTestRule.scrollToText("GPS interval")
         composeTestRule.assertTextDisplayed("GPS interval")
     }
 
     @Test
     fun settingsScreen_displaysAppInfo() {
-        composeTestRule.onNodeWithText("OpenAnchor v", substring = true).performScrollTo().assertIsDisplayed()
+        composeTestRule.scrollToText("OpenAnchor v").assertIsDisplayed()
     }
 
     @Test

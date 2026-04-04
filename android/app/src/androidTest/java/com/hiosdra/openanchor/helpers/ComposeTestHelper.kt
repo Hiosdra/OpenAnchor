@@ -6,9 +6,9 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextDisplayed(text: String) {
+    waitForText(text) // Wait for Compose hierarchy and text node to appear
     val nodes = onAllNodesWithText(text, substring = true, ignoreCase = true)
     val count = nodes.fetchSemanticsNodes().size
-    if (count == 0) throw AssertionError("No nodes found with text containing '$text'")
     for (i in 0 until count) {
         try {
             nodes[i].assertIsDisplayed()
@@ -25,9 +25,13 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
     waitUntil(timeoutMs) {
-        onAllNodesWithText(text, substring = true, ignoreCase = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+        try {
+            onAllNodesWithText(text, substring = true, ignoreCase = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        } catch (_: IllegalStateException) {
+            false // Compose hierarchy not ready yet, keep waiting
+        }
     }
     return onAllNodesWithText(text, substring = true, ignoreCase = true).onFirst()
 }
@@ -37,14 +41,19 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.w
     timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
     waitUntil(timeoutMs) {
-        onAllNodesWithTag(tag)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+        try {
+            onAllNodesWithTag(tag)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        } catch (_: IllegalStateException) {
+            false
+        }
     }
     return onNodeWithTag(tag)
 }
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTagDisplayed(tag: String) {
+    waitForTag(tag)
     onNodeWithTag(tag)
         .assertIsDisplayed()
 }
@@ -59,6 +68,17 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
 }
 
 /**
+ * Wait for a text node to appear, then scroll to it.
+ * Resilient to transient "No compose hierarchies found" errors on slow emulators.
+ */
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.scrollToText(
+    text: String,
+    timeoutMs: Long = 15_000
+): SemanticsNodeInteraction {
+    return waitForText(text, timeoutMs).performScrollTo()
+}
+
+/**
  * With GrantPermissionRule granting all permissions (including CAMERA), the onboarding
  * auto-completes and navigates to Home. This helper just waits for "Drop Anchor" to appear.
  * OceanBackground's infinite animations are disabled on CI (animator_duration_scale=0),
@@ -66,8 +86,12 @@ fun SemanticsNodeInteraction.tryPerformScrollTo(): SemanticsNodeInteraction {
  */
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.skipOnboardingIfPresent() {
     waitUntil(30_000) {
-        onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+        try {
+            onAllNodesWithText("Drop Anchor", substring = true, ignoreCase = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        } catch (_: IllegalStateException) {
+            false // Compose hierarchy not ready yet, keep waiting
+        }
     }
 }

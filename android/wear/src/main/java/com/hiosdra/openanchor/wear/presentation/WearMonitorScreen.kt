@@ -39,9 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Text
 import com.hiosdra.openanchor.wear.R
 import com.hiosdra.openanchor.wear.data.WearAlarmState
-import com.hiosdra.openanchor.wear.data.WearConnectionManager
 import com.hiosdra.openanchor.wear.data.WearMonitorState
-import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
 import kotlinx.coroutines.delay
 import com.google.android.horologist.compose.ambient.AmbientState
 
@@ -65,9 +63,9 @@ private const val INFO_MODE_COUNT = 3
 private const val DEFAULT_MAX_RADIUS_METERS = 50.0
 
 @Composable
-fun WearMonitorScreen() {
-    val state by WearMonitorStateHolder.state.collectAsState()
-    val isConnected by WearConnectionManager.connected.collectAsState()
+fun WearMonitorScreen(viewModel: WearMonitorViewModel) {
+    val state by viewModel.state.collectAsState()
+    val isConnected by viewModel.connected.collectAsState()
     val ambientState = LocalAmbientState.current
     val isAmbient = ambientState is AmbientState.Ambient
 

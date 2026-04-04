@@ -12,27 +12,35 @@ import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUp
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.hiosdra.openanchor.wear.data.WearMonitorStateHolder
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 
 /**
  * Complication data source that displays anchor monitoring info on watch faces.
  *
- * Supported complication types:
- * - SHORT_TEXT: Shows distance in meters (e.g., "42m")
- * - LONG_TEXT: Shows distance with alarm state (e.g., "42m — SAFE")
- * - RANGED_VALUE: Shows distance as percentage of max radius (100m default)
- *
- * Registered in AndroidManifest.xml with BIND_COMPLICATION_PROVIDER permission.
- * Live updates are pushed via [requestComplicationUpdate] when monitor state changes.
+ * Uses Hilt EntryPoint for dependency injection since SuspendingComplicationDataSourceService
+ * does not support @AndroidEntryPoint directly.
  */
 class WearComplicationService : SuspendingComplicationDataSourceService() {
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface ComplicationEntryPoint {
+        fun stateHolder(): WearMonitorStateHolder
+    }
+
+    private val stateHolder: WearMonitorStateHolder by lazy {
+        EntryPointAccessors.fromApplication(
+            applicationContext,
+            ComplicationEntryPoint::class.java
+        ).stateHolder()
+    }
 
     companion object {
         private const val MAX_RADIUS_METERS = 100f
 
-        /**
-         * Request all active complications to update with fresh data.
-         * Call this from [AnchorDataListenerService] when new monitor state arrives.
-         */
         fun requestComplicationUpdate(context: Context) {
             val requester = ComplicationDataSourceUpdateRequester.create(
                 context,
@@ -73,7 +81,7 @@ class WearComplicationService : SuspendingComplicationDataSourceService() {
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
-        val state = WearMonitorStateHolder.state.value
+        val state = stateHolder.state.value
 
         return when (request.complicationType) {
             ComplicationType.SHORT_TEXT -> {

@@ -39,7 +39,7 @@ class CrewWatchScreenTest {
 
     private fun navigateToCrewWatch() {
         composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.onNodeWithText("Crew Watch", substring = true).performScrollTo()
+        composeTestRule.scrollToText("Crew Watch")
         composeTestRule.waitForText("Crew Watch").performClick()
         composeTestRule.waitForText("Watch schedule and timer")
     }
@@ -90,7 +90,7 @@ class CrewWatchScreenTest {
 
     @Test
     fun crewWatchScreen_showsCrewMemberInput() {
-        composeTestRule.onNodeWithText("Crew member").performScrollTo()
+        composeTestRule.scrollToText("Crew member")
         composeTestRule.assertTextDisplayed("Crew member")
     }
 

@@ -5,6 +5,8 @@ import com.google.android.gms.wearable.DataMap
 import com.hiosdra.openanchor.wear.data.DataPaths
 import com.hiosdra.openanchor.wear.data.WearAlarmState
 import com.hiosdra.openanchor.wear.data.WearMonitorState
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Parses Wearable Data Layer [DataMap] into [WearMonitorState].
@@ -12,9 +14,12 @@ import com.hiosdra.openanchor.wear.data.WearMonitorState
  * Extracted from [AnchorDataListenerService] so the parsing logic can be
  * unit-tested without mocking the WearableListenerService.
  */
-object WearDataParser {
+@Singleton
+class WearDataParser @Inject constructor() {
 
-    private const val TAG = "WearDataParser"
+    private companion object {
+        const val TAG = "WearDataParser"
+    }
 
     /**
      * Parse a [DataMap] received from the phone's monitor-state DataItem.

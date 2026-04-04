@@ -39,7 +39,7 @@ class HistoryDetailScreenTest {
 
     private fun navigateToHistory() {
         composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.onNodeWithText("History", substring = true).performScrollTo()
+        composeTestRule.scrollToText("History")
         composeTestRule.waitForText("History").performClick()
         composeTestRule.waitForText("No anchoring history yet")
     }

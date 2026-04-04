@@ -43,7 +43,7 @@ class QRCodeScreenTest {
     // ── Helpers ──────────────────────────────────────────────────────
 
     private fun scrollToAndClick(text: String) {
-        composeTestRule.onNodeWithText(text, substring = true).performScrollTo()
+        composeTestRule.scrollToText(text)
         composeTestRule.waitForIdle()
         composeTestRule.waitForText(text).performClick()
         composeTestRule.waitForIdle()
