@@ -35,7 +35,6 @@ include(":core:ui")
 include(":core:testing")
 
 // Feature modules
-include(":feature:exam")
 include(":feature:monitor")
 include(":feature:history")
 include(":feature:settings")

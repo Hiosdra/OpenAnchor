@@ -23,5 +23,4 @@ sealed class Screen(val route: String) {
     data object CrewWatch : Screen("crewwatch")
     data object AIAdvisor : Screen("ai/advisor")
     data object Logbook : Screen("ai/logbook")
-    data object ExamQuiz : Screen("exam/quiz")
 }

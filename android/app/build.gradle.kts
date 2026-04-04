@@ -77,7 +77,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:network"))
     implementation(project(":core:ui"))
-    implementation(project(":feature:exam"))
+
     implementation(project(":feature:monitor"))
     implementation(project(":feature:history"))
     implementation(project(":feature:settings"))
@@ -221,8 +221,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         // Bound service lifecycle (logic extracted to GpsProcessor/AlarmHandler)
         "**/AnchorMonitorService*.class",
         "**/ServiceBinder*.class",
-        // PDF renderer uses system PdfRenderer + Bitmap (not unit-testable)
-        "**/ExamPdfRenderer*.class",
         // Service orchestrators/managers extracted from AnchorMonitorService
         // (interact with Android services, GPS, alarms — not unit-testable)
         "**/StandaloneMonitorManager*.class",
@@ -276,8 +274,6 @@ tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
         "**/MainActivity*.class",
         "**/AnchorMonitorService*.class",
         "**/ServiceBinder*.class",
-        // PDF renderer uses system PdfRenderer + Bitmap (not unit-testable)
-        "**/ExamPdfRenderer*.class",
         // Service orchestrators/managers extracted from AnchorMonitorService
         "**/StandaloneMonitorManager*.class",
         "**/PairedModeOrchestrator*.class",
