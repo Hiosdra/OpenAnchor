@@ -35,7 +35,6 @@ class ServiceBinder @Inject constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     private val _serviceInstance = MutableStateFlow<AnchorMonitorService?>(null)
-    val serviceInstance: StateFlow<AnchorMonitorService?> = _serviceInstance.asStateFlow()
 
     init {
         // Propagate service monitorState to the interface's monitorState
