@@ -14,26 +14,51 @@ import { PdfRenderer } from '../src/modules/egzamin/pdf-renderer';
 
 // --- helpers ---
 
-function mockCanvas() {
-  const ctx = { drawImage: vi.fn() };
+interface MockCanvasContext {
+  drawImage: ReturnType<typeof vi.fn>;
+}
+
+interface MockCanvas {
+  width: number;
+  height: number;
+  getContext: ReturnType<typeof vi.fn>;
+  toDataURL: ReturnType<typeof vi.fn>;
+  toBlob: ReturnType<typeof vi.fn>;
+  _ctx: MockCanvasContext;
+}
+
+interface MockPage {
+  getViewport: ReturnType<typeof vi.fn>;
+  render: ReturnType<typeof vi.fn>;
+}
+
+interface MockPdfDoc {
+  numPages: number;
+  getPage: ReturnType<typeof vi.fn>;
+  destroy: ReturnType<typeof vi.fn>;
+  _page: MockPage;
+}
+
+function mockCanvas(): MockCanvas {
+  const ctx: MockCanvasContext = { drawImage: vi.fn() };
   return {
     width: 0,
     height: 0,
     getContext: vi.fn(() => ctx),
     toDataURL: vi.fn(() => 'data:image/png;base64,MOCK'),
-    toBlob: vi.fn((cb) => cb(new Blob(['mock'], { type: 'image/png' }))),
+    toBlob: vi.fn((cb: (blob: Blob) => void) => cb(new Blob(['mock'], { type: 'image/png' }))),
     _ctx: ctx,
   };
 }
 
-function mockPage(w = 800, h = 600) {
+function mockPage(w = 800, h = 600): MockPage {
   return {
-    getViewport: vi.fn(({ scale }) => ({ width: w * scale, height: h * scale })),
+    getViewport: vi.fn(({ scale }: { scale: number }) => ({ width: w * scale, height: h * scale })),
     render: vi.fn(() => ({ promise: Promise.resolve() })),
   };
 }
 
-function mockPdfDoc(numPages = 5) {
+function mockPdfDoc(numPages = 5): MockPdfDoc {
   const page = mockPage();
   return {
     numPages,
@@ -44,9 +69,10 @@ function mockPdfDoc(numPages = 5) {
 }
 
 describe('PdfRenderer', () => {
-  let canvases;
-  let origCreateElement;
-  let origCreateObjectURL, origRevokeObjectURL;
+  let canvases: MockCanvas[];
+  let origCreateElement: typeof document.createElement;
+  let origCreateObjectURL: typeof URL.createObjectURL;
+  let origRevokeObjectURL: typeof URL.revokeObjectURL;
 
   beforeEach(() => {
     PdfRenderer._pdfDoc = null;
@@ -63,11 +89,11 @@ describe('PdfRenderer', () => {
 
     canvases = [];
     origCreateElement = document.createElement.bind(document);
-    vi.spyOn(document, 'createElement').mockImplementation((tag) => {
+    vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
       if (tag === 'canvas') {
         const c = mockCanvas();
         canvases.push(c);
-        return c;
+        return c as unknown as HTMLElement;
       }
       return origCreateElement(tag);
     });
@@ -102,7 +128,7 @@ describe('PdfRenderer', () => {
     });
 
     it('should clear the cache on load', async () => {
-      PdfRenderer._cache.set('old', 'val');
+      PdfRenderer._cache.set('old', 'val' as unknown as HTMLCanvasElement);
       const doc = mockPdfDoc();
       mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc) });
 
@@ -138,7 +164,7 @@ describe('PdfRenderer', () => {
   // --- renderPage ---
 
   describe('renderPage', () => {
-    let doc;
+    let doc: MockPdfDoc;
 
     beforeEach(async () => {
       doc = mockPdfDoc();
@@ -155,8 +181,8 @@ describe('PdfRenderer', () => {
 
     it('should set canvas dimensions from viewport', async () => {
       const canvas = await PdfRenderer.renderPage(0, 2.0);
-      expect(canvas.width).toBe(1600);
-      expect(canvas.height).toBe(1200);
+      expect(canvas!.width).toBe(1600);
+      expect(canvas!.height).toBe(1200);
     });
 
     it('should call page.render with correct args', async () => {
@@ -270,7 +296,7 @@ describe('PdfRenderer', () => {
       const doc = mockPdfDoc();
       mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc) });
       await PdfRenderer.loadFromBlob(new Blob(['pdf']));
-      PdfRenderer._cache.set('k', 'v');
+      PdfRenderer._cache.set('k', 'v' as unknown as HTMLCanvasElement);
       PdfRenderer._blobUrls.push('blob:test1', 'blob:test2');
 
       PdfRenderer.unload();
@@ -287,7 +313,7 @@ describe('PdfRenderer', () => {
     });
 
     it('should clear cache even when no PDF was loaded', () => {
-      PdfRenderer._cache.set('k', 'v');
+      PdfRenderer._cache.set('k', 'v' as unknown as HTMLCanvasElement);
       PdfRenderer.unload();
       expect(PdfRenderer._cache.size).toBe(0);
     });
@@ -297,14 +323,14 @@ describe('PdfRenderer', () => {
 
   describe('visibilitychange listener', () => {
     it('should clear cache when document becomes hidden', () => {
-      PdfRenderer._cache.set('k', 'v');
+      PdfRenderer._cache.set('k', 'v' as unknown as HTMLCanvasElement);
       Object.defineProperty(document, 'hidden', { value: true, configurable: true });
       document.dispatchEvent(new Event('visibilitychange'));
       expect(PdfRenderer._cache.size).toBe(0);
     });
 
     it('should not clear cache when document is visible', () => {
-      PdfRenderer._cache.set('k', 'v');
+      PdfRenderer._cache.set('k', 'v' as unknown as HTMLCanvasElement);
       Object.defineProperty(document, 'hidden', { value: false, configurable: true });
       document.dispatchEvent(new Event('visibilitychange'));
       expect(PdfRenderer._cache.size).toBe(1);

@@ -10,59 +10,81 @@ import {
   forceUpdate
 } from '../src/service-worker/sw-utils';
 
+interface MockServiceWorker {
+  postMessage: ReturnType<typeof vi.fn>;
+  state?: string;
+  addEventListener?: ReturnType<typeof vi.fn>;
+  removeEventListener?: ReturnType<typeof vi.fn>;
+}
+
+interface MockRegistration {
+  waiting: MockServiceWorker | null;
+  installing: MockServiceWorker | null;
+  addEventListener: ReturnType<typeof vi.fn>;
+  update?: ReturnType<typeof vi.fn>;
+}
+
+interface MockCaches {
+  keys: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+}
+
 describe('Service Worker Utils', () => {
   describe('isServiceWorkerSupported', () => {
     it('should return true when serviceWorker is in navigator', () => {
-      global.navigator.serviceWorker = {};
+      (globalThis as Record<string, unknown>).navigator = {
+        ...globalThis.navigator,
+        serviceWorker: {},
+      };
       expect(isServiceWorkerSupported()).toBe(true);
     });
 
     it('should return false when serviceWorker is not supported', () => {
-      const original = global.navigator.serviceWorker;
-      delete global.navigator.serviceWorker;
+      const original = (globalThis.navigator as Record<string, unknown>).serviceWorker;
+      delete (globalThis.navigator as Record<string, unknown>).serviceWorker;
 
       expect(isServiceWorkerSupported()).toBe(false);
 
-      global.navigator.serviceWorker = original;
+      (globalThis.navigator as Record<string, unknown>).serviceWorker = original;
     });
   });
 
   describe('clearAppCaches', () => {
     beforeEach(() => {
-      global.caches = {
+      (globalThis as Record<string, unknown>).caches = {
         keys: vi.fn(),
         delete: vi.fn()
       };
     });
 
     it('should clear only openanchor- prefixed caches', async () => {
-      global.caches.keys.mockResolvedValue([
+      (globalThis.caches as MockCaches).keys.mockResolvedValue([
         'openanchor-v1',
         'openanchor-v2',
         'other-cache',
         'some-app-cache'
       ]);
 
-      global.caches.delete.mockResolvedValue(true);
+      (globalThis.caches as MockCaches).delete.mockResolvedValue(true);
 
       await clearAppCaches();
 
-      expect(global.caches.delete).toHaveBeenCalledTimes(2);
-      expect(global.caches.delete).toHaveBeenCalledWith('openanchor-v1');
-      expect(global.caches.delete).toHaveBeenCalledWith('openanchor-v2');
-      expect(global.caches.delete).not.toHaveBeenCalledWith('other-cache');
+      expect((globalThis.caches as MockCaches).delete).toHaveBeenCalledTimes(2);
+      expect((globalThis.caches as MockCaches).delete).toHaveBeenCalledWith('openanchor-v1');
+      expect((globalThis.caches as MockCaches).delete).toHaveBeenCalledWith('openanchor-v2');
+      expect((globalThis.caches as MockCaches).delete).not.toHaveBeenCalledWith('other-cache');
     });
 
     it('should handle no caches gracefully', async () => {
-      global.caches.keys.mockResolvedValue([]);
+      (globalThis.caches as MockCaches).keys.mockResolvedValue([]);
 
       await clearAppCaches();
 
-      expect(global.caches.delete).not.toHaveBeenCalled();
+      expect((globalThis.caches as MockCaches).delete).not.toHaveBeenCalled();
     });
 
     it('should handle caches API not available', async () => {
-      delete global.caches;
+      delete (globalThis as Record<string, unknown>).caches;
 
       await expect(clearAppCaches()).resolves.toBeUndefined();
     });
@@ -70,44 +92,45 @@ describe('Service Worker Utils', () => {
 
   describe('waitForServiceWorkerUpdate', () => {
     it('should resolve true when waiting worker exists', async () => {
-      const registration = {
-        waiting: {},
+      const registration: MockRegistration = {
+        waiting: { postMessage: vi.fn() },
         installing: null,
         addEventListener: vi.fn()
       };
 
-      const result = await waitForServiceWorkerUpdate(registration, 100);
+      const result = await waitForServiceWorkerUpdate(registration as unknown as ServiceWorkerRegistration, 100);
       expect(result).toBe(true);
     });
 
     it('should resolve false on timeout', async () => {
-      const registration = {
+      const registration: MockRegistration = {
         waiting: null,
         installing: null,
         addEventListener: vi.fn()
       };
 
-      const result = await waitForServiceWorkerUpdate(registration, 100);
+      const result = await waitForServiceWorkerUpdate(registration as unknown as ServiceWorkerRegistration, 100);
       expect(result).toBe(false);
     });
 
     it('should wait for installing worker to become installed', async () => {
-      const stateChangeListeners = [];
-      const installing = {
+      const stateChangeListeners: ((event: { target: MockServiceWorker }) => void)[] = [];
+      const installing: MockServiceWorker = {
         state: 'installing',
-        addEventListener: vi.fn((event, listener) => {
+        postMessage: vi.fn(),
+        addEventListener: vi.fn((_event: string, listener: (event: { target: MockServiceWorker }) => void) => {
           stateChangeListeners.push(listener);
         }),
         removeEventListener: vi.fn()
       };
 
-      const registration = {
+      const registration: MockRegistration = {
         waiting: null,
-        installing,
+        installing: installing,
         addEventListener: vi.fn()
       };
 
-      const resultPromise = waitForServiceWorkerUpdate(registration, 5000);
+      const resultPromise = waitForServiceWorkerUpdate(registration as unknown as ServiceWorkerRegistration, 5000);
 
       // Simulate state change to installed
       setTimeout(() => {
@@ -122,14 +145,14 @@ describe('Service Worker Utils', () => {
     });
 
     it('should respect custom timeout value', async () => {
-      const registration = {
+      const registration: MockRegistration = {
         waiting: null,
         installing: null,
         addEventListener: vi.fn()
       };
 
       // Use a very short timeout to verify it's being used
-      const result = await waitForServiceWorkerUpdate(registration, 50);
+      const result = await waitForServiceWorkerUpdate(registration as unknown as ServiceWorkerRegistration, 50);
 
       // Should return false because no update is found
       expect(result).toBe(false);
@@ -149,7 +172,7 @@ describe('Service Worker Utils', () => {
     });
 
     it('should handle undefined banner', () => {
-      expect(() => showUpdateBanner()).not.toThrow();
+      expect(() => showUpdateBanner(undefined as unknown as HTMLElement | null)).not.toThrow();
     });
   });
 
@@ -170,18 +193,18 @@ describe('Service Worker Utils', () => {
 
   describe('handleUpdateClick', () => {
     it('should post SKIP_WAITING message to worker', () => {
-      const newWorker = {
+      const newWorker: MockServiceWorker = {
         postMessage: vi.fn()
       };
 
-      handleUpdateClick(newWorker);
+      handleUpdateClick(newWorker as unknown as ServiceWorker);
 
       expect(newWorker.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
     });
 
     it('should reload when no worker is available', () => {
       const reloadSpy = vi.fn();
-      global.window = { location: { reload: reloadSpy } };
+      (globalThis as Record<string, unknown>).window = { location: { reload: reloadSpy } };
 
       handleUpdateClick(null);
 
@@ -190,17 +213,17 @@ describe('Service Worker Utils', () => {
   });
 
   describe('forceUpdate', () => {
-    let btn;
-    let reloadSpy;
-    let originalLocation;
-    let originalCaches;
+    let btn: HTMLButtonElement;
+    let reloadSpy: ReturnType<typeof vi.fn>;
+    let originalLocation: Location;
+    let originalCaches: CacheStorage;
 
     beforeEach(() => {
       btn = document.createElement('button');
       btn.innerHTML = 'Update';
 
       originalLocation = window.location;
-      originalCaches = global.caches;
+      originalCaches = globalThis.caches;
 
       reloadSpy = vi.fn();
       Object.defineProperty(window, 'location', {
@@ -209,7 +232,7 @@ describe('Service Worker Utils', () => {
         configurable: true
       });
 
-      global.caches = {
+      (globalThis as Record<string, unknown>).caches = {
         keys: vi.fn().mockResolvedValue([]),
         delete: vi.fn().mockResolvedValue(true)
       };
@@ -221,7 +244,7 @@ describe('Service Worker Utils', () => {
         writable: true,
         configurable: true
       });
-      global.caches = originalCaches;
+      (globalThis as Record<string, unknown>).caches = originalCaches;
     });
 
     it('should return early when btn is null', async () => {
@@ -230,8 +253,8 @@ describe('Service Worker Utils', () => {
     });
 
     it('should reload page when service worker is not supported', async () => {
-      const original = navigator.serviceWorker;
-      delete global.navigator.serviceWorker;
+      const original = (navigator as Record<string, unknown>).serviceWorker;
+      delete (globalThis.navigator as Record<string, unknown>).serviceWorker;
 
       await forceUpdate(btn);
 
@@ -239,11 +262,11 @@ describe('Service Worker Utils', () => {
       expect(btn.classList.contains('updating')).toBe(true);
       expect(reloadSpy).toHaveBeenCalled();
 
-      global.navigator.serviceWorker = original;
+      (globalThis.navigator as Record<string, unknown>).serviceWorker = original;
     });
 
     it('should reload page when no registration is found', async () => {
-      global.navigator.serviceWorker = {
+      (globalThis.navigator as Record<string, unknown>).serviceWorker = {
         getRegistration: vi.fn().mockResolvedValue(undefined)
       };
 
@@ -255,7 +278,7 @@ describe('Service Worker Utils', () => {
 
     it('should post SKIP_WAITING when registration has waiting worker', async () => {
       const postMessageSpy = vi.fn();
-      global.navigator.serviceWorker = {
+      (globalThis.navigator as Record<string, unknown>).serviceWorker = {
         getRegistration: vi.fn().mockResolvedValue({
           waiting: { postMessage: postMessageSpy }
         })
@@ -270,13 +293,13 @@ describe('Service Worker Utils', () => {
     it('should post SKIP_WAITING when update found with waiting worker', async () => {
       const postMessageSpy = vi.fn();
       const registration = {
-        waiting: null,
+        waiting: null as MockServiceWorker | null,
         installing: null,
         update: vi.fn().mockResolvedValue(undefined),
         addEventListener: vi.fn()
       };
 
-      global.navigator.serviceWorker = {
+      (globalThis.navigator as Record<string, unknown>).serviceWorker = {
         getRegistration: vi.fn().mockResolvedValue(registration)
       };
 
@@ -300,7 +323,7 @@ describe('Service Worker Utils', () => {
         addEventListener: vi.fn()
       };
 
-      global.navigator.serviceWorker = {
+      (globalThis.navigator as Record<string, unknown>).serviceWorker = {
         getRegistration: vi.fn().mockResolvedValue(registration)
       };
 
@@ -313,7 +336,7 @@ describe('Service Worker Utils', () => {
 
     it('should restore button state and re-throw on error', async () => {
       const testError = new Error('update failed');
-      global.navigator.serviceWorker = {
+      (globalThis.navigator as Record<string, unknown>).serviceWorker = {
         getRegistration: vi.fn().mockRejectedValue(testError)
       };
 

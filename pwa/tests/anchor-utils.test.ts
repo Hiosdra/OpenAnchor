@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import type { Position } from '../src/shared/types';
 import {
   calculateDistance,
   ALARM_STATES,
@@ -194,7 +195,7 @@ describe('Anchor Utils - GPS Calculations', () => {
   describe('calculateSOG', () => {
     it('should calculate speed over ground', () => {
       const now = Date.now();
-      const positions = [
+      const positions: Position[] = [
         { lat: 50.0, lon: 0.0, timestamp: now - 1000 },
         { lat: 50.001, lon: 0.0, timestamp: now }
       ];
@@ -208,14 +209,14 @@ describe('Anchor Utils - GPS Calculations', () => {
     });
 
     it('should return 0 for insufficient position data', () => {
-      const positions = [{ lat: 50.0, lon: 0.0, timestamp: Date.now() }];
+      const positions: Position[] = [{ lat: 50.0, lon: 0.0, timestamp: Date.now() }];
       const sog = calculateSOG(positions);
       expect(sog).toBe(0);
     });
 
     it('should return 0 for same position', () => {
       const now = Date.now();
-      const positions = [
+      const positions: Position[] = [
         { lat: 50.0, lon: 0.0, timestamp: now - 1000 },
         { lat: 50.0, lon: 0.0, timestamp: now }
       ];
@@ -226,7 +227,7 @@ describe('Anchor Utils - GPS Calculations', () => {
 
     it('should use only last two positions', () => {
       const now = Date.now();
-      const positions = [
+      const positions: Position[] = [
         { lat: 49.0, lon: 0.0, timestamp: now - 3000 },
         { lat: 49.5, lon: 0.0, timestamp: now - 2000 },
         { lat: 50.0, lon: 0.0, timestamp: now - 1000 },
@@ -239,7 +240,7 @@ describe('Anchor Utils - GPS Calculations', () => {
 
     it('should round to 1 decimal place', () => {
       const now = Date.now();
-      const positions = [
+      const positions: Position[] = [
         { lat: 50.0, lon: 0.0, timestamp: now - 1000 },
         { lat: 50.0001, lon: 0.0, timestamp: now }
       ];
@@ -253,7 +254,7 @@ describe('Anchor Utils - GPS Calculations', () => {
   describe('calculateCOG', () => {
     it('should calculate course over ground', () => {
       const now = Date.now();
-      const positions = [
+      const positions: Position[] = [
         { lat: 50.0, lon: 0.0, timestamp: now - 1000 },
         { lat: 51.0, lon: 0.0, timestamp: now }
       ];
@@ -265,14 +266,14 @@ describe('Anchor Utils - GPS Calculations', () => {
     });
 
     it('should return 0 for insufficient data', () => {
-      const positions = [{ lat: 50.0, lon: 0.0, timestamp: Date.now() }];
+      const positions: Position[] = [{ lat: 50.0, lon: 0.0, timestamp: Date.now() }];
       const cog = calculateCOG(positions);
       expect(cog).toBe(0);
     });
 
     it('should use only last two positions', () => {
       const now = Date.now();
-      const positions = [
+      const positions: Position[] = [
         { lat: 49.0, lon: 0.0, timestamp: now - 3000 },
         { lat: 50.0, lon: 0.0, timestamp: now - 1000 },
         { lat: 50.0, lon: 1.0, timestamp: now }
@@ -308,10 +309,10 @@ describe('Anchor Utils - GPS Calculations', () => {
     });
 
     it('should reject non-numeric values', () => {
-      expect(isValidCoordinates('50', 0)).toBe(false);
-      expect(isValidCoordinates(0, '10')).toBe(false);
-      expect(isValidCoordinates(null, 0)).toBe(false);
-      expect(isValidCoordinates(0, undefined)).toBe(false);
+      expect(isValidCoordinates('50' as unknown as number, 0)).toBe(false);
+      expect(isValidCoordinates(0, '10' as unknown as number)).toBe(false);
+      expect(isValidCoordinates(null as unknown as number, 0)).toBe(false);
+      expect(isValidCoordinates(0, undefined as unknown as number)).toBe(false);
     });
 
     it('should accept boundary values', () => {

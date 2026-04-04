@@ -14,13 +14,13 @@ import type { GPXSession, GPXTrackPoint, CSVTrackPoint, ScheduleItem } from '../
 
 // ─── formatDuration ─────────────────────────────────────────────────
 describe('formatDuration', () => {
-  it('returns "0m" for 0 ms', () => {
-    expect(formatDuration(0)).toBe('0m');
+  it('returns seconds for 0 ms', () => {
+    expect(formatDuration(0)).toBe('0s');
   });
 
-  it('returns "0m" for values less than one minute', () => {
-    expect(formatDuration(30_000)).toBe('0m');
-    expect(formatDuration(59_999)).toBe('0m');
+  it('returns seconds for values less than one minute', () => {
+    expect(formatDuration(30_000)).toBe('30s');
+    expect(formatDuration(59_999)).toBe('59s');
   });
 
   it('returns minutes only when less than one hour', () => {

@@ -1,5 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
+declare global {
+  interface Window {
+    toggleBetaMode: (...args: unknown[]) => void;
+    openSettings: (...args: unknown[]) => void;
+    closeSettings: (...args: unknown[]) => void;
+    closeSettingsOnBackdrop: (...args: unknown[]) => void;
+    openModule: (...args: unknown[]) => void;
+  }
+}
+
 /**
  * Integration tests for dashboard functions global exposure
  *
@@ -11,11 +21,11 @@ import { describe, it, expect, beforeEach } from 'vitest';
 describe('Dashboard - Global Function Exposure (Regression)', () => {
   beforeEach(() => {
     // Clean up any previously set global functions
-    delete window.toggleBetaMode;
-    delete window.openSettings;
-    delete window.closeSettings;
-    delete window.closeSettingsOnBackdrop;
-    delete window.openModule;
+    delete (window as Partial<Window>).toggleBetaMode;
+    delete (window as Partial<Window>).openSettings;
+    delete (window as Partial<Window>).closeSettings;
+    delete (window as Partial<Window>).closeSettingsOnBackdrop;
+    delete (window as Partial<Window>).openModule;
   });
 
   describe('Required global functions for onclick handlers', () => {
@@ -96,8 +106,8 @@ describe('Dashboard - Global Function Exposure (Regression)', () => {
 
       // Mock window.location
       const originalHref = window.location.href;
-      delete window.location;
-      window.location = { href: originalHref };
+      delete (window as { location?: unknown }).location;
+      window.location = { href: originalHref } as Location;
 
       // Call from global scope as onclick handler would
       window.openModule('modules/anchor/index.html');
@@ -111,7 +121,7 @@ describe('Dashboard - Global Function Exposure (Regression)', () => {
 
       // Create mock modal
       document.body.innerHTML = '<div id="settingsModal"></div>';
-      const modal = document.getElementById('settingsModal');
+      const modal = document.getElementById('settingsModal')!;
 
       // Call from global scope
       window.openSettings();

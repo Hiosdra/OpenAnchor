@@ -2,10 +2,7 @@
  * Anchor module types
  */
 
-import type { AlarmStates, Position } from '../../shared/types/index';
-
-export type { Position };
-export type { AlarmStates };
+import type { Position } from '../../shared/types/index';
 
 export interface AnchorConfig {
   radius: number;

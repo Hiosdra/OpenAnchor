@@ -13,13 +13,54 @@ const swCompiled = buildSync({
 const swSource = swCompiled.outputFiles[0].text;
 const CACHE_NAME = 'openanchor-superapp-v10';
 
-function createServiceWorkerEnvironment() {
-  const listeners = new Map();
-  const cache = {
+interface MockCache {
+  addAll: ReturnType<typeof vi.fn>;
+  put: ReturnType<typeof vi.fn>;
+}
+
+interface MockCaches {
+  open: ReturnType<typeof vi.fn>;
+  match: ReturnType<typeof vi.fn>;
+  keys: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+}
+
+interface WindowClient {
+  postMessage: ReturnType<typeof vi.fn>;
+}
+
+interface SWContext {
+  Promise: typeof Promise;
+  URL: typeof URL;
+  Response: typeof Response;
+  console: typeof console;
+  setTimeout: typeof setTimeout;
+  clearTimeout: typeof clearTimeout;
+  caches: MockCaches;
+  fetch: ReturnType<typeof vi.fn>;
+  clients: {
+    openWindow: ReturnType<typeof vi.fn>;
+  };
+  self: {
+    addEventListener: ReturnType<typeof vi.fn>;
+    skipWaiting: ReturnType<typeof vi.fn>;
+    clients: {
+      claim: ReturnType<typeof vi.fn>;
+      matchAll: ReturnType<typeof vi.fn>;
+    };
+  };
+  cache: MockCache;
+  windowClients: WindowClient[];
+  getHandler(type: string): (event: Record<string, unknown>) => void;
+}
+
+function createServiceWorkerEnvironment(): SWContext {
+  const listeners = new Map<string, (event: Record<string, unknown>) => void>();
+  const cache: MockCache = {
     addAll: vi.fn().mockResolvedValue(undefined),
     put: vi.fn().mockResolvedValue(undefined),
   };
-  const windowClients = [{ postMessage: vi.fn() }];
+  const windowClients: WindowClient[] = [{ postMessage: vi.fn() }];
 
   const context = {
     Promise,
@@ -39,7 +80,7 @@ function createServiceWorkerEnvironment() {
       openWindow: vi.fn().mockResolvedValue(undefined),
     },
     self: {
-      addEventListener: vi.fn((type, handler) => {
+      addEventListener: vi.fn((type: string, handler: (event: Record<string, unknown>) => void) => {
         listeners.set(type, handler);
       }),
       skipWaiting: vi.fn().mockResolvedValue(undefined),
@@ -56,7 +97,7 @@ function createServiceWorkerEnvironment() {
     ...context,
     cache,
     windowClients,
-    getHandler(type) {
+    getHandler(type: string) {
       const handler = listeners.get(type);
       if (!handler) {
         throw new Error(`Missing ${type} handler`);
@@ -66,11 +107,14 @@ function createServiceWorkerEnvironment() {
   };
 }
 
-async function runWaitUntil(handler, event = {}) {
-  const pending = [];
+async function runWaitUntil(
+  handler: (event: Record<string, unknown>) => void,
+  event: Record<string, unknown> = {}
+): Promise<void> {
+  const pending: Promise<unknown>[] = [];
   handler({
     ...event,
-    waitUntil(promise) {
+    waitUntil(promise: Promise<unknown>) {
       pending.push(promise);
       return promise;
     },
@@ -78,16 +122,19 @@ async function runWaitUntil(handler, event = {}) {
   await Promise.all(pending);
 }
 
-async function runFetch(handler, request) {
-  let responsePromise;
+async function runFetch(
+  handler: (event: Record<string, unknown>) => void,
+  request: Record<string, unknown>
+): Promise<Response> {
+  let responsePromise: Promise<Response> | undefined;
   handler({
     request,
-    respondWith(promise) {
+    respondWith(promise: Promise<Response>) {
       responsePromise = promise;
     },
   });
   expect(responsePromise).toBeDefined();
-  return responsePromise;
+  return responsePromise!;
 }
 
 describe('Service Worker Core Functionality', () => {
@@ -137,7 +184,7 @@ describe('Service Worker Core Functionality', () => {
     const env = createServiceWorkerEnvironment();
     const shellResponse = new Response('<html>shell</html>');
 
-    env.caches.match.mockImplementation((request) => {
+    env.caches.match.mockImplementation((request: string) => {
       if (request === './index.html') return Promise.resolve(undefined);
       if (request === './') return Promise.resolve(shellResponse);
       return Promise.resolve(undefined);

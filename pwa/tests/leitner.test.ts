@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { LeitnerQuestionData, LeitnerState, ExamQuestion } from '../src/shared/types';
 import {
   LEITNER_INTERVALS,
   initializeLeitnerQuestion,
@@ -26,7 +27,7 @@ describe('Leitner System - Spaced Repetition', () => {
 
   describe('advanceQuestion', () => {
     it('should advance from box 1 to box 2', () => {
-      const data = { box: 1, lastReview: null, reviewCount: 0 };
+      const data: LeitnerQuestionData = { box: 1, lastReview: null, reviewCount: 0 };
       const advanced = advanceQuestion(data);
 
       expect(advanced.box).toBe(2);
@@ -35,7 +36,7 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should advance from box 4 to box 5', () => {
-      const data = { box: 4, lastReview: Date.now(), reviewCount: 3 };
+      const data: LeitnerQuestionData = { box: 4, lastReview: Date.now(), reviewCount: 3 };
       const advanced = advanceQuestion(data);
 
       expect(advanced.box).toBe(5);
@@ -43,7 +44,7 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should not advance beyond box 5', () => {
-      const data = { box: 5, lastReview: Date.now(), reviewCount: 10 };
+      const data: LeitnerQuestionData = { box: 5, lastReview: Date.now(), reviewCount: 10 };
       const advanced = advanceQuestion(data);
 
       expect(advanced.box).toBe(5);
@@ -52,7 +53,7 @@ describe('Leitner System - Spaced Repetition', () => {
 
     it('should update lastReview timestamp', () => {
       const before = Date.now();
-      const data = { box: 1, lastReview: null, reviewCount: 0 };
+      const data: LeitnerQuestionData = { box: 1, lastReview: null, reviewCount: 0 };
       const advanced = advanceQuestion(data);
       const after = Date.now();
 
@@ -61,13 +62,13 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should default box to 1 when missing', () => {
-      const data = { lastReview: null, reviewCount: 0 };
+      const data = { lastReview: null, reviewCount: 0 } as unknown as LeitnerQuestionData;
       const advanced = advanceQuestion(data);
       expect(advanced.box).toBe(2);
     });
 
     it('should default reviewCount to 0 when missing', () => {
-      const data = { box: 2, lastReview: Date.now() };
+      const data = { box: 2, lastReview: Date.now() } as unknown as LeitnerQuestionData;
       const advanced = advanceQuestion(data);
       expect(advanced.reviewCount).toBe(1);
     });
@@ -75,7 +76,7 @@ describe('Leitner System - Spaced Repetition', () => {
 
   describe('resetQuestion', () => {
     it('should reset to box 1', () => {
-      const data = { box: 5, lastReview: Date.now(), reviewCount: 10 };
+      const data: LeitnerQuestionData = { box: 5, lastReview: Date.now(), reviewCount: 10 };
       const reset = resetQuestion(data);
 
       expect(reset.box).toBe(1);
@@ -83,21 +84,21 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should update lastReview timestamp', () => {
-      const data = { box: 3, lastReview: 1000, reviewCount: 5 };
+      const data: LeitnerQuestionData = { box: 3, lastReview: 1000, reviewCount: 5 };
       const reset = resetQuestion(data);
 
       expect(reset.lastReview).toBeGreaterThan(1000);
     });
 
     it('should maintain reviewCount increment', () => {
-      const data = { box: 4, lastReview: Date.now(), reviewCount: 7 };
+      const data: LeitnerQuestionData = { box: 4, lastReview: Date.now(), reviewCount: 7 };
       const reset = resetQuestion(data);
 
       expect(reset.reviewCount).toBe(8);
     });
 
     it('should default reviewCount to 0 when missing', () => {
-      const data = { box: 3, lastReview: Date.now() };
+      const data = { box: 3, lastReview: Date.now() } as unknown as LeitnerQuestionData;
       const reset = resetQuestion(data);
       expect(reset.reviewCount).toBe(1);
     });
@@ -105,34 +106,34 @@ describe('Leitner System - Spaced Repetition', () => {
 
   describe('isDueForReview', () => {
     it('should return true for never-reviewed questions', () => {
-      const data = { box: 1, lastReview: null, reviewCount: 0 };
+      const data: LeitnerQuestionData = { box: 1, lastReview: null, reviewCount: 0 };
       expect(isDueForReview(data)).toBe(true);
     });
 
     it('should return true when interval has passed (box 1)', () => {
       const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000 + 1000);
-      const data = { box: 1, lastReview: oneDayAgo, reviewCount: 1 };
+      const data: LeitnerQuestionData = { box: 1, lastReview: oneDayAgo, reviewCount: 1 };
 
       expect(isDueForReview(data)).toBe(true);
     });
 
     it('should return false when interval has not passed', () => {
       const oneHourAgo = Date.now() - (60 * 60 * 1000);
-      const data = { box: 1, lastReview: oneHourAgo, reviewCount: 1 };
+      const data: LeitnerQuestionData = { box: 1, lastReview: oneHourAgo, reviewCount: 1 };
 
       expect(isDueForReview(data)).toBe(false);
     });
 
     it('should respect box 2 interval (2 days)', () => {
       const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000 + 1000);
-      const data = { box: 2, lastReview: twoDaysAgo, reviewCount: 2 };
+      const data: LeitnerQuestionData = { box: 2, lastReview: twoDaysAgo, reviewCount: 2 };
 
       expect(isDueForReview(data)).toBe(true);
     });
 
     it('should respect box 5 interval (16 days)', () => {
       const fifteenDaysAgo = Date.now() - (15 * 24 * 60 * 60 * 1000);
-      const data = { box: 5, lastReview: fifteenDaysAgo, reviewCount: 5 };
+      const data: LeitnerQuestionData = { box: 5, lastReview: fifteenDaysAgo, reviewCount: 5 };
 
       expect(isDueForReview(data)).toBe(false);
     });
@@ -142,33 +143,33 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should handle undefined lastReview', () => {
-      const data = { box: 3, reviewCount: 0 };
+      const data = { box: 3, reviewCount: 0 } as unknown as LeitnerQuestionData;
       expect(isDueForReview(data)).toBe(true);
     });
 
     it('should default box to 1 when missing', () => {
       const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000 + 1000);
-      const data = { lastReview: oneDayAgo, reviewCount: 1 };
+      const data = { lastReview: oneDayAgo, reviewCount: 1 } as unknown as LeitnerQuestionData;
       expect(isDueForReview(data)).toBe(true);
     });
 
     it('should default interval to 1 for invalid box number', () => {
       const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000 + 1000);
-      const data = { box: 99, lastReview: oneDayAgo, reviewCount: 1 };
+      const data: LeitnerQuestionData = { box: 99, lastReview: oneDayAgo, reviewCount: 1 };
       expect(isDueForReview(data)).toBe(true);
     });
   });
 
   describe('getDueQuestions', () => {
-    const allQuestions = [
-      { id: 'q1', text: 'Question 1' },
-      { id: 'q2', text: 'Question 2' },
-      { id: 'q3', text: 'Question 3' },
-      { id: 'q4', text: 'Question 4' }
+    const allQuestions: ExamQuestion[] = [
+      { id: 'q1', category: 'test' },
+      { id: 'q2', category: 'test' },
+      { id: 'q3', category: 'test' },
+      { id: 'q4', category: 'test' }
     ];
 
     it('should return all questions when none have been reviewed', () => {
-      const leitnerState = { boxes: {} };
+      const leitnerState: LeitnerState = { boxes: {}, lastReview: {} };
       const due = getDueQuestions(leitnerState, allQuestions);
 
       expect(due.length).toBe(4);
@@ -178,12 +179,13 @@ describe('Leitner System - Spaced Repetition', () => {
       const threeDaysAgo = Date.now() - (3 * 24 * 60 * 60 * 1000);
       const oneHourAgo = Date.now() - (60 * 60 * 1000);
 
-      const leitnerState = {
+      const leitnerState: LeitnerState = {
         boxes: {
           q1: { box: 1, lastReview: threeDaysAgo, reviewCount: 1 }, // Due (box 1 needs 1 day)
           q2: { box: 1, lastReview: oneHourAgo, reviewCount: 1 }, // Not due
           q3: { box: 2, lastReview: oneHourAgo, reviewCount: 1 }  // Not due (needs 2 days for box 2)
-        }
+        },
+        lastReview: {}
       };
 
       const due = getDueQuestions(leitnerState, allQuestions);
@@ -194,7 +196,7 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should handle empty question list', () => {
-      const leitnerState = { boxes: {} };
+      const leitnerState: LeitnerState = { boxes: {}, lastReview: {} };
       const due = getDueQuestions(leitnerState, []);
 
       expect(due.length).toBe(0);
@@ -203,15 +205,16 @@ describe('Leitner System - Spaced Repetition', () => {
 
   describe('getLeitnerStats', () => {
     it('should count questions in each box', () => {
-      const leitnerState = {
+      const leitnerState: LeitnerState = {
         boxes: {
-          q1: { box: 1 },
-          q2: { box: 1 },
-          q3: { box: 2 },
-          q4: { box: 3 },
-          q5: { box: 5 },
-          q6: { box: 5 }
-        }
+          q1: { box: 1, lastReview: null, reviewCount: 0 },
+          q2: { box: 1, lastReview: null, reviewCount: 0 },
+          q3: { box: 2, lastReview: null, reviewCount: 0 },
+          q4: { box: 3, lastReview: null, reviewCount: 0 },
+          q5: { box: 5, lastReview: null, reviewCount: 0 },
+          q6: { box: 5, lastReview: null, reviewCount: 0 }
+        },
+        lastReview: {}
       };
 
       const stats = getLeitnerStats(leitnerState);
@@ -227,7 +230,7 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should handle empty state', () => {
-      const leitnerState = { boxes: {} };
+      const leitnerState: LeitnerState = { boxes: {}, lastReview: {} };
       const stats = getLeitnerStats(leitnerState);
 
       expect(stats).toEqual({
@@ -241,18 +244,19 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should handle missing boxes property', () => {
-      const leitnerState = {};
+      const leitnerState = {} as unknown as LeitnerState;
       const stats = getLeitnerStats(leitnerState);
 
       expect(stats.total).toBe(0);
     });
 
     it('should default box to 1 when data.box is missing', () => {
-      const leitnerState = {
+      const leitnerState: LeitnerState = {
         boxes: {
-          q1: { lastReview: Date.now(), reviewCount: 1 },
-          q2: { box: 0, lastReview: Date.now(), reviewCount: 1 }
-        }
+          q1: { lastReview: Date.now(), reviewCount: 1 } as unknown as LeitnerQuestionData,
+          q2: { box: 0, lastReview: Date.now(), reviewCount: 1 } as unknown as LeitnerQuestionData
+        },
+        lastReview: {}
       };
       const stats = getLeitnerStats(leitnerState);
       expect(stats[1]).toBe(2);
@@ -262,7 +266,7 @@ describe('Leitner System - Spaced Repetition', () => {
 
   describe('getNextReviewDate', () => {
     it('should return null for never-reviewed questions', () => {
-      const data = { box: 1, lastReview: null, reviewCount: 0 };
+      const data: LeitnerQuestionData = { box: 1, lastReview: null, reviewCount: 0 };
       const nextDate = getNextReviewDate(data);
 
       expect(nextDate).toBeNull();
@@ -270,20 +274,20 @@ describe('Leitner System - Spaced Repetition', () => {
 
     it('should calculate next review for box 1 (1 day)', () => {
       const now = Date.now();
-      const data = { box: 1, lastReview: now, reviewCount: 1 };
+      const data: LeitnerQuestionData = { box: 1, lastReview: now, reviewCount: 1 };
       const nextDate = getNextReviewDate(data);
 
       const expectedTime = now + (1 * 24 * 60 * 60 * 1000);
-      expect(nextDate.getTime()).toBe(expectedTime);
+      expect(nextDate!.getTime()).toBe(expectedTime);
     });
 
     it('should calculate next review for box 5 (16 days)', () => {
       const now = Date.now();
-      const data = { box: 5, lastReview: now, reviewCount: 5 };
+      const data: LeitnerQuestionData = { box: 5, lastReview: now, reviewCount: 5 };
       const nextDate = getNextReviewDate(data);
 
       const expectedTime = now + (16 * 24 * 60 * 60 * 1000);
-      expect(nextDate.getTime()).toBe(expectedTime);
+      expect(nextDate!.getTime()).toBe(expectedTime);
     });
 
     it('should handle null data', () => {
@@ -293,27 +297,28 @@ describe('Leitner System - Spaced Repetition', () => {
 
     it('should default box to 1 when missing', () => {
       const now = Date.now();
-      const data = { lastReview: now, reviewCount: 1 };
+      const data = { lastReview: now, reviewCount: 1 } as unknown as LeitnerQuestionData;
       const nextDate = getNextReviewDate(data);
       const expectedTime = now + (1 * 24 * 60 * 60 * 1000);
-      expect(nextDate.getTime()).toBe(expectedTime);
+      expect(nextDate!.getTime()).toBe(expectedTime);
     });
 
     it('should default interval to 1 for invalid box number', () => {
       const now = Date.now();
-      const data = { box: 99, lastReview: now, reviewCount: 1 };
+      const data: LeitnerQuestionData = { box: 99, lastReview: now, reviewCount: 1 };
       const nextDate = getNextReviewDate(data);
       const expectedTime = now + (1 * 24 * 60 * 60 * 1000);
-      expect(nextDate.getTime()).toBe(expectedTime);
+      expect(nextDate!.getTime()).toBe(expectedTime);
     });
   });
 
   describe('updateLeitnerState', () => {
     it('should advance question on correct answer', () => {
-      const leitnerState = {
+      const leitnerState: LeitnerState = {
         boxes: {
           q1: { box: 1, lastReview: Date.now(), reviewCount: 0 }
-        }
+        },
+        lastReview: {}
       };
 
       const updated = updateLeitnerState(leitnerState, 'q1', true);
@@ -323,10 +328,11 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should reset question on incorrect answer', () => {
-      const leitnerState = {
+      const leitnerState: LeitnerState = {
         boxes: {
           q1: { box: 4, lastReview: Date.now(), reviewCount: 5 }
-        }
+        },
+        lastReview: {}
       };
 
       const updated = updateLeitnerState(leitnerState, 'q1', false);
@@ -336,7 +342,7 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should initialize new question', () => {
-      const leitnerState = { boxes: {} };
+      const leitnerState: LeitnerState = { boxes: {}, lastReview: {} };
 
       const updated = updateLeitnerState(leitnerState, 'q1', true);
 
@@ -345,10 +351,11 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should not mutate original state', () => {
-      const leitnerState = {
+      const leitnerState: LeitnerState = {
         boxes: {
           q1: { box: 1, lastReview: Date.now(), reviewCount: 0 }
-        }
+        },
+        lastReview: {}
       };
 
       const original = { ...leitnerState };
@@ -358,11 +365,12 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should preserve other questions in state', () => {
-      const leitnerState = {
+      const leitnerState: LeitnerState = {
         boxes: {
           q1: { box: 1, lastReview: Date.now(), reviewCount: 0 },
           q2: { box: 3, lastReview: Date.now(), reviewCount: 2 }
-        }
+        },
+        lastReview: {}
       };
 
       const updated = updateLeitnerState(leitnerState, 'q1', true);
@@ -372,13 +380,13 @@ describe('Leitner System - Spaced Repetition', () => {
     });
 
     it('should handle missing boxes property in state', () => {
-      const leitnerState = {};
+      const leitnerState = {} as unknown as LeitnerState;
       const updated = updateLeitnerState(leitnerState, 'q1', true);
       expect(updated.boxes.q1.box).toBe(2);
     });
 
     it('should initialize and reset new question on incorrect answer', () => {
-      const leitnerState = { boxes: {} };
+      const leitnerState: LeitnerState = { boxes: {}, lastReview: {} };
       const updated = updateLeitnerState(leitnerState, 'q1', false);
       expect(updated.boxes.q1.box).toBe(1);
       expect(updated.boxes.q1.reviewCount).toBe(1);

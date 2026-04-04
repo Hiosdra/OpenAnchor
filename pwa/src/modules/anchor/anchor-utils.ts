@@ -43,17 +43,9 @@ export interface ParsedLogbook {
   safetyNote: string;
 }
 
-// ── Duration formatting ─────────────────────────────────────────────
+// ── Duration formatting (shared) ────────────────────────────────────
 
-/**
- * Convert milliseconds to a human-readable duration string.
- * Returns "Xh Ym" when hours > 0, otherwise "Xm".
- */
-export function formatDuration(ms: number): string {
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
-}
+export { formatDuration } from '../../shared/utils/format';
 
 // ── Compass direction ───────────────────────────────────────────────
 

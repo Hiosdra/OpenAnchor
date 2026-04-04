@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { WatchSlot, CoverageResult, Locale } from '../types';
 import { defaultSlots, WATCH_TEMPLATES, t } from '../constants';
-import { calculateCoverage } from '../utils/schedule-utils';
+import { calculateCoverage } from '../utils/schedule-logic';
 
 export interface WatchSlotsReturn {
   slots: WatchSlot[];

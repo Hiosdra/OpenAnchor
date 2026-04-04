@@ -10,7 +10,10 @@ import type {
   WatchSlot,
   DaySchedule,
   CoverageResult,
+  Recommendation,
+  WatchTemplate,
 } from '../types';
+import { WATCH_TEMPLATES } from '../constants';
 
 // ---------------------------------------------------------------------------
 // Types specific to schedule-logic
@@ -396,4 +399,110 @@ export function generateSmallCrewSchedule(
   }
 
   return newSchedule;
+}
+
+// ---------------------------------------------------------------------------
+// Debounce utility
+// ---------------------------------------------------------------------------
+
+export function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
+  let timer: ReturnType<typeof setTimeout>;
+  return function (this: unknown, ...args: unknown[]) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  } as T;
+}
+
+// ---------------------------------------------------------------------------
+// Crew filtering
+// ---------------------------------------------------------------------------
+
+export function getActiveCrew(crew: CrewMember[], captainParticipates: boolean): CrewMember[] {
+  return crew.filter((c) => {
+    const role = (c.role || '').toLowerCase();
+    return role !== 'cook' && (captainParticipates || role !== 'captain');
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Watch-system recommendation
+// ---------------------------------------------------------------------------
+
+export function recommendWatchSystem(
+  crew: CrewMember[],
+  captainParticipates = true,
+): Recommendation[] {
+  const activeCrew = getActiveCrew(crew, captainParticipates);
+  const crewSize = activeCrew.length;
+
+  const experiencedCrew = activeCrew.filter((c) => {
+    const role = (c.role || '').toLowerCase();
+    return role === 'captain' || role === 'officer';
+  }).length;
+
+  const scores = Object.entries(WATCH_TEMPLATES).map(([key, template]) => {
+    let score = 0;
+
+    if (crewSize >= template.minCrew && crewSize <= template.optimalCrew + 2) {
+      score += 25;
+      const diff = Math.abs(crewSize - template.optimalCrew);
+      score += Math.max(0, 15 - diff * 3);
+    } else if (crewSize < template.minCrew) {
+      score -= 20;
+    }
+
+    const maxReqCrew = Math.max(...template.slots.map((s) => s.reqCrew));
+    if (maxReqCrew > crewSize) {
+      score -= 30;
+    } else if (maxReqCrew <= crewSize / 2) {
+      score += 10;
+    }
+
+    if (crewSize <= 4) {
+      const slotsCount = template.slots.length;
+      if (slotsCount <= 4) score += 10;
+      if (slotsCount >= 7) score -= 10;
+    }
+
+    if (crewSize >= 8) {
+      const slotsCount = template.slots.length;
+      if (slotsCount >= 6) score += 10;
+    }
+
+    return { key, template, score };
+  });
+
+  scores.sort((a, b) => b.score - a.score);
+
+  return scores.slice(0, 3).map((s) => ({
+    templateKey: s.key,
+    template: s.template,
+    score: s.score,
+    reason: generateRecommendationReason(s, crewSize, experiencedCrew),
+  }));
+}
+
+export function generateRecommendationReason(
+  scoreObj: { template: WatchTemplate; score: number },
+  crewSize: number,
+  experiencedCrew: number,
+): string {
+  const reasons: string[] = [];
+
+  if (crewSize >= scoreObj.template.minCrew && crewSize <= scoreObj.template.optimalCrew + 2) {
+    reasons.push(`Optymalna wielkość załogi (${crewSize} osób)`);
+  }
+
+  const slotsCount = scoreObj.template.slots.length;
+  if (crewSize <= 4 && slotsCount <= 4) {
+    reasons.push('Prosty system dla małej załogi');
+  } else if (crewSize >= 8 && slotsCount >= 6) {
+    reasons.push('Dobre rozłożenie obciążenia dla dużej załogi');
+  }
+
+  if (experiencedCrew >= crewSize * 0.4) {
+    reasons.push('Doświadczona załoga');
+  }
+
+  return reasons.length > 0 ? reasons.join(', ') : 'Uniwersalny system';
 }

@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { SyncOperation } from '../src/shared/types';
 import { SyncQueue } from '../src/shared/storage/sync-queue';
 
 describe('SyncQueue', () => {
-  let queue;
+  let queue: SyncQueue;
 
   beforeEach(() => {
     localStorage.clear();
@@ -28,7 +29,7 @@ describe('SyncQueue', () => {
     });
 
     it('should return parsed queue from localStorage', () => {
-      const data = [{ id: '1', type: 'A', payload: {}, timestamp: 1, retries: 0 }];
+      const data: SyncOperation[] = [{ id: '1', type: 'A', payload: {}, timestamp: 1, retries: 0 }];
       localStorage.setItem('test_queue', JSON.stringify(data));
       expect(queue.getQueue()).toEqual(data);
     });
@@ -98,7 +99,7 @@ describe('SyncQueue', () => {
       queue.enqueue('NEW', { i: 100 });
       const items = queue.getQueue();
       expect(items).toHaveLength(100);
-      expect(items[0].payload.i).toBe(1);
+      expect((items[0].payload as { i: number }).i).toBe(1);
       expect(items[99].type).toBe('NEW');
     });
 
@@ -153,7 +154,7 @@ describe('SyncQueue', () => {
     });
 
     it('should drop operations exceeding MAX_RETRIES (3)', async () => {
-      const op = { id: 'x', type: 'T', payload: {}, timestamp: 1, retries: 3 };
+      const op: SyncOperation = { id: 'x', type: 'T', payload: {}, timestamp: 1, retries: 3 };
       localStorage.setItem('test_queue', JSON.stringify([op]));
 
       const handler = vi.fn().mockRejectedValue(new Error('fail'));
@@ -169,9 +170,9 @@ describe('SyncQueue', () => {
       queue.enqueue('OK2', {});
 
       const handler = vi.fn()
-        .mockResolvedValueOnce()
+        .mockResolvedValueOnce(undefined)
         .mockRejectedValueOnce(new Error('err'))
-        .mockResolvedValueOnce();
+        .mockResolvedValueOnce(undefined);
 
       const result = await queue.processQueue(handler);
       expect(result).toEqual({ processed: 2, failed: 1 });
@@ -206,7 +207,7 @@ describe('SyncQueue', () => {
     it('should persist empty array in localStorage', () => {
       queue.enqueue('A', {});
       queue.clear();
-      expect(JSON.parse(localStorage.getItem('test_queue'))).toEqual([]);
+      expect(JSON.parse(localStorage.getItem('test_queue')!)).toEqual([]);
     });
   });
 });

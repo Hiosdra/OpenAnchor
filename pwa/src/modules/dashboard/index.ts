@@ -70,5 +70,18 @@ export function openModule(url: string): void {
       module: match[1]
     });
   }
+
+  // Try SPA navigation first; fall back to full-page load
+  const { navigateToModule } = await_router_ref;
+  if (navigateToModule && navigateToModule(url)) return;
+
   window.location.href = url;
 }
+
+/**
+ * Lazy reference to the router so the dashboard module doesn't
+ * have a hard import-time dependency on the router.
+ */
+export const await_router_ref: {
+  navigateToModule: ((url: string) => boolean) | null;
+} = { navigateToModule: null };

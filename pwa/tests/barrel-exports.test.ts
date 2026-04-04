@@ -117,7 +117,7 @@ describe('wachtownik barrel (src/modules/wachtownik/index.tsx)', () => {
     expect(mod).toHaveProperty('t');
   });
 
-  it('re-exports schedule-utils', async () => {
+  it('re-exports schedule-logic', async () => {
     const mod = await import('../src/modules/wachtownik/index');
     expect(mod).toHaveProperty('getActiveCrew');
     expect(mod).toHaveProperty('recommendWatchSystem');

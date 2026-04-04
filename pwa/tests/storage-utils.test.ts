@@ -1,26 +1,36 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { StorageUtils } from '../src/shared/storage/local-storage';
 
+interface LocalStorageMock {
+  _store: Record<string, string>;
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+  clear(): void;
+  readonly length: number;
+  key(i: number): string | null;
+}
+
 // The setup.js mock lacks length/key() needed by StorageUtils.keys().
 // Provide a full localStorage mock for these tests.
-function createLocalStorageMock() {
-  const store = {};
+function createLocalStorageMock(): LocalStorageMock {
+  const store: Record<string, string> = {};
   return {
     _store: store,
-    getItem(key) { return key in store ? store[key] : null; },
-    setItem(key, value) { store[key] = String(value); },
-    removeItem(key) { delete store[key]; },
+    getItem(key: string) { return key in store ? store[key] : null; },
+    setItem(key: string, value: string) { store[key] = String(value); },
+    removeItem(key: string) { delete store[key]; },
     clear() { for (const k of Object.keys(store)) delete store[k]; },
     get length() { return Object.keys(store).length; },
-    key(i) { return Object.keys(store)[i] ?? null; },
+    key(i: number) { return Object.keys(store)[i] ?? null; },
   };
 }
 
 describe('StorageUtils', () => {
-  let storage;
+  let storage: StorageUtils;
 
   beforeEach(() => {
-    global.localStorage = createLocalStorageMock();
+    (globalThis as Record<string, unknown>).localStorage = createLocalStorageMock();
     storage = new StorageUtils('test');
   });
 

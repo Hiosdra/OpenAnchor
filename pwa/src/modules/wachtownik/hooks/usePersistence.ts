@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import LZString from 'lz-string';
 import type { CrewMember, WatchSlot, DaySchedule, AppState } from '../types';
-import { debounce } from '../utils/schedule-utils';
+import { debounce } from '../utils/schedule-logic';
 
 export interface PersistenceSetters {
   setCrew: React.Dispatch<React.SetStateAction<CrewMember[]>>;

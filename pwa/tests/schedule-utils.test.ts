@@ -8,7 +8,7 @@ import {
   generateStandardSchedule,
   generateSmallCrewSchedule,
   detectScheduleConflicts,
-} from '../src/modules/wachtownik/utils/schedule-utils';
+} from '../src/modules/wachtownik/utils/schedule-logic';
 import type {
   CrewMember,
   WatchSlot,
@@ -406,7 +406,6 @@ describe('generateSmallCrewSchedule', () => {
 // ---------------------------------------------------------------------------
 describe('detectScheduleConflicts', () => {
   it('detects insufficient rest between watches', () => {
-    const warnSpy = vi.spyOn(console, 'warn');
     const shortRestSlots: WatchSlot[] = [
       { id: '1', start: '00:00', end: '04:00', reqCrew: 1 },
       { id: '2', start: '06:00', end: '10:00', reqCrew: 1 },
@@ -420,28 +419,23 @@ describe('detectScheduleConflicts', () => {
         ],
       },
     ];
-    detectScheduleConflicts(scheduleData, shortRestSlots);
-    // Should warn about 2h rest (less than 6h minimum)
-    expect(warnSpy).toHaveBeenCalled();
-    const warnings = warnSpy.mock.calls.flat().join(' ');
-    expect(warnings).toContain('Schedule conflicts detected');
+    const conflicts = detectScheduleConflicts(scheduleData, shortRestSlots);
+    expect(conflicts.length).toBeGreaterThan(0);
+    expect(conflicts.some((c) => c.type === 'insufficient_rest')).toBe(true);
   });
 
   it('detects consecutive night watches > 3', () => {
-    const warnSpy = vi.spyOn(console, 'warn');
     const nightSlot: WatchSlot = { id: 'n', start: '02:00', end: '06:00', reqCrew: 1 };
     const scheduleData: DaySchedule[] = Array.from({ length: 5 }, (_, i) => ({
       day: i + 1,
       slots: [{ ...nightSlot, assigned: [sailor1] }],
     }));
-    detectScheduleConflicts(scheduleData, [nightSlot]);
-    expect(warnSpy).toHaveBeenCalled();
-    const warnings = JSON.stringify(warnSpy.mock.calls);
-    expect(warnings).toContain('consecutive_night');
+    const conflicts = detectScheduleConflicts(scheduleData, [nightSlot]);
+    expect(conflicts.length).toBeGreaterThan(0);
+    expect(conflicts.some((c) => c.type === 'consecutive_night')).toBe(true);
   });
 
   it('does not warn for well-distributed schedule', () => {
-    const warnSpy = vi.spyOn(console, 'warn');
     const crew = [captain, officer, sailor1, sailor2];
     const daySlots: WatchSlot[] = [
       { id: '1', start: '08:00', end: '14:00', reqCrew: 1 },
@@ -463,13 +457,11 @@ describe('detectScheduleConflicts', () => {
         ],
       },
     ];
-    detectScheduleConflicts(scheduleData, daySlots);
-    // No conflicts expected — 6h rest, no night watches
-    expect(warnSpy).not.toHaveBeenCalled();
+    const conflicts = detectScheduleConflicts(scheduleData, daySlots);
+    expect(conflicts).toHaveLength(0);
   });
 
   it('detects uneven night watch distribution', () => {
-    const warnSpy = vi.spyOn(console, 'warn');
     const nightSlot: WatchSlot = { id: 'n', start: '02:00', end: '06:00', reqCrew: 1 };
     const daySlot: WatchSlot = { id: 'd', start: '14:00', end: '18:00', reqCrew: 1 };
     // sailor1 gets ALL night watches, sailor2 gets none
@@ -480,13 +472,13 @@ describe('detectScheduleConflicts', () => {
         { ...daySlot, assigned: [sailor2] },
       ],
     }));
-    detectScheduleConflicts(scheduleData, [nightSlot, daySlot]);
-    expect(warnSpy).toHaveBeenCalled();
-    const warnings = JSON.stringify(warnSpy.mock.calls);
-    expect(warnings).toContain('uneven_distribution');
+    const conflicts = detectScheduleConflicts(scheduleData, [nightSlot, daySlot]);
+    expect(conflicts.length).toBeGreaterThan(0);
+    expect(conflicts.some((c) => c.type === 'uneven_distribution')).toBe(true);
   });
 
   it('handles empty schedule gracefully', () => {
-    expect(() => detectScheduleConflicts([], [])).not.toThrow();
+    const conflicts = detectScheduleConflicts([], []);
+    expect(conflicts).toHaveLength(0);
   });
 });

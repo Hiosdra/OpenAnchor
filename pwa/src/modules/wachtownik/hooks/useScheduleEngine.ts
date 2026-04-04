@@ -5,7 +5,7 @@ import {
   generateStandardSchedule,
   generateSmallCrewSchedule,
   detectScheduleConflicts,
-} from '../utils/schedule-utils';
+} from '../utils/schedule-logic';
 
 export interface ScheduleEngineReturn {
   schedule: DaySchedule[];

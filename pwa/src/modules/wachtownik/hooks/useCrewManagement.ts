@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { CrewMember, Recommendation } from '../types';
 import { defaultCrew } from '../constants';
-import { getActiveCrew, recommendWatchSystem } from '../utils/schedule-utils';
+import { getActiveCrew, recommendWatchSystem } from '../utils/schedule-logic';
 
 export interface CrewManagementReturn {
   crew: CrewMember[];

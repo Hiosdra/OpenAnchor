@@ -50,7 +50,7 @@ describe('Dashboard - Beta Mode Management', () => {
     });
 
     it('should convert value to string', () => {
-      setBetaMode(1);
+      setBetaMode(1 as unknown as boolean);
       expect(localStorage.getItem(BETA_MODE_KEY)).toBe('1');
     });
   });
@@ -68,7 +68,7 @@ describe('Dashboard - Beta Mode Management', () => {
       setBetaMode(false);
       initBetaMode();
 
-      const anchor = document.getElementById('anchorModule');
+      const anchor = document.getElementById('anchorModule')!;
       expect(anchor.classList.contains('module-hidden')).toBe(true);
     });
 
@@ -76,7 +76,7 @@ describe('Dashboard - Beta Mode Management', () => {
       setBetaMode(true);
       initBetaMode();
 
-      const anchor = document.getElementById('anchorModule');
+      const anchor = document.getElementById('anchorModule')!;
       expect(anchor.classList.contains('module-hidden')).toBe(false);
     });
 
@@ -84,7 +84,7 @@ describe('Dashboard - Beta Mode Management', () => {
       setBetaMode(true);
       initBetaMode();
 
-      const toggle = document.getElementById('betaToggle');
+      const toggle = document.getElementById('betaToggle') as HTMLInputElement;
       expect(toggle.checked).toBe(true);
     });
 
@@ -92,7 +92,7 @@ describe('Dashboard - Beta Mode Management', () => {
       setBetaMode(false);
       initBetaMode();
 
-      const toggle = document.getElementById('betaToggle');
+      const toggle = document.getElementById('betaToggle') as HTMLInputElement;
       expect(toggle.checked).toBe(false);
     });
 
@@ -105,7 +105,7 @@ describe('Dashboard - Beta Mode Management', () => {
       document.body.innerHTML = '<input type="checkbox" id="betaToggle" />';
       setBetaMode(true);
       expect(() => initBetaMode()).not.toThrow();
-      expect(document.getElementById('betaToggle').checked).toBe(true);
+      expect((document.getElementById('betaToggle') as HTMLInputElement).checked).toBe(true);
     });
 
     it('should handle beta enabled with only anchorModule present', () => {
@@ -115,7 +115,7 @@ describe('Dashboard - Beta Mode Management', () => {
       `;
       setBetaMode(true);
       initBetaMode();
-      expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(false);
+      expect(document.getElementById('anchorModule')!.classList.contains('module-hidden')).toBe(false);
     });
   });
 
@@ -128,27 +128,27 @@ describe('Dashboard - Beta Mode Management', () => {
     });
 
     it('should enable beta mode when checkbox is checked', () => {
-      const toggle = document.getElementById('betaToggle');
+      const toggle = document.getElementById('betaToggle') as HTMLInputElement;
       toggle.checked = true;
 
       toggleBetaMode();
 
       expect(isBetaModeEnabled()).toBe(true);
-      expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(false);
+      expect(document.getElementById('anchorModule')!.classList.contains('module-hidden')).toBe(false);
     });
 
     it('should disable beta mode when checkbox is unchecked', () => {
-      const toggle = document.getElementById('betaToggle');
+      const toggle = document.getElementById('betaToggle') as HTMLInputElement;
       toggle.checked = false;
 
       toggleBetaMode();
 
       expect(isBetaModeEnabled()).toBe(false);
-      expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(true);
+      expect(document.getElementById('anchorModule')!.classList.contains('module-hidden')).toBe(true);
     });
 
     it('should persist preference to localStorage', () => {
-      const toggle = document.getElementById('betaToggle');
+      const toggle = document.getElementById('betaToggle') as HTMLInputElement;
       toggle.checked = true;
 
       toggleBetaMode();
@@ -162,19 +162,19 @@ describe('Dashboard - Beta Mode Management', () => {
       `;
       toggleBetaMode();
       expect(isBetaModeEnabled()).toBe(false);
-      expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(true);
+      expect(document.getElementById('anchorModule')!.classList.contains('module-hidden')).toBe(true);
     });
 
     it('should handle enabled with missing module elements', () => {
       document.body.innerHTML = '<input type="checkbox" id="betaToggle" />';
-      document.getElementById('betaToggle').checked = true;
+      (document.getElementById('betaToggle') as HTMLInputElement).checked = true;
       expect(() => toggleBetaMode()).not.toThrow();
       expect(isBetaModeEnabled()).toBe(true);
     });
 
     it('should handle disabled with missing module elements', () => {
       document.body.innerHTML = '<input type="checkbox" id="betaToggle" />';
-      document.getElementById('betaToggle').checked = false;
+      (document.getElementById('betaToggle') as HTMLInputElement).checked = false;
       expect(() => toggleBetaMode()).not.toThrow();
       expect(isBetaModeEnabled()).toBe(false);
     });
@@ -184,9 +184,9 @@ describe('Dashboard - Beta Mode Management', () => {
         <input type="checkbox" id="betaToggle" />
         <div id="anchorModule" class="module-hidden"></div>
       `;
-      document.getElementById('betaToggle').checked = true;
+      (document.getElementById('betaToggle') as HTMLInputElement).checked = true;
       toggleBetaMode();
-      expect(document.getElementById('anchorModule').classList.contains('module-hidden')).toBe(false);
+      expect(document.getElementById('anchorModule')!.classList.contains('module-hidden')).toBe(false);
     });
   });
 });
@@ -199,7 +199,7 @@ describe('Dashboard - Settings Modal', () => {
   describe('openSettings', () => {
     it('should add show class to modal', () => {
       openSettings();
-      const modal = document.getElementById('settingsModal');
+      const modal = document.getElementById('settingsModal')!;
       expect(modal.classList.contains('show')).toBe(true);
     });
 
@@ -211,7 +211,7 @@ describe('Dashboard - Settings Modal', () => {
 
   describe('closeSettings', () => {
     it('should remove show class from modal', () => {
-      const modal = document.getElementById('settingsModal');
+      const modal = document.getElementById('settingsModal')!;
       modal.classList.add('show');
 
       closeSettings();
@@ -227,20 +227,20 @@ describe('Dashboard - Settings Modal', () => {
 
   describe('closeSettingsOnBackdrop', () => {
     it('should close when clicking on backdrop (modal itself)', () => {
-      const modal = document.getElementById('settingsModal');
+      const modal = document.getElementById('settingsModal')!;
       modal.classList.add('show');
 
-      const event = { target: { id: 'settingsModal' } };
+      const event = { target: { id: 'settingsModal' } } as unknown as MouseEvent;
       closeSettingsOnBackdrop(event);
 
       expect(modal.classList.contains('show')).toBe(false);
     });
 
     it('should not close when clicking on content', () => {
-      const modal = document.getElementById('settingsModal');
+      const modal = document.getElementById('settingsModal')!;
       modal.classList.add('show');
 
-      const event = { target: { id: 'settingsContent' } };
+      const event = { target: { id: 'settingsContent' } } as unknown as MouseEvent;
       closeSettingsOnBackdrop(event);
 
       expect(modal.classList.contains('show')).toBe(true);
@@ -254,8 +254,8 @@ describe('Dashboard - Navigation', () => {
       const originalHref = window.location.href;
 
       // Mock window.location.href setter
-      delete window.location;
-      window.location = { href: originalHref };
+      delete (window as { location?: unknown }).location;
+      window.location = { href: originalHref } as Location;
 
       openModule('modules/anchor/index.html');
 

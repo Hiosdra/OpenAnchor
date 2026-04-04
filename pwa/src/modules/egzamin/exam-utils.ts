@@ -24,14 +24,9 @@ export function getAnswerState(
   return 'default';
 }
 
-// -- Time formatting -------------------------------------------------------
+// -- Time formatting (shared) ----------------------------------------------
 
-/** Format seconds as "M:SS" (exam countdown style). */
-export function formatExamTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
+export { formatExamTime } from '../../shared/utils/format';
 
 // -- Exam result calculation -----------------------------------------------
 

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import type { ExamProgress, ExamQuestion } from '../src/shared/types';
 import {
   EXAM_PROGRESS_KEY,
   LEARN_POSITION_KEY,
@@ -26,12 +27,12 @@ describe('Exam Storage - Progress Management', () => {
     });
 
     it('should save and load progress correctly', () => {
-      const progress = {
+      const progress: ExamProgress = {
         answered: {
           q1: { correct: true, userAnswer: 'A' },
           q2: { correct: false, userAnswer: 'B' }
         },
-        stats: { total: 2, correct: 1 }
+        stats: { total: 2, correct: 1, incorrect: 0 }
       };
 
       saveProgress(progress);
@@ -61,7 +62,7 @@ describe('Exam Storage - Progress Management', () => {
       expect(loaded).not.toBeNull();
       expect(loaded).toHaveProperty('questionId', questionId);
       expect(loaded).toHaveProperty('timestamp');
-      expect(typeof loaded.timestamp).toBe('number');
+      expect(typeof loaded!.timestamp).toBe('number');
     });
 
     it('should handle parse errors gracefully', () => {
@@ -76,8 +77,8 @@ describe('Exam Storage - Progress Management', () => {
       const loaded = loadLearnPosition();
       const after = Date.now();
 
-      expect(loaded.timestamp).toBeGreaterThanOrEqual(before);
-      expect(loaded.timestamp).toBeLessThanOrEqual(after);
+      expect(loaded!.timestamp).toBeGreaterThanOrEqual(before);
+      expect(loaded!.timestamp).toBeLessThanOrEqual(after);
     });
   });
 
@@ -133,13 +134,14 @@ describe('Exam Storage - Progress Management', () => {
 describe('Exam Storage - Statistics', () => {
   describe('calculateStats', () => {
     it('should calculate statistics correctly', () => {
-      const progress = {
+      const progress: ExamProgress = {
         answered: {
           q1: { correct: true },
           q2: { correct: true },
           q3: { correct: false },
           q4: { correct: true }
-        }
+        },
+        stats: { correct: 0, incorrect: 0, total: 0 }
       };
 
       const stats = calculateStats(progress);
@@ -153,7 +155,7 @@ describe('Exam Storage - Statistics', () => {
     });
 
     it('should handle empty progress', () => {
-      const progress = { answered: {} };
+      const progress: ExamProgress = { answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } };
       const stats = calculateStats(progress);
 
       expect(stats).toEqual({
@@ -165,11 +167,12 @@ describe('Exam Storage - Statistics', () => {
     });
 
     it('should handle all correct answers', () => {
-      const progress = {
+      const progress: ExamProgress = {
         answered: {
           q1: { correct: true },
           q2: { correct: true }
-        }
+        },
+        stats: { correct: 0, incorrect: 0, total: 0 }
       };
 
       const stats = calculateStats(progress);
@@ -177,11 +180,12 @@ describe('Exam Storage - Statistics', () => {
     });
 
     it('should handle all incorrect answers', () => {
-      const progress = {
+      const progress: ExamProgress = {
         answered: {
           q1: { correct: false },
           q2: { correct: false }
-        }
+        },
+        stats: { correct: 0, incorrect: 0, total: 0 }
       };
 
       const stats = calculateStats(progress);
@@ -189,12 +193,13 @@ describe('Exam Storage - Statistics', () => {
     });
 
     it('should round percentage to nearest integer', () => {
-      const progress = {
+      const progress: ExamProgress = {
         answered: {
           q1: { correct: true },
           q2: { correct: false },
           q3: { correct: false }
-        }
+        },
+        stats: { correct: 0, incorrect: 0, total: 0 }
       };
 
       const stats = calculateStats(progress);
@@ -203,7 +208,7 @@ describe('Exam Storage - Statistics', () => {
   });
 
   describe('calculateCategoryStats', () => {
-    const questions = [
+    const questions: ExamQuestion[] = [
       { id: 'q1', category: 'Navigation' },
       { id: 'q2', category: 'Navigation' },
       { id: 'q3', category: 'Navigation' },
@@ -212,14 +217,15 @@ describe('Exam Storage - Statistics', () => {
     ];
 
     it('should calculate stats by category', () => {
-      const progress = {
+      const progress: ExamProgress = {
         answered: {
           q1: { correct: true },
           q2: { correct: true },
           q3: { correct: false },
           q4: { correct: true },
           q5: { correct: false }
-        }
+        },
+        stats: { correct: 0, incorrect: 0, total: 0 }
       };
 
       const categoryStats = calculateCategoryStats(progress, questions);
@@ -238,10 +244,11 @@ describe('Exam Storage - Statistics', () => {
     });
 
     it('should handle unanswered questions', () => {
-      const progress = {
+      const progress: ExamProgress = {
         answered: {
           q1: { correct: true }
-        }
+        },
+        stats: { correct: 0, incorrect: 0, total: 0 }
       };
 
       const categoryStats = calculateCategoryStats(progress, questions);
@@ -256,19 +263,20 @@ describe('Exam Storage - Statistics', () => {
     });
 
     it('should handle empty progress', () => {
-      const progress = { answered: {} };
+      const progress: ExamProgress = { answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } };
       const categoryStats = calculateCategoryStats(progress, questions);
 
       expect(Object.keys(categoryStats).length).toBe(0);
     });
 
     it('should handle perfect score in a category', () => {
-      const progress = {
+      const progress: ExamProgress = {
         answered: {
           q1: { correct: true },
           q2: { correct: true },
           q3: { correct: true }
-        }
+        },
+        stats: { correct: 0, incorrect: 0, total: 0 }
       };
 
       const categoryStats = calculateCategoryStats(progress, questions);

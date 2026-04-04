@@ -9,34 +9,62 @@ import {
   computeSha256,
   verifyPdfHash,
 } from '../src/shared/storage/indexed-db';
+import type { PdfMetadata } from '../src/shared/types';
+
+// --- IndexedDB mock types ---
+interface MockObjectStore {
+  put(value: unknown, key: string): { onsuccess: (() => void) | null; onerror: (() => void) | null };
+  get(key: string): { result: unknown; onsuccess: (() => void) | null; onerror: (() => void) | null };
+  delete(key: string): { onsuccess: (() => void) | null; onerror: (() => void) | null };
+}
+
+interface MockTransaction {
+  objectStore: () => MockObjectStore;
+  oncomplete: (() => void) | null;
+  onerror: (() => void) | null;
+}
+
+interface MockDB {
+  transaction: () => MockTransaction;
+  close: ReturnType<typeof vi.fn>;
+  objectStoreNames: { contains: () => boolean };
+  createObjectStore: ReturnType<typeof vi.fn>;
+}
+
+interface MockDBRequest {
+  result: MockDB;
+  onsuccess: (() => void) | null;
+  onerror: (() => void) | null;
+  onupgradeneeded: (() => void) | null;
+}
 
 // --- IndexedDB mock ---
-function createMockIDB() {
-  let store = {};
+function createMockIDB(): { store: Record<string, unknown>; clear: () => void } {
+  let store: Record<string, unknown> = {};
 
-  const objectStoreMock = {
-    put(value, key) {
+  const objectStoreMock: MockObjectStore = {
+    put(value: unknown, key: string) {
       store[key] = value;
       return { onsuccess: null, onerror: null };
     },
-    get(key) {
-      const req = { result: store[key] || undefined, onsuccess: null, onerror: null };
+    get(key: string) {
+      const req = { result: store[key] || undefined, onsuccess: null as (() => void) | null, onerror: null as (() => void) | null };
       setTimeout(() => req.onsuccess?.(), 0);
       return req;
     },
-    delete(key) {
+    delete(key: string) {
       delete store[key];
       return { onsuccess: null, onerror: null };
     },
   };
 
-  const txMock = {
+  const txMock: MockTransaction = {
     objectStore: () => objectStoreMock,
     oncomplete: null,
     onerror: null,
   };
 
-  const dbMock = {
+  const dbMock: MockDB = {
     transaction: () => {
       setTimeout(() => txMock.oncomplete?.(), 0);
       return txMock;
@@ -46,14 +74,14 @@ function createMockIDB() {
     createObjectStore: vi.fn(),
   };
 
-  const requestMock = {
+  const requestMock: MockDBRequest = {
     result: dbMock,
     onsuccess: null,
     onerror: null,
     onupgradeneeded: null,
   };
 
-  global.indexedDB = {
+  (globalThis as Record<string, unknown>).indexedDB = {
     open: () => {
       setTimeout(() => requestMock.onsuccess?.(), 0);
       return requestMock;
@@ -64,8 +92,8 @@ function createMockIDB() {
 }
 
 // --- crypto.subtle mock ---
-function setupCryptoMock() {
-  const mockDigest = vi.fn(async (_algo, buffer) => {
+function setupCryptoMock(): void {
+  const mockDigest = vi.fn(async (_algo: string, buffer: ArrayBuffer) => {
     const bytes = new Uint8Array(buffer);
     const hash = new Uint8Array(32);
     for (let i = 0; i < bytes.length; i++) {
@@ -80,7 +108,7 @@ function setupCryptoMock() {
 }
 
 describe('Exam PDF Storage', () => {
-  let mockDb;
+  let mockDb: { store: Record<string, unknown>; clear: () => void };
 
   beforeEach(() => {
     mockDb = createMockIDB();
@@ -100,7 +128,7 @@ describe('Exam PDF Storage', () => {
   describe('savePdfData / loadPdfBlob / loadPdfMeta', () => {
     it('should save and load PDF blob', async () => {
       const blob = new Blob(['test-pdf-content'], { type: 'application/pdf' });
-      const metadata = { hash: 'abc123', filename: 'test.pdf', importDate: '2026-01-01' };
+      const metadata: PdfMetadata = { hash: 'abc123', filename: 'test.pdf', importDate: '2026-01-01' };
 
       await savePdfData(blob, metadata);
       const loadedBlob = await loadPdfBlob();
@@ -110,7 +138,7 @@ describe('Exam PDF Storage', () => {
 
     it('should save and load metadata', async () => {
       const blob = new Blob(['test'], { type: 'application/pdf' });
-      const metadata = { hash: 'abc123', filename: 'test.pdf', importDate: '2026-01-01' };
+      const metadata: PdfMetadata = { hash: 'abc123', filename: 'test.pdf', importDate: '2026-01-01' };
 
       await savePdfData(blob, metadata);
       const loadedMeta = await loadPdfMeta();
@@ -137,7 +165,7 @@ describe('Exam PDF Storage', () => {
 
     it('should return true after importing', async () => {
       const blob = new Blob(['test'], { type: 'application/pdf' });
-      const metadata = { hash: 'abc', filename: 'test.pdf' };
+      const metadata: PdfMetadata = { hash: 'abc', filename: 'test.pdf' };
 
       await savePdfData(blob, metadata);
       const result = await isPdfImported();
@@ -214,7 +242,7 @@ describe('Exam PDF Storage', () => {
 
     it('should match expected hash when content produces it', async () => {
       // Mock crypto to return the expected hash
-      const expectedBytes = [];
+      const expectedBytes: number[] = [];
       for (let i = 0; i < 64; i += 2) {
         expectedBytes.push(parseInt(EXPECTED_PDF_HASH.substring(i, i + 2), 16));
       }
@@ -232,9 +260,9 @@ describe('Exam PDF Storage', () => {
 
   describe('error handling', () => {
     it('loadPdfBlob returns null on IndexedDB error', async () => {
-      global.indexedDB = {
+      (globalThis as Record<string, unknown>).indexedDB = {
         open: () => {
-          const req = { onerror: null, onsuccess: null };
+          const req = { onerror: null as (() => void) | null, onsuccess: null as (() => void) | null };
           setTimeout(() => req.onerror?.(), 0);
           return req;
         },
@@ -245,9 +273,9 @@ describe('Exam PDF Storage', () => {
     });
 
     it('loadPdfMeta returns null on IndexedDB error', async () => {
-      global.indexedDB = {
+      (globalThis as Record<string, unknown>).indexedDB = {
         open: () => {
-          const req = { onerror: null, onsuccess: null };
+          const req = { onerror: null as (() => void) | null, onsuccess: null as (() => void) | null };
           setTimeout(() => req.onerror?.(), 0);
           return req;
         },

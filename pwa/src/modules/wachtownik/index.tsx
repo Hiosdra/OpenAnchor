@@ -6,7 +6,7 @@
 
 export type { CrewMember, WatchSlot, DaySchedule, ScheduleSlot, WatchTemplate, Recommendation, Locale, AppState } from './types';
 export { ROLES, WATCH_TEMPLATES, defaultCrew, defaultSlots, MAX_HISTORY_SIZE, t } from './constants';
-export { getActiveCrew, recommendWatchSystem, generateRecommendationReason, calculateCoverage } from './utils/schedule-utils';
+export { getActiveCrew, recommendWatchSystem, generateRecommendationReason, calculateCoverage } from './utils/schedule-logic';
 export { exportScheduleToPDF } from './utils/pdf-export';
 export { buildShareUrl, generateQRCode } from './utils/qr-utils';
 export { Icon } from './components/Icon';
