@@ -34,3 +34,5 @@ local.properties
 test-results/
 test-report/
 .playwright-mcp/
+android/build-logic/build/
+android/build-logic/.gradle/

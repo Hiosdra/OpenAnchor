@@ -6,9 +6,15 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,12 +25,27 @@ import javax.inject.Singleton
 @Singleton
 class ServiceBinder @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+) : ServiceBinderApi {
     private var service: AnchorMonitorService? = null
     private var bound = false
 
+    private val _monitorState = MutableStateFlow(MonitorState())
+    override val monitorState: StateFlow<MonitorState> = _monitorState.asStateFlow()
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
     private val _serviceInstance = MutableStateFlow<AnchorMonitorService?>(null)
-    val serviceInstance: StateFlow<AnchorMonitorService?> = _serviceInstance.asStateFlow()
+
+    init {
+        // Propagate service monitorState to the interface's monitorState
+        scope.launch {
+            _serviceInstance.flatMapLatest { svc ->
+                svc?.monitorState ?: flowOf(MonitorState())
+            }.collect { state ->
+                _monitorState.value = state
+            }
+        }
+    }
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
@@ -41,22 +62,22 @@ class ServiceBinder @Inject constructor(
         }
     }
 
-    fun startAndBind(sessionId: Long) {
+    override fun startAndBind(sessionId: Long) {
         val intent = AnchorMonitorService.startIntent(context, sessionId)
         context.startForegroundService(intent)
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
-    fun stopMonitoring() {
+    override fun stopMonitoring() {
         service?.stopMonitoring()
         unbind()
     }
 
-    fun dismissAlarm() {
+    override fun dismissAlarm() {
         service?.dismissAlarm()
     }
 
-    fun muteAlarm() {
+    override fun muteAlarm() {
         service?.muteAlarm()
     }
 
@@ -64,7 +85,7 @@ class ServiceBinder @Inject constructor(
      * Start the WebSocket server for paired mode.
      * This also starts the foreground service if not already running.
      */
-    fun startWebSocketServer() {
+    override fun startWebSocketServer() {
         val intent = AnchorMonitorService.startServerIntent(context)
         context.startForegroundService(intent)
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
@@ -73,7 +94,7 @@ class ServiceBinder @Inject constructor(
     /**
      * Stop the WebSocket server and unbind from the service.
      */
-    fun stopWebSocketServer() {
+    override fun stopWebSocketServer() {
         if (service != null || bound) {
             val intent = AnchorMonitorService.stopServerIntent(context)
             context.startService(intent)
@@ -85,7 +106,7 @@ class ServiceBinder @Inject constructor(
      * Start client mode — connect to another Android device as a WebSocket client.
      * This also starts the foreground service if not already running.
      */
-    fun startClientMode(wsUrl: String) {
+    override fun startClientMode(wsUrl: String) {
         val intent = AnchorMonitorService.startClientIntent(context, wsUrl)
         context.startForegroundService(intent)
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
@@ -94,7 +115,7 @@ class ServiceBinder @Inject constructor(
     /**
      * Stop client mode — disconnect from the server.
      */
-    fun stopClientMode() {
+    override fun stopClientMode() {
         service?.let {
             val intent = AnchorMonitorService.stopClientIntent(context)
             context.startService(intent)
@@ -102,7 +123,7 @@ class ServiceBinder @Inject constructor(
         unbind()
     }
 
-    fun unbind() {
+    override fun unbind() {
         if (bound) {
             context.unbindService(connection)
             bound = false

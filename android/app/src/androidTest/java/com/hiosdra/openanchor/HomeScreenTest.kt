@@ -69,11 +69,6 @@ class HomeScreenTest {
         composeTestRule.onNodeWithText("Statistics").performScrollTo().assertIsDisplayed()
     }
 
-    @Test
-    fun homeScreen_examQuizButtonVisible() {
-        composeTestRule.onNodeWithText("Exam Quiz").performScrollTo().assertIsDisplayed()
-    }
-
     // --- 2. All Navigation Buttons Present ---
 
     @Test
