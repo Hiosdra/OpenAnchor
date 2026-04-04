@@ -1,12 +1,12 @@
 import type { Page } from '@playwright/test';
 import { EGZAMIN_PDF_TEST_HOOK } from '../src/modules/egzamin/pdf-test-hook';
 
-/** Module URL paths */
+/** Module URL paths (SPA hash routes for egzamin/wachtownik, full-page for anchor) */
 export const MODULES = {
   dashboard: '/',
   anchor: '/modules/anchor/',
-  egzamin: '/modules/egzamin/',
-  wachtownik: '/modules/wachtownik/',
+  egzamin: '/#/egzamin',
+  wachtownik: '/#/wachtownik',
 } as const;
 
 /** Common localStorage keys used across the app */

@@ -1,0 +1,96 @@
+- generic [ref=e1]:
+  - status:
+    - generic:
+      - generic:
+        - strong: Nowa wersja dostępna!
+        - text: Zaktualizuj aplikację, aby korzystać z najnowszych funkcji.
+      - button "Aktualizuj"
+      - button "Później"
+  - status:
+    - generic:
+      - generic:
+        - strong: Zainstaluj OpenAnchor
+        - text: Dodaj do ekranu głównego, aby korzystać offline.
+      - button "Zainstaluj"
+      - button "Nie teraz" [active]
+  - banner [ref=e8]:
+    - button "Ustawienia" [ref=e9] [cursor=pointer]:
+      - img [ref=e10]
+    - img "OpenAnchor" [ref=e13]
+    - heading "OpenAnchor" [level=1] [ref=e14]
+    - paragraph [ref=e15]: Morska Superapp
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - button "Otwórz Egzamin ŻJ/JSM" [ref=e18] [cursor=pointer]:
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - img [ref=e22]
+            - generic [ref=e26]:
+              - heading "Egzamin ŻJ / JSM" [level=2] [ref=e28]
+              - paragraph [ref=e29]: Nauka do egzaminu PZŻ
+          - generic [ref=e30]:
+            - generic [ref=e33]: Baza pytań egzaminacyjnych PZŻ
+            - generic [ref=e36]: Tryb nauki z odpowiedziami
+            - generic [ref=e39]: Symulacja egzaminu z limitem czasu
+            - generic [ref=e42]: Pytania ze zdjęciami (ABC/D)
+          - generic [ref=e43]:
+            - generic [ref=e45]: Uruchom
+            - img [ref=e46]
+      - button "Otwórz Żeglowanie - Informacje" [ref=e48] [cursor=pointer]:
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - img [ref=e52]
+            - generic [ref=e54]:
+              - heading "Żeglowanie" [level=2] [ref=e56]
+              - paragraph [ref=e57]: Informacje i porady dla żeglarzy
+          - generic [ref=e58]:
+            - generic [ref=e61]: Lista rzeczy do spakowania
+            - generic [ref=e64]: Interaktywna checklist z zapisem
+            - generic [ref=e67]: Przygotowanie do rejsu morskiego
+            - generic [ref=e70]: Praktyczne porady żeglarskie
+          - generic [ref=e71]:
+            - generic [ref=e73]: Uruchom
+            - img [ref=e74]
+      - button "Otwórz Wachtownik" [ref=e76] [cursor=pointer]:
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - img [ref=e80]
+            - generic [ref=e83]:
+              - heading "Wachtownik" [level=2] [ref=e85]
+              - paragraph [ref=e86]: Morski grafik wacht
+          - generic [ref=e87]:
+            - generic [ref=e90]: Inteligentne szablony wacht
+            - generic [ref=e93]: Zarządzanie załogą i rolami
+            - generic [ref=e96]: Eksport PDF & kalendarze ICS
+            - generic [ref=e99]: Udostępnianie przez QR kod
+          - generic [ref=e100]:
+            - generic [ref=e102]: Uruchom
+            - img [ref=e103]
+  - generic:
+    - generic:
+      - generic:
+        - heading "Ustawienia" [level=2]
+        - button "Zamknij":
+          - img
+      - generic:
+        - generic:
+          - generic: Wersja Beta
+          - generic: Funkcje eksperymentalne (Alert Kotwiczny)
+        - generic:
+          - checkbox
+      - generic:
+        - generic:
+          - generic: Motyw
+          - generic: Zmień wygląd aplikacji
+        - generic:
+          - button "🌙"
+          - button "☀️"
+          - button "🔴"
+      - generic:
+        - generic:
+          - generic: Wymuś aktualizację
+          - generic: Sprawdź i zainstaluj najnowszą wersję aplikacji
+        - button "Aktualizuj":
+          - img
+          - text: Aktualizuj
+  - contentinfo [ref=e105]: OpenAnchor · Morska Superapp · v2.0

@@ -1,0 +1,60 @@
+- generic [ref=e1]:
+  - button "Wróć do menu głównego" [ref=e2] [cursor=pointer]:
+    - img [ref=e3]
+  - banner [ref=e5]:
+    - heading "Informacje o Żeglarstwie" [level=1] [ref=e6]
+    - paragraph [ref=e7]: Przygotowanie do rejsu morskiego
+  - main [ref=e8]:
+    - navigation [ref=e9]:
+      - button "Pakowanie" [ref=e10] [cursor=pointer]:
+        - img [ref=e11]
+        - generic [ref=e13]: Pakowanie
+      - button "Zakupy" [ref=e14] [cursor=pointer]:
+        - img [ref=e15]
+        - generic [ref=e19]: Zakupy
+      - button "Briefing" [ref=e20] [cursor=pointer]:
+        - img [ref=e21]
+        - generic [ref=e26]: Briefing
+      - button "Checklisty" [active] [ref=e27] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e31]: Checklisty
+      - button "Wiedza" [ref=e32] [cursor=pointer]:
+        - img [ref=e33]
+        - generic [ref=e36]: Wiedza
+    - text: ✓
+    - generic [ref=e228]:
+      - generic [ref=e229]:
+        - button "🌅 Codziennie rano Poranne czynności" [ref=e230] [cursor=pointer]:
+          - generic [ref=e231]: 🌅 Codziennie rano
+          - generic [ref=e232]: Poranne czynności
+        - button "⚓ Wyjście z portu Przed wypłynięciem" [ref=e233] [cursor=pointer]:
+          - generic [ref=e234]: ⚓ Wyjście z portu
+          - generic [ref=e235]: Przed wypłynięciem
+        - button "🛟 Cumowanie Wejście do portu" [ref=e236] [cursor=pointer]:
+          - generic [ref=e237]: 🛟 Cumowanie
+          - generic [ref=e238]: Wejście do portu
+        - button "🎒 Grab bag Torba ratunkowa" [ref=e239] [cursor=pointer]:
+          - generic [ref=e240]: 🎒 Grab bag
+          - generic [ref=e241]: Torba ratunkowa
+      - generic [ref=e242]:
+        - heading "Codziennie rano" [level=2] [ref=e243]:
+          - img [ref=e245]
+          - generic [ref=e248]: Codziennie rano
+        - list [ref=e249]:
+          - listitem [ref=e250] [cursor=pointer]:
+            - generic [ref=e252]: Sprawdzić olej
+          - listitem [ref=e253] [cursor=pointer]:
+            - generic [ref=e255]: V baterii
+          - listitem [ref=e256] [cursor=pointer]:
+            - generic [ref=e258]: (Załoga) Przemyć pokład
+          - listitem [ref=e259] [cursor=pointer]:
+            - generic [ref=e261]: (Załoga) Zmiotka wewnątrz
+          - listitem [ref=e262] [cursor=pointer]:
+            - generic [ref=e264]: (Załoga) Dolać wody
+          - listitem [ref=e265] [cursor=pointer]:
+            - generic [ref=e267]: Pogoda
+          - listitem [ref=e268] [cursor=pointer]:
+            - generic [ref=e270]: Trasa główna, alternatywna i porty schronienia
+        - button "Wyczyść obecną checklistę" [ref=e271] [cursor=pointer]:
+          - img [ref=e272]
+          - text: Wyczyść obecną checklistę

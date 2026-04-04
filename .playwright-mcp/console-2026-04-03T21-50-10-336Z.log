@@ -1,0 +1,4 @@
+[      35ms] [WARNING] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation @ https://cdn.tailwindcss.com/:63
+[      74ms] [INFO] Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner. @ http://localhost:8081/:0
+[  168720ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8081/modules/anchor/index.html:0
+[  168803ms] [LOG] Service Worker registered: http://localhost:8081/ @ http://localhost:8081/assets/anchor-XRKcG0Mf.js:35

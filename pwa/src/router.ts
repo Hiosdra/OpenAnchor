@@ -7,6 +7,7 @@ export interface ModuleMount {
 
 export interface RouteDefinition {
   path: string;
+  title?: string;
   loader: () => Promise<ModuleMount>;
 }
 
@@ -25,6 +26,7 @@ const MODULE_URL_TO_ROUTE: Record<string, string> = {
 let _config: RouterConfig | null = null;
 let _currentCleanup: (() => void) | null = null;
 let _currentPath = '/';
+let _defaultTitle = '';
 
 export function getHashPath(): string {
   const hash = window.location.hash;
@@ -60,7 +62,7 @@ export async function navigateTo(path: string): Promise<void> {
   if (_currentCleanup) { _currentCleanup(); _currentCleanup = null; }
   _currentPath = path;
 
-  if (path === '/') { showDashboard(); return; }
+  if (path === '/') { showDashboard(); document.title = _defaultTitle; return; }
 
   const route = _config.routes.find((r) => r.path === path);
   if (!route) { showDashboard(); _currentPath = '/'; return; }
@@ -72,6 +74,7 @@ export async function navigateTo(path: string): Promise<void> {
     const mod = await route.loader();
     if (_currentPath !== path) return;
     hideLoading();
+    if (route.title) document.title = route.title;
 
     _config.outlet.innerHTML = '';
     const backBtn = Object.assign(document.createElement('button'), {
@@ -117,6 +120,7 @@ export function initRouter(cfg: RouterConfig): () => void {
   _config = cfg;
   _currentPath = '/';
   _currentCleanup = null;
+  _defaultTitle = document.title;
   hideLoading();
 
   window.addEventListener('hashchange', onHashChange);

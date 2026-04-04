@@ -24,10 +24,12 @@ if (outlet && dashboardEl && loadingEl) {
     routes: [
       {
         path: '/egzamin',
+        title: 'Egzamin ŻJ / JSM - Baza Pytań',
         loader: () => import('./modules/egzamin/spa-mount'),
       },
       {
         path: '/wachtownik',
+        title: 'Wachtownik',
         loader: () => import('./modules/wachtownik/spa-mount'),
       },
     ],
