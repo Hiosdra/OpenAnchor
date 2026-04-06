@@ -1,20 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 
 // ── anchor/index barrel ──────────────────────────────────────────────────
-// anchor/index re-exports from many DOM-dependent modules; mock the heavy ones.
-vi.mock('../src/modules/anchor/anchor-app', () => ({ AnchorApp: class {} }));
-vi.mock('../src/modules/anchor/map-controller', () => ({ MapController: class {} }));
-vi.mock('../src/modules/anchor/alert-controller', () => ({ AlertController: class {} }));
-vi.mock('../src/modules/anchor/ai-controller', () => ({ AiController: class {} }));
-vi.mock('../src/modules/anchor/sync-controller', () => ({ SyncController: class {} }));
-vi.mock('../src/modules/anchor/connection-status', () => ({ ConnectionStatus: { init: vi.fn(), _update: vi.fn() } }));
-vi.mock('../src/modules/anchor/ui-utils', () => ({
-  UI: { init: vi.fn() },
-  OnboardingController: class {},
-  throttle: vi.fn((fn: Function) => fn),
-}));
+// anchor/index re-exports pure utilities + React App.
 vi.mock('../src/modules/anchor/session-db', () => ({
   SessionDB: class {},
+}));
+vi.mock('../src/modules/anchor/App', () => ({
+  App: () => null,
 }));
 vi.mock('leaflet', () => ({
   default: { marker: vi.fn(), map: vi.fn(), tileLayer: vi.fn(), LatLng: class { constructor(public lat: number, public lng: number) {} } },
@@ -42,10 +34,9 @@ describe('anchor barrel (src/modules/anchor/index.ts)', () => {
     expect(mod).toHaveProperty('I18N');
   });
 
-  it('re-exports types', async () => {
+  it('re-exports App component', async () => {
     const mod = await import('../src/modules/anchor/index');
-    // Types are erased at runtime, but the module should load without error
-    expect(mod).toBeDefined();
+    expect(mod).toHaveProperty('App');
   });
 });
 

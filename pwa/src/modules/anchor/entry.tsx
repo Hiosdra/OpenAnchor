@@ -3,7 +3,7 @@
  */
 
 import { createRoot } from 'react-dom/client';
-import { AnchorShell } from './AnchorShell';
+import { App } from './App';
 import './styles.css';
 import { initBackground } from '../../shared/init-background';
 
@@ -12,7 +12,6 @@ initBackground();
 document.documentElement.dataset.theme =
   localStorage.getItem('openanchor-theme') || 'dark';
 
-// Register Service Worker for PWA functionality
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
@@ -24,4 +23,4 @@ if ('serviceWorker' in navigator) {
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element not found');
 const root = createRoot(container);
-root.render(<AnchorShell />);
+root.render(<App />);

@@ -9,7 +9,6 @@ export interface I18NInstance {
   readonly locale: string;
   readonly lang: string;
   setLang(lang: string): void;
-  _applyToDOM(): void;
 }
 
 export const I18N: I18NInstance = {
@@ -269,30 +268,8 @@ export const I18N: I18NInstance = {
     this._lang = lang;
     localStorage.setItem('oa_lang', lang);
     this.t = this.translations[lang] || this.translations.pl;
-    this._applyToDOM();
-  },
-
-  _applyToDOM() {
     document.documentElement.lang = this._lang;
     document.title = this.t.appTitle;
-    document.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.getAttribute('data-i18n');
-      if (key && this.t[key]) el.textContent = this.t[key];
-    });
-    document.querySelectorAll('[data-i18n-html]').forEach((el) => {
-      const key = el.getAttribute('data-i18n-html');
-      if (key && this.t[key]) el.innerHTML = this.t[key];
-    });
-    document.querySelectorAll('[data-i18n-title]').forEach((el) => {
-      const key = el.getAttribute('data-i18n-title');
-      if (key && this.t[key]) (el as HTMLElement).title = this.t[key];
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
-      const key = el.getAttribute('data-i18n-placeholder');
-      if (key && this.t[key]) (el as HTMLInputElement).placeholder = this.t[key];
-    });
-    const langBtn = document.getElementById('lang-toggle');
-    if (langBtn) langBtn.textContent = this._lang === 'pl' ? 'EN' : 'PL';
   },
 };
 

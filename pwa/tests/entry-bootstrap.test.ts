@@ -11,8 +11,21 @@ vi.mock('../src/modules/dashboard/dashboard-ui', () => ({
 }));
 
 // ── anchor/entry deps (React) ────────────────────────────────────────────
-vi.mock('../src/modules/anchor/AnchorShell', () => ({
-  AnchorShell: () => null,
+vi.mock('../src/modules/anchor/App', () => ({
+  App: () => null,
+}));
+vi.mock('leaflet', () => ({
+  default: { marker: vi.fn(), map: vi.fn(), tileLayer: vi.fn(), LatLng: class { constructor(public lat: number, public lng: number) {} } },
+  marker: vi.fn(),
+  map: vi.fn(),
+  tileLayer: vi.fn(),
+  LatLng: class { constructor(public lat: number, public lng: number) {} },
+  latLng: vi.fn((...a: any[]) => ({ lat: a[0], lng: a[1] })),
+  divIcon: vi.fn(() => ({})),
+  circleMarker: vi.fn(() => ({ addTo: vi.fn(), setLatLng: vi.fn(), setRadius: vi.fn(), remove: vi.fn() })),
+  circle: vi.fn(() => ({ addTo: vi.fn(), setLatLng: vi.fn(), setRadius: vi.fn(), remove: vi.fn() })),
+  polyline: vi.fn(() => ({ addTo: vi.fn(), setLatLngs: vi.fn(), remove: vi.fn() })),
+  polygon: vi.fn(() => ({ addTo: vi.fn(), remove: vi.fn() })),
 }));
 
 // ── egzamin/entry deps ──────────────────────────────────────────────────
