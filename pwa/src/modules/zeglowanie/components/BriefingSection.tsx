@@ -72,7 +72,7 @@ export function BriefingSection() {
     <>
       <TypeSelector options={briefingOptions} current={briefingType} onChange={setBriefingType} />
 
-      <div style={{ display: briefingType === 'zero' ? 'block' : 'none' }}>
+      {briefingType === 'zero' && (
         <BriefingList
           type="zero"
           title="Briefing zerowy - Checklista dla prowadzącego"
@@ -81,9 +81,9 @@ export function BriefingSection() {
           resetKey={resetKeys.zero}
           onReset={() => handleReset('zero')}
         />
-      </div>
+      )}
 
-      <div style={{ display: briefingType === 'first-day' ? 'block' : 'none' }}>
+      {briefingType === 'first-day' && (
         <BriefingList
           type="first-day"
           title="Briefing pierwszy dzień - Checklista dla prowadzącego"
@@ -92,7 +92,7 @@ export function BriefingSection() {
           resetKey={resetKeys['first-day']}
           onReset={() => handleReset('first-day')}
         />
-      </div>
+      )}
     </>
   );
 }

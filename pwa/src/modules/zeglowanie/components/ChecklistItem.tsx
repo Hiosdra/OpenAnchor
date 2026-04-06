@@ -18,7 +18,19 @@ export function ChecklistItem({ itemId, text, storageKey, isHtml = false, crewPr
   };
 
   return (
-    <li className={`checklist-item${checked ? ' checked' : ''}`} onClick={toggle}>
+    <li
+      className={`checklist-item${checked ? ' checked' : ''}`}
+      onClick={toggle}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      }}
+      tabIndex={0}
+      role="checkbox"
+      aria-checked={checked}
+    >
       <div className={`checklist-checkbox${checked ? ' checked' : ''}`} />
       {isHtml ? (
         <div className="checklist-text" dangerouslySetInnerHTML={{ __html: text }} />
