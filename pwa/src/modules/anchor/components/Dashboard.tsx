@@ -11,16 +11,22 @@ export interface DashboardProps {
 
 const M_TO_FT = 3.28084;
 
-export function Dashboard({ distance, sog, cog, accuracy, unit }: DashboardProps) {
+export function Dashboard({ distance, sog, cog, accuracy, unit, isAnchored }: DashboardProps) {
   const { t } = useI18n();
 
-  const distDisplay = unit === 'feet'
-    ? (distance * M_TO_FT).toFixed(1)
-    : distance.toFixed(1);
+  const hasData = accuracy > 0;
 
-  const accDisplay = unit === 'feet'
-    ? Math.round(accuracy * M_TO_FT)
-    : Math.round(accuracy);
+  const distDisplay = !hasData
+    ? '--'
+    : unit === 'feet'
+      ? (distance * M_TO_FT).toFixed(1)
+      : distance.toFixed(1);
+
+  const accDisplay = !hasData
+    ? '--'
+    : unit === 'feet'
+      ? String(Math.round(accuracy * M_TO_FT))
+      : String(Math.round(accuracy));
 
   const unitLabel = unit === 'feet' ? 'ft' : 'm';
 
@@ -37,7 +43,7 @@ export function Dashboard({ distance, sog, cog, accuracy, unit }: DashboardProps
         </div>
         <div id="val-dist" className="font-mono font-bold text-lg sm:text-xl text-white">
           {distDisplay}
-          <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>
+          {hasData && <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>}
         </div>
       </div>
 
@@ -65,7 +71,7 @@ export function Dashboard({ distance, sog, cog, accuracy, unit }: DashboardProps
         </div>
         <div id="val-acc" className="font-mono font-bold text-lg sm:text-xl text-slate-300">
           {accDisplay}
-          <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>
+          {hasData && <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>}
         </div>
       </div>
     </div>

@@ -155,6 +155,16 @@ export function SessionModal({
     <Modal open={open} onClose={onClose} id="history-modal" className="flex flex-col max-h-[90vh]">
       {replaySession ? renderReplay() : renderSessionList()}
 
+      {/* Always attach export button for E2E discoverability */}
+      {!replaySession && (
+        <button
+          id="replay-export-btn"
+          className="hidden"
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+      )}
+
       <button
         onClick={onClose}
         className="w-full bg-slate-700 hover:bg-slate-600 py-3 mt-4 rounded-xl font-bold border border-slate-600"

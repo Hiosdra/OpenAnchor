@@ -64,18 +64,17 @@ export function AIModal({
           <span>{t.aiTitle}</span>
         </h3>
         <div className="flex items-center gap-2">
-          {chatMessages.length > 0 && (
-            <button
-              id="ai-clear-chat-btn"
-              onClick={onClearChat}
-              className="text-slate-500 hover:text-red-400 transition-colors"
-              title="Clear chat"
-              aria-label="Clear chat"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
           <button
+            id="ai-clear-chat-btn"
+            onClick={onClearChat}
+            className={`text-slate-500 hover:text-red-400 transition-colors${chatMessages.length === 0 ? ' invisible' : ''}`}
+            title="Clear chat"
+            aria-label="Clear chat"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <button
+            id="edit-api-key-btn"
             onClick={onOpenApiKeyModal}
             className="text-slate-400"
             aria-label="API Key"

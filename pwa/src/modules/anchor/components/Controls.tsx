@@ -25,12 +25,23 @@ export interface ControlsProps {
 const M_TO_FT = 3.28084;
 
 const TOOL_IDS: Record<string, string> = {
+  calc: 'tool-calc',
+  sector: 'tool-sector',
+  watch: 'tool-watch',
+  sync: 'tool-sync',
   monitor: 'simple-monitor-btn',
   history: 'open-history-btn',
   ai: 'open-ai-btn',
   share: 'share-pos-btn',
   qr: 'open-qr-scan-btn',
   weather: 'open-weather-btn',
+};
+
+const TOOL_DATA_MODAL: Record<string, string> = {
+  calc: 'calc-modal',
+  sector: 'sector-modal',
+  watch: 'watch-setup-modal',
+  sync: 'ws-sync-modal',
 };
 
 const TOOLS = [
@@ -67,7 +78,7 @@ export function Controls({
   const unitLabel = unit === 'feet' ? 'ft' : 'm';
   const displayRadius = unit === 'feet' ? Math.round(radius * M_TO_FT) : radius;
   const sliderMax = 500;
-  const numberMax = unit === 'feet' ? Math.round(500 * M_TO_FT) : 500;
+  const numberMax = unit === 'feet' ? Math.round(500 * M_TO_FT) : 1000;
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onRadiusChange(Number(e.target.value));
@@ -113,7 +124,7 @@ export function Controls({
           id="radius-slider"
           min={10}
           max={sliderMax}
-          step={1}
+          step={5}
           value={radius}
           onChange={handleSliderChange}
           aria-label={t.safeRadius}
@@ -165,6 +176,7 @@ export function Controls({
             <button
               key={tool.id}
               id={TOOL_IDS[tool.id]}
+              data-modal={TOOL_DATA_MODAL[tool.id]}
               onClick={() => onOpenTool(tool.id)}
               className={`py-1.5 sm:py-2 rounded-xl flex flex-col items-center justify-center gap-0.5 sm:gap-1 border transition-colors ${tool.colSpan} ${
                 isAi

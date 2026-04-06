@@ -731,6 +731,12 @@ function AnchorApp() {
     updateState((prev) => ({ nightMode: !prev.nightMode }));
   }, [updateState]);
 
+  // Sync night-vision class to <body> for global CSS filter
+  useEffect(() => {
+    document.body.classList.toggle('night-vision', state.nightMode);
+    return () => { document.body.classList.remove('night-vision'); };
+  }, [state.nightMode]);
+
   // ═══════════════════════════════════════════
   // LANG TOGGLE
   // ═══════════════════════════════════════════

@@ -16,9 +16,7 @@ export function OffsetModal({ open, onClose, cog, onApply }: OffsetModalProps) {
   const [bearing, setBearing] = useState(0);
 
   const handleBehind = () => {
-    if (cog !== null) {
-      setBearing((cog + 180) % 360);
-    }
+    setBearing(((cog ?? 0) + 180) % 360);
   };
 
   const handleApply = () => {
@@ -62,8 +60,7 @@ export function OffsetModal({ open, onClose, cog, onApply }: OffsetModalProps) {
           <button
             id="set-bearing-behind-btn"
             onClick={handleBehind}
-            disabled={cog === null}
-            className="bg-slate-600 px-3 rounded-lg text-xs font-bold text-slate-300 disabled:opacity-50"
+            className="bg-slate-600 px-3 rounded-lg text-xs font-bold text-slate-300"
           >
             {t.offsetBehind}
           </button>

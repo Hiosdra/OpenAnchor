@@ -66,8 +66,8 @@ test.describe('Module Navigation Flow', () => {
 
     await expect(page.locator('#anchorModule')).toBeVisible();
 
-    // Navigate to Anchor
-    await clickAndNavigate(page, '#anchorModule', '**/modules/anchor/**');
+    // Navigate to Anchor (SPA hash route)
+    await clickAndNavigate(page, '#anchorModule', /#\/anchor/);
     await expect(page).toHaveTitle(/Alert Kotwiczny/);
 
     // Dismiss any overlays (onboarding, warnings) blocking interaction
@@ -76,8 +76,8 @@ test.describe('Module Navigation Flow', () => {
       document.getElementById('warning-modal')?.remove();
     });
 
-    // Navigate back
-    await clickAndNavigate(page, 'a.oa-back-btn', '**/index.html');
+    // Navigate back (intercepted by SPA router)
+    await clickAndNavigate(page, 'a.oa-back-btn', /#\/$/);
     await expect(page).toHaveTitle(/OpenAnchor/);
   });
 
