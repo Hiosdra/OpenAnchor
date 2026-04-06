@@ -21,6 +21,8 @@ export interface RouterConfig {
 const MODULE_URL_TO_ROUTE: Record<string, string> = {
   'modules/egzamin/index.html': '/egzamin',
   'modules/wachtownik/index.html': '/wachtownik',
+  'modules/zeglowanie/index.html': '/zeglowanie',
+  'modules/anchor/index.html': '/anchor',
 };
 
 let _config: RouterConfig | null = null;

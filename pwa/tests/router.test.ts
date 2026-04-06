@@ -270,20 +270,26 @@ describe('router', () => {
       expect(window.location.hash).toBe('#/wachtownik');
     });
 
-    it('returns false for non-SPA module URLs (anchor)', () => {
-      const cfg = makeConfig();
+    it('returns true for anchor module URL (now SPA-routable)', () => {
+      const cfg = makeConfig([
+        { path: '/anchor', loader: () => Promise.resolve(fakeModule()) },
+      ]);
       destroy = initRouter(cfg);
 
       const handled = navigateToModule('modules/anchor/index.html');
-      expect(handled).toBe(false);
+      expect(handled).toBe(true);
+      expect(window.location.hash).toBe('#/anchor');
     });
 
-    it('returns false for non-SPA module URLs (zeglowanie)', () => {
-      const cfg = makeConfig();
+    it('returns true for zeglowanie module URL (now SPA-routable)', () => {
+      const cfg = makeConfig([
+        { path: '/zeglowanie', loader: () => Promise.resolve(fakeModule()) },
+      ]);
       destroy = initRouter(cfg);
 
       const handled = navigateToModule('modules/zeglowanie/index.html');
-      expect(handled).toBe(false);
+      expect(handled).toBe(true);
+      expect(window.location.hash).toBe('#/zeglowanie');
     });
 
     it('returns false when router is not initialized', () => {

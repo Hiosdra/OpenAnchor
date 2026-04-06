@@ -16,3 +16,4 @@ export * from './map-controller';
 export * from './ai-controller';
 export * from './sync-controller';
 export * from './anchor-app';
+export { AnchorShell } from './AnchorShell';
