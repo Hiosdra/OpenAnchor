@@ -76,8 +76,9 @@ test.describe('Module Navigation Flow', () => {
       document.getElementById('warning-modal')?.remove();
     });
 
-    // Navigate back (intercepted by SPA router)
-    await clickAndNavigate(page, 'a.oa-back-btn', /#\/$/);
+    // Navigate back (SPA hash change — no page load, so use click + URL assertion)
+    await page.locator('a.oa-back-btn').click();
+    await expect(page).toHaveURL(/#\/$/);
     await expect(page).toHaveTitle(/OpenAnchor/);
   });
 

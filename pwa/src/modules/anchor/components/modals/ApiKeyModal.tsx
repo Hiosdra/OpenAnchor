@@ -80,7 +80,7 @@ export function ApiKeyModal({ open, onClose, onSave, onClear, hasKey }: ApiKeyMo
 
       {hasKey && (
         <button
-          id="edit-api-key-btn"
+          id="delete-api-key-btn"
           onClick={onClear}
           className="w-full mt-3 text-xs text-red-400 underline"
         >

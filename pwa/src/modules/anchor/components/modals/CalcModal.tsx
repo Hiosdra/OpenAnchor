@@ -77,10 +77,10 @@ export function CalcModal({
         </div>
       </div>
 
-      <div id="calc-chain-result" className="bg-slate-900 p-3 rounded-xl mb-4 text-center border border-slate-700">
+      <div className="bg-slate-900 p-3 rounded-xl mb-4 text-center border border-slate-700">
         <div className="text-slate-400 text-xs">{t.calcResult}</div>
         <div className="text-2xl font-bold text-blue-400">
-          {radius} <span className="text-sm">m</span>
+          <span id="calc-chain-result">{radius}</span> <span className="text-sm">m</span>
         </div>
         <div className="text-[10px] text-slate-500 mt-1">
           sqrt(L²-D²) + 20%

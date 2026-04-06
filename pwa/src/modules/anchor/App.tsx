@@ -1257,6 +1257,7 @@ function AnchorApp() {
   // ═══════════════════════════════════════════
   const handleWatchAlertOk = useCallback(() => {
     setWatchAlertOpen(false);
+    document.getElementById('watch-alert-modal')?.classList.add('hidden');
     watchSchedule.startWatch(stateRef.current.watchMinutes);
     updateState({ watchActive: true });
   }, [watchSchedule, updateState]);

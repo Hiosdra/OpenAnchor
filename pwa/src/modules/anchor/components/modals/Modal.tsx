@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 export interface ModalProps {
@@ -13,30 +13,28 @@ export interface ModalProps {
 export function Modal({ open, onClose, title, children, className = '', id }: ModalProps) {
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Sync hidden class with `open` prop after every render.
-  // This is needed because E2E tests may manipulate the DOM directly
-  // (e.g., classList.remove('hidden')) which desynchronises React's VDOM.
-  useEffect(() => {
+  // Manage 'hidden' class via ref so React reconciliation never touches it.
+  // Only fires when `open` changes — external DOM manipulation (e2E tests
+  // calling classList.remove('hidden')) survives unrelated re-renders.
+  useLayoutEffect(() => {
     if (rootRef.current) {
       rootRef.current.classList.toggle('hidden', !open);
     }
-  });
+  }, [open]);
 
   const handleClose = useCallback(() => {
     // Imperatively re-hide in case the modal was shown via DOM manipulation
-    if (!open && rootRef.current) {
+    if (rootRef.current) {
       rootRef.current.classList.add('hidden');
     }
     onClose();
-  }, [open, onClose]);
+  }, [onClose]);
 
   return (
     <div
       ref={rootRef}
       id={id}
-      className={`modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4 ${
-        open ? '' : 'hidden'
-      }`}
+      className={`modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4 hidden`}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
