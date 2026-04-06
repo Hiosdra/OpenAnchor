@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
 
 export interface ModalProps {
@@ -12,6 +12,7 @@ export interface ModalProps {
 
 export function Modal({ open, onClose, title, children, className = '', id }: ModalProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
 
   // Manage 'hidden' class via ref so React reconciliation never touches it.
   // Only fires when `open` changes — external DOM manipulation (e2E tests
@@ -37,13 +38,13 @@ export function Modal({ open, onClose, title, children, className = '', id }: Mo
       className={`modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4 hidden`}
       role="dialog"
       aria-modal="true"
-      aria-labelledby={title ? 'modal-title' : undefined}
+      aria-labelledby={title ? titleId : undefined}
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     >
       <div className={`bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-slate-700 relative ${className}`}>
         {title ? (
           <div className="flex items-center justify-between mb-4">
-            <h3 id="modal-title" className="text-xl font-bold text-white">{title}</h3>
+            <h3 id={titleId} className="text-xl font-bold text-white">{title}</h3>
             <button
               onClick={handleClose}
               className="modal-close-btn text-slate-400 hover:text-white transition-colors"

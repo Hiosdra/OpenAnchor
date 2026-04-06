@@ -23,8 +23,8 @@ export function StatsModal({ open, onClose, stats }: StatsModalProps) {
     ? [
         { label: t.statsSessions, value: String(stats.totalSessions) },
         { label: t.statsAlarms, value: String(stats.totalAlarms) },
-        { label: t.statsTotalTime, value: formatDuration(stats.totalTime, 's') },
-        { label: t.statsAvgTime, value: formatDuration(stats.avgTime, 's') },
+        { label: t.statsTotalTime, value: formatDuration(stats.totalTime) },
+        { label: t.statsAvgTime, value: formatDuration(stats.avgTime) },
         { label: t.statsMaxDist, value: `${stats.maxDistance.toFixed(1)}m` },
         { label: t.statsMaxSog, value: `${stats.maxSog.toFixed(1)} kn` },
       ]

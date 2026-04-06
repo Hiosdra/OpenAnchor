@@ -1391,10 +1391,10 @@ function AnchorApp() {
         onClose={() => setWatchModalOpen(false)}
         watchActive={watchSchedule.watchActive}
         watchMinutes={watchSchedule.watchMinutes}
-        schedule={watchSchedule.schedule as any}
+        schedule={watchSchedule.schedule}
         onStartWatch={watchSchedule.startWatch}
         onCancelWatch={watchSchedule.cancelWatch}
-        onAddScheduleItem={watchSchedule.addScheduleItem as any}
+        onAddScheduleItem={watchSchedule.addScheduleItem}
         onRemoveScheduleItem={watchSchedule.removeScheduleItem}
         onWatchMinutesChange={watchSchedule.setWatchMinutes}
       />

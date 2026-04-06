@@ -2,14 +2,7 @@ import { useState } from 'react';
 import { ClipboardList, Timer, CalendarClock, Plus, X } from 'lucide-react';
 import { Modal } from './Modal';
 import { useI18n } from '../../hooks/useI18n';
-
-export interface ScheduleItem {
-  name: string;
-  startHour: number;
-  startMin: number;
-  endHour: number;
-  endMin: number;
-}
+import type { ScheduleItem } from '../../anchor-utils';
 
 export interface WatchModalProps {
   open: boolean;
@@ -43,9 +36,7 @@ export function WatchModal({
 
   const handleAddSchedule = () => {
     if (!schedStart || !schedEnd) return;
-    const [sh, sm] = schedStart.split(':').map(Number);
-    const [eh, em] = schedEnd.split(':').map(Number);
-    onAddScheduleItem({ name: schedName || '?', startHour: sh, startMin: sm, endHour: eh, endMin: em });
+    onAddScheduleItem({ start: schedStart, end: schedEnd, person: schedName || '?' });
     setSchedName('');
     setSchedStart('');
     setSchedEnd('');
@@ -131,10 +122,9 @@ export function WatchModal({
                 key={i}
                 className="flex items-center justify-between bg-slate-800 p-2 rounded-lg border border-slate-700 text-xs"
               >
-                <span className="text-white font-medium">{item.name}</span>
+                <span className="text-white font-medium">{item.person}</span>
                 <span className="text-slate-400">
-                  {String(item.startHour).padStart(2, '0')}:{String(item.startMin).padStart(2, '0')} –{' '}
-                  {String(item.endHour).padStart(2, '0')}:{String(item.endMin).padStart(2, '0')}
+                  {item.start} – {item.end}
                 </span>
                 <button
                   onClick={() => onRemoveScheduleItem(i)}

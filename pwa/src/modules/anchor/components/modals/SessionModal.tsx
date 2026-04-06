@@ -50,10 +50,10 @@ export function SessionModal({
         {!loading &&
           sessions.map((s) => {
             const duration = s.endTime
-              ? formatDuration(s.endTime - s.startTime, 's')
+              ? formatDuration(s.endTime - s.startTime)
               : t.histActive;
-            const date = new Date(s.startTime * 1000).toLocaleDateString();
-            const time = new Date(s.startTime * 1000).toLocaleTimeString();
+            const date = new Date(s.startTime).toLocaleDateString();
+            const time = new Date(s.startTime).toLocaleTimeString();
 
             return (
               <button

@@ -18,6 +18,7 @@ export function useGPS({ onPosition, onError }: UseGPSParams) {
   const throttleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastCallRef = useRef<number>(0);
   const batterySaverRef = useRef(false);
+  const reinitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Keep refs in sync with latest callbacks
   const onPositionRef = useRef(onPosition);
@@ -99,8 +100,7 @@ export function useGPS({ onPosition, onError }: UseGPSParams) {
         batterySaverRef.current = true;
         setBatterySaverActive(true);
         cleanupGPS();
-        // Re-init with battery saver options on next tick
-        setTimeout(() => initGPS(), 0);
+        reinitTimerRef.current = setTimeout(() => initGPS(), 0);
         return true;
       }
 
@@ -108,7 +108,7 @@ export function useGPS({ onPosition, onError }: UseGPSParams) {
         batterySaverRef.current = false;
         setBatterySaverActive(false);
         cleanupGPS();
-        setTimeout(() => initGPS(), 0);
+        reinitTimerRef.current = setTimeout(() => initGPS(), 0);
         return false;
       }
 
@@ -120,6 +120,7 @@ export function useGPS({ onPosition, onError }: UseGPSParams) {
   useEffect(() => {
     return () => {
       cleanupGPS();
+      if (reinitTimerRef.current) clearTimeout(reinitTimerRef.current);
     };
   }, [cleanupGPS]);
 
