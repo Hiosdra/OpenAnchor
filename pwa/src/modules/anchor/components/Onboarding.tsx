@@ -31,7 +31,7 @@ export function Onboarding({ visible, onComplete }: OnboardingProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900 z-[6000] flex flex-col">
+    <div id="onboarding-overlay" className="fixed inset-0 bg-slate-900 z-[6000] flex flex-col">
       <div className="flex-grow relative overflow-hidden">
         {STEPS.map((s, i) => {
           const Icon = s.icon;
