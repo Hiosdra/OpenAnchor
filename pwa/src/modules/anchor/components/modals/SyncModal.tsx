@@ -25,7 +25,7 @@ export function SyncModal({
   const { t } = useI18n();
 
   return (
-    <Modal open={open} onClose={onClose} className="border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+    <Modal open={open} onClose={onClose} id="ws-sync-modal" className="border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
       <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
         <Smartphone className="text-blue-400" />
         <span>{t.wsTitle}</span>

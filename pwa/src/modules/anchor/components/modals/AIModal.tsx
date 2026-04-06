@@ -54,6 +54,7 @@ export function AIModal({
     <Modal
       open={open}
       onClose={onClose}
+      id="ai-modal"
       className="flex flex-col max-h-[90vh] border border-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.3)]"
     >
       {/* Header */}
@@ -65,6 +66,7 @@ export function AIModal({
         <div className="flex items-center gap-2">
           {chatMessages.length > 0 && (
             <button
+              id="ai-clear-chat-btn"
               onClick={onClearChat}
               className="text-slate-500 hover:text-red-400 transition-colors"
               title="Clear chat"
@@ -90,7 +92,7 @@ export function AIModal({
       </div>
 
       {/* Chat area */}
-      <div className="flex-grow overflow-y-auto mb-3 space-y-2 min-h-[120px] max-h-[45vh]">
+      <div id="ai-chat-area" className="flex-grow overflow-y-auto mb-3 space-y-2 min-h-[120px] max-h-[45vh]">
         {chatMessages.length === 0 && !loading && (
           <div className="text-slate-500 text-xs text-center py-6">
             <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />

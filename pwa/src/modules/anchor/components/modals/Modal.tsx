@@ -6,11 +6,13 @@ export interface ModalProps {
   title?: string;
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }
 
-export function Modal({ open, onClose, title, children, className = '' }: ModalProps) {
+export function Modal({ open, onClose, title, children, className = '', id }: ModalProps) {
   return (
     <div
+      id={id}
       className={`modal fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4 ${
         open ? '' : 'hidden'
       }`}

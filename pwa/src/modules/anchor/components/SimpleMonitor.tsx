@@ -70,7 +70,7 @@ export function SimpleMonitor({
   const isAlarm = alarmState === 'ALARM' || alarmState === 'WARNING';
 
   return (
-    <div className={`fixed inset-0 z-[5500] flex flex-col ${bg}`}>
+    <div id="simple-monitor-overlay" className={`fixed inset-0 z-[5500] flex flex-col ${bg}`}>
       <div className="flex-grow flex flex-col items-center justify-center p-8 text-center select-none">
         <div className={`text-lg font-bold uppercase tracking-widest mb-2 ${color}`}>
           {t[`alarm${alarmState.charAt(0) + alarmState.slice(1).toLowerCase()}` as keyof typeof t] ?? alarmState}
@@ -81,7 +81,7 @@ export function SimpleMonitor({
         )}
 
         <div className="mb-1">
-          <span className={`text-[120px] leading-none font-bold tabular-nums ${color}`}>
+          <span id="sm-distance" className={`text-[120px] leading-none font-bold tabular-nums ${color}`}>
             {distDisplay}
           </span>
         </div>
@@ -89,11 +89,11 @@ export function SimpleMonitor({
 
         <div className="flex gap-8 mb-6">
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-400 tabular-nums">{sog.toFixed(1)}</div>
+            <div id="sm-sog" className="text-3xl font-bold text-blue-400 tabular-nums">{sog.toFixed(1)}</div>
             <div className="text-xs text-slate-500">SOG (kn)</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-400 tabular-nums">
+            <div id="sm-cog" className="text-3xl font-bold text-blue-400 tabular-nums">
               {cog !== null ? `${Math.round(cog)}°` : '---'}
             </div>
             <div className="text-xs text-slate-500">COG</div>
@@ -116,12 +116,13 @@ export function SimpleMonitor({
 
       <div className="p-4 bg-black/50 flex justify-between items-center">
         <button
+          id="sm-close-btn"
           onClick={onOpenMap}
           className="text-slate-400 font-medium text-sm px-4 py-2 bg-slate-800 rounded-xl border border-slate-700"
         >
           <Map className="w-4 h-4 inline mr-1" /> {t.smMap}
         </button>
-        <div className="text-slate-500 text-sm font-mono">
+        <div id="sm-time" className="text-slate-500 text-sm font-mono">
           {new Date().toLocaleTimeString()}
         </div>
         <button

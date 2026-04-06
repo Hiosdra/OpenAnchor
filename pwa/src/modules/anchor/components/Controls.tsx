@@ -24,6 +24,15 @@ export interface ControlsProps {
 
 const M_TO_FT = 3.28084;
 
+const TOOL_IDS: Record<string, string> = {
+  monitor: 'simple-monitor-btn',
+  history: 'open-history-btn',
+  ai: 'open-ai-btn',
+  share: 'share-pos-btn',
+  qr: 'open-qr-scan-btn',
+  weather: 'open-weather-btn',
+};
+
 const TOOLS = [
   { id: 'calc', Icon: Calculator, i18nKey: 'toolChain', colSpan: '' },
   { id: 'sector', Icon: Radar, i18nKey: 'toolSector', colSpan: '' },
@@ -80,7 +89,7 @@ export function Controls({
           <label className="text-xs sm:text-sm text-slate-400 font-medium">
             {t.safeRadius}
             {sectorEnabled && (
-              <span className="ml-1 sm:ml-2 text-[9px] sm:text-[10px] bg-blue-900 text-blue-300 px-1.5 sm:px-2 py-0.5 rounded-full">
+              <span id="sector-badge" className="ml-1 sm:ml-2 text-[9px] sm:text-[10px] bg-blue-900 text-blue-300 px-1.5 sm:px-2 py-0.5 rounded-full">
                 {t.sectorBadge}
               </span>
             )}
@@ -88,6 +97,7 @@ export function Controls({
           <div className="flex items-baseline gap-1">
             <input
               type="number"
+              id="radius-number"
               value={displayRadius}
               min={unit === 'feet' ? Math.round(10 * M_TO_FT) : 10}
               max={numberMax}
@@ -100,6 +110,7 @@ export function Controls({
         </div>
         <input
           type="range"
+          id="radius-slider"
           min={10}
           max={sliderMax}
           step={1}
@@ -112,6 +123,7 @@ export function Controls({
       {/* Main button + offset */}
       <div className="flex gap-2 max-w-md mx-auto">
         <button
+          id="main-btn"
           onClick={onToggleAnchor}
           disabled={!hasGpsFix && !isAnchored}
           className={`flex-grow py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 ${
@@ -121,9 +133,10 @@ export function Controls({
           } disabled:opacity-50`}
         >
           <Anchor className="w-4 sm:w-5 h-4 sm:h-5" />
-          <span>{isAnchored ? t.raiseAnchor : t.dropAnchor}</span>
+          <span id="main-btn-text">{isAnchored ? t.raiseAnchor : t.dropAnchor}</span>
         </button>
         <button
+          id="offset-btn"
           onClick={onOffset}
           disabled={!hasGpsFix}
           className="w-12 sm:w-14 py-2.5 sm:py-3 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center bg-slate-700 border border-slate-600 text-slate-300 disabled:opacity-50"
@@ -151,6 +164,7 @@ export function Controls({
           return (
             <button
               key={tool.id}
+              id={TOOL_IDS[tool.id]}
               onClick={() => onOpenTool(tool.id)}
               className={`py-1.5 sm:py-2 rounded-xl flex flex-col items-center justify-center gap-0.5 sm:gap-1 border transition-colors ${tool.colSpan} ${
                 isAi

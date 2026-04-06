@@ -37,6 +37,7 @@ export function AlarmBar({ alarmState, distance, unit, isAnchored, onDismissAlar
 
   return (
     <div
+      id="alarm-state-bar"
       className={`w-full py-1 text-center text-xs font-bold uppercase tracking-widest z-20 transition-all flex items-center justify-center gap-2 ${barClass}`}
       role="alert"
       aria-live="assertive"
@@ -47,6 +48,7 @@ export function AlarmBar({ alarmState, distance, unit, isAnchored, onDismissAlar
       </span>
       {alarmState === 'ALARM' && (
         <button
+          id="stop-alarm-btn"
           onClick={onDismissAlarm}
           className="ml-2 bg-black/30 px-2 py-0.5 rounded text-[10px]"
           aria-label={t.muteAlarm}

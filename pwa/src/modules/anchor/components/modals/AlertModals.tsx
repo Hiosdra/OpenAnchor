@@ -37,6 +37,7 @@ export function AlertModals({
       <Modal
         open={dragWarningOpen}
         onClose={onDragDismiss}
+        id="drag-warning-modal"
         className="border-2 border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
       >
         <h3 className="text-lg sm:text-xl font-bold text-orange-500 mb-2 flex items-center gap-2">
@@ -82,6 +83,7 @@ export function AlertModals({
       <Modal
         open={batteryLowOpen}
         onClose={onBatteryLowClose}
+        id="battery-modal"
         className="border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.3)]"
       >
         <h3 className="text-xl font-bold text-red-500 mb-2 flex items-center gap-2">
@@ -103,12 +105,14 @@ export function AlertModals({
       <Modal
         open={watchAlertOpen}
         onClose={onWatchAlertOk}
+        id="watch-alert-modal"
         className="border-2 border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.3)] text-center"
       >
         <Timer className="w-16 h-16 text-blue-500 mx-auto mb-4 animate-bounce" />
         <h3 className="text-2xl font-bold text-white mb-2">{t.watchAlertTitle}</h3>
         <p className="text-slate-300 text-sm mb-6 leading-relaxed">{t.watchAlertBody}</p>
         <button
+          id="watch-alert-ok-btn"
           onClick={onWatchAlertOk}
           className="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white"
         >

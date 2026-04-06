@@ -35,7 +35,7 @@ export function Dashboard({ distance, sog, cog, accuracy, unit }: DashboardProps
         <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">
           {t.dashDistance}
         </div>
-        <div className="font-mono font-bold text-lg sm:text-xl text-white">
+        <div id="val-dist" className="font-mono font-bold text-lg sm:text-xl text-white">
           {distDisplay}
           <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>
         </div>
@@ -45,7 +45,7 @@ export function Dashboard({ distance, sog, cog, accuracy, unit }: DashboardProps
         <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">
           SOG <span className="text-[7px] sm:text-[8px]">({t.dashSog})</span>
         </div>
-        <div className="font-mono font-bold text-lg sm:text-xl text-blue-400">
+        <div id="val-sog" className="font-mono font-bold text-lg sm:text-xl text-blue-400">
           {sog.toFixed(1)}
         </div>
       </div>
@@ -54,7 +54,7 @@ export function Dashboard({ distance, sog, cog, accuracy, unit }: DashboardProps
         <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">
           COG <span className="text-[7px] sm:text-[8px]">({t.dashCogUnit})</span>
         </div>
-        <div className="font-mono font-bold text-lg sm:text-xl text-blue-400">
+        <div id="val-cog" className="font-mono font-bold text-lg sm:text-xl text-blue-400">
           {cog !== null ? `${Math.round(cog)}°` : '---'}
         </div>
       </div>
@@ -63,7 +63,7 @@ export function Dashboard({ distance, sog, cog, accuracy, unit }: DashboardProps
         <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">
           {t.dashGpsAcc}
         </div>
-        <div className="font-mono font-bold text-lg sm:text-xl text-slate-300">
+        <div id="val-acc" className="font-mono font-bold text-lg sm:text-xl text-slate-300">
           {accDisplay}
           <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>
         </div>

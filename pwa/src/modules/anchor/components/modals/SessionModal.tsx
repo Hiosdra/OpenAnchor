@@ -128,6 +128,7 @@ export function SessionModal({
 
         <div className="flex gap-2">
           <button
+            id="replay-export-btn"
             onClick={() => s.id != null && onExportGPX(s.id)}
             className="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2"
           >
@@ -151,7 +152,7 @@ export function SessionModal({
   };
 
   return (
-    <Modal open={open} onClose={onClose} className="flex flex-col max-h-[90vh]">
+    <Modal open={open} onClose={onClose} id="history-modal" className="flex flex-col max-h-[90vh]">
       {replaySession ? renderReplay() : renderSessionList()}
 
       <button

@@ -27,7 +27,7 @@ export function OffsetModal({ open, onClose, cog, onApply }: OffsetModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} id="offset-modal">
       <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <MoveDownLeft className="text-blue-400" />
         <span>{t.offsetTitle}</span>
@@ -39,6 +39,7 @@ export function OffsetModal({ open, onClose, cog, onApply }: OffsetModalProps) {
         </label>
         <input
           type="number"
+          id="offset-dist"
           value={dist}
           min={1}
           onChange={(e) => setDist(Number(e.target.value))}
@@ -51,6 +52,7 @@ export function OffsetModal({ open, onClose, cog, onApply }: OffsetModalProps) {
         <div className="flex gap-2">
           <input
             type="number"
+            id="offset-bearing"
             value={bearing}
             min={0}
             max={360}
@@ -58,6 +60,7 @@ export function OffsetModal({ open, onClose, cog, onApply }: OffsetModalProps) {
             className="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 outline-none"
           />
           <button
+            id="set-bearing-behind-btn"
             onClick={handleBehind}
             disabled={cog === null}
             className="bg-slate-600 px-3 rounded-lg text-xs font-bold text-slate-300 disabled:opacity-50"
@@ -75,6 +78,7 @@ export function OffsetModal({ open, onClose, cog, onApply }: OffsetModalProps) {
           {t.btnCancel}
         </button>
         <button
+          id="confirm-offset-btn"
           onClick={handleApply}
           className="flex-1 bg-blue-600 py-3 rounded-xl font-bold text-white"
         >

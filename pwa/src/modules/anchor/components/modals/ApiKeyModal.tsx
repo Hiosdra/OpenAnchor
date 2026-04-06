@@ -24,7 +24,7 @@ export function ApiKeyModal({ open, onClose, onSave, onClear, hasKey }: ApiKeyMo
   };
 
   return (
-    <Modal open={open} onClose={onClose} className="border border-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.3)]">
+    <Modal open={open} onClose={onClose} id="api-key-modal" className="border border-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.3)]">
       <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
         <Key className="text-purple-400" />
         <span>{t.apiTitle}</span>
@@ -54,6 +54,7 @@ export function ApiKeyModal({ open, onClose, onSave, onClear, hasKey }: ApiKeyMo
 
       <input
         type="password"
+        id="api-key-input"
         value={keyValue}
         onChange={(e) => setKeyValue(e.target.value)}
         placeholder="AIzaSy..."
@@ -68,6 +69,7 @@ export function ApiKeyModal({ open, onClose, onSave, onClear, hasKey }: ApiKeyMo
           {t.btnCancel}
         </button>
         <button
+          id="save-api-key-btn"
           onClick={handleSave}
           disabled={!keyValue.trim()}
           className="flex-1 bg-purple-600 py-3 rounded-xl font-bold text-white disabled:opacity-50"
@@ -78,6 +80,7 @@ export function ApiKeyModal({ open, onClose, onSave, onClear, hasKey }: ApiKeyMo
 
       {hasKey && (
         <button
+          id="edit-api-key-btn"
           onClick={onClear}
           className="w-full mt-3 text-xs text-red-400 underline"
         >

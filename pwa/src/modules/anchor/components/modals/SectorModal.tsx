@@ -37,7 +37,7 @@ export function SectorModal({
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} id="sector-modal">
       <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <PieChart className="text-blue-400" />
         <span>{t.sectorTitle}</span>
@@ -46,6 +46,7 @@ export function SectorModal({
       <label className="flex items-center gap-3 bg-slate-700 p-3 rounded-xl mb-4 border border-slate-600 cursor-pointer">
         <input
           type="checkbox"
+          id="sector-enable"
           checked={enabled}
           onChange={(e) => setEnabled(e.target.checked)}
           className="w-5 h-5 accent-blue-500 rounded"
@@ -54,12 +55,14 @@ export function SectorModal({
       </label>
 
       <div
+        id="sector-inputs"
         className={`grid grid-cols-2 gap-4 mb-6 transition-opacity ${enabled ? '' : 'opacity-50 pointer-events-none'}`}
       >
         <div>
           <label className="block text-slate-300 text-xs mb-1">{t.sectorCenter}</label>
           <input
             type="number"
+            id="sector-bearing"
             value={bearing}
             min={0}
             max={360}
@@ -71,6 +74,7 @@ export function SectorModal({
           <label className="block text-slate-300 text-xs mb-1">{t.sectorWidth}</label>
           <input
             type="number"
+            id="sector-width"
             value={width}
             min={10}
             max={360}
@@ -88,6 +92,7 @@ export function SectorModal({
           {t.btnCancel}
         </button>
         <button
+          id="save-sector-btn"
           onClick={handleSave}
           className="flex-1 bg-blue-600 py-3 rounded-xl font-bold text-white"
         >

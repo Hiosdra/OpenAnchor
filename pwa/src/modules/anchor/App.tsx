@@ -509,7 +509,7 @@ function AnchorApp() {
       gps.initGPS();
 
       // Onboarding check
-      if (!localStorage.getItem('oa_onboarded')) {
+      if (!localStorage.getItem('anchor_onboarding_done')) {
         setOnboardingOpen(true);
       }
     }
@@ -1226,7 +1226,7 @@ function AnchorApp() {
   // ONBOARDING COMPLETE
   // ═══════════════════════════════════════════
   const handleOnboardingComplete = useCallback(() => {
-    localStorage.setItem('oa_onboarded', '1');
+    localStorage.setItem('anchor_onboarding_done', '1');
     setOnboardingOpen(false);
   }, []);
 
@@ -1295,7 +1295,7 @@ function AnchorApp() {
   // RENDER
   // ═══════════════════════════════════════════
   return (
-    <div className={`app-container ${state.nightMode ? 'night-vision' : ''}`}>
+    <div id="app-body" className={`app-container ${state.nightMode ? 'night-vision' : ''}`}>
       <Header
         isOnline={isOnline}
         nightMode={state.nightMode}

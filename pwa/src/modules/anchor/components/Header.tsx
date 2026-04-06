@@ -69,6 +69,7 @@ export function Header({
         </span>
 
         <button
+          id="night-mode-btn"
           className="oa-settings-btn"
           title={t.nightMode}
           aria-label={t.nightMode}
@@ -79,6 +80,7 @@ export function Header({
         </button>
 
         <button
+          id="unit-toggle"
           className="bg-slate-700 px-2 sm:px-3 py-0.5 sm:py-1 rounded text-xs sm:text-sm font-bold text-slate-300 border border-slate-600"
           onClick={onToggleUnit}
         >
@@ -86,6 +88,7 @@ export function Header({
         </button>
 
         <button
+          id="lang-toggle"
           className="bg-slate-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-bold text-slate-300 border border-slate-600"
           title="Language / Język"
           onClick={onToggleLang}
@@ -112,7 +115,7 @@ export function Header({
 
           <div className={`flex items-center gap-0.5 sm:gap-1 text-xs ${gpsColor} ml-0.5 sm:ml-1`}>
             <Satellite className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-            <span>{gpsText}</span>
+            <span id="gps-status-text">{gpsText}</span>
           </div>
 
           {batterySaverActive && (

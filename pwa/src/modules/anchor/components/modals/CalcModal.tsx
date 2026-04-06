@@ -42,7 +42,7 @@ export function CalcModal({
   };
 
   return (
-    <Modal open={open} onClose={onClose} className="border border-slate-700">
+    <Modal open={open} onClose={onClose} id="calc-modal" className="border border-slate-700">
       <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <Ruler className="text-blue-400" />
         <span>{t.calcTitle}</span>
@@ -55,6 +55,7 @@ export function CalcModal({
           </label>
           <input
             type="number"
+            id="calc-depth"
             value={depth}
             min={1}
             onChange={(e) => setDepth(Number(e.target.value))}
@@ -64,6 +65,7 @@ export function CalcModal({
         <div>
           <label className="block text-slate-300 text-xs mb-1">{t.calcMulti}</label>
           <select
+            id="calc-ratio"
             value={ratio}
             onChange={(e) => setRatio(Number(e.target.value))}
             className="w-full bg-slate-700 text-white p-2.5 rounded-lg border border-slate-600 outline-none"
@@ -75,7 +77,7 @@ export function CalcModal({
         </div>
       </div>
 
-      <div className="bg-slate-900 p-3 rounded-xl mb-4 text-center border border-slate-700">
+      <div id="calc-chain-result" className="bg-slate-900 p-3 rounded-xl mb-4 text-center border border-slate-700">
         <div className="text-slate-400 text-xs">{t.calcResult}</div>
         <div className="text-2xl font-bold text-blue-400">
           {radius} <span className="text-sm">m</span>
@@ -93,6 +95,7 @@ export function CalcModal({
           {t.btnClose}
         </button>
         <button
+          id="apply-calc-btn"
           onClick={handleApply}
           className="flex-1 bg-blue-600 py-3 rounded-xl font-bold text-white"
         >
