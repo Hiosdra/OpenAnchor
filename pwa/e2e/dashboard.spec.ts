@@ -124,7 +124,7 @@ test.describe('Module Navigation', () => {
       { key: STORAGE_KEYS.betaMode, value: 'true' },
     ]);
     await page.locator('#anchorModule').click();
-    await expect(page).toHaveURL(/modules\/anchor/);
+    await expect(page).toHaveURL(/#\/anchor/);
   });
 
   test('clicking wachtownik card navigates to wachtownik module', async ({ page }) => {

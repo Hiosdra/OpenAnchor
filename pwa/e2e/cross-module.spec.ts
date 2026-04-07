@@ -62,22 +62,18 @@ test.describe('Module Navigation Flow', () => {
   }) => {
     const page = await setLocalStorage(MODULES.dashboard, [
       { key: STORAGE_KEYS.betaMode, value: 'true' },
+      { key: 'anchor_onboarding_done', value: '1' },
     ]);
 
     await expect(page.locator('#anchorModule')).toBeVisible();
 
-    // Navigate to Anchor
-    await clickAndNavigate(page, '#anchorModule', '**/modules/anchor/**');
+    // Navigate to Anchor (SPA hash route)
+    await clickAndNavigate(page, '#anchorModule', /#\/anchor/);
     await expect(page).toHaveTitle(/Alert Kotwiczny/);
 
-    // Dismiss any overlays (onboarding, warnings) blocking interaction
-    await page.evaluate(() => {
-      document.getElementById('onboarding-overlay')?.remove();
-      document.getElementById('warning-modal')?.remove();
-    });
-
-    // Navigate back
-    await clickAndNavigate(page, 'a.oa-back-btn', '**/index.html');
+    // Navigate back (SPA hash change — no page load, so use click + URL assertion)
+    await page.locator('a.oa-back-btn').click();
+    await expect(page).toHaveURL(/#\/$/);
     await expect(page).toHaveTitle(/OpenAnchor/);
   });
 

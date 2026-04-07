@@ -1,20 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 
 // ── anchor/index barrel ──────────────────────────────────────────────────
-// anchor/index re-exports from many DOM-dependent modules; mock the heavy ones.
-vi.mock('../src/modules/anchor/anchor-app', () => ({ AnchorApp: class {} }));
-vi.mock('../src/modules/anchor/map-controller', () => ({ MapController: class {} }));
-vi.mock('../src/modules/anchor/alert-controller', () => ({ AlertController: class {} }));
-vi.mock('../src/modules/anchor/ai-controller', () => ({ AiController: class {} }));
-vi.mock('../src/modules/anchor/sync-controller', () => ({ SyncController: class {} }));
-vi.mock('../src/modules/anchor/connection-status', () => ({ ConnectionStatus: { init: vi.fn(), _update: vi.fn() } }));
-vi.mock('../src/modules/anchor/ui-utils', () => ({
-  UI: { init: vi.fn() },
-  OnboardingController: class {},
-  throttle: vi.fn((fn: Function) => fn),
-}));
+// anchor/index re-exports pure utilities + React App.
 vi.mock('../src/modules/anchor/session-db', () => ({
   SessionDB: class {},
+}));
+vi.mock('../src/modules/anchor/App', () => ({
+  App: () => null,
 }));
 vi.mock('leaflet', () => ({
   default: { marker: vi.fn(), map: vi.fn(), tileLayer: vi.fn(), LatLng: class { constructor(public lat: number, public lng: number) {} } },
@@ -42,10 +34,9 @@ describe('anchor barrel (src/modules/anchor/index.ts)', () => {
     expect(mod).toHaveProperty('I18N');
   });
 
-  it('re-exports types', async () => {
+  it('re-exports App component', async () => {
     const mod = await import('../src/modules/anchor/index');
-    // Types are erased at runtime, but the module should load without error
-    expect(mod).toBeDefined();
+    expect(mod).toHaveProperty('App');
   });
 });
 
@@ -147,33 +138,22 @@ describe('zeglowanie barrel (src/modules/zeglowanie/index.ts)', () => {
     expect(mod).toHaveProperty('checklistData');
   });
 
-  it('re-exports section functions', async () => {
+  it('re-exports storage-keys utilities', async () => {
     const mod = await import('../src/modules/zeglowanie/index');
-    expect(mod).toHaveProperty('switchSection');
-    expect(mod).toHaveProperty('initSections');
+    expect(mod).toHaveProperty('briefingStorageKey');
+    expect(mod).toHaveProperty('checklistStorageKey');
+    expect(mod).toHaveProperty('packingStorageKey');
+    expect(mod).toHaveProperty('STORAGE_KEYS');
+    expect(mod).toHaveProperty('isValidBriefingType');
+    expect(mod).toHaveProperty('isValidChecklistType');
+    expect(mod).toHaveProperty('isValidCruiseType');
+    expect(mod).toHaveProperty('isValidSection');
+    expect(mod).toHaveProperty('crewLabel');
+    expect(mod).toHaveProperty('parseCheckedState');
   });
 
-  it('re-exports packing functions', async () => {
+  it('re-exports React App component', async () => {
     const mod = await import('../src/modules/zeglowanie/index');
-    expect(mod).toHaveProperty('switchCruiseType');
-    expect(mod).toHaveProperty('resetChecklist');
-    expect(mod).toHaveProperty('renderChecklist');
-    expect(mod).toHaveProperty('initPacking');
-  });
-
-  it('re-exports briefing functions', async () => {
-    const mod = await import('../src/modules/zeglowanie/index');
-    expect(mod).toHaveProperty('switchBriefingType');
-    expect(mod).toHaveProperty('resetBriefingChecklist');
-    expect(mod).toHaveProperty('renderBriefingChecklist');
-    expect(mod).toHaveProperty('initBriefing');
-  });
-
-  it('re-exports checklist functions', async () => {
-    const mod = await import('../src/modules/zeglowanie/index');
-    expect(mod).toHaveProperty('switchChecklistType');
-    expect(mod).toHaveProperty('resetChecklistSection');
-    expect(mod).toHaveProperty('renderChecklistItems');
-    expect(mod).toHaveProperty('initChecklists');
+    expect(mod).toHaveProperty('App');
   });
 });

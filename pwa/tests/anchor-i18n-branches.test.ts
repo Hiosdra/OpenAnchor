@@ -116,31 +116,23 @@ describe('I18N', () => {
     });
 
     it('applies data-i18n to DOM elements', () => {
-      I18N.setLang('en');
-      const el = document.querySelector('[data-i18n="appTitle"]')!;
-      expect(el.innerHTML).toBe('Anchor Alert');
+      // DOM patching removed — React handles translations via useI18n context
     });
 
     it('applies data-i18n-title to DOM elements', () => {
-      I18N.setLang('en');
-      const el = document.querySelector('[data-i18n-title="changeMap"]') as HTMLElement;
-      expect(el.title).toBe('Change map');
+      // DOM patching removed — React handles translations via useI18n context
     });
 
     it('applies data-i18n-placeholder to DOM elements', () => {
-      I18N.setLang('en');
-      const el = document.querySelector('[data-i18n-placeholder="gpsSearching"]') as HTMLInputElement;
-      expect(el.placeholder).toBe('Searching...');
+      // DOM patching removed — React handles translations via useI18n context
     });
 
     it('updates lang-toggle button text to EN when switching to pl', () => {
-      I18N.setLang('pl');
-      expect(document.getElementById('lang-toggle')!.textContent).toBe('EN');
+      // DOM patching removed — React handles lang toggle via useI18n context
     });
 
     it('updates lang-toggle button text to PL when switching to en', () => {
-      I18N.setLang('en');
-      expect(document.getElementById('lang-toggle')!.textContent).toBe('PL');
+      // DOM patching removed — React handles lang toggle via useI18n context
     });
 
     it('sets document.documentElement.lang attribute', () => {
@@ -154,41 +146,5 @@ describe('I18N', () => {
     });
   });
 
-  // ─── _applyToDOM() ─────────────────────────────────────────────
-  describe('_applyToDOM()', () => {
-    it('skips elements with missing i18n key', () => {
-      document.body.innerHTML = `<div data-i18n="nonExistentKey">original</div>`;
-      I18N.init();
-      I18N._applyToDOM();
-      expect(document.querySelector('[data-i18n="nonExistentKey"]')!.innerHTML).toBe('original');
-    });
-
-    it('skips elements with empty data-i18n attribute', () => {
-      document.body.innerHTML = `<div data-i18n="">original</div>`;
-      I18N.init();
-      I18N._applyToDOM();
-      expect(document.querySelector('[data-i18n=""]')!.innerHTML).toBe('original');
-    });
-
-    it('skips data-i18n-title elements with missing key', () => {
-      document.body.innerHTML = `<div data-i18n-title="nonExistent" title="original"></div>`;
-      I18N.init();
-      I18N._applyToDOM();
-      expect((document.querySelector('[data-i18n-title]') as HTMLElement).title).toBe('original');
-    });
-
-    it('skips data-i18n-placeholder elements with missing key', () => {
-      document.body.innerHTML = `<input data-i18n-placeholder="nonExistent" placeholder="original" />`;
-      I18N.init();
-      I18N._applyToDOM();
-      expect((document.querySelector('[data-i18n-placeholder]') as HTMLInputElement).placeholder).toBe('original');
-    });
-
-    it('handles missing lang-toggle button gracefully', () => {
-      document.body.innerHTML = '';
-      I18N.init();
-      // Should not throw
-      expect(() => I18N._applyToDOM()).not.toThrow();
-    });
-  });
+  // ─── _applyToDOM() removed — React handles DOM translations via useI18n ───
 });

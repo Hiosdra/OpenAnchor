@@ -32,6 +32,16 @@ if (outlet && dashboardEl && loadingEl) {
         title: 'Wachtownik',
         loader: () => import('./modules/wachtownik/spa-mount'),
       },
+      {
+        path: '/zeglowanie',
+        title: 'Żeglowanie - Informacje i Porady',
+        loader: () => import('./modules/zeglowanie/spa-mount'),
+      },
+      {
+        path: '/anchor',
+        title: 'Alert Kotwiczny — OpenAnchor',
+        loader: () => import('./modules/anchor/spa-mount'),
+      },
     ],
   });
 
