@@ -4,7 +4,7 @@ kotlin = "2.3.20"
 coreKtx = "1.18.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
-composeBom = "2026.03.00"
+composeBom = "2026.03.01"
 navigationCompose = "2.9.7"
 room = "2.8.4"
 hilt = "2.59.2"
@@ -17,25 +17,26 @@ coroutines = "1.10.2"
 retrofit = "3.0.0"
 okhttp = "5.3.2"
 gson = "2.13.2"
-wearCompose = "1.5.6"
-wearComposeFoundation = "1.5.6"
-wearComposeMaterial = "1.5.6"
+wearCompose = "1.6.0"
+wearComposeFoundation = "1.6.0"
+wearComposeMaterial = "1.6.0"
 wearWatchfaceComplications = "1.3.0"
 horologistComposeLayout = "0.8.3-alpha"
 coreSplashscreen = "1.2.0"
-ktor = "3.4.1"
-camerax = "1.5.3"
+ktor = "3.4.2"
+camerax = "1.6.0"
+guava = "33.3.1-android"
 zxing = "3.5.4"
 generativeai = "0.9.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
-androidTestRules = "1.6.1"
+androidTestRules = "1.7.0"
 ksp = "2.3.6"
 mockk = "1.14.9"
 coroutinesTest = "1.10.2"
-robolectric = "4.15"
-turbine = "1.2.0"
+robolectric = "4.16.1"
+turbine = "1.2.1"
 javaxInject = "1"
 
 [libraries]
@@ -111,6 +112,7 @@ camerax-core = { group = "androidx.camera", name = "camera-core", version.ref = 
 camerax-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
 camerax-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 
 # QR Code Generation & Scanning
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
