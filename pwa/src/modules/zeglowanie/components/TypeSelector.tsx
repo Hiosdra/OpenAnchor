@@ -13,7 +13,11 @@ interface TypeSelectorProps<T extends string> {
   onChange: (value: T) => void;
 }
 
-export function TypeSelector<T extends string>({ options, current, onChange }: TypeSelectorProps<T>) {
+export function TypeSelector<T extends string>({
+  options,
+  current,
+  onChange,
+}: TypeSelectorProps<T>) {
   return (
     <div className="flex gap-3 mb-6 flex-wrap">
       {options.map((opt) => (
@@ -22,7 +26,9 @@ export function TypeSelector<T extends string>({ options, current, onChange }: T
           className={`cruise-btn${current === opt.value ? ' active' : ''}`}
           onClick={() => onChange(opt.value)}
         >
-          <div className="text-base font-bold mb-1">{opt.emoji} {opt.label}</div>
+          <div className="text-base font-bold mb-1">
+            {opt.emoji} {opt.label}
+          </div>
           <div className="text-[0.8rem] opacity-70">{opt.sublabel}</div>
         </button>
       ))}

@@ -11,7 +11,9 @@ import { PlaceholderSection } from './components/PlaceholderSection';
 
 export default function App() {
   const [section, setSection] = useLocalStorage<SectionType>(
-    STORAGE_KEYS.SECTION, 'packing', isValidSection
+    STORAGE_KEYS.SECTION,
+    'packing',
+    isValidSection,
   );
 
   return (

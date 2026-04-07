@@ -14,6 +14,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
 
+/**
+ * Camera-dependent pairing tests. These navigate to the ScanQRCodeScreen
+ * ("Connect to Server") which initializes CameraX for QR scanning.
+ * Requires camera hardware not available on CI emulators.
+ *
+ * Non-camera tests are in PairingNavigationTest.
+ */
 @Ignore("Requires camera hardware not available on CI emulator")
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -41,24 +48,14 @@ class PairingScreensTest {
 
     // ── Helpers ──────────────────────────────────────────────────────
 
-    private fun scrollToAndClick(text: String) {
-        composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.scrollToText(text)
-        composeTestRule.waitForIdle()
-        composeTestRule.waitForText(text).performClick()
-        composeTestRule.waitForIdle()
-    }
-
-    // ══════════════════════════════════════════════════════════════════
-    // ScanQRCodeScreen Tests
-    // ══════════════════════════════════════════════════════════════════
-
     private fun navigateToScanQRScreen() {
-        scrollToAndClick("Connect to Server")
+        composeTestRule.navigateFromHome("Connect to Server")
         composeTestRule.waitForText("Scan Server QR Code", timeoutMs = 10_000)
     }
 
-    // ── 1. Screen Displays ──────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════
+    // ScanQRCodeScreen Tests (camera required)
+    // ══════════════════════════════════════════════════════════════════
 
     @Test
     fun scanQRScreen_displaysWithoutCrash() {
@@ -66,15 +63,11 @@ class PairingScreensTest {
         composeTestRule.assertTextDisplayed("Scan Server QR Code")
     }
 
-    // ── 2. Title Visible ────────────────────────────────────────────
-
     @Test
     fun scanQRScreen_titleVisible() {
         navigateToScanQRScreen()
         composeTestRule.assertTextDisplayed("Scan Server QR Code")
     }
-
-    // ── 3. Scanning State Content ───────────────────────────────────
 
     @Test
     fun scanQRScreen_showsDescription() {
@@ -95,15 +88,6 @@ class PairingScreensTest {
     }
 
     @Test
-    fun scanQRScreen_showsCameraPermissionOrPreview() {
-        navigateToScanQRScreen()
-        // Screen rendered without crash — camera area is present in some form
-        composeTestRule.assertTextDisplayed("Scan Server QR Code")
-    }
-
-    // ── 4. Back Navigation ──────────────────────────────────────────
-
-    @Test
     fun scanQRScreen_backNavigation_returnsToHome() {
         navigateToScanQRScreen()
         Espresso.pressBack()
@@ -117,40 +101,5 @@ class PairingScreensTest {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitForText("Drop Anchor", timeoutMs = 10_000)
-    }
-
-    // ══════════════════════════════════════════════════════════════════
-    // PairedDashboardScreen Tests
-    // ══════════════════════════════════════════════════════════════════
-
-    // PairedDashboard requires an active pairing session. Since we can't
-    // establish a real WebSocket connection in instrumented tests, we verify
-    // the navigation flow reaches the QR code screen (the gateway to the
-    // paired dashboard) and that the screen structure compiles correctly.
-
-    @Test
-    fun pairedDashboard_qrCodeGateway_isReachable() {
-        // Verify the path to the paired dashboard starts correctly
-        scrollToAndClick("Pair with Tablet")
-        composeTestRule.waitForText("Pair with Tablet", timeoutMs = 10_000)
-        composeTestRule.assertTextDisplayed("Connect to Tablet")
-        composeTestRule.assertTextDisplayed("Create Hotspot")
-    }
-
-    // ══════════════════════════════════════════════════════════════════
-    // ClientDashboardScreen Tests
-    // ══════════════════════════════════════════════════════════════════
-
-    // ClientDashboard requires an active server connection. Since we can't
-    // establish a real WebSocket connection in instrumented tests, we verify
-    // the navigation flow reaches the scan screen (the gateway to the
-    // client dashboard) and that the screen structure compiles correctly.
-
-    @Test
-    fun clientDashboard_scanGateway_isReachable() {
-        // Verify the path to the client dashboard starts correctly
-        scrollToAndClick("Connect to Server")
-        composeTestRule.waitForText("Scan Server QR Code", timeoutMs = 10_000)
-        composeTestRule.assertTextDisplayed("Server URL")
     }
 }

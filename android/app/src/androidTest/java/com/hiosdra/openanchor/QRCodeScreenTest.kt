@@ -8,13 +8,15 @@ import com.hiosdra.openanchor.helpers.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.GrantPermissionRule
 
-@Ignore("Requires camera hardware not available on CI emulator")
+/**
+ * Tests for the QR code generation screen (Pair with Tablet).
+ * This screen generates/displays QR codes for pairing — no camera required.
+ */
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class QRCodeScreenTest {
@@ -40,17 +42,8 @@ class QRCodeScreenTest {
         navigateToQRCodeScreen()
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────
-
-    private fun scrollToAndClick(text: String) {
-        composeTestRule.scrollToText(text)
-        composeTestRule.waitForIdle()
-        composeTestRule.waitForText(text).performClick()
-        composeTestRule.waitForIdle()
-    }
-
     private fun navigateToQRCodeScreen() {
-        scrollToAndClick("Pair with Tablet")
+        composeTestRule.navigateFromHome("Pair with Tablet")
         composeTestRule.waitForText("Pair with Tablet", timeoutMs = 10_000)
     }
 

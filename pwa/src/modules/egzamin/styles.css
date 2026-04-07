@@ -1,69 +1,97 @@
-@import "tailwindcss";
-@import "../../../styles/theme.css";
+@import 'tailwindcss';
+@import '../../../styles/theme.css';
 
 /* Module-specific styles only - base styles in theme.css */
 
 /* Answer button animations */
 .answer-btn {
-    transition: all 0.2s ease;
-    cursor: pointer;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 .answer-btn:active {
-    transform: scale(0.96);
+  transform: scale(0.96);
 }
 
 /* Correct/incorrect animations */
 @keyframes correct-pulse {
-    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
-    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
 }
 
 @keyframes incorrect-shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 .correct-btn {
-    animation: correct-pulse 0.6s ease-out;
+  animation: correct-pulse 0.6s ease-out;
 }
 
 .incorrect-btn {
-    animation: incorrect-shake 0.4s ease-out;
+  animation: incorrect-shake 0.4s ease-out;
 }
 
 /* Image zoom modal */
 .image-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: rgba(0,0,0,0.92);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem; /* fallback for browsers without safe-area support */
-    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-    cursor: zoom-out;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem; /* fallback for browsers without safe-area support */
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  cursor: zoom-out;
 }
 
 .image-modal img {
-    max-width: 100%;
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: 0.5rem;
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 0.5rem;
 }
 
 /* Progress bar */
 .progress-fill {
-    transition: width 0.3s ease;
+  transition: width 0.3s ease;
 }
 
 /* Leitner box colors */
-.leitner-box-1 { --box-color: #ef4444; }
-.leitner-box-2 { --box-color: #f97316; }
-.leitner-box-3 { --box-color: #eab308; }
-.leitner-box-4 { --box-color: #22c55e; }
-.leitner-box-5 { --box-color: #3b82f6; }
+.leitner-box-1 {
+  --box-color: #ef4444;
+}
+.leitner-box-2 {
+  --box-color: #f97316;
+}
+.leitner-box-3 {
+  --box-color: #eab308;
+}
+.leitner-box-4 {
+  --box-color: #22c55e;
+}
+.leitner-box-5 {
+  --box-color: #3b82f6;
+}

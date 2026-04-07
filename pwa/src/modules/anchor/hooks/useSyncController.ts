@@ -1,10 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import L from 'leaflet';
 import { ReconnectStrategy } from '../reconnect-strategy';
-
-const PING_INTERVAL_MS = 5000;
-const STATE_UPDATE_INTERVAL_MS = 2000;
-const HEARTBEAT_TIMEOUT_MS = 15000;
+import {
+  WS_PING_INTERVAL_MS,
+  WS_HEARTBEAT_TIMEOUT_MS,
+  WS_STATE_UPDATE_INTERVAL_MS,
+  MessageType,
+  type ConnectionState,
+} from '@shared/constants/protocol';
 
 interface UseSyncControllerParams {
   onMessage: (type: string, data: Record<string, any>) => void;
@@ -12,9 +15,8 @@ interface UseSyncControllerParams {
 
 export function useSyncController({ onMessage }: UseSyncControllerParams) {
   const [isConnected, setIsConnected] = useState(false);
-  const [wsUrl, setWsUrl] = useState(
-    () => localStorage.getItem('anchor_ws_url') || '',
-  );
+  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
+  const [wsUrl, setWsUrl] = useState(() => localStorage.getItem('anchor_ws_url') || '');
   const [peerBattery, setPeerBattery] = useState<number | null>(null);
   const [peerCharging, setPeerCharging] = useState(false);
   const [peerPos, setPeerPos] = useState<L.LatLng | null>(null);
@@ -88,7 +90,7 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
       }
       if (state.chainLengthM != null) payload.chainLengthM = state.chainLengthM;
       if (state.depthM != null) payload.depthM = state.depthM;
-      sendMessage('FULL_SYNC', payload);
+      sendMessage(MessageType.FULL_SYNC, payload);
     },
     [sendMessage],
   );
@@ -117,19 +119,15 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
       const hash = JSON.stringify(payload);
       if (hash !== lastSentStateHashRef.current) {
         lastSentStateHashRef.current = hash;
-        sendMessage('STATE_UPDATE', payload);
+        sendMessage(MessageType.STATE_UPDATE, payload);
       }
     },
     [sendMessage],
   );
 
   const sendTriggerAlarm = useCallback(
-    (
-      reason: string,
-      message: string,
-      alarmState: string,
-    ) => {
-      sendMessage('TRIGGER_ALARM', { reason, message, alarmState });
+    (reason: string, message: string, alarmState: string) => {
+      sendMessage(MessageType.TRIGGER_ALARM, { reason, message, alarmState });
     },
     [sendMessage],
   );
@@ -151,10 +149,15 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
         }
       });
       if (delay !== null) {
+        setConnectionState('reconnecting');
         console.warn(
           `WS: scheduling reconnect #${reconnectStrategyRef.current.attempts} in ${delay}ms`,
         );
+      } else {
+        setConnectionState('disconnected');
       }
+    } else {
+      setConnectionState('disconnected');
     }
   }, [clearIntervals]);
 
@@ -163,13 +166,13 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
       const data = JSON.parse(event.data);
       if (!data || typeof data.type !== 'string') return;
 
-      if (data.type === 'PING') {
+      if (data.type === MessageType.PING) {
         lastPeerPingTimeRef.current = Date.now();
         setConnectionLostWarning(false);
         return;
       }
 
-      if (data.type === 'ANDROID_GPS_REPORT' && data.payload) {
+      if (data.type === MessageType.ANDROID_GPS_REPORT && data.payload) {
         const p = data.payload;
         if (p.pos && typeof p.pos.lat === 'number' && typeof p.pos.lng === 'number') {
           setPeerPos(L.latLng(p.pos.lat, p.pos.lng));
@@ -188,28 +191,30 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
 
   const doConnect = useCallback(() => {
     try {
+      setConnectionState('connecting');
       const ws = new WebSocket(urlRef.current);
 
       ws.onopen = () => {
         isConnectedRef.current = true;
         setIsConnected(true);
+        setConnectionState('connected');
         reconnectStrategyRef.current.onConnected();
         lastPeerPingTimeRef.current = Date.now();
         setConnectionLostWarning(false);
         lastSentStateHashRef.current = null;
 
         pingIntervalRef.current = setInterval(() => {
-          sendMessage('PING');
-        }, PING_INTERVAL_MS);
+          sendMessage(MessageType.PING);
+        }, WS_PING_INTERVAL_MS);
       };
 
       ws.onclose = () => handleOnClose();
-      ws.onerror = (e) => console.warn('WS Error', e);
+      ws.onerror = (e) => console.warn('WS: connection error', e);
       ws.onmessage = (msg) => handleOnMessage(msg);
 
       wsRef.current = ws;
     } catch (err) {
-      console.error('WS Connect error', err);
+      console.error('WS: failed to create WebSocket', err);
       handleOnClose();
     }
   }, [sendMessage, handleOnClose, handleOnMessage]);
@@ -240,12 +245,13 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
     (reason = 'USER_DISCONNECT') => {
       reconnectStrategyRef.current.markIntentional();
       if (wsRef.current && isConnectedRef.current) {
-        sendMessage('DISCONNECT', { reason });
+        sendMessage(MessageType.DISCONNECT, { reason });
       }
       closeSocket();
       clearIntervals();
       isConnectedRef.current = false;
       setIsConnected(false);
+      setConnectionState('disconnected');
       lastPeerPingTimeRef.current = null;
       setConnectionLostWarning(false);
       setPeerBattery(null);
@@ -257,7 +263,7 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
   const checkHeartbeat = useCallback(() => {
     if (!isConnectedRef.current || !lastPeerPingTimeRef.current) return;
     const elapsed = Date.now() - lastPeerPingTimeRef.current;
-    if (elapsed > HEARTBEAT_TIMEOUT_MS) {
+    if (elapsed > WS_HEARTBEAT_TIMEOUT_MS) {
       setConnectionLostWarning(true);
       closeSocket();
       handleOnClose();
@@ -265,22 +271,24 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
   }, [closeSocket, handleOnClose]);
 
   const startStateUpdateInterval = useCallback(
-    (getState: () => {
-      currentPos: L.LatLng | null;
-      accuracy: number;
-      distance: number;
-      alarmState: string;
-      sog: number;
-      cog: number | null;
-      batteryLevel: number;
-      isCharging: boolean;
-    }) => {
+    (
+      getState: () => {
+        currentPos: L.LatLng | null;
+        accuracy: number;
+        distance: number;
+        alarmState: string;
+        sog: number;
+        cog: number | null;
+        batteryLevel: number;
+        isCharging: boolean;
+      },
+    ) => {
       if (stateUpdateIntervalRef.current) clearInterval(stateUpdateIntervalRef.current);
       stateUpdateIntervalRef.current = setInterval(() => {
         if (isConnectedRef.current) {
           sendStateUpdate(getState());
         }
-      }, STATE_UPDATE_INTERVAL_MS);
+      }, WS_STATE_UPDATE_INTERVAL_MS);
     },
     [sendStateUpdate],
   );
@@ -310,5 +318,6 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
     peerCharging,
     peerPos,
     connectionLostWarning,
+    connectionState,
   };
 }

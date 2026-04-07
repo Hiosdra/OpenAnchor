@@ -42,10 +42,7 @@ export function buildShareUrlLocal(state: AppState, readOnly = false): string {
   }
 }
 
-export async function renderShareQrCode(
-  container: HTMLElement,
-  appState: AppState,
-): Promise<void> {
+export async function renderShareQrCode(container: HTMLElement, appState: AppState): Promise<void> {
   container.innerHTML = '';
 
   const url = buildShareUrlLocal(appState);
@@ -193,8 +190,7 @@ export function useExportShare(
             Array.isArray(value) &&
             value.length <= MAX_ITEMS &&
             value.every(
-              (item: unknown) =>
-                item !== null && typeof item === 'object' && !Array.isArray(item),
+              (item: unknown) => item !== null && typeof item === 'object' && !Array.isArray(item),
             );
 
           if (!isValidArrayOfObjects(crew) || !isValidArrayOfObjects(slots)) {

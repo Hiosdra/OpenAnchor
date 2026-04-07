@@ -9,8 +9,7 @@ import { initBackground } from '../../shared/init-background';
 
 initBackground();
 
-document.documentElement.dataset.theme =
-  localStorage.getItem('openanchor-theme') || 'dark';
+document.documentElement.dataset.theme = localStorage.getItem('openanchor-theme') || 'dark';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

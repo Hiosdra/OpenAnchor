@@ -125,9 +125,9 @@ export function buildCSV(points: CSVTrackPoint[]): string | null {
  * Returns `null` when the response does not match.
  */
 export function parseLogbookResponse(response: string): ParsedLogbook | null {
-  const summaryMatch = response.match(/SUMMARY:\s*(.+?)(?=\n|LOG:)/si);
-  const logMatch = response.match(/LOG:\s*(.+?)(?=SAFETY:)/si);
-  const safetyMatch = response.match(/SAFETY:\s*(.+?)$/si);
+  const summaryMatch = response.match(/SUMMARY:\s*(.+?)(?=\n|LOG:)/is);
+  const logMatch = response.match(/LOG:\s*(.+?)(?=SAFETY:)/is);
+  const safetyMatch = response.match(/SAFETY:\s*(.+?)$/is);
 
   if (summaryMatch && logMatch) {
     return {
@@ -184,9 +184,6 @@ export function isGpsSignalLost(elapsedMs: number, timeoutMs: number): boolean {
  * Determine whether battery saver mode should be activated.
  * Activates when battery level is ≤ 30 % and the device is NOT charging.
  */
-export function shouldActivateBatterySaver(
-  level: number | undefined,
-  charging: boolean,
-): boolean {
+export function shouldActivateBatterySaver(level: number | undefined, charging: boolean): boolean {
   return level !== undefined && level <= 0.3 && !charging;
 }

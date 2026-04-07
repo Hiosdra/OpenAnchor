@@ -40,8 +40,12 @@ export function getCurrentPath(): string {
   return _currentPath;
 }
 
-function showLoading(): void { if (_config) _config.loadingEl.style.display = ''; }
-function hideLoading(): void { if (_config) _config.loadingEl.style.display = 'none'; }
+function showLoading(): void {
+  if (_config) _config.loadingEl.style.display = '';
+}
+function hideLoading(): void {
+  if (_config) _config.loadingEl.style.display = 'none';
+}
 
 function showDashboard(): void {
   if (!_config) return;
@@ -61,13 +65,24 @@ export async function navigateTo(path: string): Promise<void> {
   if (!_config) return;
   if (path === _currentPath) return;
 
-  if (_currentCleanup) { _currentCleanup(); _currentCleanup = null; }
+  if (_currentCleanup) {
+    _currentCleanup();
+    _currentCleanup = null;
+  }
   _currentPath = path;
 
-  if (path === '/') { showDashboard(); document.title = _defaultTitle; return; }
+  if (path === '/') {
+    showDashboard();
+    document.title = _defaultTitle;
+    return;
+  }
 
   const route = _config.routes.find((r) => r.path === path);
-  if (!route) { showDashboard(); _currentPath = '/'; return; }
+  if (!route) {
+    showDashboard();
+    _currentPath = '/';
+    return;
+  }
 
   showLoading();
   showOutlet();
@@ -118,7 +133,10 @@ export function push(path: string): void {
 /** Handle a legacy MPA module URL via the SPA router. Returns true if handled. */
 export function navigateToModule(url: string): boolean {
   const route = MODULE_URL_TO_ROUTE[url];
-  if (route && _config) { push(route); return true; }
+  if (route && _config) {
+    push(route);
+    return true;
+  }
   return false;
 }
 
@@ -141,7 +159,10 @@ export function initRouter(cfg: RouterConfig): () => void {
 
   return () => {
     window.removeEventListener('hashchange', onHashChange);
-    if (_currentCleanup) { _currentCleanup(); _currentCleanup = null; }
+    if (_currentCleanup) {
+      _currentCleanup();
+      _currentCleanup = null;
+    }
     _currentPath = '/';
     _config = null;
   };

@@ -40,15 +40,12 @@ export function useWatchSchedule() {
     }, SAVE_DEBOUNCE_MS);
   }, []);
 
-  const startWatch = useCallback(
-    (minutes: number) => {
-      const endTime = Date.now() + minutes * 60 * 1000;
-      setWatchActive(true);
-      setWatchEndTime(endTime);
-      setWatchMinutes(minutes);
-    },
-    [],
-  );
+  const startWatch = useCallback((minutes: number) => {
+    const endTime = Date.now() + minutes * 60 * 1000;
+    setWatchActive(true);
+    setWatchEndTime(endTime);
+    setWatchMinutes(minutes);
+  }, []);
 
   const cancelWatch = useCallback(() => {
     setWatchActive(false);

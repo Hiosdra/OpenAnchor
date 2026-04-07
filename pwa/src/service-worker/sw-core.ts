@@ -1,9 +1,6 @@
 export const CACHE_NAME = 'openanchor-superapp-v10' as const;
 
-export const coreUrls: readonly string[] = [
-  './',
-  './index.html',
-] as const;
+export const coreUrls: readonly string[] = ['./', './index.html'] as const;
 
 export const moduleUrls: Readonly<Record<string, readonly string[]>> = {
   anchor: ['./modules/anchor/', './modules/anchor/index.html'],
@@ -38,9 +35,7 @@ export function isHashedAsset(url: URL): boolean {
   return url.pathname.includes('/assets/');
 }
 
-export async function cacheFirstStrategy(
-  request: Request,
-): Promise<Response> {
+export async function cacheFirstStrategy(request: Request): Promise<Response> {
   const cached = await caches.match(request);
   if (cached) return cached;
 
@@ -57,9 +52,7 @@ export async function cacheFirstStrategy(
   }
 }
 
-export async function staleWhileRevalidate(
-  request: Request,
-): Promise<Response> {
+export async function staleWhileRevalidate(request: Request): Promise<Response> {
   const cachedResponse = await caches.match(request);
 
   if (cachedResponse) {

@@ -49,12 +49,14 @@ export class AIController {
 
     if (appState.currentPos) {
       parts.push(
-        `- Boat position: ${appState.currentPos.lat.toFixed(6)}, ${appState.currentPos.lng.toFixed(6)} (GPS accuracy: ${Math.round(appState.accuracy)}m)`
+        `- Boat position: ${appState.currentPos.lat.toFixed(6)}, ${appState.currentPos.lng.toFixed(6)} (GPS accuracy: ${Math.round(appState.accuracy)}m)`,
       );
     }
 
     if (appState.isAnchored && appState.anchorPos) {
-      parts.push(`- Anchor position: ${appState.anchorPos.lat.toFixed(6)}, ${appState.anchorPos.lng.toFixed(6)}`);
+      parts.push(
+        `- Anchor position: ${appState.anchorPos.lat.toFixed(6)}, ${appState.anchorPos.lng.toFixed(6)}`,
+      );
       parts.push(`- Safe zone radius: ${appState.radius}m`);
       if (appState.anchorStartTime) {
         const hours = (Date.now() - appState.anchorStartTime) / 3600000;
@@ -63,11 +65,14 @@ export class AIController {
       parts.push(`- Alarms so far: ${appState.alarmCount || 0}`);
       parts.push(`- Current distance from anchor: ${Math.round(appState.distance)}m`);
       parts.push(`- Current alarm state: ${appState.alarmState}`);
-      if (appState.maxDistanceSwing > 0) parts.push(`- Max swing distance: ${Math.round(appState.maxDistanceSwing)}m`);
-      if (appState.maxSogDuringAnchor > 0) parts.push(`- Max SOG while anchored: ${appState.maxSogDuringAnchor.toFixed(1)} kn`);
+      if (appState.maxDistanceSwing > 0)
+        parts.push(`- Max swing distance: ${Math.round(appState.maxDistanceSwing)}m`);
+      if (appState.maxSogDuringAnchor > 0)
+        parts.push(`- Max SOG while anchored: ${appState.maxSogDuringAnchor.toFixed(1)} kn`);
     }
 
-    if (appState.chainLengthM) parts.push(`- Chain deployed: ${Math.round(appState.chainLengthM)}m`);
+    if (appState.chainLengthM)
+      parts.push(`- Chain deployed: ${Math.round(appState.chainLengthM)}m`);
     if (appState.depthM) parts.push(`- Water depth: ${appState.depthM}m`);
 
     return parts.join('\n');
@@ -77,16 +82,22 @@ export class AIController {
     question: string,
     systemInstruction: string,
     contextPrompt: string,
-    weatherContext: string
+    weatherContext: string,
   ): Promise<string> {
     const fullContext = contextPrompt + (weatherContext ? '\n' + weatherContext : '');
     const contents: ChatTurn[] = [];
 
     if (this.chatHistory.length === 0) {
-      contents.push({ role: 'user', parts: [{ text: `${fullContext}\n\nSailor's question: ${question}` }] });
+      contents.push({
+        role: 'user',
+        parts: [{ text: `${fullContext}\n\nSailor's question: ${question}` }],
+      });
     } else {
       for (const turn of this.chatHistory) contents.push(turn);
-      contents.push({ role: 'user', parts: [{ text: `${fullContext}\n\nFollow-up question: ${question}` }] });
+      contents.push({
+        role: 'user',
+        parts: [{ text: `${fullContext}\n\nFollow-up question: ${question}` }],
+      });
     }
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.apiKey}`;
@@ -160,10 +171,10 @@ export class AIController {
   async fetchWeather(lat: number, lng: number): Promise<string> {
     try {
       const marineRes = await fetch(
-        `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lng}&current=wave_height,wave_direction,wave_period&hourly=wave_height,wave_direction,wave_period`
+        `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lng}&current=wave_height,wave_direction,wave_period&hourly=wave_height,wave_direction,wave_period`,
       );
       const windRes = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&timezone=auto&forecast_days=2`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&timezone=auto&forecast_days=2`,
       );
       const windData = await windRes.json();
       const curWind = windData.current.wind_speed_10m;
@@ -171,7 +182,9 @@ export class AIController {
       const curDir = windData.current.wind_direction_10m;
       const now = new Date();
       const nowIdx = windData.hourly.time.findIndex((t: string) => new Date(t) > now) || 0;
-      const next12hGusts = windData.hourly.wind_gusts_10m.slice(nowIdx, nowIdx + 12).filter((g: number | null) => g !== null);
+      const next12hGusts = windData.hourly.wind_gusts_10m
+        .slice(nowIdx, nowIdx + 12)
+        .filter((g: number | null) => g !== null);
       const maxGust12h = next12hGusts.length > 0 ? Math.max(...next12hGusts) : curGust;
 
       let marineTxt = '';

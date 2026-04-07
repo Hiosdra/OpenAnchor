@@ -16,11 +16,18 @@ const BOX_LABELS = ['Pudełko 1', 'Pudełko 2', 'Pudełko 3', 'Pudełko 4', 'Pud
 const BOX_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
 const BOX_INTERVALS = ['Co sesje', 'Co 2 sesje', 'Co 4 sesje', 'Co 8 sesji', 'Co 16 sesji'];
 
-export function LeitnerOverviewScreen({ questions, leitnerState, onStartSession, onBack, onReset }: LeitnerOverviewScreenProps) {
+export function LeitnerOverviewScreen({
+  questions,
+  leitnerState,
+  onStartSession,
+  onBack,
+  onReset,
+}: LeitnerOverviewScreenProps) {
   const boxCounts = getBoxCounts(leitnerState, questions);
   const dueQuestions = getDueQuestions(leitnerState, questions);
   const totalMastered = boxCounts[4];
-  const pctMastered = questions.length > 0 ? Math.round((totalMastered / questions.length) * 100) : 0;
+  const pctMastered =
+    questions.length > 0 ? Math.round((totalMastered / questions.length) * 100) : 0;
   const stats = getLeitnerStats(leitnerState);
 
   return (
@@ -64,7 +71,9 @@ export function LeitnerOverviewScreen({ questions, leitnerState, onStartSession,
 
           {/* Box breakdown */}
           <div className="space-y-2 mb-6">
-            <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 px-1">Pudełka</h3>
+            <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 px-1">
+              Pudełka
+            </h3>
             {BOX_LABELS.map((label, i) => {
               const count = boxCounts[i];
               const pct = questions.length > 0 ? (count / questions.length) * 100 : 0;
@@ -72,11 +81,20 @@ export function LeitnerOverviewScreen({ questions, leitnerState, onStartSession,
                 <div key={i} className="rounded-xl bg-white/5 border border-white/5 px-4 py-3">
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
-                      <span style={{ width: 10, height: 10, borderRadius: '50%', background: BOX_COLORS[i] }}></span>
+                      <span
+                        style={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: '50%',
+                          background: BOX_COLORS[i],
+                        }}
+                      ></span>
                       <span className="text-sm font-semibold">{label}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-bold" style={{ color: BOX_COLORS[i] }}>{count}</span>
+                      <span className="text-sm font-bold" style={{ color: BOX_COLORS[i] }}>
+                        {count}
+                      </span>
                       <span className="text-xs text-white/30 ml-1">pytań</span>
                     </div>
                   </div>
@@ -100,9 +118,17 @@ export function LeitnerOverviewScreen({ questions, leitnerState, onStartSession,
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold text-base hover:from-blue-500 hover:to-blue-400 transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <div className="flex items-center justify-center gap-2">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                  strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                  <polygon points="5 3 19 12 5 21 5 3"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  width="20"
+                  height="20"
+                >
+                  <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
                 {dueQuestions.length > 0
                   ? `Rozpocznij sesję (${dueQuestions.length} pytań)`
@@ -113,7 +139,11 @@ export function LeitnerOverviewScreen({ questions, leitnerState, onStartSession,
             {stats.total > 0 && (
               <button
                 onClick={() => {
-                  if (confirm('Na pewno chcesz zresetować postęp Leitnera? Wszystkie pytania wrócą do Pudełka 1.')) {
+                  if (
+                    confirm(
+                      'Na pewno chcesz zresetować postęp Leitnera? Wszystkie pytania wrócą do Pudełka 1.',
+                    )
+                  ) {
                     onReset();
                   }
                 }}

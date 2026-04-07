@@ -17,7 +17,13 @@ interface LeitnerSessionScreenProps {
 
 const BOX_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
 
-export function LeitnerSessionScreen({ dueQuestions, leitnerState, onUpdateLeitner, onComplete, onBack }: LeitnerSessionScreenProps) {
+export function LeitnerSessionScreen({
+  dueQuestions,
+  leitnerState,
+  onUpdateLeitner,
+  onComplete,
+  onBack,
+}: LeitnerSessionScreenProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [sessionCorrect, setSessionCorrect] = useState(0);
@@ -34,7 +40,6 @@ export function LeitnerSessionScreen({ dueQuestions, leitnerState, onUpdateLeitn
   sessionIncorrectRef.current = sessionIncorrect;
   leitnerStateRef.current = currentLeitnerState;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (isSessionComplete) {
       onComplete(sessionCorrectRef.current, sessionIncorrectRef.current, leitnerStateRef.current);
@@ -56,13 +61,13 @@ export function LeitnerSessionScreen({ dueQuestions, leitnerState, onUpdateLeitn
     setCurrentLeitnerState(newState);
     onUpdateLeitner(newState);
 
-    if (isCorrect) setSessionCorrect(c => c + 1);
-    else setSessionIncorrect(c => c + 1);
+    if (isCorrect) setSessionCorrect((c) => c + 1);
+    else setSessionIncorrect((c) => c + 1);
   };
 
   const handleNext = () => {
     if (currentIndex < dueQuestions.length - 1) {
-      setCurrentIndex(i => i + 1);
+      setCurrentIndex((i) => i + 1);
       setSelectedAnswer(null);
     } else {
       onComplete(sessionCorrectRef.current, sessionIncorrectRef.current, leitnerStateRef.current);
@@ -80,7 +85,14 @@ export function LeitnerSessionScreen({ dueQuestions, leitnerState, onUpdateLeitn
         }}
         rightContent={
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5">
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: BOX_COLORS[currentBox - 1] }}></span>
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: BOX_COLORS[currentBox - 1],
+              }}
+            ></span>
             <span className="text-xs text-white/50">P{currentBox}</span>
           </div>
         }
@@ -97,7 +109,10 @@ export function LeitnerSessionScreen({ dueQuestions, leitnerState, onUpdateLeitn
         }}
       />
 
-      <div className="flex-1 px-4 pb-4" style={{paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'}}>
+      <div
+        className="flex-1 px-4 pb-4"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+      >
         <div className="max-w-2xl mx-auto space-y-3">
           <QuestionImageCard question={currentQuestion} />
 
@@ -117,9 +132,7 @@ export function LeitnerSessionScreen({ dueQuestions, leitnerState, onUpdateLeitn
                   Pudełko {currentBox} &rarr; {Math.min(currentBox + 1, LEITNER_BOX_COUNT)}
                 </div>
               ) : (
-                <div className="text-sm text-red-400">
-                  Pudełko {currentBox} &rarr; 1
-                </div>
+                <div className="text-sm text-red-400">Pudełko {currentBox} &rarr; 1</div>
               )}
             </div>
           )}

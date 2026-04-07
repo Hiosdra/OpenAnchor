@@ -29,14 +29,8 @@ export function formatICSDateTime(d: Date): string {
  *
  * Only slots where `person` is in the `assigned` array are included.
  */
-export function generateICSContent(
-  allSlotsAbsolute: AbsoluteSlot[],
-  person: CrewMember,
-): string {
-  let ics =
-    'BEGIN:VCALENDAR\r\n' +
-    'VERSION:2.0\r\n' +
-    'PRODID:-//Morski Grafik Wacht//PL\r\n';
+export function generateICSContent(allSlotsAbsolute: AbsoluteSlot[], person: CrewMember): string {
+  let ics = 'BEGIN:VCALENDAR\r\n' + 'VERSION:2.0\r\n' + 'PRODID:-//Morski Grafik Wacht//PL\r\n';
 
   for (const slot of allSlotsAbsolute) {
     if (!slot.assigned.some((p) => p.id === person.id)) continue;

@@ -23,7 +23,7 @@ export interface LeitnerQuestionData {
 
 export interface LeitnerState {
   boxes: Record<string, LeitnerQuestionData>;
-  lastReview: Record<string, unknown>;
+  lastReview: Record<string, number>;
 }
 
 export interface LeitnerIntervals {
@@ -37,12 +37,12 @@ export interface LeitnerIntervals {
 export interface ExamQuestion {
   id: string;
   category: string;
-  [key: string]: unknown;
 }
 
 export interface ExamAnswerRecord {
   correct: boolean;
-  [key: string]: unknown;
+  answer?: string;
+  timestamp?: number;
 }
 
 export interface ExamProgress {
@@ -86,7 +86,10 @@ export interface SyncResult {
 }
 
 export interface PdfMetadata {
-  [key: string]: unknown;
+  hash: string;
+  filename: string;
+  importDate: string;
+  fileSize: number;
 }
 
 export interface PdfStorageRecord {

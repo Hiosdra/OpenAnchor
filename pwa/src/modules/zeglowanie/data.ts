@@ -1,9 +1,19 @@
 // ── Types ──────────────────────────────────────────────────────
-interface TextItem { id: string; text: string }
+interface TextItem {
+  id: string;
+  text: string;
+}
 export type PackingItem = TextItem;
 export type BriefingItem = TextItem;
-export interface ChecklistItem { id: string; text: string; crew: boolean }
-export interface ChecklistSection { title: string; items: ChecklistItem[] }
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  crew: boolean;
+}
+export interface ChecklistSection {
+  title: string;
+  items: ChecklistItem[];
+}
 export type CruiseType = 'baltic-autumn' | 'croatia-summer';
 export type BriefingType = 'zero' | 'first-day';
 export type ChecklistType = 'morning' | 'departure' | 'mooring' | 'grabbag';
@@ -32,10 +42,16 @@ export const packingLists: Record<CruiseType, PackingItem[]> = {
     t('krem-uv', '<strong>Krem UV</strong> (wysoki filtr!)'),
     t('latarka', '<strong>Latarka</strong>, najlepiej czołówka'),
     t('ladowarka', '<strong>Ładowarka z gniazdkiem europejskim</strong>'),
-    t('rozdzielacz', '<strong>Kradziejka prądu (rozdzielacz)</strong> - w kabinach zazwyczaj 1 gniazdko na 2 osoby'),
+    t(
+      'rozdzielacz',
+      '<strong>Kradziejka prądu (rozdzielacz)</strong> - w kabinach zazwyczaj 1 gniazdko na 2 osoby',
+    ),
     t('powerbank', '<strong>Powerbank</strong>'),
     t('kable', '<strong>Kable do ładowania</strong> (USB-C, Lightning, itp.)'),
-    t('choroba-morska', '<strong>Coś na chorobę morską</strong> jeżeli podlegasz (Aviomarin, opaski, itp.)'),
+    t(
+      'choroba-morska',
+      '<strong>Coś na chorobę morską</strong> jeżeli podlegasz (Aviomarin, opaski, itp.)',
+    ),
   ],
   'croatia-summer': [
     t('ekuz', '<strong>EKUZ</strong>, paszport, dowód osobisty'),
@@ -48,25 +64,37 @@ export const packingLists: Record<CruiseType, PackingItem[]> = {
     t('kostium', '<strong>Kostium do pływania</strong> (a nawet x2 jednak będzie dobre słoneczko)'),
     t('czapka', '<strong>Czapka!</strong>'),
     t('okulary', '<strong>Okulary przeciwsłoneczne</strong> (nie zastępują czapki)'),
-    t('rekawiczki', '<strong>Rękawiczki</strong> jeżeli ktoś preferuje, ale koniecznie nie rowerowe, na morzu opcjonalne'),
+    t(
+      'rekawiczki',
+      '<strong>Rękawiczki</strong> jeżeli ktoś preferuje, ale koniecznie nie rowerowe, na morzu opcjonalne',
+    ),
     t('buty', '<strong>Buty niefarbujące od spodu</strong> z zasłoniętymi palcami'),
     t('klapki', '<strong>Klapki do kąpieli</strong>'),
     t('recznik', '<strong>Ręcznik</strong>, najlepiej szybkoschnący'),
     t('kosmetyki', '<strong>Kosmetyki</strong>, fajnie jak BIO, ale nie jest to konieczne'),
-    t('proszek', '<strong>Proszek do prania</strong> (opcjonalnie, ja piorę rzeczy w trakcie, aby mniej brać)'),
+    t(
+      'proszek',
+      '<strong>Proszek do prania</strong> (opcjonalnie, ja piorę rzeczy w trakcie, aby mniej brać)',
+    ),
     t('krem-uv', '<strong>Krem UV</strong>'),
     t('latarka', '<strong>Latarka</strong>, najlepiej czołówka'),
     t('ladowarka', '<strong>Ładowarka z gniazdkiem europejskim</strong>'),
-    t('rozdzielacz', '<strong>Kradziejka prądu (rozdzielacz)</strong> (w kabinach jest zazwyczaj po 1 gniazdku na 2 osoby)'),
+    t(
+      'rozdzielacz',
+      '<strong>Kradziejka prądu (rozdzielacz)</strong> (w kabinach jest zazwyczaj po 1 gniazdku na 2 osoby)',
+    ),
     t('powerbank', '<strong>Powerbank</strong> (nie codziennie będzie prąd do ładowania)'),
     t('kable', '<strong>Kable do ładowania</strong>'),
-    t('ubranie-wierzch', '<strong>W porcie i restauracjach</strong> trzeba być nie tylko w kostiumie kąpielowym, więc coś sensownego na wierzch 😀'),
+    t(
+      'ubranie-wierzch',
+      '<strong>W porcie i restauracjach</strong> trzeba być nie tylko w kostiumie kąpielowym, więc coś sensownego na wierzch 😀',
+    ),
     t('rekawice-budowlane', '<strong>2 pary rękawic budowlanych</strong> na ekipę'),
   ],
 };
 
 export const briefingLists: Record<BriefingType, BriefingItem[]> = {
-  'zero': [
+  zero: [
     t('sailing-intro', 'Jak wygląda żeglowanie? (wachty, współpraca, role na łódce)'),
     t('wc-operation', 'Obsługa WC (zawór, pompowanie, papier do kosza!)'),
     t('boarding', 'Wchodzenie i schodzenie z łódki (jedna ręka dla siebie, druga dla łódki)'),
@@ -84,7 +112,10 @@ export const briefingLists: Record<BriefingType, BriefingItem[]> = {
     t('first-aid', 'Apteczka (lokalizacja, poinformuj o alergiach)'),
     t('alcohol', 'Alkohol (zero podczas żeglugi, tylko w porcie)'),
     t('water-tea', 'Woda i herbata (oszczędzaj wodę, pilnuj garnka na kuchence)'),
-    t('secure-items', 'Zamknięte szafki i luźne rzeczy (wszystko zabezpieczone przed wypłynięciem!)'),
+    t(
+      'secure-items',
+      'Zamknięte szafki i luźne rzeczy (wszystko zabezpieczone przed wypłynięciem!)',
+    ),
     t('nav-apps', 'Aplikacje nawigacyjne (Orca, pobierz mapy offline)'),
     t('nav-planning', 'Patrzenie w mapę (planowanie z wyprzedzeniem, jak F1)'),
     t('port-time', 'Czas w porcie (zakupy, zwiedzanie, umiar z alkoholem)'),
@@ -98,37 +129,71 @@ export const briefingLists: Record<BriefingType, BriefingItem[]> = {
     t('no-lines', 'Nie stój na linach! (lina pod napięciem jest śmiertelnie niebezpieczna)'),
     t('winches', 'Obsługa kabestanów (3-4 razy, palce z dala!)'),
     t('knots', 'Węzły (ósemka, cumowniczy, szkotowy, bulina, dwa półsztyki)'),
-    t('mob-procedure', 'Człowiek za burtą - MOB (krzycz! → przycisk MOB → koło → obserwator → nie trać z oczu!)'),
+    t(
+      'mob-procedure',
+      'Człowiek za burtą - MOB (krzycz! → przycisk MOB → koło → obserwator → nie trać z oczu!)',
+    ),
   ],
 };
 
 export const checklistData: Record<ChecklistType, ChecklistSection> = {
-  'morning': { title: 'Codziennie rano', items: [
-    c('oil', 'Sprawdzić olej'), c('battery', 'V baterii'),
-    c('deck', 'Przemyć pokład', true), c('sweep', 'Zmiotka wewnątrz', true),
-    c('water', 'Dolać wody', true), c('weather', 'Pogoda'),
-    c('routes', 'Trasa główna, alternatywna i porty schronienia'),
-  ]},
-  'departure': { title: 'Wyjście z portu', items: [
-    c('port-fees', 'Opłaty'), c('water-refill', 'Woda', true), c('trash', 'Śmieci', true),
-    c('lockers', 'Zamknięcie szafek', true), c('report-out', 'Zgłoszenie?'),
-    c('wind-prep', 'Wiatr'), c('bimini-depart', 'Bimini', true),
-    c('bow-thruster', 'Cuma prądowa', true), c('windows', 'Okienka', true),
-    c('ladder', 'Trap', true), c('fenders-depart', 'Odbijacze', true),
-    c('observer-depart', 'Obserwator'), c('departure-plan', 'Plan odejścia'),
-  ]},
-  'mooring': { title: 'Cumowanie', items: [
-    c('marina-report', 'Zgłoszenie do mariny'), c('fenders-moor', 'Odbijacze', true),
-    c('railings', 'Nic na relingach', true), c('bimini-moor', 'Bimini', true),
-    c('observer-moor', 'Obserwator'), c('landing', 'Desant'),
-    c('mooring-lines', 'Cumy'), c('wind-direction', 'Kierunek wiatru'),
-    c('location', 'Miejsce'), c('approach-plan', 'Plan podejścia'),
-    c('fender-height', 'Wysokość odbijaczy'),
-  ]},
-  'grabbag': { title: 'Grab bag', items: [
-    c('boat-docs', 'Dokumenty łódki'), c('crew-docs', 'Dokumenty załogi'),
-    c('logbook', 'Dziennik'), c('handheld-vhf', 'Handheld VHF'),
-    c('powerbank-grab', 'Powerbank'), c('flashlights', 'Latarki'),
-    c('water-grab', 'Woda'), c('clothes', 'Ubrania, dużo'),
-  ]},
+  morning: {
+    title: 'Codziennie rano',
+    items: [
+      c('oil', 'Sprawdzić olej'),
+      c('battery', 'V baterii'),
+      c('deck', 'Przemyć pokład', true),
+      c('sweep', 'Zmiotka wewnątrz', true),
+      c('water', 'Dolać wody', true),
+      c('weather', 'Pogoda'),
+      c('routes', 'Trasa główna, alternatywna i porty schronienia'),
+    ],
+  },
+  departure: {
+    title: 'Wyjście z portu',
+    items: [
+      c('port-fees', 'Opłaty'),
+      c('water-refill', 'Woda', true),
+      c('trash', 'Śmieci', true),
+      c('lockers', 'Zamknięcie szafek', true),
+      c('report-out', 'Zgłoszenie?'),
+      c('wind-prep', 'Wiatr'),
+      c('bimini-depart', 'Bimini', true),
+      c('bow-thruster', 'Cuma prądowa', true),
+      c('windows', 'Okienka', true),
+      c('ladder', 'Trap', true),
+      c('fenders-depart', 'Odbijacze', true),
+      c('observer-depart', 'Obserwator'),
+      c('departure-plan', 'Plan odejścia'),
+    ],
+  },
+  mooring: {
+    title: 'Cumowanie',
+    items: [
+      c('marina-report', 'Zgłoszenie do mariny'),
+      c('fenders-moor', 'Odbijacze', true),
+      c('railings', 'Nic na relingach', true),
+      c('bimini-moor', 'Bimini', true),
+      c('observer-moor', 'Obserwator'),
+      c('landing', 'Desant'),
+      c('mooring-lines', 'Cumy'),
+      c('wind-direction', 'Kierunek wiatru'),
+      c('location', 'Miejsce'),
+      c('approach-plan', 'Plan podejścia'),
+      c('fender-height', 'Wysokość odbijaczy'),
+    ],
+  },
+  grabbag: {
+    title: 'Grab bag',
+    items: [
+      c('boat-docs', 'Dokumenty łódki'),
+      c('crew-docs', 'Dokumenty załogi'),
+      c('logbook', 'Dziennik'),
+      c('handheld-vhf', 'Handheld VHF'),
+      c('powerbank-grab', 'Powerbank'),
+      c('flashlights', 'Latarki'),
+      c('water-grab', 'Woda'),
+      c('clothes', 'Ubrania, dużo'),
+    ],
+  },
 };

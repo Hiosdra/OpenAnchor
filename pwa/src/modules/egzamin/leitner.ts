@@ -5,21 +5,26 @@
  * Migrated from js/leitner.js
  */
 
-import type { LeitnerQuestionData, LeitnerState, LeitnerIntervals, ExamQuestion } from '../../shared/types/index';
+import type {
+  LeitnerQuestionData,
+  LeitnerState,
+  LeitnerIntervals,
+  ExamQuestion,
+} from '../../shared/types/index';
 
 export const LEITNER_INTERVALS: LeitnerIntervals = {
-  1: 1,    // Box 1: Review daily
-  2: 2,    // Box 2: Review every 2 days
-  3: 4,    // Box 3: Review every 4 days
-  4: 8,    // Box 4: Review every 8 days
-  5: 16    // Box 5: Review every 16 days
+  1: 1, // Box 1: Review daily
+  2: 2, // Box 2: Review every 2 days
+  3: 4, // Box 3: Review every 4 days
+  4: 8, // Box 4: Review every 8 days
+  5: 16, // Box 5: Review every 16 days
 };
 
 export function initializeLeitnerQuestion(_questionId: string): LeitnerQuestionData {
   return {
     box: 1,
     lastReview: null,
-    reviewCount: 0
+    reviewCount: 0,
   };
 }
 
@@ -31,7 +36,7 @@ export function advanceQuestion(leitnerData: LeitnerQuestionData): LeitnerQuesti
     ...leitnerData,
     box: nextBox,
     lastReview: Date.now(),
-    reviewCount: (leitnerData.reviewCount || 0) + 1
+    reviewCount: (leitnerData.reviewCount || 0) + 1,
   };
 }
 
@@ -40,7 +45,7 @@ export function resetQuestion(leitnerData: LeitnerQuestionData): LeitnerQuestion
     ...leitnerData,
     box: 1,
     lastReview: Date.now(),
-    reviewCount: (leitnerData.reviewCount || 0) + 1
+    reviewCount: (leitnerData.reviewCount || 0) + 1,
   };
 }
 
@@ -57,8 +62,11 @@ export function isDueForReview(leitnerData: LeitnerQuestionData | null | undefin
   return timeSinceReview >= intervalMs;
 }
 
-export function getDueQuestions(leitnerState: LeitnerState, allQuestions: ExamQuestion[]): ExamQuestion[] {
-  const dueQuestions: ExamQuestion[] = [];
+export function getDueQuestions<T extends ExamQuestion>(
+  leitnerState: LeitnerState,
+  allQuestions: T[],
+): T[] {
+  const dueQuestions: T[] = [];
 
   allQuestions.forEach(function (question) {
     const leitnerData = leitnerState.boxes && leitnerState.boxes[question.id];
@@ -80,7 +88,7 @@ export function getLeitnerStats(leitnerState: LeitnerState): Record<string, numb
     3: 0,
     4: 0,
     5: 0,
-    total: 0
+    total: 0,
   };
 
   const boxes = leitnerState.boxes || {};
@@ -94,7 +102,9 @@ export function getLeitnerStats(leitnerState: LeitnerState): Record<string, numb
   return stats;
 }
 
-export function getNextReviewDate(leitnerData: LeitnerQuestionData | null | undefined): Date | null {
+export function getNextReviewDate(
+  leitnerData: LeitnerQuestionData | null | undefined,
+): Date | null {
   if (!leitnerData || !leitnerData.lastReview) {
     return null;
   }
@@ -106,19 +116,21 @@ export function getNextReviewDate(leitnerData: LeitnerQuestionData | null | unde
   return new Date(leitnerData.lastReview + intervalMs);
 }
 
-export function updateLeitnerState(leitnerState: LeitnerState, questionId: string, correct: boolean): LeitnerState {
+export function updateLeitnerState(
+  leitnerState: LeitnerState,
+  questionId: string,
+  correct: boolean,
+): LeitnerState {
   const boxes = leitnerState.boxes || {};
   const currentData = boxes[questionId] || initializeLeitnerQuestion(questionId);
 
-  const updatedData = correct
-    ? advanceQuestion(currentData)
-    : resetQuestion(currentData);
+  const updatedData = correct ? advanceQuestion(currentData) : resetQuestion(currentData);
 
   return {
     ...leitnerState,
     boxes: {
       ...boxes,
-      [questionId]: updatedData
-    }
+      [questionId]: updatedData,
+    },
   };
 }

@@ -34,8 +34,14 @@ export async function savePdfData(blob: Blob, metadata: PdfMetadata): Promise<vo
     const tx = db.transaction(PDF_STORE_NAME, 'readwrite');
     const store = tx.objectStore(PDF_STORE_NAME);
     store.put({ blob, metadata } as PdfStorageRecord, PDF_KEY);
-    tx.oncomplete = () => { db.close(); resolve(); };
-    tx.onerror = () => { db.close(); reject(tx.error); };
+    tx.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error);
+    };
   });
 }
 
@@ -49,9 +55,16 @@ export async function loadPdfBlob(): Promise<Blob | null> {
       request.onsuccess = () => {
         resolve(request.result ? (request.result as PdfStorageRecord).blob : null);
       };
-      request.onerror = () => { db.close(); reject(request.error); };
-      tx.oncomplete = () => { db.close(); };
-      tx.onerror = () => { db.close(); };
+      request.onerror = () => {
+        db.close();
+        reject(request.error);
+      };
+      tx.oncomplete = () => {
+        db.close();
+      };
+      tx.onerror = () => {
+        db.close();
+      };
     });
   } catch {
     return null;
@@ -68,9 +81,16 @@ export async function loadPdfMeta(): Promise<PdfMetadata | null> {
       request.onsuccess = () => {
         resolve(request.result ? (request.result as PdfStorageRecord).metadata : null);
       };
-      request.onerror = () => { db.close(); reject(request.error); };
-      tx.oncomplete = () => { db.close(); };
-      tx.onerror = () => { db.close(); };
+      request.onerror = () => {
+        db.close();
+        reject(request.error);
+      };
+      tx.oncomplete = () => {
+        db.close();
+      };
+      tx.onerror = () => {
+        db.close();
+      };
     });
   } catch {
     return null;
@@ -88,18 +108,26 @@ export async function deletePdf(): Promise<void> {
     const tx = db.transaction(PDF_STORE_NAME, 'readwrite');
     const store = tx.objectStore(PDF_STORE_NAME);
     store.delete(PDF_KEY);
-    tx.oncomplete = () => { db.close(); resolve(); };
-    tx.onerror = () => { db.close(); reject(tx.error); };
+    tx.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error);
+    };
   });
 }
 
 export async function computeSha256(arrayBuffer: ArrayBuffer): Promise<string> {
   const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function verifyPdfHash(arrayBuffer: ArrayBuffer): Promise<{ valid: boolean; hash: string }> {
+export async function verifyPdfHash(
+  arrayBuffer: ArrayBuffer,
+): Promise<{ valid: boolean; hash: string }> {
   const hash = await computeSha256(arrayBuffer);
   return { valid: hash === EXPECTED_PDF_HASH, hash };
 }

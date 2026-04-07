@@ -64,7 +64,7 @@ export function calculateRestHours(endTime: string, startTime: string): number {
   const [h1, m1] = endTime.split(':').map(Number);
   const [h2, m2] = startTime.split(':').map(Number);
 
-  let end = h1 * 60 + m1;
+  const end = h1 * 60 + m1;
   let start = h2 * 60 + m2;
 
   if (start < end) start += 24 * 60;
@@ -86,10 +86,7 @@ export function calculateRestHours(endTime: string, startTime: string): number {
  * Returns a result object instead of calling `alert()` so the caller can
  * decide how to present the error.
  */
-export function validateSlotTime(
-  slot: WatchSlot,
-  allSlots: WatchSlot[],
-): SlotValidationResult {
+export function validateSlotTime(slot: WatchSlot, allSlots: WatchSlot[]): SlotValidationResult {
   const startMinutes = timeToMinutes(slot.start);
   const endMinutes = timeToMinutes(slot.end);
 
@@ -141,8 +138,12 @@ export function calculateCoverage(slots: WatchSlot[]): CoverageResult {
       gapStart = i;
     } else if (coverage[i] && gapStart !== null) {
       gaps.push({
-        start: `${Math.floor(gapStart / 60).toString().padStart(2, '0')}:${(gapStart % 60).toString().padStart(2, '0')}`,
-        end: `${Math.floor(i / 60).toString().padStart(2, '0')}:${(i % 60).toString().padStart(2, '0')}`,
+        start: `${Math.floor(gapStart / 60)
+          .toString()
+          .padStart(2, '0')}:${(gapStart % 60).toString().padStart(2, '0')}`,
+        end: `${Math.floor(i / 60)
+          .toString()
+          .padStart(2, '0')}:${(i % 60).toString().padStart(2, '0')}`,
         minutes: i - gapStart,
       });
       gapStart = null;
@@ -151,7 +152,9 @@ export function calculateCoverage(slots: WatchSlot[]): CoverageResult {
 
   if (gapStart !== null) {
     gaps.push({
-      start: `${Math.floor(gapStart / 60).toString().padStart(2, '0')}:${(gapStart % 60).toString().padStart(2, '0')}`,
+      start: `${Math.floor(gapStart / 60)
+        .toString()
+        .padStart(2, '0')}:${(gapStart % 60).toString().padStart(2, '0')}`,
       end: '24:00',
       minutes: 1440 - gapStart,
     });
@@ -267,8 +270,7 @@ export function detectScheduleConflicts(
 
   // De-duplicate by message
   return conflicts.filter(
-    (conflict, index, self) =>
-      index === self.findIndex((c) => c.message === conflict.message),
+    (conflict, index, self) => index === self.findIndex((c) => c.message === conflict.message),
   );
 }
 

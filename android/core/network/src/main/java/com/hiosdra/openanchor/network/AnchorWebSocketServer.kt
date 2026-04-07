@@ -33,6 +33,7 @@ class AnchorWebSocketServer @Inject constructor(
     companion object {
         private const val TAG = "AnchorWSServer"
         const val DEFAULT_PORT = 8080
+        // Protocol timing constants — canonical source: docs/protocol/protocol.md
         private const val HEARTBEAT_INTERVAL_MS = 5_000L
         private const val HEARTBEAT_TIMEOUT_MS = 15_000L
         private const val MAX_FRAME_SIZE = 65_536L // 64 KB — protocol messages are small JSON

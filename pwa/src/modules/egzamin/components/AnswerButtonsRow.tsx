@@ -11,7 +11,12 @@ interface AnswerButtonsRowProps {
 
 type AnswerState = 'default' | 'correct' | 'incorrect' | 'selected';
 
-function getState(label: string, selectedAnswer: string | null, correctAnswer: string, showCorrect: boolean): AnswerState {
+function getState(
+  label: string,
+  selectedAnswer: string | null,
+  correctAnswer: string,
+  showCorrect: boolean,
+): AnswerState {
   if (!selectedAnswer) return 'default';
   if (showCorrect && label === correctAnswer) return 'correct';
   if (!showCorrect && label === selectedAnswer) return 'selected';
@@ -19,15 +24,24 @@ function getState(label: string, selectedAnswer: string | null, correctAnswer: s
   return 'default';
 }
 
-export function AnswerButtonsRow({ answerCount, correctAnswer, selectedAnswer, onSelectAnswer, showCorrect }: AnswerButtonsRowProps) {
+export function AnswerButtonsRow({
+  answerCount,
+  correctAnswer,
+  selectedAnswer,
+  onSelectAnswer,
+  showCorrect,
+}: AnswerButtonsRowProps) {
   const labels = getAnswerLabels(answerCount);
 
   return (
     <div className="flex gap-3">
-      {labels.map(label => {
+      {labels.map((label) => {
         const state = getState(label, selectedAnswer, correctAnswer, showCorrect);
 
-        let bgClass: string, borderClass: string, textClass: string, animClass = '';
+        let bgClass: string,
+          borderClass: string,
+          textClass: string,
+          animClass = '';
         switch (state) {
           case 'correct':
             bgClass = 'bg-green-500/20';
@@ -52,22 +66,37 @@ export function AnswerButtonsRow({ answerCount, correctAnswer, selectedAnswer, o
             textClass = 'text-white';
         }
 
-        const icon = state === 'correct'
-          ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
-              strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
-              <polyline points="20 6 9 17 4 12"/>
+        const icon =
+          state === 'correct' ? (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              width="24"
+              height="24"
+            >
+              <polyline points="20 6 9 17 4 12" />
             </svg>
-          )
-          : state === 'incorrect'
-          ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
-              strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
+          ) : state === 'incorrect' ? (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              width="24"
+              height="24"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-          )
-          : (<span className="text-lg font-bold">{label}</span>);
+          ) : (
+            <span className="text-lg font-bold">{label}</span>
+          );
 
         return (
           <button

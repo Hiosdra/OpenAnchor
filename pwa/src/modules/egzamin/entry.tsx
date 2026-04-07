@@ -28,5 +28,5 @@ const questions = (examData as unknown as RawExamQuestion[]).map(transformQuesti
 root.render(
   <ErrorBoundary>
     <App questions={questions} />
-  </ErrorBoundary>
+  </ErrorBoundary>,
 );

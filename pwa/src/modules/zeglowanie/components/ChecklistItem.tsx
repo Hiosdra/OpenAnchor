@@ -8,7 +8,13 @@ interface ChecklistItemProps {
   crewPrefix?: string;
 }
 
-export function ChecklistItem({ itemId, text, storageKey, isHtml = false, crewPrefix }: ChecklistItemProps) {
+export function ChecklistItem({
+  itemId,
+  text,
+  storageKey,
+  isHtml = false,
+  crewPrefix,
+}: ChecklistItemProps) {
   const [checked, setChecked] = useState(() => localStorage.getItem(storageKey) === 'true');
 
   const toggle = () => {
@@ -35,7 +41,10 @@ export function ChecklistItem({ itemId, text, storageKey, isHtml = false, crewPr
       {isHtml ? (
         <div className="checklist-text" dangerouslySetInnerHTML={{ __html: text }} />
       ) : (
-        <div className="checklist-text">{crewPrefix}{text}</div>
+        <div className="checklist-text">
+          {crewPrefix}
+          {text}
+        </div>
       )}
     </li>
   );

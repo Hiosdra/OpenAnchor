@@ -28,12 +28,9 @@ export function exportScheduleToPDF(
   doc.text('Wachtownik', 148, 15, { align: 'center' });
 
   doc.setFontSize(10);
-  doc.text(
-    `Okres: ${schedule.length} dni (${formattedStartDate} - ${endDate})`,
-    148,
-    22,
-    { align: 'center' },
-  );
+  doc.text(`Okres: ${schedule.length} dni (${formattedStartDate} - ${endDate})`, 148, 22, {
+    align: 'center',
+  });
 
   const roleLabels: Record<string, string> = {
     captain: t('role.captain', userLocale) || 'Kapitan',
@@ -171,7 +168,9 @@ export function exportScheduleToPDF(
     });
   }
 
-  const pageCount = (doc as unknown as { internal: { getNumberOfPages(): number } }).internal.getNumberOfPages();
+  const pageCount = (
+    doc as unknown as { internal: { getNumberOfPages(): number } }
+  ).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);

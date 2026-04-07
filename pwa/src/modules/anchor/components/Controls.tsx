@@ -1,7 +1,18 @@
 import {
-  Anchor, MoveDownLeft, BellOff, Calculator, Radar, Clock,
-  CloudSun, Monitor, History, Bot, Share2, QrCode,
-  Layers, Crosshair,
+  Anchor,
+  MoveDownLeft,
+  BellOff,
+  Calculator,
+  Radar,
+  Clock,
+  CloudSun,
+  Monitor,
+  History,
+  Bot,
+  Share2,
+  QrCode,
+  Layers,
+  Crosshair,
 } from 'lucide-react';
 import { useI18n } from '../hooks/useI18n';
 
@@ -100,7 +111,10 @@ export function Controls({
           <label className="text-xs sm:text-sm text-slate-400 font-medium">
             {t.safeRadius}
             {sectorEnabled && (
-              <span id="sector-badge" className="ml-1 sm:ml-2 text-[9px] sm:text-[10px] bg-blue-900 text-blue-300 px-1.5 sm:px-2 py-0.5 rounded-full">
+              <span
+                id="sector-badge"
+                className="ml-1 sm:ml-2 text-[9px] sm:text-[10px] bg-blue-900 text-blue-300 px-1.5 sm:px-2 py-0.5 rounded-full"
+              >
                 {t.sectorBadge}
               </span>
             )}
@@ -165,8 +179,17 @@ export function Controls({
           const isSync = tool.id === 'sync';
           const Icon = isSync
             ? ({ className }: { className?: string }) => (
-                <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" />
+                <svg
+                  className={className}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+                  <path d="M12 18h.01" />
                 </svg>
               )
             : tool.Icon;
@@ -184,7 +207,9 @@ export function Controls({
                   : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600'
               }`}
             >
-              {Icon && <Icon className={`w-3.5 sm:w-4 h-3.5 sm:h-4${isAi ? ' text-purple-300' : ''}`} />}
+              {Icon && (
+                <Icon className={`w-3.5 sm:w-4 h-3.5 sm:h-4${isAi ? ' text-purple-300' : ''}`} />
+              )}
               <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider">
                 {label}
               </span>

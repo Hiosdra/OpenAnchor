@@ -13,8 +13,15 @@ import type { PdfMetadata } from '../src/shared/types';
 
 // --- IndexedDB mock types ---
 interface MockObjectStore {
-  put(value: unknown, key: string): { onsuccess: (() => void) | null; onerror: (() => void) | null };
-  get(key: string): { result: unknown; onsuccess: (() => void) | null; onerror: (() => void) | null };
+  put(
+    value: unknown,
+    key: string,
+  ): { onsuccess: (() => void) | null; onerror: (() => void) | null };
+  get(key: string): {
+    result: unknown;
+    onsuccess: (() => void) | null;
+    onerror: (() => void) | null;
+  };
   delete(key: string): { onsuccess: (() => void) | null; onerror: (() => void) | null };
 }
 
@@ -48,7 +55,11 @@ function createMockIDB(): { store: Record<string, unknown>; clear: () => void } 
       return { onsuccess: null, onerror: null };
     },
     get(key: string) {
-      const req = { result: store[key] || undefined, onsuccess: null as (() => void) | null, onerror: null as (() => void) | null };
+      const req = {
+        result: store[key] || undefined,
+        onsuccess: null as (() => void) | null,
+        onerror: null as (() => void) | null,
+      };
       setTimeout(() => req.onsuccess?.(), 0);
       return req;
     },
@@ -88,7 +99,12 @@ function createMockIDB(): { store: Record<string, unknown>; clear: () => void } 
     },
   };
 
-  return { store, clear: () => { store = {}; } };
+  return {
+    store,
+    clear: () => {
+      store = {};
+    },
+  };
 }
 
 // --- crypto.subtle mock ---
@@ -121,14 +137,21 @@ describe('Exam PDF Storage', () => {
     });
 
     it('should be the known SHA-256 hash', () => {
-      expect(EXPECTED_PDF_HASH).toBe('967e36168e85a50fc551acbcea171939bad82c2de4872009044c67685c970c10');
+      expect(EXPECTED_PDF_HASH).toBe(
+        '967e36168e85a50fc551acbcea171939bad82c2de4872009044c67685c970c10',
+      );
     });
   });
 
   describe('savePdfData / loadPdfBlob / loadPdfMeta', () => {
     it('should save and load PDF blob', async () => {
       const blob = new Blob(['test-pdf-content'], { type: 'application/pdf' });
-      const metadata: PdfMetadata = { hash: 'abc123', filename: 'test.pdf', importDate: '2026-01-01' };
+      const metadata: PdfMetadata = {
+        hash: 'abc123',
+        filename: 'test.pdf',
+        importDate: '2026-01-01',
+        fileSize: 100,
+      };
 
       await savePdfData(blob, metadata);
       const loadedBlob = await loadPdfBlob();
@@ -138,7 +161,12 @@ describe('Exam PDF Storage', () => {
 
     it('should save and load metadata', async () => {
       const blob = new Blob(['test'], { type: 'application/pdf' });
-      const metadata: PdfMetadata = { hash: 'abc123', filename: 'test.pdf', importDate: '2026-01-01' };
+      const metadata: PdfMetadata = {
+        hash: 'abc123',
+        filename: 'test.pdf',
+        importDate: '2026-01-01',
+        fileSize: 100,
+      };
 
       await savePdfData(blob, metadata);
       const loadedMeta = await loadPdfMeta();
@@ -165,7 +193,12 @@ describe('Exam PDF Storage', () => {
 
     it('should return true after importing', async () => {
       const blob = new Blob(['test'], { type: 'application/pdf' });
-      const metadata: PdfMetadata = { hash: 'abc', filename: 'test.pdf' };
+      const metadata: PdfMetadata = {
+        hash: 'abc',
+        filename: 'test.pdf',
+        importDate: '2026-01-01',
+        fileSize: 50,
+      };
 
       await savePdfData(blob, metadata);
       const result = await isPdfImported();
@@ -177,7 +210,12 @@ describe('Exam PDF Storage', () => {
   describe('deletePdf', () => {
     it('should remove saved PDF data', async () => {
       const blob = new Blob(['test'], { type: 'application/pdf' });
-      await savePdfData(blob, { hash: 'abc' });
+      await savePdfData(blob, {
+        hash: 'abc',
+        filename: 'test.pdf',
+        importDate: '2026-01-01',
+        fileSize: 50,
+      });
 
       await deletePdf();
 
@@ -262,7 +300,10 @@ describe('Exam PDF Storage', () => {
     it('loadPdfBlob returns null on IndexedDB error', async () => {
       (globalThis as Record<string, unknown>).indexedDB = {
         open: () => {
-          const req = { onerror: null as (() => void) | null, onsuccess: null as (() => void) | null };
+          const req = {
+            onerror: null as (() => void) | null,
+            onsuccess: null as (() => void) | null,
+          };
           setTimeout(() => req.onerror?.(), 0);
           return req;
         },
@@ -275,7 +316,10 @@ describe('Exam PDF Storage', () => {
     it('loadPdfMeta returns null on IndexedDB error', async () => {
       (globalThis as Record<string, unknown>).indexedDB = {
         open: () => {
-          const req = { onerror: null as (() => void) | null, onsuccess: null as (() => void) | null };
+          const req = {
+            onerror: null as (() => void) | null,
+            onsuccess: null as (() => void) | null,
+          };
           setTimeout(() => req.onerror?.(), 0);
           return req;
         },

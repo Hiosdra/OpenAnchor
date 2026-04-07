@@ -26,12 +26,12 @@ export function CalcModal({
   const [depth, setDepth] = useState(depthM ?? 5);
   const [ratio, setRatio] = useState(5);
 
-  useEffect(() => { if (depthM !== null) setDepth(depthM); }, [depthM]);
+  useEffect(() => {
+    if (depthM !== null) setDepth(depthM);
+  }, [depthM]);
 
   const chainLength = depth * ratio;
-  const swing = chainLength > depth
-    ? Math.sqrt(chainLength * chainLength - depth * depth)
-    : 0;
+  const swing = chainLength > depth ? Math.sqrt(chainLength * chainLength - depth * depth) : 0;
   const radius = Math.round(swing * 1.2);
 
   const handleApply = () => {
@@ -50,9 +50,7 @@ export function CalcModal({
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <label className="block text-slate-300 text-xs mb-1">
-            {t.calcDepth} (m)
-          </label>
+          <label className="block text-slate-300 text-xs mb-1">{t.calcDepth} (m)</label>
           <input
             type="number"
             id="calc-depth"
@@ -82,9 +80,7 @@ export function CalcModal({
         <div className="text-2xl font-bold text-blue-400">
           <span id="calc-chain-result">{radius}</span> <span className="text-sm">m</span>
         </div>
-        <div className="text-[10px] text-slate-500 mt-1">
-          sqrt(L²-D²) + 20%
-        </div>
+        <div className="text-[10px] text-slate-500 mt-1">sqrt(L²-D²) + 20%</div>
       </div>
 
       <div className="flex gap-3">

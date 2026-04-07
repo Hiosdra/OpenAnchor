@@ -1,12 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
 
-interface BatteryManager extends EventTarget {
-  charging: boolean;
-  level: number;
-  addEventListener(type: string, listener: () => void): void;
-  removeEventListener(type: string, listener: () => void): void;
-}
-
 type BeepType = 'square' | 'warning' | 'sine';
 
 interface UseAlertControllerParams {
@@ -14,10 +7,7 @@ interface UseAlertControllerParams {
   isAnchored?: () => boolean;
 }
 
-export function useAlertController({
-  onLowBattery,
-  isAnchored,
-}: UseAlertControllerParams = {}) {
+export function useAlertController({ onLowBattery, isAnchored }: UseAlertControllerParams = {}) {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const alertIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -37,7 +27,7 @@ export function useAlertController({
 
   const ensureAudioContext = useCallback(() => {
     if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
     }
     if (audioCtxRef.current.state === 'suspended') {
       audioCtxRef.current.resume();
@@ -45,44 +35,41 @@ export function useAlertController({
     return audioCtxRef.current;
   }, []);
 
-  const playBeep = useCallback(
-    (type: BeepType = 'square') => {
-      const ctx = audioCtxRef.current;
-      if (!ctx) return;
-      if (ctx.state === 'suspended') ctx.resume();
+  const playBeep = useCallback((type: BeepType = 'square') => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
 
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
 
-      if (type === 'square') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(800, ctx.currentTime);
-        osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.2);
-        gain.gain.setValueAtTime(1, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-        osc.stop(ctx.currentTime + 0.5);
-      } else if (type === 'warning') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, ctx.currentTime);
-        gain.gain.setValueAtTime(0.5, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-        osc.stop(ctx.currentTime + 0.4);
-      } else {
-        // sine
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, ctx.currentTime);
-        gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
-        osc.stop(ctx.currentTime + 1);
-      }
+    if (type === 'square') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.stop(ctx.currentTime + 0.5);
+    } else if (type === 'warning') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      gain.gain.setValueAtTime(0.5, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.stop(ctx.currentTime + 0.4);
+    } else {
+      // sine
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
+      osc.stop(ctx.currentTime + 1);
+    }
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-    },
-    [],
-  );
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+  }, []);
 
   const startAlarm = useCallback(
     (interval = 1000) => {
@@ -157,7 +144,7 @@ export function useAlertController({
 
     let mounted = true;
 
-    (navigator as any).getBattery().then((b: BatteryManager) => {
+    navigator.getBattery!().then((b: BatteryManager) => {
       if (!mounted) return;
 
       batteryRef.current = b;

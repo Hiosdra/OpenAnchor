@@ -22,13 +22,13 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 
   const filteredQuestions = useMemo(() => {
-    return questions.filter(q => selectedCategories.includes(q.category));
+    return questions.filter((q) => selectedCategories.includes(q.category));
   }, [questions, selectedCategories]);
 
   const [currentIndex, setCurrentIndex] = useState(() => {
     const savedPos = loadLearnPosition();
     if (savedPos?.questionId) {
-      const index = filteredQuestions.findIndex(q => q.id === savedPos.questionId);
+      const index = filteredQuestions.findIndex((q) => q.id === savedPos.questionId);
       if (index >= 0) return index;
     }
     return 0;
@@ -42,34 +42,37 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
     }
   }, [currentIndex, currentQuestion]);
 
-  const handleAnswer = useCallback((label: string) => {
-    if (selectedAnswer || !currentQuestion) return;
-    setSelectedAnswer(label);
+  const handleAnswer = useCallback(
+    (label: string) => {
+      if (selectedAnswer || !currentQuestion) return;
+      setSelectedAnswer(label);
 
-    const isCorrect = label === currentQuestion.correctAnswer;
-    const newProgress = { ...progress };
-    newProgress.answered = { ...progress.answered };
-    const previousAnswer = newProgress.answered[currentQuestion.id];
-    newProgress.stats = { ...newProgress.stats };
-    if (previousAnswer) {
-      newProgress.stats.total--;
-      if (previousAnswer.correct) newProgress.stats.correct--;
-      else newProgress.stats.incorrect--;
-    }
-    newProgress.answered[currentQuestion.id] = {
-      answer: label,
-      correct: isCorrect,
-      timestamp: Date.now()
-    };
-    newProgress.stats.total++;
-    if (isCorrect) newProgress.stats.correct++;
-    else newProgress.stats.incorrect++;
-    onUpdateProgress(newProgress);
-  }, [selectedAnswer, currentQuestion, progress, onUpdateProgress]);
+      const isCorrect = label === currentQuestion.correctAnswer;
+      const newProgress = { ...progress };
+      newProgress.answered = { ...progress.answered };
+      const previousAnswer = newProgress.answered[currentQuestion.id];
+      newProgress.stats = { ...newProgress.stats };
+      if (previousAnswer) {
+        newProgress.stats.total--;
+        if (previousAnswer.correct) newProgress.stats.correct--;
+        else newProgress.stats.incorrect--;
+      }
+      newProgress.answered[currentQuestion.id] = {
+        answer: label,
+        correct: isCorrect,
+        timestamp: Date.now(),
+      };
+      newProgress.stats.total++;
+      if (isCorrect) newProgress.stats.correct++;
+      else newProgress.stats.incorrect++;
+      onUpdateProgress(newProgress);
+    },
+    [selectedAnswer, currentQuestion, progress, onUpdateProgress],
+  );
 
   const handleNext = useCallback(() => {
     if (currentIndex < filteredQuestions.length - 1) {
-      setCurrentIndex(i => i + 1);
+      setCurrentIndex((i) => i + 1);
     } else {
       setCurrentIndex(0);
     }
@@ -78,7 +81,7 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
 
   const handlePrev = useCallback(() => {
     if (currentIndex > 0) {
-      setCurrentIndex(i => i - 1);
+      setCurrentIndex((i) => i - 1);
       setSelectedAnswer(null);
     }
   }, [currentIndex]);
@@ -114,9 +117,17 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
             className="w-11 h-11 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
             aria-label="Filtruj kategorie"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-              strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              width="20"
+              height="20"
+            >
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
             </svg>
           </button>
         }
@@ -140,14 +151,14 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
             selectedCategories={selectedCategories}
             onToggle={(id) => {
               const newCategories = selectedCategories.includes(id)
-                ? selectedCategories.filter(c => c !== id)
+                ? selectedCategories.filter((c) => c !== id)
                 : [...selectedCategories, id];
               setSelectedCategories(newCategories);
 
               const savedPos = loadLearnPosition();
               if (savedPos?.questionId) {
-                const newFiltered = questions.filter(q => newCategories.includes(q.category));
-                const index = newFiltered.findIndex(q => q.id === savedPos.questionId);
+                const newFiltered = questions.filter((q) => newCategories.includes(q.category));
+                const index = newFiltered.findIndex((q) => q.id === savedPos.questionId);
                 setCurrentIndex(index >= 0 ? index : 0);
               } else {
                 setCurrentIndex(0);
@@ -159,7 +170,7 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
 
               const savedPos = loadLearnPosition();
               if (savedPos?.questionId) {
-                const index = questions.findIndex(q => q.id === savedPos.questionId);
+                const index = questions.findIndex((q) => q.id === savedPos.questionId);
                 setCurrentIndex(index >= 0 ? index : 0);
               } else {
                 setCurrentIndex(0);
@@ -171,7 +182,10 @@ export function LearnScreen({ questions, progress, onUpdateProgress, onBack }: L
       )}
 
       {/* Question */}
-      <div className="flex-1 px-4 pb-4" style={{paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'}}>
+      <div
+        className="flex-1 px-4 pb-4"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+      >
         <div className="max-w-2xl mx-auto space-y-3">
           <QuestionImageCard question={currentQuestion} />
 

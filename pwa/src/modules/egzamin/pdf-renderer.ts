@@ -11,7 +11,7 @@ import type { PDFDocumentProxy } from 'pdfjs-dist';
 if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
     'pdfjs-dist/build/pdf.worker.min.mjs',
-    import.meta.url
+    import.meta.url,
   ).toString();
 }
 
@@ -29,7 +29,11 @@ export const PdfRenderer = {
   },
 
   _getScale(): number {
-    if ((navigator as unknown as { deviceMemory?: number }).deviceMemory && (navigator as unknown as { deviceMemory: number }).deviceMemory <= 4) return 1.5;
+    if (
+      (navigator as unknown as { deviceMemory?: number }).deviceMemory &&
+      (navigator as unknown as { deviceMemory: number }).deviceMemory <= 4
+    )
+      return 1.5;
     return 2.0;
   },
 
@@ -45,7 +49,9 @@ export const PdfRenderer = {
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     const ctx = canvas.getContext('2d')!;
-    await page.render({ canvasContext: ctx, viewport: viewport, annotationMode: 0 } as Parameters<typeof page.render>[0]).promise;
+    await page.render({ canvasContext: ctx, viewport: viewport, annotationMode: 0 } as Parameters<
+      typeof page.render
+    >[0]).promise;
 
     if (this._cache.size >= this._MAX_CACHE) {
       const firstKey = this._cache.keys().next().value;
@@ -57,7 +63,13 @@ export const PdfRenderer = {
     return canvas;
   },
 
-  async renderQuestion(pageIndex: number, cropYStart: number, cropYEnd: number, pageHeight: number, scale?: number): Promise<string | null> {
+  async renderQuestion(
+    pageIndex: number,
+    cropYStart: number,
+    cropYEnd: number,
+    pageHeight: number,
+    scale?: number,
+  ): Promise<string | null> {
     if (scale === undefined) scale = 2.0;
     const fullPage = await this.renderPage(pageIndex, scale);
     if (!fullPage) return null;
@@ -71,11 +83,24 @@ export const PdfRenderer = {
     cropCanvas.width = fullPage.width;
     cropCanvas.height = cropHeight;
     const ctx = cropCanvas.getContext('2d')!;
-    ctx.drawImage(fullPage, 0, yStart, fullPage.width, cropHeight, 0, 0, fullPage.width, cropHeight);
+    ctx.drawImage(
+      fullPage,
+      0,
+      yStart,
+      fullPage.width,
+      cropHeight,
+      0,
+      0,
+      fullPage.width,
+      cropHeight,
+    );
 
     return new Promise((resolve) => {
       cropCanvas.toBlob((blob) => {
-        if (!blob) { resolve(null); return; }
+        if (!blob) {
+          resolve(null);
+          return;
+        }
         const url = URL.createObjectURL(blob);
         this._blobUrls.push(url);
         resolve(url);
@@ -88,14 +113,14 @@ export const PdfRenderer = {
   },
 
   unload(): void {
-    this._blobUrls.forEach(url => URL.revokeObjectURL(url));
+    this._blobUrls.forEach((url) => URL.revokeObjectURL(url));
     this._blobUrls = [];
     if (this._pdfDoc) {
       this._pdfDoc.destroy();
       this._pdfDoc = null;
     }
     this._cache.clear();
-  }
+  },
 };
 
 // Clear PDF cache when tab is hidden to reduce memory pressure
@@ -114,8 +139,8 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     document.addEventListener('visibilitychange', w.__pdfRendererVisibilityListener);
     w.__pdfRendererVisibilityListenerRegistered = true;
 
-    if ((import.meta as any).hot) {
-      (import.meta as any).hot.dispose(() => {
+    if (import.meta.hot) {
+      import.meta.hot.dispose(() => {
         if (w.__pdfRendererVisibilityListener) {
           document.removeEventListener('visibilitychange', w.__pdfRendererVisibilityListener);
         }

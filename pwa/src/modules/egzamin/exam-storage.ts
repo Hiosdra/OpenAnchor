@@ -4,7 +4,14 @@
  * Migrated from js/exam-storage.js
  */
 
-import type { ExamProgress, ExamStats, ExamQuestion, CategoryStat, LearnPosition, LeitnerState } from '../../shared/types/index';
+import type {
+  ExamProgress,
+  ExamStats,
+  ExamQuestion,
+  CategoryStat,
+  LearnPosition,
+  LeitnerState,
+} from '../../shared/types/index';
 
 export const EXAM_PROGRESS_KEY = 'openanchor_exam_progress';
 export const LEARN_POSITION_KEY = 'openanchor_learn_position';
@@ -45,10 +52,13 @@ export function loadLearnPosition(): LearnPosition | null {
 
 export function saveLearnPosition(questionId: string): void {
   try {
-    localStorage.setItem(LEARN_POSITION_KEY, JSON.stringify({
-      questionId,
-      timestamp: Date.now()
-    }));
+    localStorage.setItem(
+      LEARN_POSITION_KEY,
+      JSON.stringify({
+        questionId,
+        timestamp: Date.now(),
+      }),
+    );
   } catch (e) {
     console.error('Failed to save learn position:', e);
   }
@@ -82,7 +92,11 @@ function _resetExamDataInternal(): void {
 
 export function resetExamData(message?: string): boolean {
   const confirmMsg = message || 'Na pewno chcesz zresetować dane egzaminu?';
-  if (typeof window !== 'undefined' && typeof window.confirm === 'function' && !window.confirm(confirmMsg)) {
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.confirm === 'function' &&
+    !window.confirm(confirmMsg)
+  ) {
     return false;
   }
   _resetExamDataInternal();
@@ -96,7 +110,7 @@ export function forceResetExamData(): void {
 export function calculateStats(progress: ExamProgress): ExamStats {
   const answered = progress.answered || {};
   const total = Object.keys(answered).length;
-  const correct = Object.values(answered).filter(a => a.correct).length;
+  const correct = Object.values(answered).filter((a) => a.correct).length;
   const incorrect = total - correct;
   const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
 
@@ -104,15 +118,18 @@ export function calculateStats(progress: ExamProgress): ExamStats {
     total,
     correct,
     incorrect,
-    percentage
+    percentage,
   };
 }
 
-export function calculateCategoryStats(progress: ExamProgress, questions: ExamQuestion[]): Record<string, CategoryStat> {
+export function calculateCategoryStats(
+  progress: ExamProgress,
+  questions: ExamQuestion[],
+): Record<string, CategoryStat> {
   const answered = progress.answered || {};
   const categoryStats: Record<string, CategoryStat> = {};
 
-  questions.forEach(q => {
+  questions.forEach((q) => {
     const answer = answered[q.id];
     if (answer) {
       if (!categoryStats[q.category]) {
@@ -125,7 +142,7 @@ export function calculateCategoryStats(progress: ExamProgress, questions: ExamQu
     }
   });
 
-  Object.keys(categoryStats).forEach(cat => {
+  Object.keys(categoryStats).forEach((cat) => {
     const stats = categoryStats[cat];
     stats.percentage = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
   });

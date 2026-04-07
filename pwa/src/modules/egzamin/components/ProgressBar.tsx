@@ -24,7 +24,9 @@ export function ProgressBar({ current, total, correct, incorrect, onNavigate }: 
   return (
     <div className="px-4 py-2">
       <div className="flex items-center justify-between text-sm text-white/40 mb-1.5 gap-2">
-        <span className="whitespace-nowrap">Pytanie {current} / {total}</span>
+        <span className="whitespace-nowrap">
+          Pytanie {current} / {total}
+        </span>
         <div className="flex gap-2 sm:gap-3 whitespace-nowrap">
           <span className="text-green-400">{correct} OK</span>
           <span className="text-red-400">{incorrect} Err</span>

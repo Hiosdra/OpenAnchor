@@ -32,9 +32,7 @@ export function OffsetModal({ open, onClose, cog, onApply }: OffsetModalProps) {
       </h3>
 
       <div className="mb-4">
-        <label className="block text-slate-300 text-sm mb-1">
-          {t.offsetDist} (m)
-        </label>
+        <label className="block text-slate-300 text-sm mb-1">{t.offsetDist} (m)</label>
         <input
           type="number"
           id="offset-dist"

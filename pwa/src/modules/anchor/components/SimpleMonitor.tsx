@@ -57,13 +57,9 @@ export function SimpleMonitor({
   const bg = BG_CLASS[alarmState] ?? BG_CLASS.SAFE;
   const color = TEXT_COLOR[alarmState] ?? TEXT_COLOR.SAFE;
 
-  const distDisplay = unit === 'feet'
-    ? (distance * M_TO_FT).toFixed(1)
-    : distance.toFixed(1);
+  const distDisplay = unit === 'feet' ? (distance * M_TO_FT).toFixed(1) : distance.toFixed(1);
 
-  const accDisplay = unit === 'feet'
-    ? Math.round(accuracy * M_TO_FT)
-    : Math.round(accuracy);
+  const accDisplay = unit === 'feet' ? Math.round(accuracy * M_TO_FT) : Math.round(accuracy);
 
   const unitLabel = unit === 'feet' ? t.smUnitFt : t.smUnit;
   const unitShort = unit === 'feet' ? 'ft' : 'm';
@@ -73,7 +69,9 @@ export function SimpleMonitor({
     <div id="simple-monitor-overlay" className={`fixed inset-0 z-[5500] flex flex-col ${bg}`}>
       <div className="flex-grow flex flex-col items-center justify-center p-8 text-center select-none">
         <div className={`text-lg font-bold uppercase tracking-widest mb-2 ${color}`}>
-          {t[`alarm${alarmState.charAt(0) + alarmState.slice(1).toLowerCase()}` as keyof typeof t] ?? alarmState}
+          {t[
+            `alarm${alarmState.charAt(0) + alarmState.slice(1).toLowerCase()}` as keyof typeof t
+          ] ?? alarmState}
         </div>
 
         {(!hasGpsFix || gpsSignalLost) && (
@@ -81,7 +79,10 @@ export function SimpleMonitor({
         )}
 
         <div className="mb-1">
-          <span id="sm-distance" className={`text-[120px] leading-none font-bold tabular-nums ${color}`}>
+          <span
+            id="sm-distance"
+            className={`text-[120px] leading-none font-bold tabular-nums ${color}`}
+          >
             {distDisplay}
           </span>
         </div>
@@ -89,7 +90,9 @@ export function SimpleMonitor({
 
         <div className="flex gap-8 mb-6">
           <div className="text-center">
-            <div id="sm-sog" className="text-3xl font-bold text-blue-400 tabular-nums">{sog.toFixed(1)}</div>
+            <div id="sm-sog" className="text-3xl font-bold text-blue-400 tabular-nums">
+              {sog.toFixed(1)}
+            </div>
             <div className="text-xs text-slate-500">SOG (kn)</div>
           </div>
           <div className="text-center">
@@ -130,9 +133,13 @@ export function SimpleMonitor({
           className="text-slate-400 font-medium text-sm px-4 py-2 bg-slate-800 rounded-xl border border-slate-700"
         >
           {nightRedFilter ? (
-            <><Moon className="w-4 h-4 inline mr-1" /> {t.smNormalFilter}</>
+            <>
+              <Moon className="w-4 h-4 inline mr-1" /> {t.smNormalFilter}
+            </>
           ) : (
-            <><SunDim className="w-4 h-4 inline mr-1" /> {t.smRedFilter}</>
+            <>
+              <SunDim className="w-4 h-4 inline mr-1" /> {t.smRedFilter}
+            </>
           )}
         </button>
       </div>

@@ -6,7 +6,6 @@
  */
 
 import type { LeitnerState, EgzaminQuestion } from './types';
-import type { ExamQuestion } from '../../shared/types/index';
 import {
   isDueForReview as leitnerIsDue,
   getDueQuestions as leitnerGetDue,
@@ -20,7 +19,7 @@ export function getBoxForQuestion(leitnerState: LeitnerState, questionId: string
 
 export function getBoxCounts(leitnerState: LeitnerState, questions: EgzaminQuestion[]): number[] {
   const counts = [0, 0, 0, 0, 0];
-  questions.forEach(q => {
+  questions.forEach((q) => {
     const box = getBoxForQuestion(leitnerState, q.id);
     counts[box - 1]++;
   });
@@ -32,11 +31,18 @@ export function isDueForReview(leitnerState: LeitnerState, questionId: string): 
   return leitnerIsDue(qData);
 }
 
-export function getDueQuestions(leitnerState: LeitnerState, questions: EgzaminQuestion[]): EgzaminQuestion[] {
-  return leitnerGetDue(leitnerState, questions as ExamQuestion[]) as EgzaminQuestion[];
+export function getDueQuestions(
+  leitnerState: LeitnerState,
+  questions: EgzaminQuestion[],
+): EgzaminQuestion[] {
+  return leitnerGetDue(leitnerState, questions);
 }
 
-export function advanceQuestion(leitnerState: LeitnerState, questionId: string, correct: boolean): LeitnerState {
+export function advanceQuestion(
+  leitnerState: LeitnerState,
+  questionId: string,
+  correct: boolean,
+): LeitnerState {
   return updateLeitnerState(leitnerState, questionId, correct);
 }
 

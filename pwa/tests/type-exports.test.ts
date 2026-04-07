@@ -18,10 +18,7 @@ import type {
   PdfStorageRecord,
 } from '../src/shared/types';
 
-import type {
-  AnchorConfig,
-  AlarmEngineState,
-} from '../src/modules/anchor/types';
+import type { AnchorConfig, AlarmEngineState } from '../src/modules/anchor/types';
 
 describe('shared type exports', () => {
   it('Position is usable', () => {
@@ -37,7 +34,12 @@ describe('shared type exports', () => {
   });
 
   it('AlarmStates interface is structurally valid', () => {
-    const states: AlarmStates = { SAFE: 'safe', CAUTION: 'caution', WARNING: 'warning', ALARM: 'alarm' };
+    const states: AlarmStates = {
+      SAFE: 'safe',
+      CAUTION: 'caution',
+      WARNING: 'warning',
+      ALARM: 'alarm',
+    };
     expect(states.SAFE).toBe('safe');
   });
 
@@ -97,12 +99,20 @@ describe('shared type exports', () => {
   });
 
   it('PdfMetadata is usable', () => {
-    const meta: PdfMetadata = { title: 'Test' };
-    expect(meta.title).toBe('Test');
+    const meta: PdfMetadata = {
+      hash: 'abc123',
+      filename: 'test.pdf',
+      importDate: '2026-01-01',
+      fileSize: 100,
+    };
+    expect(meta.hash).toBe('abc123');
   });
 
   it('PdfStorageRecord is usable', () => {
-    const rec: PdfStorageRecord = { blob: new Blob(), metadata: {} };
+    const rec: PdfStorageRecord = {
+      blob: new Blob(),
+      metadata: { hash: 'abc', filename: 'f.pdf', importDate: '2026-01-01', fileSize: 50 },
+    };
     expect(rec.blob).toBeInstanceOf(Blob);
   });
 });

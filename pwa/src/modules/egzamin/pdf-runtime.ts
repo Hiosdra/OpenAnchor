@@ -32,7 +32,9 @@ export async function clearEgzaminPdf(): Promise<void> {
   await deletePdf();
 }
 
-export async function renderEgzaminQuestion(request: EgzaminPdfRenderRequest): Promise<string | null> {
+export async function renderEgzaminQuestion(
+  request: EgzaminPdfRenderRequest,
+): Promise<string | null> {
   const testHook = getEgzaminPdfTestHook();
   if (testHook?.renderQuestion) {
     return await testHook.renderQuestion(request);

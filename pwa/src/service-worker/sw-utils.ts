@@ -16,8 +16,8 @@ export async function clearAppCaches(): Promise<void> {
   }
 
   const cacheNames = await caches.keys();
-  const appCacheNames = cacheNames.filter(name => name.startsWith(APP_CACHE_PREFIX));
-  await Promise.all(appCacheNames.map(name => caches.delete(name)));
+  const appCacheNames = cacheNames.filter((name) => name.startsWith(APP_CACHE_PREFIX));
+  await Promise.all(appCacheNames.map((name) => caches.delete(name)));
 }
 
 export async function forceUpdate(btn: HTMLElement | null): Promise<void> {
@@ -79,7 +79,10 @@ export async function forceUpdate(btn: HTMLElement | null): Promise<void> {
   }
 }
 
-export function waitForServiceWorkerUpdate(registration: ServiceWorkerRegistration, timeout: number = 5000): Promise<boolean> {
+export function waitForServiceWorkerUpdate(
+  registration: ServiceWorkerRegistration,
+  timeout: number = 5000,
+): Promise<boolean> {
   return new Promise((resolve) => {
     const timeoutId = setTimeout(() => resolve(false), timeout);
 

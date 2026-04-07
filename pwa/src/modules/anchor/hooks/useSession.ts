@@ -116,10 +116,7 @@ export function useSession() {
   }, [startTrackFlushing]);
 
   const setAnchor = useCallback(
-    async (
-      pos: L.LatLng,
-      sessionState: SessionState,
-    ): Promise<number | null> => {
+    async (pos: L.LatLng, sessionState: SessionState): Promise<number | null> => {
       if (!dbRef.current.db) return null;
       try {
         const sessionId = await dbRef.current.createSession({

@@ -39,12 +39,18 @@ export function Modal({ open, onClose, title, children, className = '', id }: Mo
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? titleId : undefined}
-      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
     >
-      <div className={`bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-slate-700 relative ${className}`}>
+      <div
+        className={`bg-slate-800 p-6 rounded-2xl max-w-sm w-full border border-slate-700 relative ${className}`}
+      >
         {title ? (
           <div className="flex items-center justify-between mb-4">
-            <h3 id={titleId} className="text-xl font-bold text-white">{title}</h3>
+            <h3 id={titleId} className="text-xl font-bold text-white">
+              {title}
+            </h3>
             <button
               onClick={handleClose}
               className="modal-close-btn text-slate-400 hover:text-white transition-colors"

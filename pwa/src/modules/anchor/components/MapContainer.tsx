@@ -20,7 +20,10 @@ export function MapContainer({ mapRef, hasGpsFix, gpsSignalLost }: MapContainerP
       aria-label="Anchor position map"
     >
       {showNoSignal && (
-        <div id="no-signal-overlay" className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm z-[1000]">
+        <div
+          id="no-signal-overlay"
+          className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm z-[1000]"
+        >
           <MapPinOff className="w-10 h-10 text-slate-500 mb-2" />
           <p className="text-slate-400 text-sm font-medium">{t.noGpsSignal}</p>
         </div>

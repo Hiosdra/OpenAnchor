@@ -27,6 +27,7 @@ class AnchorWebSocketClient @Inject constructor(
 ) {
     companion object {
         private const val TAG = "AnchorWSClient"
+        // Protocol timing constants — canonical source: docs/protocol/protocol.md
         private const val HEARTBEAT_INTERVAL_MS = 5_000L
         private const val HEARTBEAT_TIMEOUT_MS = 15_000L
         private const val RECONNECT_BASE_MS = 2_000L

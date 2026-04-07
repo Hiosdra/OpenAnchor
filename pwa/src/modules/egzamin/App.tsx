@@ -74,13 +74,16 @@ export function App({ questions }: AppProps) {
     setMode(MODES.LEITNER_SESSION);
   }, [leitnerState, questions]);
 
-  const handleLeitnerComplete = useCallback((correct: number, incorrect: number, finalState: LeitnerState) => {
-    setLeitnerSessionCorrect(correct);
-    setLeitnerSessionIncorrect(incorrect);
-    setLeitnerState(finalState);
-    saveLeitnerState(finalState);
-    setMode(MODES.LEITNER_COMPLETE);
-  }, []);
+  const handleLeitnerComplete = useCallback(
+    (correct: number, incorrect: number, finalState: LeitnerState) => {
+      setLeitnerSessionCorrect(correct);
+      setLeitnerSessionIncorrect(incorrect);
+      setLeitnerState(finalState);
+      saveLeitnerState(finalState);
+      setMode(MODES.LEITNER_COMPLETE);
+    },
+    [],
+  );
 
   const handleResetLeitner = useCallback(() => {
     const freshState: LeitnerState = { boxes: {}, lastReview: {} };
