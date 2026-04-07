@@ -390,11 +390,12 @@ function AnchorApp() {
       const now = Date.now();
       if (s.isAnchored && now - lastPersistRef.current > PERSIST_INTERVAL_MS) {
         lastPersistRef.current = now;
-        session.persistActiveState({
+        const merged = {
           ...s,
           ...stateUpdates,
           anchorPos: stateUpdates.anchorPos ?? s.anchorPos,
-        } as any);
+        };
+        session.persistActiveState(merged);
       }
     },
     [alarm, session, updateState],
@@ -473,6 +474,7 @@ function AnchorApp() {
   // ═══════════════════════════════════════════
   useEffect(() => {
     let mounted = true;
+    let mapRestoreTimeout: ReturnType<typeof setTimeout> | null = null;
     async function init() {
       const restoredState = await session.initDB();
       if (!mounted) return;
@@ -483,7 +485,8 @@ function AnchorApp() {
         // Restore map state
         if (restoredState.anchorPos) {
           // Defer map operations to allow the map to mount first
-          setTimeout(() => {
+          mapRestoreTimeout = setTimeout(() => {
+            if (!mounted) return;
             mapRef.current.setAnchor(restoredState.anchorPos);
             mapRef.current.drawSafeZone(
               restoredState.anchorPos,
@@ -517,6 +520,7 @@ function AnchorApp() {
 
     return () => {
       mounted = false;
+      if (mapRestoreTimeout) clearTimeout(mapRestoreTimeout);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -556,6 +560,7 @@ function AnchorApp() {
         batteryLevel: alertCtrl.lastKnownBatteryLevelRef.current,
         isCharging: alertCtrl.lastKnownChargingStateRef.current,
       }));
+      return () => sync.stopStateUpdateInterval();
     }
   }, [sync.isConnected, state.isAnchored, sync, alertCtrl]);
 

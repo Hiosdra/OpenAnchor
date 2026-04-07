@@ -28,6 +28,7 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
   const lastSentStateHashRef = useRef<string | null>(null);
   const isConnectedRef = useRef(false);
   const urlRef = useRef(wsUrl);
+  const doConnectRef = useRef<() => void>(() => {});
 
   const onMessageRef = useRef(onMessage);
   onMessageRef.current = onMessage;
@@ -146,7 +147,7 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
     if (urlRef.current && wasConnected) {
       const delay = reconnectStrategyRef.current.schedule(() => {
         if (!isConnectedRef.current && urlRef.current) {
-          doConnect();
+          doConnectRef.current();
         }
       });
       if (delay !== null) {
@@ -155,7 +156,7 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
         );
       }
     }
-  }, [clearIntervals]); // doConnect added below
+  }, [clearIntervals]);
 
   const handleOnMessage = useCallback((event: MessageEvent) => {
     try {
@@ -212,6 +213,15 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
       handleOnClose();
     }
   }, [sendMessage, handleOnClose, handleOnMessage]);
+
+  doConnectRef.current = doConnect;
+
+  const stopStateUpdateInterval = useCallback(() => {
+    if (stateUpdateIntervalRef.current) {
+      clearInterval(stateUpdateIntervalRef.current);
+      stateUpdateIntervalRef.current = null;
+    }
+  }, []);
 
   const connect = useCallback(
     (url: string) => {
@@ -292,6 +302,7 @@ export function useSyncController({ onMessage }: UseSyncControllerParams) {
     sendTriggerAlarm,
     checkHeartbeat,
     startStateUpdateInterval,
+    stopStateUpdateInterval,
     isConnected,
     isConnectedRef,
     wsUrl,

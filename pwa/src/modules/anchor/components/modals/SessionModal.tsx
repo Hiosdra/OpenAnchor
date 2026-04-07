@@ -86,9 +86,9 @@ export function SessionModal({
     if (!replaySession) return null;
     const { session: s, logEntries } = replaySession;
     const duration = s.endTime
-      ? formatDuration(s.endTime - s.startTime, 's')
+      ? formatDuration(s.endTime - s.startTime)
       : t.histActive;
-    const date = new Date(s.startTime * 1000).toLocaleString();
+    const date = new Date(s.startTime).toLocaleString();
 
     return (
       <>

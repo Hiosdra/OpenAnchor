@@ -51,6 +51,7 @@ export function useSession() {
   const dbRef = useRef<SessionDB>(new SessionDB());
   const trackPointBufferRef = useRef<Omit<TrackPoint, 'id'>[]>([]);
   const flushIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const mountedRef = useRef(true);
 
   const flushTrackPoints = useCallback(async () => {
     if (trackPointBufferRef.current.length === 0) return;
@@ -77,15 +78,18 @@ export function useSession() {
   const initDB = useCallback(async (): Promise<RestoredState | null> => {
     try {
       await dbRef.current.open();
+      if (!mountedRef.current) return null;
       const saved = await dbRef.current.getActiveState();
       if (!saved || !saved.isAnchored) return null;
 
       let track: L.LatLng[] = [];
       if (saved.sessionId) {
         const points = await dbRef.current.getTrackPoints(saved.sessionId);
+        if (!mountedRef.current) return null;
         track = points.map((p) => L.latLng(p.lat, p.lng));
       }
 
+      if (!mountedRef.current) return null;
       startTrackFlushing();
 
       return {
@@ -254,7 +258,9 @@ export function useSession() {
   }, []);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
       stopTrackFlushing();
     };
   }, [stopTrackFlushing]);
