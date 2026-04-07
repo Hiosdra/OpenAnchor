@@ -10,28 +10,22 @@ vi.mock('../src/modules/dashboard/dashboard-ui', () => ({
   initDashboard: mockInitDashboard,
 }));
 
-// ── anchor/entry deps ────────────────────────────────────────────────────
-const mockI18NApplyToDOM = vi.fn();
-const mockConnectionStatusInit = vi.fn();
-const mockOnboardingController = vi.fn();
-const mockAnchorApp = vi.fn();
-
-vi.mock('../src/modules/anchor/i18n', () => ({
-  I18N: { _applyToDOM: mockI18NApplyToDOM, init: vi.fn(), fmt: vi.fn(), t: {} },
+// ── anchor/entry deps (React) ────────────────────────────────────────────
+vi.mock('../src/modules/anchor/App', () => ({
+  App: () => null,
 }));
-vi.mock('../src/modules/anchor/connection-status', () => ({
-  ConnectionStatus: { init: mockConnectionStatusInit, _update: vi.fn() },
-}));
-vi.mock('../src/modules/anchor/ui-utils', () => ({
-  OnboardingController: mockOnboardingController,
-  UI: { init: vi.fn() },
-  throttle: vi.fn((fn: Function) => fn),
-}));
-vi.mock('../src/modules/anchor/anchor-app', () => ({
-  AnchorApp: mockAnchorApp,
-}));
-vi.mock('../src/modules/anchor/templates', () => ({
-  renderApp: () => '<div id="map"></div>',
+vi.mock('leaflet', () => ({
+  default: { marker: vi.fn(), map: vi.fn(), tileLayer: vi.fn(), LatLng: class { constructor(public lat: number, public lng: number) {} } },
+  marker: vi.fn(),
+  map: vi.fn(),
+  tileLayer: vi.fn(),
+  LatLng: class { constructor(public lat: number, public lng: number) {} },
+  latLng: vi.fn((...a: any[]) => ({ lat: a[0], lng: a[1] })),
+  divIcon: vi.fn(() => ({})),
+  circleMarker: vi.fn(() => ({ addTo: vi.fn(), setLatLng: vi.fn(), setRadius: vi.fn(), remove: vi.fn() })),
+  circle: vi.fn(() => ({ addTo: vi.fn(), setLatLng: vi.fn(), setRadius: vi.fn(), remove: vi.fn() })),
+  polyline: vi.fn(() => ({ addTo: vi.fn(), setLatLngs: vi.fn(), remove: vi.fn() })),
+  polygon: vi.fn(() => ({ addTo: vi.fn(), remove: vi.fn() })),
 }));
 
 // ── egzamin/entry deps ──────────────────────────────────────────────────
@@ -61,44 +55,9 @@ vi.mock('../src/modules/wachtownik/App', () => ({
   default: () => null,
 }));
 
-// ── zeglowanie/entry deps ───────────────────────────────────────────────
-const mockInitSections = vi.fn();
-const mockInitPacking = vi.fn();
-const mockInitBriefing = vi.fn();
-const mockInitChecklists = vi.fn();
-const mockSwitchSection = vi.fn();
-const mockSwitchCruiseType = vi.fn();
-const mockResetChecklist = vi.fn();
-const mockSwitchBriefingType = vi.fn();
-const mockResetBriefingChecklist = vi.fn();
-const mockSwitchChecklistType = vi.fn();
-const mockResetChecklistSection = vi.fn();
-
-vi.mock('../src/modules/zeglowanie/sections', () => ({
-  switchSection: mockSwitchSection,
-  initSections: mockInitSections,
-  getCurrentSection: vi.fn(() => 'packing'),
-}));
-vi.mock('../src/modules/zeglowanie/packing', () => ({
-  switchCruiseType: mockSwitchCruiseType,
-  resetChecklist: mockResetChecklist,
-  renderChecklist: vi.fn(),
-  initPacking: mockInitPacking,
-  getCurrentCruiseType: vi.fn(() => 'baltic-autumn'),
-}));
-vi.mock('../src/modules/zeglowanie/briefing', () => ({
-  switchBriefingType: mockSwitchBriefingType,
-  resetBriefingChecklist: mockResetBriefingChecklist,
-  renderBriefingChecklist: vi.fn(),
-  initBriefing: mockInitBriefing,
-  getCurrentBriefingType: vi.fn(() => 'zero'),
-}));
-vi.mock('../src/modules/zeglowanie/checklists', () => ({
-  switchChecklistType: mockSwitchChecklistType,
-  resetChecklistSection: mockResetChecklistSection,
-  renderChecklistItems: vi.fn(),
-  initChecklists: mockInitChecklists,
-  getCurrentChecklistType: vi.fn(() => 'morning'),
+// ── zeglowanie/entry deps (now React — mocks for App) ───────────────────
+vi.mock('../src/modules/zeglowanie/App', () => ({
+  default: () => null,
 }));
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -117,68 +76,36 @@ describe('main.ts entry', () => {
   });
 });
 
-describe('anchor/entry.ts', () => {
-  let capturedDOMContentLoaded: EventListener | null = null;
-  const origAddEventListener = window.addEventListener.bind(window);
-
+describe('anchor/entry.tsx', () => {
   beforeEach(() => {
     vi.resetModules();
-    mockConnectionStatusInit.mockClear();
-    mockOnboardingController.mockClear();
-    mockAnchorApp.mockClear();
-    mockI18NApplyToDOM.mockClear();
-    capturedDOMContentLoaded = null;
-
-    // entry.ts injects HTML into #app-root
-    if (!document.getElementById('app-root')) {
-      const el = document.createElement('div');
-      el.id = 'app-root';
-      document.body.appendChild(el);
-    }
-
-    // Intercept DOMContentLoaded registration so we can call it manually
-    vi.spyOn(window, 'addEventListener').mockImplementation((type: string, listener: any, options?: any) => {
-      if (type === 'DOMContentLoaded') {
-        capturedDOMContentLoaded = listener;
-      } else {
-        origAddEventListener(type, listener, options);
-      }
-    });
+    mockCreateRoot.mockClear();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
-    const appRoot = document.getElementById('app-root');
-    if (appRoot) appRoot.remove();
+    const root = document.getElementById('root');
+    if (root) root.remove();
   });
 
-  it('sets theme from localStorage on import', async () => {
-    localStorage.setItem('openanchor-theme', 'light');
+  it('creates a React root and renders into #root', async () => {
+    const container = document.createElement('div');
+    container.id = 'root';
+    document.body.appendChild(container);
+
+    const mockRender = vi.fn();
+    mockCreateRoot.mockReturnValue({ render: mockRender });
+
     await import('../src/modules/anchor/entry');
-    expect(document.documentElement.dataset.theme).toBe('light');
+
+    expect(mockCreateRoot).toHaveBeenCalledOnce();
+    expect(mockRender).toHaveBeenCalledOnce();
   });
 
-  it('defaults theme to dark when localStorage is empty', async () => {
-    localStorage.clear();
-    await import('../src/modules/anchor/entry');
-    expect(document.documentElement.dataset.theme).toBe('dark');
-  });
+  it('throws when #root is missing', async () => {
+    const root = document.getElementById('root');
+    if (root) root.remove();
 
-  it('initializes ConnectionStatus on import', async () => {
-    await import('../src/modules/anchor/entry');
-    expect(mockConnectionStatusInit).toHaveBeenCalled();
-  });
-
-  it('creates AnchorApp and applies i18n on DOMContentLoaded', async () => {
-    await import('../src/modules/anchor/entry');
-
-    expect(capturedDOMContentLoaded).toBeTypeOf('function');
-    // Invoke the captured handler directly (avoids duplicate handler issues)
-    capturedDOMContentLoaded!(new Event('DOMContentLoaded'));
-
-    expect(mockOnboardingController).toHaveBeenCalled();
-    expect(mockAnchorApp).toHaveBeenCalled();
-    expect(mockI18NApplyToDOM).toHaveBeenCalled();
+    await expect(import('../src/modules/anchor/entry')).rejects.toThrow('Root element not found');
   });
 });
 
@@ -298,20 +225,10 @@ describe('wachtownik/entry.tsx', () => {
   });
 });
 
-describe('zeglowanie/entry.ts', () => {
+describe('zeglowanie/entry.tsx', () => {
   beforeEach(() => {
     vi.resetModules();
-    mockInitSections.mockClear();
-    mockInitPacking.mockClear();
-    mockInitBriefing.mockClear();
-    mockInitChecklists.mockClear();
-    mockSwitchSection.mockClear();
-    mockSwitchCruiseType.mockClear();
-    mockResetChecklist.mockClear();
-    mockSwitchBriefingType.mockClear();
-    mockResetBriefingChecklist.mockClear();
-    mockSwitchChecklistType.mockClear();
-    mockResetChecklistSection.mockClear();
+    mockCreateRoot.mockClear();
   });
 
   it('sets theme on documentElement from localStorage', async () => {
@@ -320,29 +237,16 @@ describe('zeglowanie/entry.ts', () => {
     expect(document.documentElement.dataset.theme).toBe('light');
   });
 
-  it('initializes all modules on DOMContentLoaded', async () => {
+  it('creates a React root and renders when #root exists', async () => {
+    const root = document.createElement('div');
+    root.id = 'root';
+    document.body.appendChild(root);
+    const mockRender = vi.fn();
+    mockCreateRoot.mockReturnValueOnce({ render: mockRender });
+
     await import('../src/modules/zeglowanie/entry');
-
-    const event = new Event('DOMContentLoaded');
-    document.dispatchEvent(event);
-
-    expect(mockInitSections).toHaveBeenCalled();
-    expect(mockInitPacking).toHaveBeenCalled();
-    expect(mockInitBriefing).toHaveBeenCalled();
-    expect(mockInitChecklists).toHaveBeenCalled();
-  });
-
-  it('delegates click events via data-action attributes', async () => {
-    await import('../src/modules/zeglowanie/entry');
-    document.dispatchEvent(new Event('DOMContentLoaded'));
-
-    const btn = document.createElement('button');
-    btn.dataset.action = 'switchSection';
-    btn.dataset.arg = 'briefing';
-    document.body.appendChild(btn);
-
-    btn.click();
-    expect(mockSwitchSection).toHaveBeenCalledWith('briefing');
-    btn.remove();
+    expect(mockCreateRoot).toHaveBeenCalledWith(root);
+    expect(mockRender).toHaveBeenCalled();
+    root.remove();
   });
 });

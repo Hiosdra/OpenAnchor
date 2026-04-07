@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Alert Kotwiczny (Anchor Alarm)</title>
+    <meta name="description" content="Alert Kotwiczny — monitoruj pozycję kotwicy i bądź bezpieczny">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Alert Kotwiczny">
+
+    <title>Alert Kotwiczny — OpenAnchor</title>
     <link rel="icon" type="image/x-icon" href="../../favicon.ico">
     <link rel="icon" type="image/svg+xml" href="../../assets/icon.svg">
     <link rel="apple-touch-icon" href="../../assets/icon-192x192.png">
-
-    <meta name="theme-color" content="#0f172a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/manifest.json">
 
+    <!-- Unified Theme -->
     <link rel="stylesheet" href="../../styles/theme.css">
 </head>
-<body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-y-auto" id="app-body">
-
-<div id="app-root"></div>
-
-<script type="module" src="../../src/modules/anchor/entry.ts"></script>
+<body>
+    <div id="root"></div>
+    <script type="module" src="../../src/modules/anchor/entry.tsx"></script>
 </body>
 </html>

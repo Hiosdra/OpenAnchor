@@ -26,7 +26,6 @@ export default defineConfig({
         'src/**/types.ts',
         'src/shared/types/**',
         'src/modules/anchor/index.ts',
-        'src/modules/anchor/controllers/index.ts',
         'src/modules/egzamin/index.tsx',
         'src/modules/wachtownik/index.tsx',
         'src/modules/zeglowanie/index.ts',
