@@ -25,6 +25,7 @@ horologistComposeLayout = "0.8.3-alpha"
 coreSplashscreen = "1.2.0"
 ktor = "3.4.2"
 camerax = "1.6.0"
+guava = "33.3.1-android"
 zxing = "3.5.4"
 generativeai = "0.9.0"
 junit = "4.13.2"
@@ -111,6 +112,7 @@ camerax-core = { group = "androidx.camera", name = "camera-core", version.ref = 
 camerax-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
 camerax-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 
 # QR Code Generation & Scanning
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
