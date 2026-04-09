@@ -29,7 +29,7 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
   useEffect(() => {
     if (isFinished) return;
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
           setIsFinished(true);
@@ -48,11 +48,11 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
   };
 
   const handleAnswer = (label: string) => {
-    setAnswers(prev => ({ ...prev, [examQuestions[currentIndex].id]: label }));
+    setAnswers((prev) => ({ ...prev, [examQuestions[currentIndex].id]: label }));
   };
 
   const handleFinishExam = () => {
-    const results: ExamResult[] = examQuestions.map(q => ({
+    const results: ExamResult[] = examQuestions.map((q) => ({
       question: q,
       userAnswer: answers[q.id] || null,
       correct: answers[q.id] === q.correctAnswer,
@@ -60,7 +60,6 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
     onFinish(results, EXAM_TIME_MINUTES * 60 - timeLeft);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (isFinished) {
       handleFinishExam();
@@ -85,9 +84,11 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
           }
         }}
         rightContent={
-          <div className={`px-3 py-1.5 rounded-xl text-sm font-mono font-bold ${
-            timeWarning ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-white/60'
-          }`}>
+          <div
+            className={`px-3 py-1.5 rounded-xl text-sm font-mono font-bold ${
+              timeWarning ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-white/60'
+            }`}
+          >
             {formatTime(timeLeft)}
           </div>
         }
@@ -100,7 +101,10 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
         incorrect={0}
       />
 
-      <div className="flex-1 px-4 pb-4" style={{paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'}}>
+      <div
+        className="flex-1 px-4 pb-4"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+      >
         <div className="max-w-2xl mx-auto space-y-3">
           <QuestionImageCard question={currentQuestion} />
 
@@ -113,7 +117,10 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
           />
 
           {/* Question navigation dots */}
-          <div className="grid gap-2 mt-3 justify-center" style={{gridTemplateColumns: 'repeat(auto-fill, minmax(2.75rem, 1fr))'}}>
+          <div
+            className="grid gap-2 mt-3 justify-center"
+            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(2.75rem, 1fr))' }}
+          >
             {examQuestions.map((q, i) => (
               <button
                 key={q.id}
@@ -133,7 +140,7 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
 
           <div className="flex gap-3 mt-4">
             <button
-              onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
+              onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
               disabled={currentIndex === 0}
               className="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 text-base font-semibold disabled:opacity-20 hover:bg-white/10 transition-all"
             >
@@ -141,7 +148,7 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
             </button>
             {currentIndex < examQuestions.length - 1 ? (
               <button
-                onClick={() => setCurrentIndex(i => i + 1)}
+                onClick={() => setCurrentIndex((i) => i + 1)}
                 className="flex-1 py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 text-base font-bold hover:from-amber-500 hover:to-amber-400 transition-all"
               >
                 Następne
@@ -151,7 +158,12 @@ export function ExamScreen({ questions, onFinish, onBack }: ExamScreenProps) {
                 onClick={() => {
                   const unanswered = examQuestions.length - answeredCount;
                   if (unanswered > 0) {
-                    if (!confirm(`Masz ${unanswered} pytań bez odpowiedzi. Na pewno chcesz zakończyć?`)) return;
+                    if (
+                      !confirm(
+                        `Masz ${unanswered} pytań bez odpowiedzi. Na pewno chcesz zakończyć?`,
+                      )
+                    )
+                      return;
                   }
                   handleFinishExam();
                 }}

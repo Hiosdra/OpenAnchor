@@ -22,7 +22,11 @@ export function QRScanModal({ open, onClose, onConnect }: QRScanModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} className="border border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+    <Modal
+      open={open}
+      onClose={onClose}
+      className="border border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+    >
       <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
         <QrCode className="text-emerald-400" />
         <span>{t.qrTitle}</span>
@@ -44,9 +48,7 @@ export function QRScanModal({ open, onClose, onConnect }: QRScanModalProps) {
         </div>
       )}
 
-      {error && (
-        <div className="text-red-400 text-sm mb-3">{error}</div>
-      )}
+      {error && <div className="text-red-400 text-sm mb-3">{error}</div>}
 
       <div className="flex gap-3">
         <button

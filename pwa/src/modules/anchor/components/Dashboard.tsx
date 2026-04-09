@@ -38,9 +38,7 @@ export function Dashboard({ distance, sog, cog, accuracy, unit, isAnchored }: Da
       aria-live="polite"
     >
       <div className="p-1.5 sm:p-2">
-        <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">
-          {t.dashDistance}
-        </div>
+        <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">{t.dashDistance}</div>
         <div id="val-dist" className="font-mono font-bold text-lg sm:text-xl text-white">
           {distDisplay}
           {hasData && <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>}
@@ -66,9 +64,7 @@ export function Dashboard({ distance, sog, cog, accuracy, unit, isAnchored }: Da
       </div>
 
       <div className="p-1.5 sm:p-2">
-        <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">
-          {t.dashGpsAcc}
-        </div>
+        <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">{t.dashGpsAcc}</div>
         <div id="val-acc" className="font-mono font-bold text-lg sm:text-xl text-slate-300">
           {accDisplay}
           {hasData && <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>}

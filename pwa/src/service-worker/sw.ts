@@ -21,9 +21,7 @@ interface PeriodicSyncEvent extends ExtendableEvent {
 declare const self: ServiceWorkerGlobalScope;
 export {};
 
-type SWMessageData =
-  | { type: 'SKIP_WAITING' }
-  | { type: 'CACHE_MODULE'; module: string };
+type SWMessageData = { type: 'SKIP_WAITING' } | { type: 'CACHE_MODULE'; module: string };
 
 // Install — pre-cache core shell assets
 self.addEventListener('install', (event: ExtendableEvent) => {
@@ -47,9 +45,7 @@ self.addEventListener('message', (event: ExtendableMessageEvent) => {
   if (data.type === 'CACHE_MODULE') {
     const urls = getModuleUrls(data.module);
     if (urls) {
-      event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(urls as string[])),
-      );
+      event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(urls as string[])));
     }
   }
 });
@@ -75,18 +71,14 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
     caches
       .keys()
       .then((names) =>
-        Promise.all(
-          names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n)),
-        ),
+        Promise.all(names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n))),
       )
       .then(() => self.clients.claim())
       .then(() =>
         self.clients
           .matchAll({ type: 'window' })
           .then((clients) =>
-            clients.forEach((c) =>
-              c.postMessage({ type: 'SW_UPDATED', cacheName: CACHE_NAME }),
-            ),
+            clients.forEach((c) => c.postMessage({ type: 'SW_UPDATED', cacheName: CACHE_NAME })),
           ),
       ),
   );
@@ -97,14 +89,20 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.waitUntil(self.clients.openWindow('./'));
 });
 
-self.addEventListener('sync' as string, ((event: SyncEvent) => {
-  if (event.tag === 'sync-position') {
-    event.waitUntil(Promise.resolve());
-  }
-}) as EventListener);
+self.addEventListener(
+  'sync' as string,
+  ((event: SyncEvent) => {
+    if (event.tag === 'sync-position') {
+      event.waitUntil(Promise.resolve());
+    }
+  }) as EventListener,
+);
 
-self.addEventListener('periodicsync' as string, ((event: PeriodicSyncEvent) => {
-  if (event.tag === 'check-anchor-position') {
-    event.waitUntil(Promise.resolve());
-  }
-}) as EventListener);
+self.addEventListener(
+  'periodicsync' as string,
+  ((event: PeriodicSyncEvent) => {
+    if (event.tag === 'check-anchor-position') {
+      event.waitUntil(Promise.resolve());
+    }
+  }) as EventListener,
+);

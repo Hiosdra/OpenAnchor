@@ -35,22 +35,29 @@ export function Header({
   const unitLabel = unit === 'meters' ? t.unitMeters : t.unitFeet;
   const langLabel = lang === 'pl' ? 'EN' : 'PL';
 
-  const gpsColor = hasGpsFix && !gpsSignalLost
-    ? 'text-green-500'
-    : gpsSignalLost
-      ? 'text-red-500'
-      : 'text-yellow-500';
+  const gpsColor =
+    hasGpsFix && !gpsSignalLost
+      ? 'text-green-500'
+      : gpsSignalLost
+        ? 'text-red-500'
+        : 'text-yellow-500';
 
-  const gpsText = hasGpsFix && !gpsSignalLost
-    ? t.gpsOk
-    : gpsSignalLost
-      ? t.gpsLost
-      : t.gpsSearching;
+  const gpsText =
+    hasGpsFix && !gpsSignalLost ? t.gpsOk : gpsSignalLost ? t.gpsLost : t.gpsSearching;
 
   return (
     <header className="oa-header">
       <a href="../../index.html" title="OpenAnchor Superapp" className="oa-back-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <polyline points="15 18 9 12 15 6" />
         </svg>
         <span>Menu</span>

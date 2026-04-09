@@ -20,6 +20,21 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.a
     throw AssertionError("Found $count nodes with text '$text' but none are displayed")
 }
 
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.assertTextNotDisplayed(text: String) {
+    val nodes = onAllNodesWithText(text, substring = true, ignoreCase = true)
+    val count = nodes.fetchSemanticsNodes().size
+    if (count == 0) return
+    for (i in 0 until count) {
+        try {
+            nodes[i].assertIsDisplayed()
+            throw AssertionError("Found node with text '$text' that is still displayed")
+        } catch (_: AssertionError) {
+            if (i == count - 1) return // None displayed — success
+            continue
+        }
+    }
+}
+
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.waitForText(
     text: String,
     timeoutMs: Long = 15_000
@@ -76,6 +91,18 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.s
     timeoutMs: Long = 15_000
 ): SemanticsNodeInteraction {
     return waitForText(text, timeoutMs).performScrollTo()
+}
+
+/**
+ * Navigate from Home screen to a named screen by scrolling to and clicking a button.
+ * Assumes the test is currently on the Home screen (waits for "Drop Anchor" first).
+ */
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.navigateFromHome(buttonText: String) {
+    waitForText("Drop Anchor")
+    scrollToText(buttonText)
+    waitForIdle()
+    waitForText(buttonText).performClick()
+    waitForIdle()
 }
 
 /**

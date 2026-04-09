@@ -30,7 +30,7 @@ export const ALARM_STATES: AlarmStates = {
   SAFE: 'safe',
   CAUTION: 'caution',
   WARNING: 'warning',
-  ALARM: 'alarm'
+  ALARM: 'alarm',
 } as const;
 
 export function getAlarmState(distance: number, radius: number): AlarmStateValue {
@@ -64,9 +64,7 @@ export function calculateBearing(lat1: number, lon1: number, lat2: number, lon2:
   const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
   const y = Math.sin(Δλ) * Math.cos(φ2);
-  const x =
-    Math.cos(φ1) * Math.sin(φ2) -
-    Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
 
   const θ = Math.atan2(y, x);
   const bearing = ((θ * 180) / Math.PI + 360) % 360;
@@ -151,13 +149,14 @@ export class GeoUtils {
     const lat1 = (lat * Math.PI) / 180;
     const lon1 = (lng * Math.PI) / 180;
     const lat2 = Math.asin(
-      Math.sin(lat1) * Math.cos(distance / R) + Math.cos(lat1) * Math.sin(distance / R) * Math.cos(brng)
+      Math.sin(lat1) * Math.cos(distance / R) +
+        Math.cos(lat1) * Math.sin(distance / R) * Math.cos(brng),
     );
     const lon2 =
       lon1 +
       Math.atan2(
         Math.sin(brng) * Math.sin(distance / R) * Math.cos(lat1),
-        Math.cos(distance / R) - Math.sin(lat1) * Math.sin(lat2)
+        Math.cos(distance / R) - Math.sin(lat1) * Math.sin(lat2),
       );
     return { lat: (lat2 * 180) / Math.PI, lng: (lon2 * 180) / Math.PI };
   }
@@ -168,20 +167,28 @@ export class GeoUtils {
     const lon1 = (start.lng * Math.PI) / 180;
     const lon2 = (end.lng * Math.PI) / 180;
     const y = Math.sin(lon2 - lon1) * Math.cos(lat2);
-    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
-    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    const x =
+      Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+    return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
   }
 
   static getSectorPolygonPoints(
     center: LatLng,
     radiusMeters: number,
     bearing: number,
-    width: number
+    width: number,
   ): LatLng[] {
     const points: LatLng[] = [];
     const startAngle = bearing - width / 2;
     for (let i = 0; i <= 30; i++) {
-      points.push(this.getDestinationPoint(center.lat, center.lng, radiusMeters, startAngle + (width * i) / 30));
+      points.push(
+        this.getDestinationPoint(
+          center.lat,
+          center.lng,
+          radiusMeters,
+          startAngle + (width * i) / 30,
+        ),
+      );
     }
     return points;
   }

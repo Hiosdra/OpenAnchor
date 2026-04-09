@@ -2,8 +2,9 @@ import { useRef, useCallback } from 'react';
 import L from 'leaflet';
 import { AlarmEngine, type ZoneCheckResult, type AlarmLevel } from '../alarm-engine';
 import { GeoUtils } from '../geo-utils';
+import { MessageType } from '@shared/constants/protocol';
 
-interface AlarmProcessInput {
+export interface AlarmProcessInput {
   isAnchored: boolean;
   anchorPos: L.LatLng | null;
   currentPos: L.LatLng | null;
@@ -38,11 +39,7 @@ interface UseAlarmStateParams {
     sector: { enabled: boolean; bearing: number; width: number },
     alarmState: string,
   ) => void;
-  onAlarmTriggered?: (
-    newState: AlarmLevel,
-    previousState: string,
-    distStr: string,
-  ) => void;
+  onAlarmTriggered?: (newState: AlarmLevel, previousState: string, distStr: string) => void;
   onSyncMessage?: (type: string, payload: Record<string, unknown>) => void;
 }
 
@@ -84,16 +81,12 @@ export function useAlarmState({
       let dragDetected = false;
       let dragWarningDismissed = state.dragWarningDismissed;
 
-      if (
-        !dragWarningDismissed &&
-        dragHistory.length === 5 &&
-        distance > state.radius * 0.4
-      ) {
+      if (!dragWarningDismissed && dragHistory.length === 5 && distance > state.radius * 0.4) {
         const [d1, d2, d3, d4, d5] = dragHistory;
         if (d1 < d2 && d2 < d3 && d3 < d4 && d4 < d5 && d5 - d1 > 2) {
           dragDetected = true;
           dragWarningDismissed = true;
-          onSyncMessage?.('TRIGGER_ALARM', {
+          onSyncMessage?.(MessageType.TRIGGER_ALARM, {
             reason: 'OUT_OF_ZONE',
             message: 'Possible anchor drag detected!',
             alarmState: 'WARNING',
@@ -121,20 +114,20 @@ export function useAlarmState({
         if (newAlarmState === 'ALARM') {
           alarmCountRef.current++;
           onAlarmTriggered?.(newAlarmState, previousAlarmState, distStr);
-          onSyncMessage?.('TRIGGER_ALARM', {
+          onSyncMessage?.(MessageType.TRIGGER_ALARM, {
             reason: 'OUT_OF_ZONE',
             message: `Yacht outside safe zone! (${distStr})`,
             alarmState: 'ALARM',
           });
         } else if (newAlarmState === 'WARNING' && previousAlarmState !== 'ALARM') {
           onAlarmTriggered?.(newAlarmState, previousAlarmState, distStr);
-          onSyncMessage?.('TRIGGER_ALARM', {
+          onSyncMessage?.(MessageType.TRIGGER_ALARM, {
             reason: 'OUT_OF_ZONE',
             message: `Position verification in progress (${distStr})`,
             alarmState: 'WARNING',
           });
         } else if (newAlarmState === 'CAUTION' && previousAlarmState === 'SAFE') {
-          onSyncMessage?.('STATE_UPDATE', {
+          onSyncMessage?.(MessageType.STATE_UPDATE, {
             alarmState: 'CAUTION',
           });
         } else if (

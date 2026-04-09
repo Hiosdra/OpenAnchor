@@ -38,10 +38,8 @@ class AdvisorScreenTest {
     }
 
     private fun navigateToAdvisor() {
-        composeTestRule.waitForText("Drop Anchor")
-        composeTestRule.scrollToText("AI Advisor")
-        composeTestRule.waitForText("AI Advisor").performClick()
-        composeTestRule.waitForText("AI Advisor", timeoutMs = 5_000)
+        composeTestRule.navigateFromHome("AI Advisor")
+        composeTestRule.waitForText("AI Advisor", timeoutMs = 10_000)
     }
 
     @Test

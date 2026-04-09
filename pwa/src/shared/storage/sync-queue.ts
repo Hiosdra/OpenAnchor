@@ -45,7 +45,7 @@ export class SyncQueue {
       type,
       payload,
       timestamp: Date.now(),
-      retries: 0
+      retries: 0,
     });
     this._saveQueue(queue);
     return true;

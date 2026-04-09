@@ -31,7 +31,11 @@ export function StatsModal({ open, onClose, stats }: StatsModalProps) {
     : [];
 
   return (
-    <Modal open={open} onClose={onClose} className="border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+    <Modal
+      open={open}
+      onClose={onClose}
+      className="border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+    >
       <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <BarChart3 className="text-cyan-400" />
         <span>{t.statsTitle}</span>

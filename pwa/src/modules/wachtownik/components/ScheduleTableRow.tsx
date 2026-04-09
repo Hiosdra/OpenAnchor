@@ -50,9 +50,7 @@ export const ScheduleTableRow = React.memo(
           <div className="text-sm">
             {t('label.day', userLocale)} {daySchedule.day}
           </div>
-          <div
-            className={`text-xs font-normal ${isNightMode ? 'text-red-700' : 'text-slate-500'}`}
-          >
+          <div className={`text-xs font-normal ${isNightMode ? 'text-red-700' : 'text-slate-500'}`}>
             {rowDate.toLocaleDateString(userLocale, { day: '2-digit', month: '2-digit' })}
           </div>
         </td>
@@ -72,9 +70,7 @@ export const ScheduleTableRow = React.memo(
                       onDragStart={(e) =>
                         !isReadOnly && onDragStart(e, dayIndex, slotIndex, personIndex)
                       }
-                      onDrop={(e) =>
-                        !isReadOnly && onDrop(e, dayIndex, slotIndex, personIndex)
-                      }
+                      onDrop={(e) => !isReadOnly && onDrop(e, dayIndex, slotIndex, personIndex)}
                       onDragOver={!isReadOnly ? onDragOver : undefined}
                       className={`text-sm px-2 py-1 rounded border flex items-center space-x-2 ${!isReadOnly ? 'cursor-move' : ''} print:border-none print:p-0 print:bg-transparent transition-all ${draggedItem?.dayIdx === dayIndex && draggedItem?.slotIdx === slotIndex && draggedItem?.pIdx === personIndex ? 'opacity-50' : ''} ${isNightMode ? 'bg-black border-red-800 hover:border-red-500' : 'bg-white border-slate-200 hover:border-sky-300 hover:shadow-sm'}`}
                     >

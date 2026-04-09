@@ -4,6 +4,8 @@
  * Encapsulates exponential backoff logic for WebSocket reconnection.
  * Pure logic, no DOM or WebSocket dependencies.
  */
+import { WS_RECONNECT_BASE_DELAY_MS, WS_RECONNECT_MAX_DELAY_MS } from '@shared/constants/protocol';
+
 export interface ReconnectConfig {
   baseDelay?: number;
   maxDelay?: number;
@@ -11,8 +13,8 @@ export interface ReconnectConfig {
 }
 
 const DEFAULTS: Required<ReconnectConfig> = {
-  baseDelay: 2000,
-  maxDelay: 30000,
+  baseDelay: WS_RECONNECT_BASE_DELAY_MS,
+  maxDelay: WS_RECONNECT_MAX_DELAY_MS,
   maxAttempts: Infinity,
 };
 
@@ -45,9 +47,7 @@ export class ReconnectStrategy {
 
   /** Whether more reconnect attempts are allowed. */
   canReconnect(): boolean {
-    return (
-      !this._intentionalDisconnect && this._attempts < this._config.maxAttempts
-    );
+    return !this._intentionalDisconnect && this._attempts < this._config.maxAttempts;
   }
 
   /**

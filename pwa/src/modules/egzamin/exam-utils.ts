@@ -88,9 +88,7 @@ export function formatTimeTaken(timeTaken: number): TimeParts {
 // -- Category counting -----------------------------------------------------
 
 /** Count how many questions belong to each category. */
-export function countByCategory(
-  questions: Array<{ category: string }>,
-): Record<string, number> {
+export function countByCategory(questions: Array<{ category: string }>): Record<string, number> {
   const counts: Record<string, number> = {};
   questions.forEach((q) => {
     if (!counts[q.category]) counts[q.category] = 0;

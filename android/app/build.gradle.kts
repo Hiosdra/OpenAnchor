@@ -22,6 +22,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableAndroidTestCoverage = true
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
@@ -182,6 +185,50 @@ jacoco {
     toolVersion = "0.8.12"
 }
 
+val jacocoExclusions = listOf(
+    "**/R.class",
+    "**/R$*.class",
+    "**/BuildConfig.*",
+    "**/Manifest*.*",
+    "**/*Test*.*",
+    "android/**/*.*",
+    // Hilt generated
+    "**/*_Hilt*.class",
+    "**/Hilt_*.class",
+    "**/*_Factory.class",
+    "**/*_MembersInjector.class",
+    "**/*Module.class",
+    "**/*Module$*.class",
+    "**/*Component.class",
+    "**/*Component$*.class",
+    "**/*_ComponentImpl.class",
+    "**/*_ComponentImpl$*.class",
+    // Compose generated lambda holders
+    "**/ComposableSingletons*.class",
+    // Room generated DAO/DB implementations
+    "**/*_Impl.class",
+    "**/*_Impl$*.class",
+    // Navigation graph definition
+    "**/NavHostKt*.class",
+    // Activity lifecycle + permissions (not unit-testable)
+    "**/MainActivity*.class",
+    // Bound service lifecycle (logic extracted to GpsProcessor/AlarmHandler)
+    "**/AnchorMonitorService*.class",
+    "**/ServiceBinder*.class",
+    // Service orchestrators/managers extracted from AnchorMonitorService
+    // (interact with Android services, GPS, alarms — not unit-testable)
+    "**/StandaloneMonitorManager*.class",
+    "**/PairedModeOrchestrator*.class",
+    "**/ClientModeOrchestrator*.class",
+    "**/BatteryMonitorManager*.class",
+    // Hardware sensor providers (require Android system APIs)
+    "**/LocationProvider*.class",
+    "**/CompassProvider*.class",
+    "**/BatteryProvider*.class",
+    // Application class (Hilt setup only)
+    "**/OpenAnchorApp*.class",
+)
+
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -191,52 +238,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         csv.required.set(false)
     }
 
-    val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*",
-        // Hilt generated
-        "**/*_Hilt*.class",
-        "**/Hilt_*.class",
-        "**/*_Factory.class",
-        "**/*_MembersInjector.class",
-        "**/*Module.class",
-        "**/*Module$*.class",
-        "**/*Component.class",
-        "**/*Component$*.class",
-        "**/*_ComponentImpl.class",
-        "**/*_ComponentImpl$*.class",
-        // Compose generated lambda holders
-        "**/ComposableSingletons*.class",
-        // Room generated DAO/DB implementations
-        "**/*_Impl.class",
-        "**/*_Impl$*.class",
-        // Navigation graph definition
-        "**/NavHostKt*.class",
-        // Activity lifecycle + permissions (not unit-testable)
-        "**/MainActivity*.class",
-        // Bound service lifecycle (logic extracted to GpsProcessor/AlarmHandler)
-        "**/AnchorMonitorService*.class",
-        "**/ServiceBinder*.class",
-        // Service orchestrators/managers extracted from AnchorMonitorService
-        // (interact with Android services, GPS, alarms — not unit-testable)
-        "**/StandaloneMonitorManager*.class",
-        "**/PairedModeOrchestrator*.class",
-        "**/ClientModeOrchestrator*.class",
-        "**/BatteryMonitorManager*.class",
-        // Hardware sensor providers (require Android system APIs)
-        "**/LocationProvider*.class",
-        "**/CompassProvider*.class",
-        "**/BatteryProvider*.class",
-        // Application class (Hilt setup only)
-        "**/OpenAnchorApp*.class",
-    )
-
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude(fileFilter)
+        exclude(jacocoExclusions)
     }
     val mainSrc = "${project.projectDir}/src/main/java"
 
@@ -250,45 +253,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
     dependsOn("testDebugUnitTest")
 
-    val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*",
-        "**/*_Hilt*.class",
-        "**/Hilt_*.class",
-        "**/*_Factory.class",
-        "**/*_MembersInjector.class",
-        "**/*Module.class",
-        "**/*Module$*.class",
-        "**/*Component.class",
-        "**/*Component$*.class",
-        "**/*_ComponentImpl.class",
-        "**/*_ComponentImpl$*.class",
-        "**/ComposableSingletons*.class",
-        "**/*_Impl.class",
-        "**/*_Impl$*.class",
-        "**/NavHostKt*.class",
-        "**/MainActivity*.class",
-        "**/AnchorMonitorService*.class",
-        "**/ServiceBinder*.class",
-        // Service orchestrators/managers extracted from AnchorMonitorService
-        "**/StandaloneMonitorManager*.class",
-        "**/PairedModeOrchestrator*.class",
-        "**/ClientModeOrchestrator*.class",
-        "**/BatteryMonitorManager*.class",
-        // Hardware sensor providers (require Android system APIs)
-        "**/LocationProvider*.class",
-        "**/CompassProvider*.class",
-        "**/BatteryProvider*.class",
-        // Application class (Hilt setup only)
-        "**/OpenAnchorApp*.class",
-    )
-
     val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude(fileFilter)
+        exclude(jacocoExclusions)
     }
 
     classDirectories.setFrom(files(debugTree))
@@ -305,4 +271,26 @@ tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
             }
         }
     }
+}
+
+tasks.register<JacocoReport>("jacocoConnectedTestReport") {
+    description = "Generates JaCoCo coverage report from instrumented (E2E) tests. Covers :app module only."
+    group = "verification"
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    val debugTree = fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(jacocoExclusions)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(project.layout.buildDirectory.get()) {
+        include("outputs/code_coverage/debugAndroidTest/connected/**/*.ec")
+    })
 }

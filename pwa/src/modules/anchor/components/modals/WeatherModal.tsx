@@ -27,7 +27,13 @@ function ForecastChart({ data, color, label }: { data: number[]; color: string; 
 
   return (
     <div>
-      <svg viewBox="0 0 100 40" className="w-full h-24" preserveAspectRatio="none" role="img" aria-label={label}>
+      <svg
+        viewBox="0 0 100 40"
+        className="w-full h-24"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={label}
+      >
         {data.map((val, i) => {
           const h = (val / max) * 36;
           return (
@@ -75,7 +81,11 @@ export function WeatherModal({
   const { t } = useI18n();
 
   return (
-    <Modal open={open} onClose={onClose} className="flex flex-col max-h-[90vh] max-w-md border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+    <Modal
+      open={open}
+      onClose={onClose}
+      className="flex flex-col max-h-[90vh] max-w-md border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+    >
       <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
         <CloudSun className="text-cyan-400" />
         <span>{t.wxTitle}</span>
@@ -88,15 +98,15 @@ export function WeatherModal({
         </div>
       )}
 
-      {error && (
-        <div className="text-red-400 text-sm text-center py-4">{error}</div>
-      )}
+      {error && <div className="text-red-400 text-sm text-center py-4">{error}</div>}
 
       {!loading && !error && (
         <div className="overflow-y-auto flex-grow space-y-3 pr-1">
           {/* Current conditions */}
           <div className="bg-slate-900 p-3 rounded-xl border border-slate-700">
-            <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">{t.wxNow}</h4>
+            <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">
+              {t.wxNow}
+            </h4>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div>
                 <div className="text-2xl font-bold text-white">{windSpeed ?? '--'}</div>
@@ -107,7 +117,9 @@ export function WeatherModal({
                 <div className="text-[10px] text-slate-400">{t.wxGusts}</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-cyan-300">{windDir !== null ? `${windDir}°` : '--'}</div>
+                <div className="text-2xl font-bold text-cyan-300">
+                  {windDir !== null ? `${windDir}°` : '--'}
+                </div>
                 <div className="text-[10px] text-slate-400">{t.wxDir}</div>
               </div>
             </div>
@@ -115,10 +127,14 @@ export function WeatherModal({
 
           {/* Waves */}
           <div className="bg-slate-900 p-3 rounded-xl border border-slate-700">
-            <h4 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">{t.wxWaves}</h4>
+            <h4 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">
+              {t.wxWaves}
+            </h4>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div>
-                <div className="text-2xl font-bold text-white">{waveHeight !== null ? waveHeight.toFixed(1) : '--'}</div>
+                <div className="text-2xl font-bold text-white">
+                  {waveHeight !== null ? waveHeight.toFixed(1) : '--'}
+                </div>
                 <div className="text-[10px] text-slate-400">{t.wxHeight}</div>
               </div>
               <div>
@@ -126,7 +142,9 @@ export function WeatherModal({
                 <div className="text-[10px] text-slate-400">{t.wxPeriod}</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-blue-300">{waveDir !== null ? `${waveDir}°` : '--'}</div>
+                <div className="text-2xl font-bold text-blue-300">
+                  {waveDir !== null ? `${waveDir}°` : '--'}
+                </div>
                 <div className="text-[10px] text-slate-400">{t.wxDir}</div>
               </div>
             </div>
@@ -135,7 +153,9 @@ export function WeatherModal({
           {/* Wind 12h chart */}
           {windForecast.length > 0 && (
             <div className="bg-slate-900 p-3 rounded-xl border border-slate-700">
-              <h4 className="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-2">{t.wxWind12h}</h4>
+              <h4 className="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-2">
+                {t.wxWind12h}
+              </h4>
               <ForecastChart data={windForecast} color="#3b82f6" label={t.wxWind12h} />
               {gustForecast.length > 0 && (
                 <ForecastChart data={gustForecast} color="#f97316" label={t.wxGusts} />
@@ -151,7 +171,9 @@ export function WeatherModal({
           {/* Wave 12h chart */}
           {waveForecast.length > 0 && (
             <div className="bg-slate-900 p-3 rounded-xl border border-slate-700">
-              <h4 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">{t.wxWaves12h}</h4>
+              <h4 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">
+                {t.wxWaves12h}
+              </h4>
               <ForecastChart data={waveForecast} color="#06b6d4" label={t.wxWaves12h} />
               <div className="flex justify-between text-[9px] text-slate-500 mt-1">
                 <span>{t.wxNow}</span>
@@ -163,8 +185,12 @@ export function WeatherModal({
 
           {/* Assessment */}
           {assessment && (
-            <div className={`bg-slate-900 p-3 rounded-xl border ${ASSESS_COLORS[assessment.level] ?? 'border-slate-700'}`}>
-              <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">{t.wxAssess}</h4>
+            <div
+              className={`bg-slate-900 p-3 rounded-xl border ${ASSESS_COLORS[assessment.level] ?? 'border-slate-700'}`}
+            >
+              <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">
+                {t.wxAssess}
+              </h4>
               <div className="text-sm text-slate-300">{assessment.text}</div>
             </div>
           )}

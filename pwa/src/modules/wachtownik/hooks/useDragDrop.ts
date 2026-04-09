@@ -10,7 +10,12 @@ export interface DragItem {
 export interface DragDropReturn {
   draggedItem: DragItem | null;
   handleDragStart: (e: React.DragEvent, dayIdx: number, slotIdx: number, pIdx: number) => void;
-  handleDrop: (e: React.DragEvent, targetDayIdx: number, targetSlotIdx: number, targetPIdx: number) => void;
+  handleDrop: (
+    e: React.DragEvent,
+    targetDayIdx: number,
+    targetSlotIdx: number,
+    targetPIdx: number,
+  ) => void;
   handleDragOver: (e: React.DragEvent) => void;
 }
 

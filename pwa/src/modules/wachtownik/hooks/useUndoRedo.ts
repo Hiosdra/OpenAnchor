@@ -25,7 +25,12 @@ const MAX_HISTORY = 20;
 
 export function snapshotsEqual(a: UndoRedoSnapshot | null, b: UndoRedoSnapshot): boolean {
   if (!a) return false;
-  if (a.crew.length !== b.crew.length || a.slots.length !== b.slots.length || a.schedule.length !== b.schedule.length) return false;
+  if (
+    a.crew.length !== b.crew.length ||
+    a.slots.length !== b.slots.length ||
+    a.schedule.length !== b.schedule.length
+  )
+    return false;
   return (
     JSON.stringify(a.crew) === JSON.stringify(b.crew) &&
     JSON.stringify(a.slots) === JSON.stringify(b.slots) &&

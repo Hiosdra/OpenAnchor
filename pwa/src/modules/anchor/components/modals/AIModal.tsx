@@ -1,5 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sparkles, Key, Trash2, Send, Anchor, MessageCircle, CloudLightning, BookOpen, Save, Loader2 } from 'lucide-react';
+import {
+  Sparkles,
+  Key,
+  Trash2,
+  Send,
+  Anchor,
+  MessageCircle,
+  CloudLightning,
+  BookOpen,
+  Save,
+  Loader2,
+} from 'lucide-react';
 import { Modal } from './Modal';
 import { useI18n } from '../../hooks/useI18n';
 
@@ -91,7 +102,10 @@ export function AIModal({
       </div>
 
       {/* Chat area */}
-      <div id="ai-chat-area" className="flex-grow overflow-y-auto mb-3 space-y-2 min-h-[120px] max-h-[45vh]">
+      <div
+        id="ai-chat-area"
+        className="flex-grow overflow-y-auto mb-3 space-y-2 min-h-[120px] max-h-[45vh]"
+      >
         {chatMessages.length === 0 && !loading && (
           <div className="text-slate-500 text-xs text-center py-6">
             <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
@@ -123,7 +137,9 @@ export function AIModal({
       {!hasApiKey && (
         <div className="text-xs text-yellow-400 mb-2">
           {t.aiErrorKey}{' '}
-          <button onClick={onOpenApiKeyModal} className="underline">{t.apiTitle}</button>
+          <button onClick={onOpenApiKeyModal} className="underline">
+            {t.apiTitle}
+          </button>
         </div>
       )}
 

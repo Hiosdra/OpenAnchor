@@ -17,18 +17,15 @@ class ClientModeOrchestrator @Inject constructor(
     private val preferencesManager: PreferencesManager,
     private val batteryProvider: BatteryProvider,
     private val gpsProcessor: GpsProcessor,
-    private val alarmPlayer: AlarmPlayer,
+    alarmPlayer: AlarmPlayer,
     private val alarmEngine: AlarmEngine,
-    private val wearDataSender: WearDataSender,
-    private val standaloneMonitorManager: StandaloneMonitorManager
-) {
+    wearDataSender: WearDataSender,
+    standaloneMonitorManager: StandaloneMonitorManager
+) : BaseMonitoringOrchestrator(alarmPlayer, wearDataSender, standaloneMonitorManager) {
+
     companion object {
         private const val TAG = "ClientModeOrchestrator"
     }
-
-    private var clientModeJob: Job? = null
-    private var clientStateUpdateJob: Job? = null
-    private var clientEventJob: Job? = null
 
     fun startClientMode(
         wsUrl: String,
@@ -54,8 +51,7 @@ class ClientModeOrchestrator @Inject constructor(
         monitorState: MutableStateFlow<MonitorState>,
         onUpdateNotification: (String, AlarmState) -> Unit
     ) {
-        clientModeJob?.cancel()
-        clientModeJob = scope.launch {
+        scope.launchTracked {
             val intervalMs = preferencesManager.preferences.first().gpsIntervalSeconds * 1000L
             standaloneMonitorManager.resetGpsFixTime()
             standaloneMonitorManager.startGpsWatchdog(scope, monitorState, onUpdateNotification)
@@ -90,11 +86,7 @@ class ClientModeOrchestrator @Inject constructor(
                                 alarmState = alarmState
                             )
                         }
-                        else -> {
-                            if (alarmPlayer.isPlaying()) {
-                                alarmPlayer.stopAlarm()
-                            }
-                        }
+                        else -> stopAlarmIfPlaying()
                     }
                 }
 
@@ -149,8 +141,7 @@ class ClientModeOrchestrator @Inject constructor(
         onMuteAlarm: () -> Unit,
         onDismissAlarm: () -> Unit
     ) {
-        clientEventJob?.cancel()
-        clientEventJob = scope.launch {
+        scope.launchTracked {
             launch {
                 clientModeManager.clientModeState.collect { clientState ->
                     monitorState.value = monitorState.value.copy(
@@ -197,8 +188,7 @@ class ClientModeOrchestrator @Inject constructor(
             }
             is ClientModeManager.ClientModeEvent.HeartbeatTimeout -> {
                 Log.w(TAG, "Client heartbeat timeout")
-                alarmPlayer.startAlarm()
-                scope.launch { wearDataSender.sendAlarmTrigger() }
+                triggerAlarmAndNotifyWear(scope)
                 monitorState.value = monitorState.value.copy(
                     peerConnected = false,
                     alarmState = AlarmState.ALARM
@@ -217,8 +207,7 @@ class ClientModeOrchestrator @Inject constructor(
             is ClientModeManager.ClientModeEvent.AlarmSendFailed -> {
                 if (monitorState.value.alarmState == event.alarmState) {
                     Log.w(TAG, "Alarm send failed — triggering local alarm: ${event.reason}")
-                    alarmPlayer.startAlarm()
-                    scope.launch { wearDataSender.sendAlarmTrigger() }
+                    triggerAlarmAndNotifyWear(scope)
                     monitorState.value = monitorState.value.copy(alarmState = event.alarmState)
                     onUpdateNotification("ALARM (offline): ${event.reason}", event.alarmState)
                 }
@@ -228,14 +217,5 @@ class ClientModeOrchestrator @Inject constructor(
 
     fun disconnect(reason: String) {
         clientModeManager.disconnect(reason)
-    }
-
-    fun cancelAll() {
-        clientModeJob?.cancel()
-        clientModeJob = null
-        clientStateUpdateJob?.cancel()
-        clientStateUpdateJob = null
-        clientEventJob?.cancel()
-        clientEventJob = null
     }
 }

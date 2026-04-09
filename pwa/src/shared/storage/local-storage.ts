@@ -61,6 +61,6 @@ export class StorageUtils {
   }
 
   clear(): void {
-    this.keys().forEach(k => this.remove(k));
+    this.keys().forEach((k) => this.remove(k));
   }
 }

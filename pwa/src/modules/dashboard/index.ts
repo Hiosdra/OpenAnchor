@@ -67,7 +67,7 @@ export function openModule(url: string): void {
   if (match && navigator.serviceWorker && navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage({
       type: 'CACHE_MODULE',
-      module: match[1]
+      module: match[1],
     });
   }
 

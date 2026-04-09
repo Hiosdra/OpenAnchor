@@ -64,7 +64,7 @@ export class SimpleAlarmEngine {
       this._anchorPosition.lat,
       this._anchorPosition.lon,
       currentPosition.lat,
-      currentPosition.lon
+      currentPosition.lon,
     );
 
     const state = getAlarmState(distance, this._radius);
@@ -96,7 +96,7 @@ export class AlarmEngine {
     sectorBearing: number,
     sectorWidth: number,
     anchorPos: L.LatLng | null,
-    boatPos: L.LatLng | null
+    boatPos: L.LatLng | null,
   ): ZoneCheckResult {
     if (sectorEnabled && anchorPos && boatPos) {
       const brngToBoat = GeoUtils.getBearing(anchorPos, boatPos);

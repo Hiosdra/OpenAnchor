@@ -10,10 +10,13 @@ export function useLocalStorage<T extends string>(
     return validator(saved) ? saved : defaultValue;
   });
 
-  const setValue = useCallback((value: T) => {
-    setState(value);
-    localStorage.setItem(key, value);
-  }, [key]);
+  const setValue = useCallback(
+    (value: T) => {
+      setState(value);
+      localStorage.setItem(key, value);
+    },
+    [key],
+  );
 
   return [state, setValue];
 }

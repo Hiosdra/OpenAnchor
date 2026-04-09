@@ -9,7 +9,8 @@ import {
   openModule,
 } from './index';
 
-const REFRESH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>';
+const REFRESH_SVG =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>';
 
 function setTheme(theme: string): void {
   document.documentElement.dataset.theme = theme;
@@ -33,11 +34,17 @@ async function forceUpdate(): Promise<void> {
   const originalText = btn.innerHTML;
   btn.innerHTML = `${REFRESH_SVG} Sprawdzam...`;
 
-  if (!('serviceWorker' in navigator)) { window.location.reload(); return; }
+  if (!('serviceWorker' in navigator)) {
+    window.location.reload();
+    return;
+  }
 
   try {
     const registration = await navigator.serviceWorker.getRegistration();
-    if (!registration) { window.location.reload(); return; }
+    if (!registration) {
+      window.location.reload();
+      return;
+    }
 
     if (registration.waiting) {
       btn.innerHTML = `${REFRESH_SVG} Instaluję...`;
@@ -77,7 +84,9 @@ async function forceUpdate(): Promise<void> {
       btn.innerHTML = `${REFRESH_SVG} Czyszczę cache...`;
       const APP_CACHE_PREFIX = 'openanchor-';
       const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.filter((n) => n.startsWith(APP_CACHE_PREFIX)).map((n) => caches.delete(n)));
+      await Promise.all(
+        cacheNames.filter((n) => n.startsWith(APP_CACHE_PREFIX)).map((n) => caches.delete(n)),
+      );
       window.location.reload();
     }
   } catch (error) {
@@ -133,7 +142,10 @@ function initServiceWorker(): void {
   const hideUpdateBanner = () => updateBanner?.classList.remove('show');
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) { refreshing = true; window.location.reload(); }
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
   });
 
   updateBtn?.addEventListener('click', () => {
@@ -148,11 +160,15 @@ function initServiceWorker(): void {
       .register(import.meta.env.BASE_URL + 'sw.js')
       .then((registration) => {
         setInterval(() => registration.update(), 300_000);
-        if (registration.waiting) { newWorker = registration.waiting; showUpdateBanner(); }
+        if (registration.waiting) {
+          newWorker = registration.waiting;
+          showUpdateBanner();
+        }
         registration.addEventListener('updatefound', () => {
           newWorker = registration.installing;
           newWorker?.addEventListener('statechange', () => {
-            if (newWorker?.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner();
+            if (newWorker?.state === 'installed' && navigator.serviceWorker.controller)
+              showUpdateBanner();
           });
         });
       })
@@ -163,8 +179,11 @@ function initServiceWorker(): void {
 function initCardKeyboard(): void {
   document.querySelectorAll<HTMLElement>('.module-card').forEach((card) =>
     card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
-    })
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    }),
   );
 }
 
@@ -172,11 +191,26 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
-declare global { interface WindowEventMap { beforeinstallprompt: BeforeInstallPromptEvent } }
+declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
+}
 
 export function initDashboard(): void {
-  Object.assign(window, { toggleBetaMode, openSettings, closeSettings, closeSettingsOnBackdrop, openModule, setTheme, forceUpdate });
-  window.addEventListener('load', () => { initBetaMode(); updateThemeButtons(); });
+  Object.assign(window, {
+    toggleBetaMode,
+    openSettings,
+    closeSettings,
+    closeSettingsOnBackdrop,
+    openModule,
+    setTheme,
+    forceUpdate,
+  });
+  window.addEventListener('load', () => {
+    initBetaMode();
+    updateThemeButtons();
+  });
   initInstallBanner();
   initServiceWorker();
   initCardKeyboard();

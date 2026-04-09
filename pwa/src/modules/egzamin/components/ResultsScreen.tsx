@@ -13,7 +13,7 @@ interface ResultsScreenProps {
 }
 
 export function ResultsScreen({ results, timeTaken, onBack, onRetry }: ResultsScreenProps) {
-  const correct = results.filter(r => r.correct).length;
+  const correct = results.filter((r) => r.correct).length;
   const total = results.length;
   const pct = Math.round((correct / total) * 100);
   const passed = pct >= 70;
@@ -26,12 +26,16 @@ export function ResultsScreen({ results, timeTaken, onBack, onRetry }: ResultsSc
       <Header title="Wyniki egzaminu" onBack={onBack} />
       <div className="flex-1 px-4 py-6">
         <div className="max-w-2xl mx-auto">
-          <div className={`rounded-3xl p-8 text-center mb-6 ${
-            passed
-              ? 'bg-gradient-to-br from-green-500/20 to-green-700/10 border border-green-500/20'
-              : 'bg-gradient-to-br from-red-500/20 to-red-700/10 border border-red-500/20'
-          }`}>
-            <div className={`text-5xl font-black mb-2 ${passed ? 'text-green-400' : 'text-red-400'}`}>
+          <div
+            className={`rounded-3xl p-8 text-center mb-6 ${
+              passed
+                ? 'bg-gradient-to-br from-green-500/20 to-green-700/10 border border-green-500/20'
+                : 'bg-gradient-to-br from-red-500/20 to-red-700/10 border border-red-500/20'
+            }`}
+          >
+            <div
+              className={`text-5xl font-black mb-2 ${passed ? 'text-green-400' : 'text-red-400'}`}
+            >
               {pct}%
             </div>
             <div className="text-lg font-bold mb-1">
@@ -47,17 +51,27 @@ export function ResultsScreen({ results, timeTaken, onBack, onRetry }: ResultsSc
 
           <div className="rounded-2xl bg-white/5 border border-white/10 p-5 mb-6">
             <h3 className="text-sm font-semibold mb-3">Wyniki wg kategorii</h3>
-            {Object.values(CATEGORIES).map(cat => {
-              const catResults = results.filter(r => r.question.category === cat.id);
+            {Object.values(CATEGORIES).map((cat) => {
+              const catResults = results.filter((r) => r.question.category === cat.id);
               if (catResults.length === 0) return null;
-              const catCorrect = catResults.filter(r => r.correct).length;
+              const catCorrect = catResults.filter((r) => r.correct).length;
               const catPct = Math.round((catCorrect / catResults.length) * 100);
               const colors = getCategoryColors(cat.color);
               return (
                 <div key={cat.id} className="flex items-center gap-3 py-2">
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: colors.dot, flexShrink: 0 }}></span>
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      background: colors.dot,
+                      flexShrink: 0,
+                    }}
+                  ></span>
                   <span className="text-sm flex-1 truncate">{cat.name}</span>
-                  <span className={`text-sm font-bold ${catPct >= 70 ? 'text-green-400' : 'text-red-400'}`}>
+                  <span
+                    className={`text-sm font-bold ${catPct >= 70 ? 'text-green-400' : 'text-red-400'}`}
+                  >
                     {catCorrect}/{catResults.length} ({catPct}%)
                   </span>
                 </div>
@@ -75,13 +89,20 @@ export function ResultsScreen({ results, timeTaken, onBack, onRetry }: ResultsSc
           {showDetails && (
             <div className="space-y-3 mb-6">
               {results.map((r) => (
-                <div key={r.question.id} className={`rounded-2xl p-4 border ${
-                  r.correct ? 'bg-green-500/5 border-green-500/15' : 'bg-red-500/5 border-red-500/15'
-                }`}>
+                <div
+                  key={r.question.id}
+                  className={`rounded-2xl p-4 border ${
+                    r.correct
+                      ? 'bg-green-500/5 border-green-500/15'
+                      : 'bg-red-500/5 border-red-500/15'
+                  }`}
+                >
                   <div className="flex items-start gap-2 mb-2">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${
-                      r.correct ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                    }`}>
+                    <span
+                      className={`text-xs font-bold px-2 py-0.5 rounded-lg ${
+                        r.correct ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                      }`}
+                    >
                       {r.correct ? 'OK' : 'ERR'}
                     </span>
                     <span className="text-xs text-white/30">#{r.question.id}</span>

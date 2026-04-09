@@ -8,10 +8,34 @@ export interface OnboardingProps {
 }
 
 const STEPS = [
-  { icon: Anchor, titleKey: 'obWelcome', bodyKey: 'obWelcomeBody', html: false, iconColor: 'text-blue-500' },
-  { icon: Crosshair, titleKey: 'obZone', bodyKey: 'obZoneBody', html: false, iconColor: 'text-green-500' },
-  { icon: BatteryWarning, titleKey: 'obRules', bodyKey: 'obRulesBody', html: true, iconColor: 'text-orange-500' },
-  { icon: Smartphone, titleKey: 'obExpand', bodyKey: 'obExpandBody', html: false, iconColor: 'text-purple-400' },
+  {
+    icon: Anchor,
+    titleKey: 'obWelcome',
+    bodyKey: 'obWelcomeBody',
+    html: false,
+    iconColor: 'text-blue-500',
+  },
+  {
+    icon: Crosshair,
+    titleKey: 'obZone',
+    bodyKey: 'obZoneBody',
+    html: false,
+    iconColor: 'text-green-500',
+  },
+  {
+    icon: BatteryWarning,
+    titleKey: 'obRules',
+    bodyKey: 'obRulesBody',
+    html: true,
+    iconColor: 'text-orange-500',
+  },
+  {
+    icon: Smartphone,
+    titleKey: 'obExpand',
+    bodyKey: 'obExpandBody',
+    html: false,
+    iconColor: 'text-purple-400',
+  },
 ] as const;
 
 export function Onboarding({ visible, onComplete }: OnboardingProps) {
@@ -44,18 +68,14 @@ export function Onboarding({ visible, onComplete }: OnboardingProps) {
               }`}
             >
               <Icon className={`w-24 h-24 ${s.iconColor} mb-6`} />
-              <h2 className="text-3xl font-bold text-white mb-4">
-                {t[s.titleKey]}
-              </h2>
+              <h2 className="text-3xl font-bold text-white mb-4">{t[s.titleKey]}</h2>
               {s.html ? (
                 <p
                   className="text-slate-300 text-sm leading-relaxed max-w-sm"
                   dangerouslySetInnerHTML={{ __html: t[s.bodyKey] }}
                 />
               ) : (
-                <p className="text-slate-300 text-sm leading-relaxed max-w-sm">
-                  {t[s.bodyKey]}
-                </p>
+                <p className="text-slate-300 text-sm leading-relaxed max-w-sm">{t[s.bodyKey]}</p>
               )}
             </div>
           );

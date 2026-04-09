@@ -1,4 +1,12 @@
-import { History as HistoryIcon, BarChart3, Download, FileSpreadsheet, Trash2, PlayCircle, BookOpen } from 'lucide-react';
+import {
+  History as HistoryIcon,
+  BarChart3,
+  Download,
+  FileSpreadsheet,
+  Trash2,
+  PlayCircle,
+  BookOpen,
+} from 'lucide-react';
 import { Modal } from './Modal';
 import { useI18n } from '../../hooks/useI18n';
 import type { AnchorSession } from '../../session-db';
@@ -41,17 +49,13 @@ export function SessionModal({
       </div>
 
       <div className="overflow-y-auto flex-grow space-y-2 pr-1 min-h-[100px]">
-        {loading && (
-          <div className="text-slate-500 text-sm text-center py-4">{t.histLoading}</div>
-        )}
+        {loading && <div className="text-slate-500 text-sm text-center py-4">{t.histLoading}</div>}
         {!loading && sessions.length === 0 && (
           <div className="text-slate-500 text-sm text-center py-4">{t.histEmpty}</div>
         )}
         {!loading &&
           sessions.map((s) => {
-            const duration = s.endTime
-              ? formatDuration(s.endTime - s.startTime)
-              : t.histActive;
+            const duration = s.endTime ? formatDuration(s.endTime - s.startTime) : t.histActive;
             const date = new Date(s.startTime).toLocaleDateString();
             const time = new Date(s.startTime).toLocaleTimeString();
 
@@ -62,7 +66,9 @@ export function SessionModal({
                 className="w-full text-left bg-slate-900 p-3 rounded-xl border border-slate-700 hover:border-blue-500 transition-colors"
               >
                 <div className="flex justify-between items-center">
-                  <span className="text-white text-sm font-medium">{date} {time}</span>
+                  <span className="text-white text-sm font-medium">
+                    {date} {time}
+                  </span>
                   {s.alarmCount > 0 && (
                     <span className="text-red-400 text-xs font-bold">⚠ {s.alarmCount}</span>
                   )}
@@ -85,9 +91,7 @@ export function SessionModal({
   const renderReplay = () => {
     if (!replaySession) return null;
     const { session: s, logEntries } = replaySession;
-    const duration = s.endTime
-      ? formatDuration(s.endTime - s.startTime)
-      : t.histActive;
+    const duration = s.endTime ? formatDuration(s.endTime - s.startTime) : t.histActive;
     const date = new Date(s.startTime).toLocaleString();
 
     return (
@@ -98,12 +102,24 @@ export function SessionModal({
         </h3>
 
         <div className="text-slate-300 text-xs mb-3 space-y-1">
-          <div>{t.replayDate} {date}</div>
-          <div>{t.replayDuration} {duration}</div>
-          <div>{t.replayRadius} {s.radius}m</div>
-          <div>{t.replayMaxDev} {s.maxDistance.toFixed(1)}m</div>
-          <div>{t.replayAlarms} {s.alarmCount}</div>
-          <div>{t.replayPoints} {replaySession.points.length}</div>
+          <div>
+            {t.replayDate} {date}
+          </div>
+          <div>
+            {t.replayDuration} {duration}
+          </div>
+          <div>
+            {t.replayRadius} {s.radius}m
+          </div>
+          <div>
+            {t.replayMaxDev} {s.maxDistance.toFixed(1)}m
+          </div>
+          <div>
+            {t.replayAlarms} {s.alarmCount}
+          </div>
+          <div>
+            {t.replayPoints} {replaySession.points.length}
+          </div>
         </div>
 
         <div
@@ -118,7 +134,10 @@ export function SessionModal({
             </h4>
             <div className="space-y-1.5 max-h-32 overflow-y-auto">
               {logEntries.map((entry: any, i: number) => (
-                <div key={i} className="bg-slate-900 p-2 rounded-lg border border-slate-700 text-xs text-slate-300">
+                <div
+                  key={i}
+                  className="bg-slate-900 p-2 rounded-lg border border-slate-700 text-xs text-slate-300"
+                >
                   {entry.summary || entry.logEntry || JSON.stringify(entry)}
                 </div>
               ))}
@@ -157,12 +176,7 @@ export function SessionModal({
 
       {/* Always attach export button for E2E discoverability */}
       {!replaySession && (
-        <button
-          id="replay-export-btn"
-          className="hidden"
-          aria-hidden="true"
-          tabIndex={-1}
-        />
+        <button id="replay-export-btn" className="hidden" aria-hidden="true" tabIndex={-1} />
       )}
 
       <button

@@ -40,42 +40,25 @@ export function useWatchSchedule() {
     }, SAVE_DEBOUNCE_MS);
   }, []);
 
-  const startWatch = useCallback(
-    (minutes: number) => {
-      const endTime = Date.now() + minutes * 60 * 1000;
-      setWatchActive(true);
-      setWatchEndTime(endTime);
-      setWatchMinutes(minutes);
-    },
-    [],
-  );
+  const startWatch = useCallback((minutes: number) => {
+    const endTime = Date.now() + minutes * 60 * 1000;
+    setWatchActive(true);
+    setWatchEndTime(endTime);
+    setWatchMinutes(minutes);
+  }, []);
 
   const cancelWatch = useCallback(() => {
     setWatchActive(false);
     setWatchEndTime(null);
   }, []);
 
-  const addScheduleItem = useCallback(
-    (item: ScheduleItem) => {
-      setSchedule((prev) => {
-        const next = [...prev, item];
-        debouncedSave(next);
-        return next;
-      });
-    },
-    [debouncedSave],
-  );
+  const addScheduleItem = useCallback((item: ScheduleItem) => {
+    setSchedule((prev) => [...prev, item]);
+  }, []);
 
-  const removeScheduleItem = useCallback(
-    (index: number) => {
-      setSchedule((prev) => {
-        const next = prev.filter((_, i) => i !== index);
-        debouncedSave(next);
-        return next;
-      });
-    },
-    [debouncedSave],
-  );
+  const removeScheduleItem = useCallback((index: number) => {
+    setSchedule((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   const checkWatchTimer = useCallback((): boolean => {
     if (!watchActiveRef.current || !watchEndTimeRef.current) return false;
@@ -93,6 +76,16 @@ export function useWatchSchedule() {
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
     return findActiveScheduleSlot(schedule, currentMinutes);
   }, [schedule]);
+
+  // Persist schedule changes to localStorage via effect (skip initial mount)
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    debouncedSave(schedule);
+  }, [schedule, debouncedSave]);
 
   useEffect(() => {
     return () => {

@@ -12,7 +12,7 @@ import {
   saveLeitnerState,
   resetExamData,
   calculateStats,
-  calculateCategoryStats
+  calculateCategoryStats,
 } from '../src/modules/egzamin/exam-storage';
 
 describe('Exam Storage - Progress Management', () => {
@@ -29,10 +29,10 @@ describe('Exam Storage - Progress Management', () => {
     it('should save and load progress correctly', () => {
       const progress: ExamProgress = {
         answered: {
-          q1: { correct: true, userAnswer: 'A' },
-          q2: { correct: false, userAnswer: 'B' }
+          q1: { correct: true, answer: 'A' },
+          q2: { correct: false, answer: 'B' },
         },
-        stats: { total: 2, correct: 1, incorrect: 0 }
+        stats: { total: 2, correct: 1, incorrect: 0 },
       };
 
       saveProgress(progress);
@@ -92,9 +92,9 @@ describe('Exam Storage - Progress Management', () => {
       const state = {
         boxes: {
           q1: { box: 3, lastReview: 1234567890, reviewCount: 5 },
-          q2: { box: 1, lastReview: 1234567891, reviewCount: 1 }
+          q2: { box: 1, lastReview: 1234567891, reviewCount: 1 },
         },
-        lastReview: {}
+        lastReview: {},
       };
 
       saveLeitnerState(state);
@@ -139,9 +139,9 @@ describe('Exam Storage - Statistics', () => {
           q1: { correct: true },
           q2: { correct: true },
           q3: { correct: false },
-          q4: { correct: true }
+          q4: { correct: true },
         },
-        stats: { correct: 0, incorrect: 0, total: 0 }
+        stats: { correct: 0, incorrect: 0, total: 0 },
       };
 
       const stats = calculateStats(progress);
@@ -150,19 +150,22 @@ describe('Exam Storage - Statistics', () => {
         total: 4,
         correct: 3,
         incorrect: 1,
-        percentage: 75
+        percentage: 75,
       });
     });
 
     it('should handle empty progress', () => {
-      const progress: ExamProgress = { answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } };
+      const progress: ExamProgress = {
+        answered: {},
+        stats: { correct: 0, incorrect: 0, total: 0 },
+      };
       const stats = calculateStats(progress);
 
       expect(stats).toEqual({
         total: 0,
         correct: 0,
         incorrect: 0,
-        percentage: 0
+        percentage: 0,
       });
     });
 
@@ -170,9 +173,9 @@ describe('Exam Storage - Statistics', () => {
       const progress: ExamProgress = {
         answered: {
           q1: { correct: true },
-          q2: { correct: true }
+          q2: { correct: true },
         },
-        stats: { correct: 0, incorrect: 0, total: 0 }
+        stats: { correct: 0, incorrect: 0, total: 0 },
       };
 
       const stats = calculateStats(progress);
@@ -183,9 +186,9 @@ describe('Exam Storage - Statistics', () => {
       const progress: ExamProgress = {
         answered: {
           q1: { correct: false },
-          q2: { correct: false }
+          q2: { correct: false },
         },
-        stats: { correct: 0, incorrect: 0, total: 0 }
+        stats: { correct: 0, incorrect: 0, total: 0 },
       };
 
       const stats = calculateStats(progress);
@@ -197,9 +200,9 @@ describe('Exam Storage - Statistics', () => {
         answered: {
           q1: { correct: true },
           q2: { correct: false },
-          q3: { correct: false }
+          q3: { correct: false },
         },
-        stats: { correct: 0, incorrect: 0, total: 0 }
+        stats: { correct: 0, incorrect: 0, total: 0 },
       };
 
       const stats = calculateStats(progress);
@@ -213,7 +216,7 @@ describe('Exam Storage - Statistics', () => {
       { id: 'q2', category: 'Navigation' },
       { id: 'q3', category: 'Navigation' },
       { id: 'q4', category: 'Safety' },
-      { id: 'q5', category: 'Safety' }
+      { id: 'q5', category: 'Safety' },
     ];
 
     it('should calculate stats by category', () => {
@@ -223,9 +226,9 @@ describe('Exam Storage - Statistics', () => {
           q2: { correct: true },
           q3: { correct: false },
           q4: { correct: true },
-          q5: { correct: false }
+          q5: { correct: false },
         },
-        stats: { correct: 0, incorrect: 0, total: 0 }
+        stats: { correct: 0, incorrect: 0, total: 0 },
       };
 
       const categoryStats = calculateCategoryStats(progress, questions);
@@ -233,22 +236,22 @@ describe('Exam Storage - Statistics', () => {
       expect(categoryStats.Navigation).toEqual({
         total: 3,
         correct: 2,
-        percentage: 67
+        percentage: 67,
       });
 
       expect(categoryStats.Safety).toEqual({
         total: 2,
         correct: 1,
-        percentage: 50
+        percentage: 50,
       });
     });
 
     it('should handle unanswered questions', () => {
       const progress: ExamProgress = {
         answered: {
-          q1: { correct: true }
+          q1: { correct: true },
         },
-        stats: { correct: 0, incorrect: 0, total: 0 }
+        stats: { correct: 0, incorrect: 0, total: 0 },
       };
 
       const categoryStats = calculateCategoryStats(progress, questions);
@@ -256,14 +259,17 @@ describe('Exam Storage - Statistics', () => {
       expect(categoryStats.Navigation).toEqual({
         total: 1,
         correct: 1,
-        percentage: 100
+        percentage: 100,
       });
 
       expect(categoryStats.Safety).toBeUndefined();
     });
 
     it('should handle empty progress', () => {
-      const progress: ExamProgress = { answered: {}, stats: { correct: 0, incorrect: 0, total: 0 } };
+      const progress: ExamProgress = {
+        answered: {},
+        stats: { correct: 0, incorrect: 0, total: 0 },
+      };
       const categoryStats = calculateCategoryStats(progress, questions);
 
       expect(Object.keys(categoryStats).length).toBe(0);
@@ -274,9 +280,9 @@ describe('Exam Storage - Statistics', () => {
         answered: {
           q1: { correct: true },
           q2: { correct: true },
-          q3: { correct: true }
+          q3: { correct: true },
         },
-        stats: { correct: 0, incorrect: 0, total: 0 }
+        stats: { correct: 0, incorrect: 0, total: 0 },
       };
 
       const categoryStats = calculateCategoryStats(progress, questions);

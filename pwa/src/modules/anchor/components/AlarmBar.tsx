@@ -11,18 +11,27 @@ export interface AlarmBarProps {
 
 const M_TO_FT = 3.28084;
 
-const ALARM_CONFIG: Record<string, {
-  barClass: string;
-  i18nKey: string;
-  Icon: typeof ShieldCheck;
-}> = {
+const ALARM_CONFIG: Record<
+  string,
+  {
+    barClass: string;
+    i18nKey: string;
+    Icon: typeof ShieldCheck;
+  }
+> = {
   SAFE: { barClass: 'alarm-bar-safe', i18nKey: 'alarmSafe', Icon: ShieldCheck },
   CAUTION: { barClass: 'alarm-bar-caution', i18nKey: 'alarmCaution', Icon: AlertTriangle },
   WARNING: { barClass: 'alarm-bar-warning', i18nKey: 'alarmWarning', Icon: AlertTriangle },
   ALARM: { barClass: 'alarm-bar-alarm', i18nKey: 'alarmAlarm', Icon: Siren },
 };
 
-export function AlarmBar({ alarmState, distance, unit, isAnchored, onDismissAlarm }: AlarmBarProps) {
+export function AlarmBar({
+  alarmState,
+  distance,
+  unit,
+  isAnchored,
+  onDismissAlarm,
+}: AlarmBarProps) {
   const { t } = useI18n();
 
   if (!isAnchored) return null;
@@ -30,9 +39,7 @@ export function AlarmBar({ alarmState, distance, unit, isAnchored, onDismissAlar
   const config = ALARM_CONFIG[alarmState] ?? ALARM_CONFIG.SAFE;
   const { barClass, i18nKey, Icon } = config;
 
-  const distDisplay = unit === 'feet'
-    ? (distance * M_TO_FT).toFixed(1)
-    : distance.toFixed(1);
+  const distDisplay = unit === 'feet' ? (distance * M_TO_FT).toFixed(1) : distance.toFixed(1);
   const unitLabel = unit === 'feet' ? 'ft' : 'm';
 
   return (
@@ -44,7 +51,8 @@ export function AlarmBar({ alarmState, distance, unit, isAnchored, onDismissAlar
     >
       <Icon className="w-4 h-4" />
       <span>
-        {t[i18nKey]} — {distDisplay}{unitLabel}
+        {t[i18nKey]} — {distDisplay}
+        {unitLabel}
       </span>
       {alarmState === 'ALARM' && (
         <button

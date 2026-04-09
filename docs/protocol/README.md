@@ -60,3 +60,13 @@ All protocol fields map directly to existing Kotlin data classes and enums:
 | Display units | `DistanceUnit` enum (`METERS`, `NAUTICAL_MILES`, `FEET`) |
 
 See [protocol.md](protocol.md) for the full specification.
+
+## Implementation References
+
+The protocol constants (timing, message types, reconnection) are defined in the following locations. When changing a value, update **all** implementations and this document.
+
+| Platform | File | Notes |
+|---|---|---|
+| **PWA** | `pwa/src/shared/constants/protocol.ts` | Single source of truth for the TypeScript/React codebase |
+| **Android Server** | `android/core/network/.../AnchorWebSocketServer.kt` | Ktor-based server companion object |
+| **Android Client** | `android/core/network/.../AnchorWebSocketClient.kt` | OkHttp-based client companion object |

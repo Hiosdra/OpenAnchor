@@ -1,5 +1,12 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import type { CrewMember, WatchSlot, DaySchedule, DashboardData, CrewStat, AbsoluteSlot } from '../types';
+import type {
+  CrewMember,
+  WatchSlot,
+  DaySchedule,
+  DashboardData,
+  CrewStat,
+  AbsoluteSlot,
+} from '../types';
 import {
   getActiveCrew,
   generateStandardSchedule,
@@ -22,10 +29,7 @@ export interface ScheduleEngineReturn {
   generateSchedule: () => void;
 }
 
-export function computeAbsoluteSlots(
-  schedule: DaySchedule[],
-  startDate: string,
-): AbsoluteSlot[] {
+export function computeAbsoluteSlots(schedule: DaySchedule[], startDate: string): AbsoluteSlot[] {
   const baseDate = new Date(startDate);
   baseDate.setHours(0, 0, 0, 0);
   const allSlotsAbsolute: AbsoluteSlot[] = [];
@@ -77,7 +81,13 @@ export function computeDashboard(
   let progress = 0;
 
   if (!tripStart || !tripEnd) {
-    return { currentSlot: null, nextSlot: null, status: 'PRZED REJSEM', progress: 0, allSlotsAbsolute };
+    return {
+      currentSlot: null,
+      nextSlot: null,
+      status: 'PRZED REJSEM',
+      progress: 0,
+      allSlotsAbsolute,
+    };
   }
 
   if (currentTime < tripStart) {
@@ -98,17 +108,19 @@ export function computeDashboard(
     }
     progress = Math.max(
       0,
-      Math.min(100, ((currentTime.getTime() - tripStart.getTime()) / (tripEnd.getTime() - tripStart.getTime())) * 100),
+      Math.min(
+        100,
+        ((currentTime.getTime() - tripStart.getTime()) /
+          (tripEnd.getTime() - tripStart.getTime())) *
+          100,
+      ),
     );
   }
 
   return { currentSlot, nextSlot, status, progress, allSlotsAbsolute };
 }
 
-export function computeCrewStats(
-  crew: CrewMember[],
-  allSlotsAbsolute: AbsoluteSlot[],
-): CrewStat[] {
+export function computeCrewStats(crew: CrewMember[], allSlotsAbsolute: AbsoluteSlot[]): CrewStat[] {
   return crew.map((c) => {
     let totalMinutes = 0;
     let hardWatches = 0;

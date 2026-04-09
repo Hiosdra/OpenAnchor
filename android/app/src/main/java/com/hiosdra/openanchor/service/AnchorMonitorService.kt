@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import com.hiosdra.openanchor.MainActivity
 import com.hiosdra.openanchor.data.repository.AnchorSessionRepository
 import com.hiosdra.openanchor.domain.model.*
-import com.hiosdra.openanchor.network.PairedModeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -75,7 +74,6 @@ class AnchorMonitorService : Service() {
     @Inject lateinit var alarmPlayer: AlarmPlayer
     @Inject lateinit var alarmEngine: AlarmEngine
     @Inject lateinit var wearDataSender: WearDataSender
-    @Inject lateinit var pairedModeManager: PairedModeManager
     @Inject lateinit var gpsProcessor: GpsProcessor
     @Inject lateinit var standaloneMonitorManager: StandaloneMonitorManager
     @Inject lateinit var batteryMonitorManager: BatteryMonitorManager
@@ -156,10 +154,7 @@ class AnchorMonitorService : Service() {
 
     private fun stopWebSocketServer() {
         pairedModeOrchestrator.cancelAll()
-        standaloneMonitorManager.cancelAll()
-        batteryMonitorManager.cancelAll()
-        alarmEngine.reset()
-        alarmPlayer.stopAlarm()
+        resetAlarmAndMonitors()
         pairedModeOrchestrator.stopServer()
         _monitorState.value = MonitorState()
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -180,10 +175,7 @@ class AnchorMonitorService : Service() {
 
     private fun stopClientMode() {
         clientModeOrchestrator.cancelAll()
-        standaloneMonitorManager.cancelAll()
-        batteryMonitorManager.cancelAll()
-        alarmEngine.reset()
-        alarmPlayer.stopAlarm()
+        resetAlarmAndMonitors()
         clientModeOrchestrator.disconnect("USER_DISCONNECT")
         _monitorState.value = MonitorState()
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -194,16 +186,25 @@ class AnchorMonitorService : Service() {
     // Control Methods
     // ═══════════════════════════════════════
 
-    fun stopMonitoring() {
+    /**
+     * Common cleanup: cancel background monitors and reset alarm state.
+     */
+    private fun resetAlarmAndMonitors() {
         standaloneMonitorManager.cancelAll()
-        pairedModeOrchestrator.cancelAll()
         batteryMonitorManager.cancelAll()
-        clientModeOrchestrator.cancelAll()
-        gpsProcessor.reset()
         alarmEngine.reset()
         alarmPlayer.stopAlarm()
+    }
 
-        if (_monitorState.value.isClientMode) {
+    fun stopMonitoring() {
+        val wasPairedMode = _monitorState.value.isPairedMode
+        val wasClientMode = _monitorState.value.isClientMode
+
+        pairedModeOrchestrator.cancelAll()
+        clientModeOrchestrator.cancelAll()
+        resetAlarmAndMonitors()
+
+        if (wasClientMode) {
             clientModeOrchestrator.disconnect("SESSION_ENDED")
         }
 
@@ -224,6 +225,11 @@ class AnchorMonitorService : Service() {
                 _monitorState.value = MonitorState()
                 wearDataSender.clearMonitorState()
             } finally {
+                // Stop WS server AFTER session data is saved — its stop() chain
+                // cancels serviceScope asynchronously via AnchorWebSocketServer.stop()
+                if (wasPairedMode) {
+                    pairedModeOrchestrator.stopServer()
+                }
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
@@ -234,7 +240,7 @@ class AnchorMonitorService : Service() {
         alarmPlayer.stopAlarm()
         alarmEngine.reset()
         if (_monitorState.value.isPairedMode) {
-            serviceScope.launch { pairedModeManager.sendDismissAlarm() }
+            serviceScope.launch { pairedModeOrchestrator.sendDismissAlarm() }
         }
         _monitorState.value = _monitorState.value.copy(alarmState = AlarmState.SAFE)
     }
@@ -247,7 +253,7 @@ class AnchorMonitorService : Service() {
     fun muteAlarm() {
         alarmPlayer.stopAlarm()
         if (_monitorState.value.isPairedMode) {
-            serviceScope.launch { pairedModeManager.sendMuteAlarm() }
+            serviceScope.launch { pairedModeOrchestrator.sendMuteAlarm() }
         }
     }
 
@@ -311,12 +317,24 @@ class AnchorMonitorService : Service() {
     }
 
     override fun onDestroy() {
-        stopWebSocketServer()
-        if (_monitorState.value.isClientMode) {
-            clientModeOrchestrator.disconnect("SERVICE_DESTROYED")
+        val state = _monitorState.value
+        when {
+            state.isPairedMode -> {
+                pairedModeOrchestrator.cancelAll()
+                pairedModeOrchestrator.stopServer()
+            }
+            state.isClientMode -> {
+                clientModeOrchestrator.cancelAll()
+                clientModeOrchestrator.disconnect("SERVICE_DESTROYED")
+            }
+            else -> {
+                standaloneMonitorManager.cancelAll()
+            }
         }
+        batteryMonitorManager.cancelAll()
         serviceScope.cancel()
         alarmPlayer.stopAlarm()
+        stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }
 }

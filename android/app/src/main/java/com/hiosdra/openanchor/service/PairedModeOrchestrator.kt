@@ -5,34 +5,34 @@ import com.hiosdra.openanchor.data.battery.BatteryProvider
 import com.hiosdra.openanchor.data.location.LocationProvider
 import com.hiosdra.openanchor.domain.geometry.GeoCalculations
 import com.hiosdra.openanchor.domain.model.*
-import com.hiosdra.openanchor.network.AnchorWebSocketServer
 import com.hiosdra.openanchor.network.PairedModeManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class PairedModeOrchestrator @Inject constructor(
-    private val wsServer: AnchorWebSocketServer,
-    private val pairedModeManager: PairedModeManager,
+    private val webSocketLifecycleManager: WebSocketLifecycleManager,
     private val locationProvider: LocationProvider,
     private val batteryProvider: BatteryProvider,
-    private val alarmPlayer: AlarmPlayer,
+    alarmPlayer: AlarmPlayer,
     private val alarmEngine: AlarmEngine,
     private val alarmHandler: AlarmHandler,
-    private val wearDataSender: WearDataSender,
-    private val standaloneMonitorManager: StandaloneMonitorManager
-) {
+    wearDataSender: WearDataSender,
+    standaloneMonitorManager: StandaloneMonitorManager
+) : BaseMonitoringOrchestrator(alarmPlayer, wearDataSender, standaloneMonitorManager) {
+
     companion object {
         private const val TAG = "PairedModeOrchestrator"
         private const val PAIRED_GPS_VERIFICATION_INTERVAL_MS = 10 * 60 * 1000L
     }
 
-    private var pairedModeEventJob: Job? = null
+    private val pairedModeManager: PairedModeManager
+        get() = webSocketLifecycleManager.pairedModeManager
+
     private var pairedGpsVerificationJob: Job? = null
 
     fun startServer(scope: CoroutineScope) {
-        wsServer.start(scope = scope)
-        pairedModeManager.startListening(scope)
+        webSocketLifecycleManager.start(scope)
     }
 
     fun startEventCollection(
@@ -41,8 +41,7 @@ class PairedModeOrchestrator @Inject constructor(
         onUpdateNotification: (String, AlarmState) -> Unit,
         onStopMonitoring: () -> Unit
     ) {
-        pairedModeEventJob?.cancel()
-        pairedModeEventJob = scope.launch {
+        scope.launchTracked {
             launch {
                 pairedModeManager.events.collect { event ->
                     handlePairedEvent(event, scope, monitorState, onUpdateNotification, onStopMonitoring)
@@ -82,8 +81,8 @@ class PairedModeOrchestrator @Inject constructor(
         when (event) {
             is PairedModeManager.PairedEvent.EnterPairedMode -> {
                 Log.i(TAG, "Entering paired mode")
-                standaloneMonitorManager.cancelMonitoringJob()
-                if (alarmPlayer.isPlaying()) alarmPlayer.stopAlarm()
+                standaloneMonitorManager.cancelAll()
+                stopAlarmIfPlaying()
                 alarmEngine.reset()
                 monitorState.value = monitorState.value.copy(
                     isActive = true,
@@ -125,8 +124,7 @@ class PairedModeOrchestrator @Inject constructor(
 
             is PairedModeManager.PairedEvent.HeartbeatTimeout -> {
                 Log.w(TAG, "Heartbeat timeout — switching to standalone fallback")
-                alarmPlayer.startAlarm()
-                scope.launch { wearDataSender.sendAlarmTrigger() }
+                triggerAlarmAndNotifyWear(scope)
                 monitorState.value = monitorState.value.copy(
                     isPairedMode = false,
                     peerConnected = false,
@@ -212,14 +210,20 @@ class PairedModeOrchestrator @Inject constructor(
     }
 
     fun stopServer() {
-        pairedModeManager.stopListening()
-        wsServer.stop()
+        webSocketLifecycleManager.stop()
     }
 
-    fun cancelAll() {
-        pairedModeEventJob?.cancel()
-        pairedModeEventJob = null
+    override fun cancelAll() {
+        super.cancelAll()
         pairedGpsVerificationJob?.cancel()
         pairedGpsVerificationJob = null
+    }
+
+    suspend fun sendDismissAlarm() {
+        pairedModeManager.sendDismissAlarm()
+    }
+
+    suspend fun sendMuteAlarm() {
+        pairedModeManager.sendMuteAlarm()
     }
 }

@@ -28,7 +28,7 @@ const translations = {
 } as const;
 
 type Locale = keyof typeof translations;
-type TranslationKey = keyof typeof translations['pl'];
+type TranslationKey = keyof (typeof translations)['pl'];
 
 let currentLocale: Locale = 'pl';
 

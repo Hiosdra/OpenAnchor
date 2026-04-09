@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { FakeWebSocket, installFakeWebSocket } from './mocks/websocket';
 import { useSyncController } from '../src/modules/anchor/hooks/useSyncController';
+import {
+  WS_PING_INTERVAL_MS,
+  WS_HEARTBEAT_TIMEOUT_MS,
+  WS_STATE_UPDATE_INTERVAL_MS,
+  WS_RECONNECT_BASE_DELAY_MS,
+} from '../src/shared/constants/protocol';
 
 vi.mock('leaflet', () => ({
   default: { latLng: (lat: number, lng: number) => ({ lat, lng }) },
@@ -95,9 +101,9 @@ describe('useSyncController', () => {
 
     it('starts a ping interval on open', () => {
       const { hook, ws } = connectAndOpen();
-      // Advance past one PING_INTERVAL_MS (5000)
+      // Advance past one ping interval
       act(() => {
-        vi.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(WS_PING_INTERVAL_MS);
       });
       const sent = ws.send.mock.calls.map((c: any[]) => JSON.parse(c[0]));
       expect(sent.some((m: any) => m.type === 'PING')).toBe(true);
@@ -343,9 +349,9 @@ describe('useSyncController', () => {
         ws.simulateClose(1006, 'abnormal');
       });
       expect(hook.result.current.isConnected).toBe(false);
-      // First reconnect delay is 2000ms (baseDelay * 2^0)
+      // First reconnect delay is baseDelay * 2^0
       act(() => {
-        vi.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(WS_RECONNECT_BASE_DELAY_MS);
       });
       // A new WebSocket should have been created
       expect(fakeWSInstances.length).toBeGreaterThanOrEqual(2);
@@ -359,9 +365,9 @@ describe('useSyncController', () => {
       act(() => {
         ws.simulateClose();
       });
-      // 1st reconnect at 2000ms
+      // 1st reconnect at baseDelay
       act(() => {
-        vi.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(WS_RECONNECT_BASE_DELAY_MS);
       });
       expect(fakeWSInstances).toHaveLength(2);
 
@@ -373,9 +379,9 @@ describe('useSyncController', () => {
       act(() => {
         ws2.simulateClose();
       });
-      // onConnected resets attempts, so delay is again 2000ms
+      // onConnected resets attempts, so delay is again baseDelay
       act(() => {
-        vi.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(WS_RECONNECT_BASE_DELAY_MS);
       });
       expect(fakeWSInstances).toHaveLength(3);
     });
@@ -390,7 +396,7 @@ describe('useSyncController', () => {
       const { hook, ws } = connectAndOpen();
       // Advance past heartbeat timeout
       act(() => {
-        vi.advanceTimersByTime(16_000);
+        vi.advanceTimersByTime(WS_HEARTBEAT_TIMEOUT_MS + 1_000);
       });
       act(() => {
         hook.result.current.checkHeartbeat();
@@ -400,9 +406,9 @@ describe('useSyncController', () => {
       // and a reconnect should be scheduled
       expect(hook.result.current.isConnected).toBe(false);
       expect(ws.close).toHaveBeenCalled();
-      // Reconnect fires after baseDelay (2000ms)
+      // Reconnect fires after baseDelay
       act(() => {
-        vi.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(WS_RECONNECT_BASE_DELAY_MS);
       });
       expect(fakeWSInstances.length).toBeGreaterThanOrEqual(2);
     });
@@ -421,9 +427,9 @@ describe('useSyncController', () => {
       act(() => {
         ws.simulateMessage({ type: 'PING' });
       });
-      // Only advance 5 seconds (well under 15s threshold)
+      // Only advance well under heartbeat threshold
       act(() => {
-        vi.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(WS_PING_INTERVAL_MS);
       });
       act(() => {
         hook.result.current.checkHeartbeat();
@@ -453,9 +459,9 @@ describe('useSyncController', () => {
         hook.result.current.startStateUpdateInterval(getState);
       });
       const beforeCount = ws.send.mock.calls.length;
-      // Advance two intervals (STATE_UPDATE_INTERVAL_MS = 2000)
+      // Advance two intervals (WS_STATE_UPDATE_INTERVAL_MS)
       act(() => {
-        vi.advanceTimersByTime(4000);
+        vi.advanceTimersByTime(WS_STATE_UPDATE_INTERVAL_MS * 2);
       });
       const stateUpdates = ws.send.mock.calls
         .slice(beforeCount)
@@ -523,6 +529,68 @@ describe('useSyncController', () => {
       expect(sent.payload.reason).toBe('DRIFT');
       expect(sent.payload.message).toBe('Boat drifted');
       expect(sent.payload.alarmState).toBe('ALARM');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 13. connectionState
+  // ---------------------------------------------------------------------------
+  describe('connectionState', () => {
+    it('starts as disconnected', () => {
+      const { result } = setup();
+      expect(result.current.connectionState).toBe('disconnected');
+    });
+
+    it('transitions to connecting then connected', () => {
+      const hook = setup();
+      act(() => {
+        hook.result.current.connect('ws://localhost:8080');
+      });
+      expect(hook.result.current.connectionState).toBe('connecting');
+
+      const ws = fakeWSInstances[fakeWSInstances.length - 1];
+      act(() => {
+        ws.simulateOpen();
+      });
+      expect(hook.result.current.connectionState).toBe('connected');
+    });
+
+    it('transitions to reconnecting after unexpected close', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { hook, ws } = connectAndOpen();
+      act(() => {
+        ws.simulateClose();
+      });
+      expect(hook.result.current.connectionState).toBe('reconnecting');
+    });
+
+    it('transitions to disconnected after intentional disconnect', () => {
+      const { hook } = connectAndOpen();
+      act(() => {
+        hook.result.current.disconnect();
+      });
+      expect(hook.result.current.connectionState).toBe('disconnected');
+    });
+
+    it('transitions back to connected after successful reconnect', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { hook, ws } = connectAndOpen();
+      act(() => {
+        ws.simulateClose();
+      });
+      expect(hook.result.current.connectionState).toBe('reconnecting');
+
+      act(() => {
+        vi.advanceTimersByTime(WS_RECONNECT_BASE_DELAY_MS);
+      });
+      const ws2 = fakeWSInstances[fakeWSInstances.length - 1];
+      // During reconnect attempt, state goes to connecting
+      expect(hook.result.current.connectionState).toBe('connecting');
+
+      act(() => {
+        ws2.simulateOpen();
+      });
+      expect(hook.result.current.connectionState).toBe('connected');
     });
   });
 });

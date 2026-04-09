@@ -10,15 +10,25 @@ interface CategorySelectorProps {
   onDeselectAll: () => void;
 }
 
-export function CategorySelector({ categories, selectedCategories, onToggle, onSelectAll, onDeselectAll }: CategorySelectorProps) {
+export function CategorySelector({
+  categories,
+  selectedCategories,
+  onToggle,
+  onSelectAll,
+  onDeselectAll,
+}: CategorySelectorProps) {
   return (
     <div className="space-y-2 mb-4">
       <div className="flex gap-2 mb-2">
-        <button onClick={onSelectAll} className="text-sm text-amber-400 hover:text-amber-300">Zaznacz wszystkie</button>
+        <button onClick={onSelectAll} className="text-sm text-amber-400 hover:text-amber-300">
+          Zaznacz wszystkie
+        </button>
         <span className="text-sm text-white/20">|</span>
-        <button onClick={onDeselectAll} className="text-sm text-white/40 hover:text-white/60">Odznacz</button>
+        <button onClick={onDeselectAll} className="text-sm text-white/40 hover:text-white/60">
+          Odznacz
+        </button>
       </div>
-      {Object.values(categories).map(cat => {
+      {Object.values(categories).map((cat) => {
         const colors = getCategoryColors(cat.color);
         const isSelected = selectedCategories.includes(cat.id);
         return (
@@ -29,13 +39,21 @@ export function CategorySelector({ categories, selectedCategories, onToggle, onS
               isSelected ? 'bg-white/10 border-white/20' : 'bg-white/3 border-white/5 opacity-50'
             }`}
           >
-            <span style={{
-              width: 20, height: 20, borderRadius: 6,
-              background: isSelected ? colors.dot : 'transparent',
-              border: `2px solid ${isSelected ? colors.dot : 'rgba(255,255,255,0.2)'}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 12, color: 'white', fontWeight: 'bold'
-            }}>
+            <span
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 6,
+                background: isSelected ? colors.dot : 'transparent',
+                border: `2px solid ${isSelected ? colors.dot : 'rgba(255,255,255,0.2)'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 12,
+                color: 'white',
+                fontWeight: 'bold',
+              }}
+            >
               {isSelected ? '\u2713' : ''}
             </span>
             <span className="text-base">{cat.name}</span>

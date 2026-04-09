@@ -35,7 +35,13 @@ export const STORAGE_KEYS = {
 const VALID_BRIEFING_TYPES = new Set<string>(['zero', 'first-day']);
 const VALID_CHECKLIST_TYPES = new Set<string>(['morning', 'departure', 'mooring', 'grabbag']);
 const VALID_CRUISE_TYPES = new Set<string>(['baltic-autumn', 'croatia-summer']);
-const VALID_SECTIONS = new Set<string>(['packing', 'shopping', 'briefing', 'checklists', 'knowledge']);
+const VALID_SECTIONS = new Set<string>([
+  'packing',
+  'shopping',
+  'briefing',
+  'checklists',
+  'knowledge',
+]);
 
 export function isValidBriefingType(value: unknown): value is BriefingType {
   return typeof value === 'string' && VALID_BRIEFING_TYPES.has(value);

@@ -8,8 +8,18 @@ import { TypeSelector } from './TypeSelector';
 import { ResetButton } from './ResetButton';
 
 const briefingOptions = [
-  { value: 'zero' as BriefingType, emoji: '🎓', label: 'Briefing zerowy', sublabel: 'Przed rejsem' },
-  { value: 'first-day' as BriefingType, emoji: '⚓', label: 'Briefing pierwszy dzień', sublabel: 'Pierwszy dzień' },
+  {
+    value: 'zero' as BriefingType,
+    emoji: '🎓',
+    label: 'Briefing zerowy',
+    sublabel: 'Przed rejsem',
+  },
+  {
+    value: 'first-day' as BriefingType,
+    emoji: '⚓',
+    label: 'Briefing pierwszy dzień',
+    sublabel: 'Pierwszy dzień',
+  },
 ];
 
 interface BriefingListProps {
@@ -57,7 +67,9 @@ function BriefingList({ type, title, emoji, instruction, resetKey, onReset }: Br
 
 export function BriefingSection() {
   const [briefingType, setBriefingType] = useLocalStorage<BriefingType>(
-    STORAGE_KEYS.BRIEFING_TYPE, 'zero', isValidBriefingType
+    STORAGE_KEYS.BRIEFING_TYPE,
+    'zero',
+    isValidBriefingType,
   );
   const [resetKeys, setResetKeys] = useState({ zero: 0, 'first-day': 0 });
 

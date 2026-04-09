@@ -6,7 +6,7 @@ interface CategoryBadgeProps {
 }
 
 export function CategoryBadge({ categoryId }: CategoryBadgeProps) {
-  const cat = Object.values(CATEGORIES).find(c => c.id === categoryId);
+  const cat = Object.values(CATEGORIES).find((c) => c.id === categoryId);
   if (!cat) return null;
   const colors = getCategoryColors(cat.color);
   return (
@@ -14,7 +14,15 @@ export function CategoryBadge({ categoryId }: CategoryBadgeProps) {
       className="inline-flex items-center gap-[0.3rem] text-xs font-semibold tracking-wider uppercase py-1 px-[0.6rem] rounded-full"
       style={{ background: colors.bg, border: `1px solid ${colors.border}`, color: colors.text }}
     >
-      <span style={{ width: 5, height: 5, borderRadius: '50%', background: colors.dot, display: 'inline-block' }}></span>
+      <span
+        style={{
+          width: 5,
+          height: 5,
+          borderRadius: '50%',
+          background: colors.dot,
+          display: 'inline-block',
+        }}
+      ></span>
       {cat.name}
     </span>
   );

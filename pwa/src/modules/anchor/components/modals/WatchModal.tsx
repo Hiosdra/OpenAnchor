@@ -43,7 +43,12 @@ export function WatchModal({
   };
 
   return (
-    <Modal open={open} onClose={onClose} id="watch-setup-modal" className="flex flex-col max-h-[90vh]">
+    <Modal
+      open={open}
+      onClose={onClose}
+      id="watch-setup-modal"
+      className="flex flex-col max-h-[90vh]"
+    >
       <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <ClipboardList className="text-blue-400" />
         <span>{t.watchTitle}</span>

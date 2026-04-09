@@ -24,7 +24,12 @@ export function ApiKeyModal({ open, onClose, onSave, onClear, hasKey }: ApiKeyMo
   };
 
   return (
-    <Modal open={open} onClose={onClose} id="api-key-modal" className="border border-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.3)]">
+    <Modal
+      open={open}
+      onClose={onClose}
+      id="api-key-modal"
+      className="border border-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.3)]"
+    >
       <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
         <Key className="text-purple-400" />
         <span>{t.apiTitle}</span>
@@ -62,10 +67,7 @@ export function ApiKeyModal({ open, onClose, onSave, onClear, hasKey }: ApiKeyMo
       />
 
       <div className="flex gap-3">
-        <button
-          onClick={onClose}
-          className="flex-1 bg-slate-700 py-3 rounded-xl font-bold"
-        >
+        <button onClick={onClose} className="flex-1 bg-slate-700 py-3 rounded-xl font-bold">
           {t.btnCancel}
         </button>
         <button
