@@ -76,6 +76,8 @@ class HistoryDetailScreenTest {
     @Test
     fun historyScreen_showsSessionEntry() {
         navigateToHistory()
+        // Wait for seeded session data to appear (Room Flow may take a frame)
+        composeTestRule.waitForText("Jan", timeoutMs = 5_000)
         composeTestRule.onNodeWithText("No anchoring history yet").assertDoesNotExist()
     }
 

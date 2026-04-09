@@ -87,7 +87,9 @@ class WeatherScreenTest {
         composeTestRule.onNodeWithText("Simple Circle").performClick()
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForText("Set Safe Radius")
-        composeTestRule.scrollToText("Drop Anchor").assertIsDisplayed()
+        composeTestRule.scrollToText("Next").performClick()
+        composeTestRule.waitForText("Confirm Setup", timeoutMs = 5_000)
+        composeTestRule.scrollToText("Start Monitoring").assertIsDisplayed()
     }
 
     // --- 3. Back Navigation From Setup ---
