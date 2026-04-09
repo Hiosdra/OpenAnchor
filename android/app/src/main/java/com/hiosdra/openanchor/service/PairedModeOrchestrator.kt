@@ -81,7 +81,7 @@ class PairedModeOrchestrator @Inject constructor(
         when (event) {
             is PairedModeManager.PairedEvent.EnterPairedMode -> {
                 Log.i(TAG, "Entering paired mode")
-                standaloneMonitorManager.cancelMonitoringJob()
+                standaloneMonitorManager.cancelAll()
                 stopAlarmIfPlaying()
                 alarmEngine.reset()
                 monitorState.value = monitorState.value.copy(

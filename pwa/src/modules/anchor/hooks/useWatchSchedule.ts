@@ -54,22 +54,24 @@ export function useWatchSchedule() {
 
   const addScheduleItem = useCallback(
     (item: ScheduleItem) => {
+      let next: ScheduleItem[];
       setSchedule((prev) => {
-        const next = [...prev, item];
-        debouncedSave(next);
+        next = [...prev, item];
         return next;
       });
+      debouncedSave(next!);
     },
     [debouncedSave],
   );
 
   const removeScheduleItem = useCallback(
     (index: number) => {
+      let next: ScheduleItem[];
       setSchedule((prev) => {
-        const next = prev.filter((_, i) => i !== index);
-        debouncedSave(next);
+        next = prev.filter((_, i) => i !== index);
         return next;
       });
+      debouncedSave(next!);
     },
     [debouncedSave],
   );

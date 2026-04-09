@@ -197,11 +197,15 @@ class AnchorMonitorService : Service() {
     }
 
     fun stopMonitoring() {
+        val wasPairedMode = _monitorState.value.isPairedMode
+
         pairedModeOrchestrator.cancelAll()
         clientModeOrchestrator.cancelAll()
         resetAlarmAndMonitors()
-        gpsProcessor.reset()
 
+        if (wasPairedMode) {
+            pairedModeOrchestrator.stopServer()
+        }
         if (_monitorState.value.isClientMode) {
             clientModeOrchestrator.disconnect("SESSION_ENDED")
         }
