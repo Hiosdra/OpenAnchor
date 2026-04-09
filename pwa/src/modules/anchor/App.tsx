@@ -27,7 +27,7 @@ import { MapContainer } from './components/MapContainer';
 import { AlarmBar } from './components/AlarmBar';
 import { Controls } from './components/Controls';
 import { ModalManager } from './components/ModalManager';
-import { ModalProvider, useModalActions } from './contexts/ModalContext';
+import { ModalProvider, useModalActions, type ModalName } from './contexts/ModalContext';
 
 function AnchorApp() {
   const { t, lang, setLang } = useI18n();
@@ -356,7 +356,7 @@ function AnchorApp() {
     }
   }, []);
 
-  const toolModalMap: Record<string, string> = {
+  const toolModalMap: Record<string, ModalName> = {
     calc: 'calc',
     sector: 'sector',
     watch: 'watch',
@@ -375,7 +375,7 @@ function AnchorApp() {
         return;
       }
       const modal = toolModalMap[tool];
-      if (modal) openModal(modal as any);
+      if (modal) openModal(modal);
     },
     [openModal, handleSharePosition],
   );

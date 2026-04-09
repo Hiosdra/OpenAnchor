@@ -1,5 +1,6 @@
 package com.hiosdra.openanchor.service
 
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -13,7 +14,7 @@ abstract class BaseMonitoringOrchestrator(
     protected val wearDataSender: WearDataSender,
     protected val standaloneMonitorManager: StandaloneMonitorManager
 ) {
-    private val trackedJobs = mutableListOf<Job>()
+    private val trackedJobs = CopyOnWriteArrayList<Job>()
 
     /**
      * Launch a coroutine tracked for bulk cancellation via [cancelAll].
