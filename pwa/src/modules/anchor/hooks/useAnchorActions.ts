@@ -12,7 +12,8 @@ import L from 'leaflet';
 import { MessageType } from '@shared/constants/protocol';
 import { GeoUtils } from '../geo-utils';
 import type { AnchorState } from './useAnchorState';
-import type { AlarmProcessResult } from './useAlarmState';
+import type { AlarmProcessInput, AlarmProcessResult } from './useAlarmState';
+import type { TrackPoint } from '../session-db';
 import type { ModalName } from '../contexts/ModalContext';
 
 // ─── Max track points kept in-memory ───
@@ -21,34 +22,120 @@ const MAX_TRACK_POINTS = 500;
 // ─── Persist state throttle ───
 const PERSIST_INTERVAL_MS = 5000;
 
+// ─── Dependency contracts (only what useAnchorActions actually uses) ───
+
+interface AlarmActions {
+  processPosition: (state: AlarmProcessInput, newPos: L.LatLng) => AlarmProcessResult;
+  recalculateZone: (state: {
+    isAnchored: boolean;
+    anchorPos: L.LatLng | null;
+    radius: number;
+    bufferRadius: number | null;
+    sectorEnabled: boolean;
+    sectorBearing: number;
+    sectorWidth: number;
+    alarmState: string;
+  }) => void;
+  resetEngine: () => void;
+}
+
+interface SessionActions {
+  bufferTrackPoint: (point: Omit<TrackPoint, 'id'>) => void;
+  persistActiveState: (sessionState: {
+    isAnchored: boolean;
+    anchorPos: L.LatLng | null;
+    radius: number;
+    bufferRadius: number | null;
+    sectorEnabled: boolean;
+    sectorBearing: number;
+    sectorWidth: number;
+    sessionId: number | null;
+    anchorStartTime: number | null;
+    maxDistanceSwing: number;
+    maxSogDuringAnchor: number;
+    chainLengthM: number | null;
+    depthM: number | null;
+    unit: string;
+  }) => void;
+  setAnchor: (
+    pos: L.LatLng,
+    sessionState: {
+      isAnchored: boolean;
+      anchorPos: L.LatLng | null;
+      radius: number;
+      bufferRadius: number | null;
+      sectorEnabled: boolean;
+      sectorBearing: number;
+      sectorWidth: number;
+      sessionId: number | null;
+      anchorStartTime: number | null;
+      maxDistanceSwing: number;
+      maxSogDuringAnchor: number;
+      chainLengthM: number | null;
+      depthM: number | null;
+      unit: string;
+    },
+  ) => Promise<number | null>;
+  liftAnchor: (sessionState: {
+    sessionId: number | null;
+    maxDistanceSwing: number;
+    maxSogDuringAnchor: number;
+    alarmTriggered: boolean;
+  }) => Promise<void>;
+}
+
+interface MapActions {
+  updateBoat: (pos: L.LatLng, accuracy: number, cog: number | null, autoCenter: boolean) => void;
+  setAnchor: (pos: L.LatLng) => void;
+  clearAnchor: () => void;
+  drawSafeZone: (
+    anchorPos: L.LatLng,
+    radius: number,
+    bufferRadius: number | null,
+    sector: { enabled: boolean; bearing: number; width: number },
+    alarmState: string,
+  ) => void;
+  fitSafeZone: () => void;
+  updateTrack: (positions: L.LatLng[]) => void;
+}
+
+interface AlertActions {
+  ensureAudioContext: () => AudioContext;
+  initPermissions: () => void;
+  requestWakeLock: () => Promise<void>;
+  releaseWakeLock: () => void;
+  stopAlarm: () => void;
+}
+
+interface SyncActions {
+  isConnectedRef: React.MutableRefObject<boolean>;
+  sendMessage: (type: string, payload?: Record<string, unknown>) => void;
+  sendFullSync: (state: {
+    isAnchored: boolean;
+    anchorPos: L.LatLng | null;
+    sectorEnabled: boolean;
+    radius: number;
+    bufferRadius: number | null;
+    unit: string;
+    sectorBearing: number;
+    sectorWidth: number;
+    chainLengthM: number | null;
+    depthM: number | null;
+  }) => void;
+}
+
 interface AnchorActionsDeps {
   stateRef: React.RefObject<AnchorState>;
   updateState: (
     updates: Partial<AnchorState> | ((prev: AnchorState) => Partial<AnchorState>),
   ) => void;
-   
-  alarm: {
-    processPosition: (...args: any[]) => AlarmProcessResult;
-    recalculateZone: (s: any) => void;
-    resetEngine: () => void;
-  };
-   
-  session: {
-    bufferTrackPoint: (pt: any) => void;
-    persistActiveState: (s: any) => void;
-    setAnchor: (pos: L.LatLng, s: any) => Promise<number | null>;
-    liftAnchor: (s: any) => Promise<void>;
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mapRef: React.RefObject<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mapHook: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  alertCtrl: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sync: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  syncRef: React.RefObject<any>;
+  alarm: AlarmActions;
+  session: SessionActions;
+  mapRef: React.RefObject<MapActions>;
+  mapHook: MapActions;
+  alertCtrl: AlertActions;
+  sync: SyncActions;
+  syncRef: React.RefObject<SyncActions>;
   state: AnchorState;
   openModal: (name: ModalName) => void;
 }

@@ -4,7 +4,7 @@ import { AlarmEngine, type ZoneCheckResult, type AlarmLevel } from '../alarm-eng
 import { GeoUtils } from '../geo-utils';
 import { MessageType } from '@shared/constants/protocol';
 
-interface AlarmProcessInput {
+export interface AlarmProcessInput {
   isAnchored: boolean;
   anchorPos: L.LatLng | null;
   currentPos: L.LatLng | null;
