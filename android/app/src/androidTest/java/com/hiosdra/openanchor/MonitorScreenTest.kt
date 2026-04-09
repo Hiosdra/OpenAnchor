@@ -69,7 +69,7 @@ class MonitorScreenTest {
 
     private fun navigateToConfirm() {
         navigateToStep3()
-        composeTestRule.scrollToText("Next").performClick()
+        composeTestRule.waitForText("Next").performClick()
         composeTestRule.waitForText("Confirm Setup", timeoutMs = 5_000)
     }
 
@@ -97,7 +97,7 @@ class MonitorScreenTest {
     @Test
     fun setupWizard_fullFlowReachesDropAnchor() {
         navigateToConfirm()
-        composeTestRule.scrollToText("Start Monitoring").assertIsDisplayed()
+        composeTestRule.waitForText("Start Monitoring").assertIsDisplayed()
     }
 
     // --- 3. Back Navigation Through Wizard ---
