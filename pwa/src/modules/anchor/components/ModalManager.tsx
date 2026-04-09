@@ -394,6 +394,8 @@ export function ModalManager({
   // WATCH ALERT — restart timer
   // ═══════════════════════════════════════════
   const handleWatchAlertOk = useCallback(() => {
+    // Imperatively re-hide in case the modal was shown via DOM manipulation (e2e tests)
+    document.getElementById('watch-alert-modal')?.classList.add('hidden');
     closeModal('watchAlert');
     watchSchedule.startWatch(stateRef.current!.watchMinutes);
     updateState({ watchActive: true });
