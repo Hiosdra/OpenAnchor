@@ -327,6 +327,7 @@ class AnchorMonitorService : Service() {
         batteryMonitorManager.cancelAll()
         serviceScope.cancel()
         alarmPlayer.stopAlarm()
+        stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }
 }

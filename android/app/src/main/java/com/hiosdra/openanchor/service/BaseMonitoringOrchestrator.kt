@@ -20,7 +20,10 @@ abstract class BaseMonitoringOrchestrator(
      * Launch a coroutine tracked for bulk cancellation via [cancelAll].
      */
     protected fun CoroutineScope.launchTracked(block: suspend CoroutineScope.() -> Unit): Job {
-        return launch(block = block).also { trackedJobs.add(it) }
+        return launch(block = block).also { job ->
+            trackedJobs.add(job)
+            job.invokeOnCompletion { trackedJobs.remove(job) }
+        }
     }
 
     /**

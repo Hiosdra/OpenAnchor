@@ -29,6 +29,19 @@ import { Controls } from './components/Controls';
 import { ModalManager } from './components/ModalManager';
 import { ModalProvider, useModalActions, type ModalName } from './contexts/ModalContext';
 
+const TOOL_MODAL_MAP: Record<string, ModalName> = {
+  calc: 'calc',
+  sector: 'sector',
+  watch: 'watch',
+  weather: 'weather',
+  monitor: 'simpleMonitor',
+  history: 'session',
+  ai: 'ai',
+  qr: 'qr',
+  stats: 'stats',
+  sync: 'sync',
+};
+
 function AnchorApp() {
   const { t, lang, setLang } = useI18n();
   const { isOnline } = useOnlineStatus();
@@ -356,25 +369,13 @@ function AnchorApp() {
     }
   }, []);
 
-  const toolModalMap: Record<string, ModalName> = {
-    calc: 'calc',
-    sector: 'sector',
-    watch: 'watch',
-    weather: 'weather',
-    monitor: 'simpleMonitor',
-    history: 'session',
-    ai: 'ai',
-    qr: 'qr',
-    stats: 'stats',
-    sync: 'sync',
-  };
   const handleOpenTool = useCallback(
     (tool: string) => {
       if (tool === 'share') {
         handleSharePosition();
         return;
       }
-      const modal = toolModalMap[tool];
+      const modal = TOOL_MODAL_MAP[tool];
       if (modal) openModal(modal);
     },
     [openModal, handleSharePosition],

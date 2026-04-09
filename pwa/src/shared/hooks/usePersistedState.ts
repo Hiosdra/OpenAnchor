@@ -96,22 +96,24 @@ export function usePersistedState<T>(
 
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
+      let next: T;
       setState((prev) => {
-        const next = typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
-
-        if (debounceMs > 0) {
-          pendingRef.current = next;
-          if (timerRef.current) clearTimeout(timerRef.current);
-          timerRef.current = setTimeout(() => {
-            writeToDisk(next);
-            pendingRef.current = PENDING_SENTINEL;
-          }, debounceMs);
-        } else {
-          writeToDisk(next);
-        }
-
+        next = typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
         return next;
       });
+
+      // Side effects outside the state updater to stay safe in concurrent mode.
+      // `next` is set synchronously by the updater above.
+      if (debounceMs > 0) {
+        pendingRef.current = next!;
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => {
+          writeToDisk(next!);
+          pendingRef.current = PENDING_SENTINEL;
+        }, debounceMs);
+      } else {
+        writeToDisk(next!);
+      }
     },
     [debounceMs, writeToDisk],
   );
