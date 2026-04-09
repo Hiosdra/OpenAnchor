@@ -1,1 +1,0 @@
-import{n as e,t}from"./vendor-react-_ZW-7wQ-.js";import{t as n}from"./styles-BVx7rUp9.js";var r=e(),i=t(),a=null;function o(e){a=(0,r.createRoot)(e),a.render((0,i.jsx)(n,{}))}function s(){a?.unmount(),a=null}export{o as mount,s as unmount};
