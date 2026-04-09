@@ -198,15 +198,13 @@ class AnchorMonitorService : Service() {
 
     fun stopMonitoring() {
         val wasPairedMode = _monitorState.value.isPairedMode
+        val wasClientMode = _monitorState.value.isClientMode
 
         pairedModeOrchestrator.cancelAll()
         clientModeOrchestrator.cancelAll()
         resetAlarmAndMonitors()
 
-        if (wasPairedMode) {
-            pairedModeOrchestrator.stopServer()
-        }
-        if (_monitorState.value.isClientMode) {
+        if (wasClientMode) {
             clientModeOrchestrator.disconnect("SESSION_ENDED")
         }
 
@@ -227,6 +225,11 @@ class AnchorMonitorService : Service() {
                 _monitorState.value = MonitorState()
                 wearDataSender.clearMonitorState()
             } finally {
+                // Stop WS server AFTER session data is saved — its stop() chain
+                // cancels serviceScope asynchronously via AnchorWebSocketServer.stop()
+                if (wasPairedMode) {
+                    pairedModeOrchestrator.stopServer()
+                }
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }

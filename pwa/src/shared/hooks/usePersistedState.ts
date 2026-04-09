@@ -88,37 +88,32 @@ export function usePersistedState<T>(
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Use a sentinel symbol to distinguish "no pending value" from "pending value is null/undefined"
   const pendingRef = useRef<T | typeof PENDING_SENTINEL>(PENDING_SENTINEL);
+  const mountedRef = useRef(false);
 
   const writeToDisk = useCallback(
     (value: T) => writeToStorage(key, value, compress, version),
     [key, compress, version],
   );
 
-  const setValue = useCallback(
-    (value: T | ((prev: T) => T)) => {
-      let next: T;
-      setState((prev) => {
-        next = typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
-        return next;
-      });
+  // Persist state changes to localStorage via effect — safe under React 18+ batching
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    if (debounceMs > 0) {
+      pendingRef.current = state;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        writeToDisk(state);
+        pendingRef.current = PENDING_SENTINEL;
+      }, debounceMs);
+    } else {
+      writeToDisk(state);
+    }
+  }, [state, debounceMs, writeToDisk]);
 
-      // Side effects outside the state updater to stay safe in concurrent mode.
-      // `next` is set synchronously by the updater above.
-      if (debounceMs > 0) {
-        pendingRef.current = next!;
-        if (timerRef.current) clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => {
-          writeToDisk(next!);
-          pendingRef.current = PENDING_SENTINEL;
-        }, debounceMs);
-      } else {
-        writeToDisk(next!);
-      }
-    },
-    [debounceMs, writeToDisk],
-  );
-
-  // Flush pending writes on unmount
+  // Flush pending writes on unmount or when writeToDisk identity changes
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -126,9 +121,10 @@ export function usePersistedState<T>(
       }
       if (pendingRef.current !== PENDING_SENTINEL) {
         writeToDisk(pendingRef.current as T);
+        pendingRef.current = PENDING_SENTINEL;
       }
     };
   }, [writeToDisk]);
 
-  return [state, setValue];
+  return [state, setState];
 }

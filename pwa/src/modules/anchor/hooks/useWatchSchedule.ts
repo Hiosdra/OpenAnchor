@@ -52,29 +52,13 @@ export function useWatchSchedule() {
     setWatchEndTime(null);
   }, []);
 
-  const addScheduleItem = useCallback(
-    (item: ScheduleItem) => {
-      let next: ScheduleItem[];
-      setSchedule((prev) => {
-        next = [...prev, item];
-        return next;
-      });
-      debouncedSave(next!);
-    },
-    [debouncedSave],
-  );
+  const addScheduleItem = useCallback((item: ScheduleItem) => {
+    setSchedule((prev) => [...prev, item]);
+  }, []);
 
-  const removeScheduleItem = useCallback(
-    (index: number) => {
-      let next: ScheduleItem[];
-      setSchedule((prev) => {
-        next = prev.filter((_, i) => i !== index);
-        return next;
-      });
-      debouncedSave(next!);
-    },
-    [debouncedSave],
-  );
+  const removeScheduleItem = useCallback((index: number) => {
+    setSchedule((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   const checkWatchTimer = useCallback((): boolean => {
     if (!watchActiveRef.current || !watchEndTimeRef.current) return false;
@@ -92,6 +76,16 @@ export function useWatchSchedule() {
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
     return findActiveScheduleSlot(schedule, currentMinutes);
   }, [schedule]);
+
+  // Persist schedule changes to localStorage via effect (skip initial mount)
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    debouncedSave(schedule);
+  }, [schedule, debouncedSave]);
 
   useEffect(() => {
     return () => {
