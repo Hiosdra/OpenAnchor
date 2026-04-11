@@ -109,7 +109,7 @@ jobs:
           fi
 
       - name: Comment PR with preview URL
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -191,7 +191,7 @@ jobs:
           fi
 
       - name: Comment on closed PR
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
