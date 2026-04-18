@@ -3,7 +3,7 @@
    =========================== */
 
 /* === TYPOGRAPHY === */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* Google Fonts (DM Sans + JetBrains Mono) loaded via <link> in HTML entry points for performance */
 
 /* === THEME VARIABLES === */
 :root,
@@ -46,7 +46,6 @@
   --oa-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.4);
 
   --oa-bg: #0a0f1e;
-  --oa-bg-secondary: rgba(30, 41, 59, 0.5);
   --oa-text: #f1f5f9;
   --oa-text-muted: rgba(255, 255, 255, 0.5);
   --oa-text-highlight: #60a5fa;
@@ -56,7 +55,6 @@
   --oa-surface-hover: rgba(255, 255, 255, 0.1);
   --oa-header-bg: rgba(10, 15, 30, 0.85);
   --oa-scrollbar: rgba(255, 255, 255, 0.15);
-  --oa-card-border: rgba(255, 255, 255, 0.08);
   --oa-divider: rgba(255, 255, 255, 0.1);
   --oa-wave-1: #3b82f6;
   --oa-wave-2: #06b6d4;
@@ -82,7 +80,6 @@
 
 [data-theme='light'] {
   --oa-bg: #f0f4f8;
-  --oa-bg-secondary: rgba(255, 255, 255, 0.9);
   --oa-text: #0f172a;
   --oa-text-muted: rgba(15, 23, 42, 0.55);
   --oa-text-highlight: #2563eb;
@@ -92,7 +89,6 @@
   --oa-surface-hover: rgba(15, 23, 42, 0.08);
   --oa-header-bg: rgba(240, 244, 248, 0.88);
   --oa-scrollbar: rgba(15, 23, 42, 0.15);
-  --oa-card-border: rgba(15, 23, 42, 0.08);
   --oa-divider: rgba(15, 23, 42, 0.1);
   --oa-wave-1: #93c5fd;
   --oa-wave-2: #67e8f9;
@@ -126,7 +122,6 @@
 
 [data-theme='night'] {
   --oa-bg: #1a0000;
-  --oa-bg-secondary: rgba(40, 0, 0, 0.6);
   --oa-text: #cc0000;
   --oa-text-muted: rgba(204, 0, 0, 0.5);
   --oa-text-highlight: #ff3333;
@@ -136,7 +131,6 @@
   --oa-surface-hover: rgba(204, 0, 0, 0.15);
   --oa-header-bg: rgba(26, 0, 0, 0.95);
   --oa-scrollbar: rgba(204, 0, 0, 0.2);
-  --oa-card-border: rgba(204, 0, 0, 0.2);
   --oa-divider: rgba(204, 0, 0, 0.2);
   --oa-wave-1: #660000;
   --oa-wave-2: #4d0000;
