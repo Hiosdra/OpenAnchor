@@ -5,17 +5,20 @@ const EGZAMIN_URL = MODULES.egzamin;
 
 /** Wait for React to render inside #spa-root (SPA) or #root (standalone) and questions to load */
 const waitForApp = async (page: import('@playwright/test').Page) => {
-  await page.waitForFunction(() => {
-    const spa = document.getElementById('spa-root');
-    if (spa && spa.children.length > 0) return true;
-    const root = document.getElementById('root');
-    return root && root.children.length > 0;
-  }, { timeout: 15_000 });
+  await page.waitForFunction(
+    () => {
+      const spa = document.getElementById('spa-root');
+      if (spa && spa.children.length > 0) return true;
+      const root = document.getElementById('root');
+      return root && root.children.length > 0;
+    },
+    { timeout: 15_000 },
+  );
 };
 
 test.beforeEach(async ({ page }) => {
   // Block SW so controllerchange doesn't interrupt navigation
-  await page.route('**/sw.js', route => route.abort());
+  await page.route('**/sw.js', (route) => route.abort());
   await installEgzaminPdfTestHook(page);
 });
 
@@ -28,7 +31,7 @@ test.describe('Page Load & Initial State', () => {
     await waitForApp(page);
     const root = page.locator('#spa-root, #root');
     await expect(root.first()).toBeVisible();
-    const children = await root.first().evaluate(el => el.children.length);
+    const children = await root.first().evaluate((el) => el.children.length);
     expect(children).toBeGreaterThan(0);
   });
 
@@ -63,7 +66,7 @@ test.describe('Page Load & Initial State', () => {
     await waitForApp(page);
     await expect(page.getByText('Kategorie')).toBeVisible();
     await expect(page.getByText('Locja')).toBeVisible();
-    await expect(page.getByText('Nawigacja')).toBeVisible();
+    await expect(page.getByText('Nawigacja', { exact: true })).toBeVisible();
     await expect(page.getByText('Meteorologia')).toBeVisible();
   });
 
@@ -264,7 +267,7 @@ test.describe('Learn Mode - Category Filter', () => {
 
     // All 8 categories should be visible
     await expect(page.getByText('Locja')).toBeVisible();
-    await expect(page.getByText('Nawigacja')).toBeVisible();
+    await expect(page.getByText('Nawigacja', { exact: true })).toBeVisible();
     await expect(page.getByText('Meteorologia')).toBeVisible();
     await expect(page.getByText('Prawo')).toBeVisible();
     await expect(page.getByText('Ratownictwo')).toBeVisible();
@@ -420,7 +423,7 @@ test.describe('Exam Mode', () => {
     await waitForApp(page);
 
     // Handle confirm dialogs automatically
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     await page.locator('button', { hasText: 'Egzamin' }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Egzamin');
@@ -448,7 +451,7 @@ test.describe('Exam Mode', () => {
     test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     await page.locator('button', { hasText: 'Egzamin' }).click();
 
@@ -469,7 +472,7 @@ test.describe('Exam Mode', () => {
     test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     await page.locator('button', { hasText: 'Egzamin' }).click();
 
@@ -487,7 +490,7 @@ test.describe('Exam Mode', () => {
     test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     await page.locator('button', { hasText: 'Egzamin' }).click();
 
@@ -573,7 +576,7 @@ test.describe('Leitner Mode', () => {
   test('answering in Leitner shows box movement indicator', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     await page.locator('button', { hasText: 'Leitner' }).click();
     await page.locator('button', { hasText: /Rozpocznij sesję/ }).click();
@@ -589,7 +592,7 @@ test.describe('Leitner Mode', () => {
   test('answering in Leitner enables Next button', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     await page.locator('button', { hasText: 'Leitner' }).click();
     await page.locator('button', { hasText: /Rozpocznij sesję/ }).click();
@@ -608,7 +611,7 @@ test.describe('Leitner Mode', () => {
   test('completing Leitner session shows summary', async ({ page }) => {
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     // Pre-seed Leitner state with only 1 question due.
     // Questions are bundled in Vite builds with numeric IDs 1..330.
@@ -826,7 +829,7 @@ test.describe('Navigation Back to Menu', () => {
     await waitForApp(page);
 
     // Accept the confirm dialog
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     await page.locator('button', { hasText: 'Egzamin' }).click();
     await expect(page.locator('.oa-header-title')).toHaveText('Egzamin');
@@ -841,7 +844,7 @@ test.describe('Navigation Back to Menu', () => {
     test.slow(); // clicks through 30 exam questions
     await page.goto(EGZAMIN_URL);
     await waitForApp(page);
-    page.on('dialog', dialog => dialog.accept());
+    page.on('dialog', (dialog) => dialog.accept());
 
     // Complete exam quickly
     await page.locator('button', { hasText: 'Egzamin' }).click();
