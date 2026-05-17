@@ -734,7 +734,7 @@ export const shipLightProfiles: ShipLightProfile[] = [
         id: 'towed-diamond',
         name: 'Romb (czarny)',
         shape: 'diamond',
-        position: [0, 6, -1],
+        position: [0, 6, -1.5],
         description: 'Czarny romb w najbardziej widocznym miejscu — wymagany gdy hol > 200m.',
       },
     ],
