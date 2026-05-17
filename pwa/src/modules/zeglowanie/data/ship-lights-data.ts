@@ -131,7 +131,7 @@ const towingLight: LightDef = {
   id: 'towing',
   name: 'Światło holownicze',
   color: 'yellow',
-  position: [0, 3, 4],
+  position: [0, 4.5, 4.3],
   arcDeg: 135,
   arcCenterDeg: 180,
   description: 'Żółte światło nad rufowym. Sektor 135° — oznacza prowadzenie operacji holowania.',
