@@ -8,6 +8,7 @@ import { PackingSection } from './components/PackingSection';
 import { BriefingSection } from './components/BriefingSection';
 import { ChecklistsSection } from './components/ChecklistsSection';
 import { PlaceholderSection } from './components/PlaceholderSection';
+import { KnowledgeSection } from './components/knowledge/KnowledgeSection';
 
 export default function App() {
   const [section, setSection] = useLocalStorage<SectionType>(
@@ -32,13 +33,7 @@ export default function App() {
         )}
         {section === 'briefing' && <BriefingSection />}
         {section === 'checklists' && <ChecklistsSection />}
-        {section === 'knowledge' && (
-          <PlaceholderSection
-            emoji="📚"
-            title="Wiedza Żeglarska"
-            description="Tutaj będą informacje żeglarskie:<br>instrukcje wiązania węzłów, podstawy nawigacji, meteorologia, itp.<br>Sekcja dostępna w przyszłości."
-          />
-        )}
+        {section === 'knowledge' && <KnowledgeSection />}
       </main>
     </>
   );

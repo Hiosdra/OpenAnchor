@@ -58,12 +58,7 @@ if (isCoverageBuild) {
   plugins.push(
     istanbul({
       include: ['src/**/*.ts', 'src/**/*.tsx'],
-      exclude: [
-        'src/service-worker/**',
-        'tests/**',
-        'e2e/**',
-        'node_modules/**',
-      ],
+      exclude: ['src/service-worker/**', 'tests/**', 'e2e/**', 'node_modules/**'],
       extension: ['.ts', '.tsx'],
       requireEnv: true,
       forceBuildInstrument: true,
@@ -118,6 +113,12 @@ export default defineConfig({
           }
           if (id.includes('node_modules/marked/')) {
             return 'vendor-marked';
+          }
+          if (id.includes('node_modules/three/')) {
+            return 'vendor-three';
+          }
+          if (id.includes('node_modules/@react-three/')) {
+            return 'vendor-react-three';
           }
           if (id.includes('node_modules/html2canvas/')) {
             return 'vendor-html2canvas';
