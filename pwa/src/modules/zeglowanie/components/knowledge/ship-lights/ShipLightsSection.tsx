@@ -25,7 +25,12 @@ const shipGroups: ShipGroup[] = [
   {
     label: 'Rybackie',
     icon: '🐟',
-    types: ['fishing-trawling', 'fishing-not-trawling'],
+    types: [
+      'fishing-trawling-under-50m',
+      'fishing-trawling-over-50m',
+      'fishing-not-trawling-short',
+      'fishing-not-trawling-long',
+    ],
   },
   {
     label: 'Holowanie',

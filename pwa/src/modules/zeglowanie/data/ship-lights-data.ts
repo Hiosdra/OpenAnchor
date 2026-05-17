@@ -14,8 +14,10 @@ export type ShipType =
   | 'sailing'
   | 'sailing-tricolor'
   | 'sailing-motor'
-  | 'fishing-trawling'
-  | 'fishing-not-trawling'
+  | 'fishing-trawling-under-50m'
+  | 'fishing-trawling-over-50m'
+  | 'fishing-not-trawling-short'
+  | 'fishing-not-trawling-long'
   | 'at-anchor-under-50m'
   | 'at-anchor-over-50m'
   | 'not-under-command'
@@ -261,10 +263,53 @@ export const shipLightProfiles: ShipLightProfile[] = [
     ],
   },
   {
-    type: 'fishing-trawling',
-    name: 'Trałowiec',
+    type: 'fishing-trawling-under-50m',
+    name: 'Trałowiec < 50m',
     emoji: '🐟',
-    description: 'Statek zajęty trałowaniem (ciągnie włok po dnie lub w toni).',
+    description:
+      'Statek zajęty trałowaniem, długość poniżej 50 metrów. Brak obowiązku wykazywania światła masztowego.',
+    colreg: 'Prawidło 26(b)',
+    hullType: 'fishing',
+    lights: [
+      allRound(
+        'trawl-green',
+        'Zielone dookoła (górne)',
+        'green',
+        6.5,
+        'Zielone światło dookoła widnokręgu — górne światło pary oznaczającej trałowanie.',
+      ),
+      allRound(
+        'trawl-white',
+        'Białe dookoła (dolne)',
+        'white',
+        5.5,
+        'Białe światło dookoła widnokręgu — dolne światło pary oznaczającej trałowanie.',
+      ),
+      portLight,
+      starboardLight,
+      sternlight,
+    ],
+    dayMarks: [
+      {
+        id: 'cones-trawl',
+        name: 'Dwa stożki wierzchołkami złączone',
+        shape: 'diamond',
+        position: [0, 6, -1],
+        description: 'Dwa stożki złączone wierzchołkami (romb) — znak dzienny trałowca.',
+      },
+    ],
+    notes: [
+      'Zielone NAD białym dookoła widnokręgu',
+      'Dla < 50m: światło masztowe opcjonalne (tu pominięte)',
+      'Wysoce ograniczona manewrowość z powodu sieci',
+    ],
+  },
+  {
+    type: 'fishing-trawling-over-50m',
+    name: 'Trałowiec ≥ 50m',
+    emoji: '🐟',
+    description:
+      'Statek zajęty trałowaniem, długość 50 metrów lub więcej. Wymaga dodatkowego białego światła masztowego.',
     colreg: 'Prawidło 26(b)',
     hullType: 'fishing',
     lights: [
@@ -298,15 +343,15 @@ export const shipLightProfiles: ShipLightProfile[] = [
     ],
     notes: [
       'Zielone NAD białym dookoła widnokręgu',
-      'Światło masztowe wyżej niż zielone (dla > 50m)',
+      'Dla ≥ 50m: białe światło masztowe OBOWIĄZKOWE (z tyłu i wyżej niż zielone)',
       'Wysoce ograniczona manewrowość z powodu sieci',
     ],
   },
   {
-    type: 'fishing-not-trawling',
-    name: 'Rybacki (nie trałuje)',
+    type: 'fishing-not-trawling-short',
+    name: 'Rybacki (sieć ≤ 150m)',
     emoji: '🎣',
-    description: 'Statek zajęty połowem innym niż trałowanie (sieci, liny, itp.).',
+    description: 'Statek zajęty połowem innym niż trałowanie, sprzęt nie przekracza 150m od burty.',
     colreg: 'Prawidło 26(c)',
     hullType: 'fishing',
     lights: [
@@ -339,8 +384,67 @@ export const shipLightProfiles: ShipLightProfile[] = [
     ],
     notes: [
       'Czerwone NAD białym dookoła widnokręgu',
-      'Jeśli sieci > 150m: dodatkowe białe światło w kierunku sieci',
+      'Sprzęt ≤ 150m: brak dodatkowego oznakowania kierunku sieci',
       'Posuwa się po wodzie → dodaje światła burtowe i rufowe',
+    ],
+  },
+  {
+    type: 'fishing-not-trawling-long',
+    name: 'Rybacki (sieć > 150m)',
+    emoji: '🎣',
+    description:
+      'Statek zajęty połowem innym niż trałowanie, sprzęt przekracza 150m od burty — dodatkowe białe światło w kierunku sieci.',
+    colreg: 'Prawidło 26(c)',
+    hullType: 'fishing',
+    lights: [
+      allRound(
+        'fish-red',
+        'Czerwone dookoła (górne)',
+        'red',
+        6.5,
+        'Czerwone światło dookoła widnokręgu — górne, oznacza połów inny niż trałowanie.',
+      ),
+      allRound(
+        'fish-white',
+        'Białe dookoła (dolne)',
+        'white',
+        5.5,
+        'Białe światło dookoła widnokręgu — dolne, para z czerwonym oznacza statek rybacki.',
+      ),
+      {
+        id: 'fish-gear',
+        name: 'Białe dookoła (kierunek sieci)',
+        color: 'white',
+        position: [2.5, 4.0, 0],
+        arcDeg: 360,
+        arcCenterDeg: 0,
+        description:
+          'Dodatkowe białe światło dookoła widnokręgu w kierunku sprzętu — sieć wystaje ponad 150m od burty.',
+      },
+      portLight,
+      starboardLight,
+      sternlight,
+    ],
+    dayMarks: [
+      {
+        id: 'cones-fish',
+        name: 'Dwa stożki wierzchołkami złączone',
+        shape: 'diamond',
+        position: [0, 6, -1],
+        description: 'Dwa stożki złączone wierzchołkami (romb) — znak dzienny statku rybackiego.',
+      },
+      {
+        id: 'cone-gear',
+        name: 'Stożek wierzchołkiem w górę (kierunek sieci)',
+        shape: 'cone-up',
+        position: [2.2, 5.5, 0],
+        description: 'Stożek wierzchołkiem w górę w kierunku wystawionego sprzętu (sieć > 150m).',
+      },
+    ],
+    notes: [
+      'Czerwone NAD białym dookoła widnokręgu',
+      'Sieć > 150m od burty: DODATKOWE białe światło dookoła w kierunku sprzętu',
+      'W dzień: stożek wierzchołkiem w górę w kierunku sieci',
     ],
   },
   {
