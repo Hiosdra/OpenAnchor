@@ -537,6 +537,35 @@ function DayMark({ mark, isNight }: { mark: DayMarkDef; isNight: boolean }) {
 
   const pos: [number, number, number] = [mark.position[0], mark.position[1], mark.position[2]];
 
+  if (mark.shape === 'flag-h') {
+    // ICS "Hotel" flag: left half white, right half red, hanging from mast top
+    // Flag in XY plane (face visible from bow direction), hoist at mast, fly to starboard
+    return (
+      <group position={pos}>
+        {/* White (hoist) half */}
+        <mesh position={[0.3, -0.45, 0]}>
+          <boxGeometry args={[0.6, 0.9, 0.06]} />
+          <meshPhongMaterial
+            color="#f0f0f0"
+            side={THREE.DoubleSide}
+            specular="#aaaaaa"
+            shininess={20}
+          />
+        </mesh>
+        {/* Red (fly) half */}
+        <mesh position={[0.9, -0.45, 0]}>
+          <boxGeometry args={[0.6, 0.9, 0.06]} />
+          <meshPhongMaterial
+            color="#cc1111"
+            side={THREE.DoubleSide}
+            specular="#994444"
+            shininess={20}
+          />
+        </mesh>
+      </group>
+    );
+  }
+
   if (mark.shape === 'diamond') {
     return (
       <group position={pos}>

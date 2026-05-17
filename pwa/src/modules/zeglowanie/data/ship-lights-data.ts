@@ -30,7 +30,7 @@ export type ShipType =
   | 'towed-object';
 
 export type LightColor = 'red' | 'green' | 'white' | 'yellow' | 'blue';
-export type DayMarkShape = 'ball' | 'diamond' | 'cone-down' | 'cone-up' | 'cylinder';
+export type DayMarkShape = 'ball' | 'diamond' | 'cone-down' | 'cone-up' | 'cylinder' | 'flag-h';
 
 export interface LightDef {
   id: string;
@@ -824,6 +824,16 @@ export const shipLightProfiles: ShipLightProfile[] = [
       'Białe NAD czerwonym dookoła widnokręgu — sygnał pilota',
       'Dodatkowo światła burtowe i rufowe gdy w drodze',
       'W dzień: flaga "H" (Hotel) z Międzynarodowego Kodu Sygnałowego',
+    ],
+    dayMarks: [
+      {
+        id: 'pilot-flag-h',
+        name: 'Flaga "H" (Hotel)',
+        shape: 'flag-h',
+        position: [0, 9.0, -1.5],
+        description:
+          'Flaga Hotel z MKS — biała (lewa połowa) i czerwona (prawa połowa) — znak pilota.',
+      },
     ],
   },
   {
