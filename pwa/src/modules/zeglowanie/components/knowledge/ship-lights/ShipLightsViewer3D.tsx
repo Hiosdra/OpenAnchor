@@ -584,14 +584,14 @@ function DayMark({ mark, isNight }: { mark: DayMarkDef; isNight: boolean }) {
   if (mark.shape === 'diamond') {
     return (
       <group position={pos}>
-        {/* Upper cone — tip points DOWN toward center */}
-        <mesh position={[0, 0.32, 0]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[0.35, 0.65, 8]} />
+        {/* Upper cone — tip points UP (outward) */}
+        <mesh position={[0, 0.33, 0]}>
+          <coneGeometry args={[0.38, 0.66, 4]} />
           <meshPhongMaterial color="#111" specular="#333" shininess={10} />
         </mesh>
-        {/* Lower cone — tip points UP toward center */}
-        <mesh position={[0, -0.32, 0]}>
-          <coneGeometry args={[0.35, 0.65, 8]} />
+        {/* Lower cone — tip points DOWN (outward) */}
+        <mesh position={[0, -0.33, 0]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.38, 0.66, 4]} />
           <meshPhongMaterial color="#111" specular="#333" shininess={10} />
         </mesh>
       </group>
