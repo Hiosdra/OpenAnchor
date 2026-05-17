@@ -29,7 +29,8 @@ export type ShipType =
   | 'mine-clearance'
   | 'pilot-vessel'
   | 'hovercraft'
-  | 'towed-object';
+  | 'towed-object-short'
+  | 'towed-object-long';
 
 export type LightColor = 'red' | 'green' | 'white' | 'yellow' | 'blue';
 export type DayMarkShape = 'ball' | 'diamond' | 'cone-down' | 'cone-up' | 'cylinder' | 'flag-h';
@@ -707,17 +708,40 @@ export const shipLightProfiles: ShipLightProfile[] = [
     ],
   },
   {
-    type: 'towed-object',
-    name: 'Obiekt holowany',
+    type: 'towed-object-short',
+    name: 'Obiekt holowany (hol ≤ 200m)',
     emoji: '📦',
-    description: 'Statek lub obiekt holowany — nie posiada własnego napędu.',
+    description: 'Statek lub obiekt holowany — hol nie przekracza 200m.',
     colreg: 'Prawidło 24(d)',
     hullType: 'motor',
     lights: [portLight, starboardLight, sternlight],
     notes: [
       'BRAK świateł masztowych — kluczowa różnica od statku motorowego',
       'Tylko światła burtowe i rufowe',
-      'Jeśli hol > 200m: czarny romb w dzień',
+    ],
+  },
+  {
+    type: 'towed-object-long',
+    name: 'Obiekt holowany (hol > 200m)',
+    emoji: '📦',
+    description:
+      'Statek lub obiekt holowany — hol przekracza 200m. Obowiązuje czarny romb w dzień.',
+    colreg: 'Prawidło 24(d)',
+    hullType: 'motor',
+    lights: [portLight, starboardLight, sternlight],
+    dayMarks: [
+      {
+        id: 'towed-diamond',
+        name: 'Romb (czarny)',
+        shape: 'diamond',
+        position: [0, 8, 0],
+        description: 'Czarny romb w najbardziej widocznym miejscu — wymagany gdy hol > 200m.',
+      },
+    ],
+    notes: [
+      'BRAK świateł masztowych — kluczowa różnica od statku motorowego',
+      'Tylko światła burtowe i rufowe',
+      'Czarny romb w dzień gdy hol > 200m',
     ],
   },
   {

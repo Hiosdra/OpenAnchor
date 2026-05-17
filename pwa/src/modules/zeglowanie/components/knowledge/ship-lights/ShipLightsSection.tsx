@@ -35,7 +35,7 @@ const shipGroups: ShipGroup[] = [
   {
     label: 'Holowanie',
     icon: '🔗',
-    types: ['towing-under-200m', 'towing-over-200m', 'towed-object'],
+    types: ['towing-under-200m', 'towing-over-200m', 'towed-object-short', 'towed-object-long'],
   },
   {
     label: 'Postój',
