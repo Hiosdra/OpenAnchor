@@ -226,11 +226,6 @@ function HullSuperstructure({
             shininess={60}
           />
         </mesh>
-        {/* Fishing boom / davit — angled outrigger arm */}
-        <mesh position={[0.8, 5.5, -1]} rotation={[0.4, 0, 0.5]}>
-          <cylinderGeometry args={[0.03, 0.02, 4, 6]} />
-          <meshPhongMaterial color={metalColor} />
-        </mesh>
         {/* Cross-beam */}
         <mesh position={[0, 7, -1]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.03, 0.03, 1.4, 6]} />
