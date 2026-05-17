@@ -865,7 +865,7 @@ export default function ShipLightsViewer3D({ profile, isNight }: ViewerProps) {
   return (
     <div className="relative w-full h-full">
       <Canvas
-        camera={{ position: [0, 5, -13], fov: 45 }}
+        camera={{ position: [0, 7, -22], fov: 45 }}
         gl={{
           antialias: true,
           alpha: false,
