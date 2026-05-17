@@ -377,6 +377,26 @@ function HullSuperstructure({
   );
 }
 
+// ── Mine Clearance Yardarm Extension ──────────────────────────
+
+function MineYardarm({ isNight }: { isNight: boolean }) {
+  const metalColor = isNight ? '#283550' : '#5a6a7a';
+  return (
+    <group>
+      {/* Mast extension above motor hull mast top (Y=8 → Y=10) */}
+      <mesh position={[0, 9, -1.5]}>
+        <cylinderGeometry args={[0.03, 0.04, 2, 6]} />
+        <meshPhongMaterial color={metalColor} specular="#aaccee" shininess={40} />
+      </mesh>
+      {/* Wide yardarm: extends ±1.5 (total 3.0) to hold side balls */}
+      <mesh position={[0, 7, -1.5]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.025, 0.025, 3.0, 6]} />
+        <meshPhongMaterial color={metalColor} specular="#aaccee" shininess={40} />
+      </mesh>
+    </group>
+  );
+}
+
 // ── Navigation Light ───────────────────────────────────────────
 
 const DECK_LEVEL = 2.6;
@@ -787,6 +807,9 @@ function Scene({ profile, isNight }: ViewerProps) {
 
       {/* Ship hull */}
       <ShipHull hullType={profile.hullType} isNight={isNight} />
+
+      {/* Mine clearance: extended mast + wide yardarm */}
+      {profile.type === 'mine-clearance' && <MineYardarm isNight={isNight} />}
 
       {/* Light support poles */}
       {profile.lights.map((light) => (
