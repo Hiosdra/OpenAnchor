@@ -30,6 +30,7 @@ const shipGroups: ShipGroup[] = [
       'fishing-trawling-over-50m',
       'fishing-not-trawling-short',
       'fishing-not-trawling-long',
+      'fishing-purse-seiner',
     ],
   },
   {

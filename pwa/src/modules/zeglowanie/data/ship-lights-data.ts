@@ -18,6 +18,7 @@ export type ShipType =
   | 'fishing-trawling-over-50m'
   | 'fishing-not-trawling-short'
   | 'fishing-not-trawling-long'
+  | 'fishing-purse-seiner'
   | 'at-anchor-under-50m'
   | 'at-anchor-over-50m'
   | 'not-under-command'
@@ -446,6 +447,69 @@ export const shipLightProfiles: ShipLightProfile[] = [
       'Czerwone NAD białym dookoła widnokręgu',
       'Sieć > 150m od burty: DODATKOWE białe światło dookoła w kierunku sprzętu',
       'W dzień: stożek wierzchołkiem w górę w kierunku sieci',
+    ],
+  },
+  {
+    type: 'fishing-purse-seiner',
+    name: 'Rybacki (okrężnica)',
+    emoji: '🐟',
+    description:
+      'Statek zajęty połowem za pomocą sieci okrężnicy. Oprócz standardowych świateł rybackich może wykazywać dwa żółte światła w pionie — naprzemiennie błyskające gdy sprzęt utrudnia manewrowanie.',
+    colreg: 'Prawidło 26(c), Załącznik II pkt 2',
+    hullType: 'fishing',
+    lights: [
+      allRound(
+        'fish-red',
+        'Czerwone dookoła (górne)',
+        'red',
+        6.5,
+        'Czerwone światło dookoła widnokręgu — górne, oznacza połów inny niż trałowanie.',
+      ),
+      allRound(
+        'fish-white',
+        'Białe dookoła (dolne)',
+        'white',
+        5.5,
+        'Białe światło dookoła widnokręgu — dolne, para z czerwonym oznacza statek rybacki.',
+      ),
+      {
+        id: 'purse-yellow-upper',
+        name: 'Żółte dookoła (górne — okrężnica)',
+        color: 'yellow',
+        position: [1.5, 6.0, -0.5],
+        arcDeg: 360,
+        arcCenterDeg: 0,
+        description:
+          'Górne żółte światło dookoła widnokręgu — element pary naprzemiennie błyskającej (co 1 s) sygnalizującej użycie okrężnicy.',
+      },
+      {
+        id: 'purse-yellow-lower',
+        name: 'Żółte dookoła (dolne — okrężnica)',
+        color: 'yellow',
+        position: [1.5, 4.5, -0.5],
+        arcDeg: 360,
+        arcCenterDeg: 0,
+        description:
+          'Dolne żółte światło dookoła widnokręgu — element pary naprzemiennie błyskającej (co 1 s) sygnalizującej użycie okrężnicy.',
+      },
+      portLight,
+      starboardLight,
+      sternlight,
+    ],
+    dayMarks: [
+      {
+        id: 'cones-fish',
+        name: 'Dwa stożki wierzchołkami złączone',
+        shape: 'diamond',
+        position: [0, 6, -1],
+        description: 'Dwa stożki złączone wierzchołkami (romb) — znak dzienny statku rybackiego.',
+      },
+    ],
+    notes: [
+      'Czerwone NAD białym dookoła widnokręgu — standard połów inny niż trałowanie',
+      'DODATKOWE: dwa żółte dookoła w linii pionowej — pokazywane gdy sieć utrudnia manewrowanie',
+      'Żółte światła błyszczą NA PRZEMIAN (górne, dolne) z częstotliwością 1 błysk/s',
+      'Czas błysku = czas przerwy (charakterystyka równomierna)',
     ],
   },
   {
