@@ -51,6 +51,7 @@
             .module-card:nth-child(2) { animation-delay: 0.2s; }
             .module-card:nth-child(3) { animation-delay: 0.3s; }
             .module-card:nth-child(4) { animation-delay: 0.4s; }
+            .module-card:nth-child(5) { animation-delay: 0.5s; }
         }
 
         @keyframes card-enter {
@@ -102,6 +103,18 @@
         }
 
         .card-anchor:hover {
+            box-shadow: var(--oa-shadow-xl), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        /* OpenCPN card */
+        .card-opencpn {
+            background: linear-gradient(145deg, rgba(46, 26, 80, 0.8) 0%, rgba(30, 15, 55, 0.6) 50%, rgba(18, 8, 38, 0.9) 100%);
+            -webkit-backdrop-filter: blur(var(--oa-glass-blur));
+            backdrop-filter: blur(var(--oa-glass-blur));
+            box-shadow: var(--oa-shadow-lg), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .card-opencpn:hover {
             box-shadow: var(--oa-shadow-xl), inset 0 1px 0 rgba(255,255,255,0.08);
         }
 
@@ -172,6 +185,11 @@
             box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
         }
 
+        .icon-opencpn {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+        }
+
         /* Feature list */
         .feature-item {
             display: flex;
@@ -219,6 +237,15 @@
             box-shadow: 0 0 6px rgba(34, 211, 238, 0.5);
         }
 
+        .feature-dot-opencpn {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #c084fc;
+            flex-shrink: 0;
+            box-shadow: 0 0 6px rgba(192, 132, 252, 0.5);
+        }
+
         /* Launch button */
         .launch-btn {
             display: flex;
@@ -251,6 +278,10 @@
 
         .launch-btn-sailing {
             color: #67e8f9;
+        }
+
+        .launch-btn-opencpn {
+            color: #d8b4fe;
         }
 
         /* Divider line in button */
@@ -884,7 +915,7 @@
             min-height: 100dvh;
         }
     </style>
-  <script type="module" crossorigin src="/OpenAnchor/assets/main-BbtcddNP.js"></script>
+  <script type="module" crossorigin src="/OpenAnchor/assets/main-_iph7JSz.js"></script>
   <link rel="modulepreload" crossorigin href="/OpenAnchor/assets/modulepreload-polyfill-CXK8biUa.js">
   <link rel="modulepreload" crossorigin href="/OpenAnchor/assets/rolldown-runtime-BJFoxEff.js">
   <link rel="modulepreload" crossorigin href="/OpenAnchor/assets/vendor-jspdf-DrkiKdL0.js">
@@ -1170,6 +1201,71 @@
                              width="16" height="16">
                             <line x1="5" y1="12" x2="19" y2="12"/>
                             <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OpenCPN WASM -->
+            <div class="module-card card-opencpn" onclick="window.open('https://hiosdra.github.io/opencpn-wasm/', '_blank')" role="button" tabindex="0"
+                 aria-label="Otwórz OpenCPN WASM"
+                 onkeydown="if(event.key==='Enter'||event.key===' ')window.open('https://hiosdra.github.io/opencpn-wasm/', '_blank')">
+                <div class="module-card-inner">
+                    <div class="flex items-start gap-4">
+                        <!-- Icon -->
+                        <div class="module-icon icon-opencpn flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="2" y1="12" x2="22" y2="12"/>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                        </div>
+                        <!-- Title -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9">OpenCPN</h2>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                    <polyline points="15 3 21 3 21 9"/>
+                                    <line x1="10" y1="14" x2="21" y2="3"/>
+                                </svg>
+                            </div>
+                            <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:0.2rem">Nawigacja morska w przeglądarce</p>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div style="margin-top:1rem">
+                        <div class="feature-item">
+                            <span class="feature-dot-opencpn"></span>
+                            <span>Mapy wektorowe ENC/BSB</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-opencpn"></span>
+                            <span>Planowanie tras i waypoints</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-opencpn"></span>
+                            <span>AIS i śledzenie statków</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-dot-opencpn"></span>
+                            <span>Działa offline w przeglądarce</span>
+                        </div>
+                    </div>
+
+                    <!-- Launch button -->
+                    <div class="launch-btn launch-btn-opencpn">
+                        <span class="launch-divider"></span>
+                        <span>Otwórz</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                             width="16" height="16">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            <polyline points="15 3 21 3 21 9"/>
+                            <line x1="10" y1="14" x2="21" y2="3"/>
                         </svg>
                     </div>
                 </div>
