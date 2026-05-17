@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -162,11 +162,13 @@ function HullSuperstructure({
             shininess={60}
           />
         </mesh>
-        {/* Boom (horizontal bar from mast, angled slightly aft) */}
-        <mesh position={[0, 4, 1]} rotation={[0.3, 0, 0]}>
-          <cylinderGeometry args={[0.03, 0.025, 4, 6]} />
+        {/* Boom — horizontal spar running aft */}
+        <mesh position={[0, 3, 1.5]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.025, 0.02, 4.5, 6]} />
           <meshPhongMaterial color={metalColor} />
         </mesh>
+        {/* Mainsail */}
+        <Sail isNight={isNight} />
         {/* Small cockpit aft */}
         <mesh position={[0, 2.9, 2.5]}>
           <boxGeometry args={[1.2, 0.6, 1.8]} />
@@ -177,7 +179,7 @@ function HullSuperstructure({
             shininess={40}
           />
         </mesh>
-        {/* Shroud lines (stays) — port and starboard */}
+        {/* Shroud lines — port and starboard */}
         {[-1, 1].map((side) => (
           <mesh
             key={`shroud-${side}`}
@@ -390,7 +392,8 @@ function LightPole({
 }) {
   const lightY = light.position[1];
   const lightZ = light.position[2];
-  // Only draw pole for elevated lights not already on the main mast
+  // Only draw pole at night for elevated lights not already on the main mast
+  if (!isNight) return null;
   if (lightY <= DECK_LEVEL + 0.5) return null;
   if (Math.abs(lightZ - mainMastZ) < 0.3) return null;
 
@@ -417,6 +420,7 @@ function NavLight({
 }) {
   const glowRef = useRef<THREE.Mesh>(null);
   const flashRef = useRef(true);
+  const [flashOn, setFlashOn] = React.useState(true);
   const visibility = isNight ? getLightVisibility(light, cameraAngle) : 0;
 
   const color = useMemo(() => {
@@ -451,7 +455,11 @@ function NavLight({
 
   useFrame((state) => {
     if (light.flashing) {
-      flashRef.current = Math.sin(state.clock.elapsedTime * Math.PI) > 0;
+      const next = Math.sin(state.clock.elapsedTime * Math.PI) > 0;
+      if (next !== flashRef.current) {
+        flashRef.current = next;
+        setFlashOn(next);
+      }
     }
     if (glowRef.current) {
       const pulse = 1 + Math.sin(state.clock.elapsedTime * 3 + light.position[1] * 2) * 0.06;
@@ -462,8 +470,7 @@ function NavLight({
   // Day mode: don't render light fixtures
   if (!isNight) return null;
 
-  const flashOn = light.flashing ? flashRef.current : true;
-  const intensity = visibility * (flashOn ? 1 : 0);
+  const intensity = visibility * (light.flashing ? (flashOn ? 1 : 0) : 1);
 
   return (
     <group position={[light.position[0], light.position[1], light.position[2]]}>
@@ -533,12 +540,14 @@ function DayMark({ mark, isNight }: { mark: DayMarkDef; isNight: boolean }) {
   if (mark.shape === 'diamond') {
     return (
       <group position={pos}>
-        <mesh position={[0, 0.3, 0]}>
-          <coneGeometry args={[0.35, 0.6, 8]} />
+        {/* Upper cone — tip points DOWN toward center */}
+        <mesh position={[0, 0.32, 0]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.35, 0.65, 8]} />
           <meshPhongMaterial color="#111" specular="#333" shininess={10} />
         </mesh>
-        <mesh position={[0, -0.3, 0]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[0.35, 0.6, 8]} />
+        {/* Lower cone — tip points UP toward center */}
+        <mesh position={[0, -0.32, 0]}>
+          <coneGeometry args={[0.35, 0.65, 8]} />
           <meshPhongMaterial color="#111" specular="#333" shininess={10} />
         </mesh>
       </group>
@@ -642,6 +651,70 @@ function CameraAngleTracker({ onAngleChange }: { onAngleChange: (angle: number) 
   return null;
 }
 
+// ── Sail Mesh ──────────────────────────────────────────────────
+
+function Sail({ isNight }: { isNight: boolean }) {
+  const geo = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    // Mainsail triangle: tack(0,0,0), head(0,7,0), clew(0,0,4)
+    // Two faces for double-sided without material DoubleSide depth issues
+    const vertices = new Float32Array([
+      0,
+      0,
+      0,
+      0,
+      7,
+      0,
+      0,
+      0,
+      4, // front face
+      0,
+      0,
+      0,
+      0,
+      0,
+      4,
+      0,
+      7,
+      0, // back face
+    ]);
+    g.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    g.computeVertexNormals();
+    return g;
+  }, []);
+
+  return (
+    <mesh geometry={geo} position={[0, 3, -0.5]}>
+      <meshPhongMaterial
+        color={isNight ? '#8899bb' : '#ddeeff'}
+        transparent
+        opacity={isNight ? 0.45 : 0.7}
+        side={THREE.DoubleSide}
+        specular="#aaccff"
+        shininess={15}
+      />
+    </mesh>
+  );
+}
+
+function SkyBackground({ isNight }: { isNight: boolean }) {
+  const bgColor = isNight ? '#030810' : '#87CEEB';
+
+  return (
+    <>
+      <color attach="background" args={[bgColor]} />
+      {!isNight && (
+        <mesh scale={[-1, 1, -1]} position={[0, -5, 0]}>
+          <sphereGeometry args={[60, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
+          <meshBasicMaterial side={THREE.BackSide} vertexColors={false}>
+            <color attach="color" args={['#87CEEB']} />
+          </meshBasicMaterial>
+        </mesh>
+      )}
+    </>
+  );
+}
+
 // ── Scene ──────────────────────────────────────────────────────
 
 function Scene({ profile, isNight }: ViewerProps) {
@@ -650,35 +723,36 @@ function Scene({ profile, isNight }: ViewerProps) {
   return (
     <>
       <CameraAngleTracker onAngleChange={setCameraAngle} />
+      <SkyBackground isNight={isNight} />
 
       {/* Lighting setup */}
-      <ambientLight intensity={isNight ? 0.15 : 0.5} color={isNight ? '#4466aa' : '#ffffff'} />
+      <ambientLight intensity={isNight ? 0.35 : 1.4} color={isNight ? '#4466aa' : '#e8f0ff'} />
 
       {/* Key light - slightly from above and side */}
       <directionalLight
         position={[3, 8, 4]}
-        intensity={isNight ? 0.3 : 0.9}
-        color={isNight ? '#4477bb' : '#ffffff'}
+        intensity={isNight ? 0.3 : 1.2}
+        color={isNight ? '#4477bb' : '#fff8ee'}
       />
 
       {/* Fill light from opposite side */}
       <directionalLight
         position={[-4, 5, -3]}
-        intensity={isNight ? 0.1 : 0.3}
-        color={isNight ? '#334466' : '#aaccff'}
+        intensity={isNight ? 0.1 : 0.6}
+        color={isNight ? '#334466' : '#cce0ff'}
       />
 
       {/* Rim light from behind for outline */}
       <directionalLight
         position={[0, 3, -8]}
-        intensity={isNight ? 0.25 : 0.2}
+        intensity={isNight ? 0.25 : 0.4}
         color={isNight ? '#6699cc' : '#ffffff'}
       />
 
-      {/* Top-down dim fill to prevent pure black areas */}
+      {/* Top-down fill to prevent pure black areas */}
       <directionalLight
         position={[0, 12, 0]}
-        intensity={isNight ? 0.08 : 0.2}
+        intensity={isNight ? 0.08 : 0.5}
         color={isNight ? '#223355' : '#ffffff'}
       />
 
@@ -752,9 +826,6 @@ export default function ShipLightsViewer3D({ profile, isNight }: ViewerProps) {
           toneMappingExposure: 1.2,
         }}
         style={{ background: isNight ? '#030810' : '#87CEEB' }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(isNight ? '#030810' : '#87CEEB');
-        }}
       >
         <Scene profile={profile} isNight={isNight} />
         <CameraAngleExporter onAngle={setViewAngle} />

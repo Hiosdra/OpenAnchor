@@ -770,7 +770,7 @@ export const shipLightProfiles: ShipLightProfile[] = [
         id: 'mine-ball-mast',
         name: 'Czarna kula (maszt)',
         shape: 'ball',
-        position: [0, 7.5, -2],
+        position: [0, 9.6, -2],
         description: 'Kula na szczycie masztu — element znaku oczyszczania z min.',
       },
       {
