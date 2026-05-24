@@ -31,7 +31,9 @@ export function KnowledgeSection() {
       <Suspense
         fallback={
           <div className="section-card text-center py-12">
-            <div className="text-3xl mb-3 animate-pulse">💡</div>
+            <div className="text-3xl mb-3 animate-pulse">
+              {topic === 'ship-lights' ? '💡' : '📻'}
+            </div>
             <p className="text-white/50">Ładowanie modułu...</p>
           </div>
         }
