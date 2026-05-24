@@ -2,8 +2,9 @@ import React, { Suspense, useState } from 'react';
 import { TypeSelector } from '../TypeSelector';
 
 const ShipLightsSection = React.lazy(() => import('./ship-lights/ShipLightsSection'));
+const VhfSection = React.lazy(() => import('./vhf/VhfSection'));
 
-type KnowledgeTopic = 'ship-lights';
+type KnowledgeTopic = 'ship-lights' | 'vhf';
 
 const topicOptions = [
   {
@@ -11,6 +12,12 @@ const topicOptions = [
     emoji: '💡',
     label: 'Światła statków',
     sublabel: 'Sygnalizacja nawigacyjna',
+  },
+  {
+    value: 'vhf' as KnowledgeTopic,
+    emoji: '📻',
+    label: 'VHF',
+    sublabel: 'Kanały polskie wybrzeże',
   },
 ];
 
@@ -30,6 +37,7 @@ export function KnowledgeSection() {
         }
       >
         {topic === 'ship-lights' && <ShipLightsSection />}
+        {topic === 'vhf' && <VhfSection />}
       </Suspense>
     </>
   );
