@@ -17,7 +17,7 @@ const topicOptions = [
     value: 'vhf' as KnowledgeTopic,
     emoji: '📻',
     label: 'VHF',
-    sublabel: 'Kanały polskie wybrzeże',
+    sublabel: 'Kanały polskiego wybrzeża',
   },
 ];
 
