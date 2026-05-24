@@ -28,9 +28,14 @@ export const vhfGroups: VhfGroup[] = [
     icon: '📡',
     channels: [
       {
-        id: 'yacht-comms',
+        id: 'yacht-comms-72',
         name: 'Między jachtami',
-        channels: '72, 69',
+        channels: '72',
+      },
+      {
+        id: 'yacht-comms-69',
+        name: 'Między jachtami',
+        channels: '69',
         note: 'oprócz Szczecina',
       },
       { id: 'ship-comms', name: 'Między statkami', channels: '6' },
