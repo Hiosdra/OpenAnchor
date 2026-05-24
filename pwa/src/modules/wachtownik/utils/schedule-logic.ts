@@ -160,8 +160,23 @@ export function validateSlotTime(slot: WatchSlot, allSlots: WatchSlot[]): SlotVa
  * Handles ranges that may exceed 1440 (cross-day slots are represented
  * with end > 1440 to indicate wrapping past midnight).
  */
-function rangesOverlap(s1: number, e1: number, s2: number, e2: number): boolean {
-  // If range2 wraps, swap so we only handle wrapping on range1
+export function rangesOverlap(s1: number, e1: number, s2: number, e2: number): boolean {
+  // Both ranges wrap past midnight — split both and check all segment pairs
+  if (e1 > 1440 && e2 > 1440) {
+    // Range1: [s1, 1440) + [0, e1-1440), Range2: [s2, 1440) + [0, e2-1440)
+    const r1a_s = s1, r1a_e = 1440;
+    const r1b_s = 0, r1b_e = e1 - 1440;
+    const r2a_s = s2, r2a_e = 1440;
+    const r2b_s = 0, r2b_e = e2 - 1440;
+    return (
+      (r1a_s < r2a_e && r1a_e > r2a_s) || // [s1,1440) vs [s2,1440)
+      (r1a_s < r2b_e && r1a_e > r2b_s) || // [s1,1440) vs [0,e2-1440)
+      (r1b_s < r2a_e && r1b_e > r2a_s) || // [0,e1-1440) vs [s2,1440)
+      (r1b_s < r2b_e && r1b_e > r2b_s)    // [0,e1-1440) vs [0,e2-1440)
+    );
+  }
+
+  // Only range2 wraps — swap so we handle wrapping on range1
   if (e2 > 1440) {
     return rangesOverlap(s2, e2, s1, e1);
   }

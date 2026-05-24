@@ -114,7 +114,7 @@ export const WATCH_TEMPLATES: Record<string, WatchTemplate> = {
       { start: '21:00', end: '00:00', reqCrew: 2 },
       { start: '00:00', end: '03:00', reqCrew: 2 },
       { start: '03:00', end: '06:00', reqCrew: 2 },
-      // Day: 4-hour watches (06:00-22:00 ≈ 4 watches, last is 3h to align)
+      // Day: 4-hour watches (06:00-21:00 = 3 watches × 4h + 1 bridge × 3h)
       { start: '06:00', end: '10:00', reqCrew: 2 },
       { start: '10:00', end: '14:00', reqCrew: 2 },
       { start: '14:00', end: '18:00', reqCrew: 2 },

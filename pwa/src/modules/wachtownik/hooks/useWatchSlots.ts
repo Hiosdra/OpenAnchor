@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { WatchSlot, CoverageResult, Locale } from '../types';
 import { defaultSlots, WATCH_TEMPLATES, t } from '../constants';
-import { calculateCoverage, isCrossDaySlot } from '../utils/schedule-logic';
+import { calculateCoverage, isCrossDaySlot, rangesOverlap } from '../utils/schedule-logic';
 
 export interface SlotWarning {
   slotId: string;
@@ -63,12 +63,7 @@ export function computeSlotWarnings(slots: WatchSlot[], userLocale: Locale): Slo
           : parseInt(other.end.split(':')[0]) * 60 + parseInt(other.end.split(':')[1]);
       const otherEffectiveEnd = isCrossDaySlot(other) ? otherEnd + 1440 : otherEnd;
 
-      const overlaps = isCrossDaySlot(slot) || isCrossDaySlot(other)
-        ? (startMinutes < otherEffectiveEnd && effectiveEnd > otherStart) ||
-          (startMinutes < otherEnd && effectiveEnd > otherStart)
-        : (startMinutes < otherEnd && endMinutes > otherStart);
-
-      if (overlaps) {
+      if (rangesOverlap(startMinutes, effectiveEnd, otherStart, otherEffectiveEnd)) {
         // Avoid duplicate warnings (only warn from the slot that appears first)
         const alreadyWarned = warnings.some(
           (w) => w.type === 'overlap' && w.slotId === other.id && w.message.includes(slot.start),
@@ -98,6 +93,12 @@ export function useWatchSlots(userLocale: Locale): WatchSlotsReturn {
     },
     [userLocale],
   );
+
+  // Recalculate warnings when locale changes so messages stay in sync
+  useEffect(() => {
+    setSlotWarnings(computeSlotWarnings(slots, userLocale));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userLocale]);
 
   const addSlot = useCallback(() => {
     setSlots((prev) => {
