@@ -98,7 +98,7 @@ export function useWatchSlots(userLocale: Locale): WatchSlotsReturn {
   useEffect(() => {
     setSlotWarnings(computeSlotWarnings(slots, userLocale));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLocale]);
+  }, [userLocale, slots]);
 
   const addSlot = useCallback(() => {
     setSlots((prev) => {
