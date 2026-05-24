@@ -179,7 +179,7 @@ export function SettingsBar({
           <DropdownItem
             onClick={handleExportBlankPDF}
             icon="FileSpreadsheet"
-            label="Drukuj szablon (pusty)"
+            label="Eksportuj szablon PDF"
             isNightMode={isNightMode}
           />
           <DropdownItem

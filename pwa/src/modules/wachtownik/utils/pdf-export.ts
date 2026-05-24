@@ -200,6 +200,10 @@ export function exportBlankScheduleToPDF(
   slots: WatchSlot[],
   userLocale: Locale,
 ): void {
+  if (schedule.length === 0) {
+    return;
+  }
+
   const startDateObj = new Date(startDate);
   const endDateObj = new Date(startDateObj);
   endDateObj.setDate(endDateObj.getDate() + schedule.length - 1);
@@ -220,7 +224,8 @@ export function exportBlankScheduleToPDF(
     align: 'center',
   });
 
-  const slotsSource = schedule[0]?.slots ?? slots;
+  const slotsSource =
+    schedule[0]?.slots && schedule[0].slots.length > 0 ? schedule[0].slots : slots;
 
   const headers = ['Data'];
   slotsSource.forEach((slot) => {
@@ -238,9 +243,9 @@ export function exportBlankScheduleToPDF(
       rowDate.toLocaleDateString(userLocale, { day: '2-digit', month: '2-digit' });
 
     const row = [dateStr];
-    daySchedule.slots.forEach(() => {
+    for (let i = 0; i < slotsSource.length; i++) {
       row.push('');
-    });
+    }
     rows.push(row);
   });
 
