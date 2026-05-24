@@ -62,6 +62,7 @@ function App() {
     applyDogWatches: applyDogWatchesRaw,
     applyTemplate: applyTemplateRaw,
     getCoverage,
+    slotWarnings,
   } = watchSlots;
 
   const engine = useScheduleEngine(crew, slots, captainParticipates);
@@ -351,6 +352,7 @@ function App() {
                 applyDogWatches={applyDogWatches}
                 applyTemplate={applyTemplate}
                 getCoverage={getCoverage}
+                slotWarnings={slotWarnings}
               />
             </div>
 

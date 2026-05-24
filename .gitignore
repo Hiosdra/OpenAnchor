@@ -37,3 +37,4 @@ test-report/
 zeglowanie-fixed.png
 android/build-logic/build/
 android/build-logic/.gradle/
+node_modules/

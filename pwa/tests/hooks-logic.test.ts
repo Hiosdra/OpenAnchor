@@ -5,7 +5,7 @@ import type { CrewMember, WatchSlot, DaySchedule, AbsoluteSlot } from '../src/mo
 import { computeAbsoluteSlots, computeDashboard, computeCrewStats } from '../src/modules/wachtownik/hooks/useScheduleEngine';
 import { snapshotsEqual, pushSnapshot } from '../src/modules/wachtownik/hooks/useUndoRedo';
 import { applyDrop } from '../src/modules/wachtownik/hooks/useDragDrop';
-import { validateSlotTime } from '../src/modules/wachtownik/hooks/useWatchSlots';
+import { computeSlotWarnings } from '../src/modules/wachtownik/hooks/useWatchSlots';
 import { decodeShareHash, loadFromLocalStorage, applyLoadedState } from '../src/modules/wachtownik/hooks/usePersistence';
 import { buildShareUrlLocal } from '../src/modules/wachtownik/hooks/useExportShare';
 import { detectLocale } from '../src/modules/wachtownik/hooks/useAppSettings';
@@ -254,38 +254,36 @@ describe('applyDrop', () => {
 });
 
 // ---------------------------------------------------------------------------
-// validateSlotTime
+// computeSlotWarnings (replaces old validateSlotTime)
 // ---------------------------------------------------------------------------
-describe('validateSlotTime', () => {
-  beforeEach(() => {
-    window.alert = vi.fn();
+describe('computeSlotWarnings', () => {
+  it('returns no warnings for valid non-overlapping slots', () => {
+    const testSlots: WatchSlot[] = [{ id: 's1', start: '06:00', end: '12:00', reqCrew: 1 }];
+    expect(computeSlotWarnings(testSlots, 'pl-PL')).toHaveLength(0);
   });
 
-  it('returns true for valid time change', () => {
-    const testSlots: WatchSlot[] = [{ id: 's1', start: '08:00', end: '12:00', reqCrew: 1 }];
-    expect(validateSlotTime(testSlots, 's1', 'start', '06:00', 'pl-PL')).toBe(true);
+  it('returns cross_day warning when end is before start', () => {
+    const testSlots: WatchSlot[] = [{ id: 's1', start: '08:00', end: '06:00', reqCrew: 1 }];
+    const warnings = computeSlotWarnings(testSlots, 'pl-PL');
+    expect(warnings.some(w => w.type === 'cross_day')).toBe(true);
   });
 
-  it('returns false when end is before start', () => {
-    const testSlots: WatchSlot[] = [{ id: 's1', start: '08:00', end: '12:00', reqCrew: 1 }];
-    expect(validateSlotTime(testSlots, 's1', 'end', '06:00', 'pl-PL')).toBe(false);
-  });
-
-  it('returns false when overlap detected', () => {
+  it('returns overlap warning when slots overlap', () => {
     const testSlots: WatchSlot[] = [
-      { id: 's1', start: '08:00', end: '12:00', reqCrew: 1 },
+      { id: 's1', start: '08:00', end: '16:00', reqCrew: 1 },
       { id: 's2', start: '10:00', end: '14:00', reqCrew: 1 },
     ];
-    expect(validateSlotTime(testSlots, 's1', 'end', '16:00', 'pl-PL')).toBe(false);
+    const warnings = computeSlotWarnings(testSlots, 'pl-PL');
+    expect(warnings.some(w => w.type === 'overlap')).toBe(true);
   });
 
-  it('returns true for non-existent slot id', () => {
-    expect(validateSlotTime([], 'nonexistent', 'start', '08:00', 'pl-PL')).toBe(true);
+  it('returns no warnings for empty slots', () => {
+    expect(computeSlotWarnings([], 'pl-PL')).toHaveLength(0);
   });
 
-  it('allows 24:00 as end time', () => {
-    const testSlots: WatchSlot[] = [{ id: 's1', start: '20:00', end: '22:00', reqCrew: 1 }];
-    expect(validateSlotTime(testSlots, 's1', 'end', '24:00', 'pl-PL')).toBe(true);
+  it('no warning for 24:00 end time', () => {
+    const testSlots: WatchSlot[] = [{ id: 's1', start: '20:00', end: '24:00', reqCrew: 1 }];
+    expect(computeSlotWarnings(testSlots, 'pl-PL')).toHaveLength(0);
   });
 });
 

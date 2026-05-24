@@ -104,6 +104,23 @@ export const WATCH_TEMPLATES: Record<string, WatchTemplate> = {
     optimalCrew: 8,
     slots: generateTimeSlots(0, 2, 12, 3),
   },
+  'night3_day4': {
+    nameKey: 'template.night3day4',
+    descKey: 'template.night3day4.desc',
+    minCrew: 3,
+    optimalCrew: 6,
+    slots: [
+      // Night: 3-hour watches (21:00-06:00 = 3 watches)
+      { start: '21:00', end: '00:00', reqCrew: 2 },
+      { start: '00:00', end: '03:00', reqCrew: 2 },
+      { start: '03:00', end: '06:00', reqCrew: 2 },
+      // Day: 4-hour watches (06:00-21:00 = 3 watches × 4h + 1 bridge × 3h)
+      { start: '06:00', end: '10:00', reqCrew: 2 },
+      { start: '10:00', end: '14:00', reqCrew: 2 },
+      { start: '14:00', end: '18:00', reqCrew: 2 },
+      { start: '18:00', end: '21:00', reqCrew: 2 },
+    ],
+  },
 };
 
 export const translations: Record<Locale, Record<string, string>> = {
@@ -185,6 +202,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'msg.generateFirst': 'Wygeneruj harmonogram, aby zobaczyć wykres Gantta',
     'msg.noData': 'Brak danych',
     'msg.endAfterStart': 'Czas końca wachty musi być później niż czas rozpoczęcia.',
+    'msg.crossDaySlot': 'Wachta przechodzi przez północ (cross-dniowa).',
     'msg.watchOverlap': 'Wachta nakłada się z inną wachtą. Sprawdź godziny.',
     'msg.dogWatchesApplied': 'Dodano psie wachty (16-18 i 18-20)',
     'msg.dogWatchesNotApplicable': 'Nie można dodać psich wacht. Wymaga wachty 16:00-20:00.',
@@ -230,6 +248,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'template.swedish.desc': '5 wacht: 2×6h + 3×4h',
     'template.racing': 'System regatowy (12 wacht × 2h)',
     'template.racing.desc': 'Krótkie, intensywne wachty dla regat',
+    'template.night3day4': 'Noc 3h / Dzień 4h (7 wacht)',
+    'template.night3day4.desc': 'Krótsze wachty nocne (3h) i dłuższe dzienne (4h)',
     'template.traditional': 'tradycyjny',
     'template.traditional.desc': 'System tradycyjny - 6 wacht po 4 godziny',
     'template.long': 'Długie wachty',
@@ -334,6 +354,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'msg.generateFirst': 'Generate a schedule to see the Gantt chart',
     'msg.noData': 'No data',
     'msg.endAfterStart': 'End time must be after start time.',
+    'msg.crossDaySlot': 'Watch crosses midnight (cross-day).',
     'msg.watchOverlap': 'Watch overlaps with another watch. Check the times.',
     'msg.dogWatchesApplied': 'Dog watches added (16-18 and 18-20)',
     'msg.dogWatchesNotApplicable': 'Cannot add dog watches. Requires a 16:00-20:00 watch.',
@@ -378,6 +399,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'template.swedish.desc': '5 watches: 2×6h + 3×4h',
     'template.racing': 'Racing system (12 watches × 2h)',
     'template.racing.desc': 'Short, intensive watches for racing',
+    'template.night3day4': 'Night 3h / Day 4h (7 watches)',
+    'template.night3day4.desc': 'Shorter night watches (3h) and longer day watches (4h)',
     'template.traditional': 'traditional',
     'template.traditional.desc': 'Traditional system - 6 watches of 4 hours each',
     'template.long': 'Long watches',

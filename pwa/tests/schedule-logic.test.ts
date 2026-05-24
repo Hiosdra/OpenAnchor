@@ -112,14 +112,15 @@ describe('validateSlotTime', () => {
     expect(result.valid).toBe(true);
   });
 
-  it('rejects end before start', () => {
+  it('allows end before start as cross-day slot (with warning)', () => {
     const slot: WatchSlot = { id: 'x', start: '12:00', end: '08:00', reqCrew: 1 };
     const result = validateSlotTime(slot, [slot]);
-    expect(result.valid).toBe(false);
-    expect(result.error).toBe('end_before_start');
+    expect(result.valid).toBe(true);
+    expect(result.warnings).toBeDefined();
+    expect(result.warnings!.some(w => w.type === 'cross_day')).toBe(true);
   });
 
-  it('rejects same start and end', () => {
+  it('rejects same start and end (zero-length)', () => {
     const slot: WatchSlot = { id: 'x', start: '10:00', end: '10:00', reqCrew: 1 };
     const result = validateSlotTime(slot, [slot]);
     expect(result.valid).toBe(false);
@@ -132,13 +133,14 @@ describe('validateSlotTime', () => {
     expect(result.valid).toBe(true);
   });
 
-  it('detects overlap with another slot', () => {
+  it('returns overlap as warning (not blocking)', () => {
     const slot: WatchSlot = { id: 'x', start: '06:00', end: '14:00', reqCrew: 1 };
     const other: WatchSlot = { id: 'y', start: '10:00', end: '18:00', reqCrew: 1 };
     const result = validateSlotTime(slot, [slot, other]);
-    expect(result.valid).toBe(false);
-    expect(result.error).toBe('overlap');
-    expect(result.overlappingSlot?.id).toBe('y');
+    expect(result.valid).toBe(true);
+    expect(result.warnings).toBeDefined();
+    expect(result.warnings!.some(w => w.type === 'overlap')).toBe(true);
+    expect(result.warnings!.find(w => w.type === 'overlap')?.overlappingSlot?.id).toBe('y');
   });
 
   it('does not flag itself as overlapping', () => {
@@ -154,12 +156,13 @@ describe('validateSlotTime', () => {
     expect(result.valid).toBe(true);
   });
 
-  it('detects partial overlap at start boundary', () => {
+  it('detects partial overlap at start boundary (as warning)', () => {
     const slot: WatchSlot = { id: 'a', start: '06:00', end: '10:00', reqCrew: 1 };
     const other: WatchSlot = { id: 'b', start: '09:00', end: '12:00', reqCrew: 1 };
     const result = validateSlotTime(slot, [slot, other]);
-    expect(result.valid).toBe(false);
-    expect(result.error).toBe('overlap');
+    expect(result.valid).toBe(true);
+    expect(result.warnings).toBeDefined();
+    expect(result.warnings!.some(w => w.type === 'overlap')).toBe(true);
   });
 });
 
