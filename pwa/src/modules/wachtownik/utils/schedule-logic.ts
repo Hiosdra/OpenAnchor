@@ -21,7 +21,14 @@ import { WATCH_TEMPLATES } from '../constants';
 
 export interface SlotValidationResult {
   valid: boolean;
+  warnings?: SlotValidationWarning[];
   error?: 'end_before_start' | 'overlap';
+  overlappingSlot?: WatchSlot;
+}
+
+export interface SlotValidationWarning {
+  type: 'cross_day' | 'overlap';
+  message?: string;
   overlappingSlot?: WatchSlot;
 }
 
@@ -77,36 +84,89 @@ export function calculateRestHours(endTime: string, startTime: string): number {
 // ---------------------------------------------------------------------------
 
 /**
+ * Check if a slot crosses midnight (end time is earlier than start time).
+ */
+export function isCrossDaySlot(slot: { start: string; end: string }): boolean {
+  const startMinutes = timeToMinutes(slot.start);
+  const endMinutes = timeToMinutes(slot.end);
+  return endMinutes <= startMinutes && slot.end !== '24:00' && slot.start !== slot.end;
+}
+
+/**
+ * Get the effective end minutes for a slot, accounting for cross-day slots.
+ * Cross-day slots (e.g. 23:00-01:00) have their end interpreted as next day.
+ */
+function getEffectiveEndMinutes(slot: { start: string; end: string }): number {
+  const startMinutes = timeToMinutes(slot.start);
+  const endMinutes = timeToMinutes(slot.end);
+  if (endMinutes <= startMinutes && slot.end !== '24:00' && slot.start !== slot.end) {
+    return endMinutes + 1440; // next day
+  }
+  return endMinutes;
+}
+
+/**
  * Validate a single watch slot against all other slots.
  *
- * Checks:
- * 1. End time must be after start time (unless end is "24:00").
- * 2. The slot must not overlap with any other slot.
+ * Cross-day slots (end time < start time, e.g. 23:00 → 01:00) are valid and
+ * represent watches that cross midnight. Instead of blocking the user, this
+ * function returns warnings that can be displayed as an info banner.
  *
  * Returns a result object instead of calling `alert()` so the caller can
- * decide how to present the error.
+ * decide how to present the warning.
  */
 export function validateSlotTime(slot: WatchSlot, allSlots: WatchSlot[]): SlotValidationResult {
   const startMinutes = timeToMinutes(slot.start);
   const endMinutes = timeToMinutes(slot.end);
+  const warnings: SlotValidationWarning[] = [];
 
-  // end must be after start
-  if (endMinutes <= startMinutes && slot.end !== '24:00') {
+  // Cross-day slot detection — valid but noteworthy
+  const crossDay = isCrossDaySlot(slot);
+  if (crossDay) {
+    warnings.push({ type: 'cross_day' });
+  }
+
+  // Same start and end (zero-length slot) is still invalid
+  if (slot.start === slot.end) {
     return { valid: false, error: 'end_before_start' };
   }
 
   // overlap check against every *other* slot
   const otherSlots = allSlots.filter((s) => s.id !== slot.id);
+  const effectiveEnd = getEffectiveEndMinutes(slot);
+
   for (const other of otherSlots) {
     const otherStart = timeToMinutes(other.start);
-    const otherEnd = timeToMinutes(other.end);
+    const otherEffectiveEnd = getEffectiveEndMinutes(other);
 
-    if (startMinutes < otherEnd && endMinutes > otherStart) {
-      return { valid: false, error: 'overlap', overlappingSlot: other };
+    // Check overlap considering cross-day wrapping
+    if (crossDay || isCrossDaySlot(other)) {
+      // For cross-day slots, check if ranges overlap modulo 1440
+      if (rangesOverlap(startMinutes, effectiveEnd, otherStart, otherEffectiveEnd)) {
+        warnings.push({ type: 'overlap', overlappingSlot: other });
+      }
+    } else {
+      if (startMinutes < otherEffectiveEnd && endMinutes > otherStart) {
+        warnings.push({ type: 'overlap', overlappingSlot: other });
+      }
     }
   }
 
-  return { valid: true };
+  return { valid: true, warnings: warnings.length > 0 ? warnings : undefined };
+}
+
+/** Check if two time ranges overlap (handles ranges that may exceed 1440). */
+function rangesOverlap(s1: number, e1: number, s2: number, e2: number): boolean {
+  // Normalize: if either range wraps past 1440, expand it
+  // Range 1: [s1, e1), Range 2: [s2, e2)
+  if (e1 > 1440) {
+    // Split range1 into [s1, 1440) and [0, e1-1440)
+    return (s1 < e2 && e1 > s2) || (0 < e2 && (e1 - 1440) > s2) || (s1 < (e2 > 1440 ? e2 : e2 + 1440) && 1440 > s2);
+  }
+  if (e2 > 1440) {
+    return rangesOverlap(s2, e2, s1, e1);
+  }
+  return s1 < e2 && e1 > s2;
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +176,7 @@ export function validateSlotTime(slot: WatchSlot, allSlots: WatchSlot[]): SlotVa
 /**
  * Analyse 24-hour coverage from a set of watch slots.
  * Uses a 1 440-element boolean array (one per minute of the day).
+ * Supports cross-day slots (end < start means the slot wraps past midnight).
  */
 export function calculateCoverage(slots: WatchSlot[]): CoverageResult {
   if (slots.length === 0) return { totalMinutes: 0, gaps: [], hasFull24h: false };
@@ -125,7 +186,14 @@ export function calculateCoverage(slots: WatchSlot[]): CoverageResult {
   for (const slot of slots) {
     const start = timeToMinutes(slot.start);
     const end = timeToMinutes(slot.end);
-    for (let i = start; i < end; i++) coverage[i] = true;
+
+    if (isCrossDaySlot(slot)) {
+      // Cross-day: covers [start, 1440) and [0, end)
+      for (let i = start; i < 1440; i++) coverage[i] = true;
+      for (let i = 0; i < end; i++) coverage[i] = true;
+    } else {
+      for (let i = start; i < end; i++) coverage[i] = true;
+    }
   }
 
   const totalMinutes = coverage.filter(Boolean).length;

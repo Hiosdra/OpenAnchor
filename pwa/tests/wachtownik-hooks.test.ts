@@ -11,7 +11,7 @@ import {
   type UndoRedoSnapshot,
   type UndoRedoSetters,
 } from '../src/modules/wachtownik/hooks/useUndoRedo';
-import { useWatchSlots, validateSlotTime } from '../src/modules/wachtownik/hooks/useWatchSlots';
+import { useWatchSlots, computeSlotWarnings } from '../src/modules/wachtownik/hooks/useWatchSlots';
 import {
   useKeyboardShortcuts,
   useNotifications,
@@ -570,12 +570,12 @@ describe('useWatchSlots', () => {
         result.current.updateSlot('x1', 'end', '06:00');
       });
 
-      // Should not update
-      expect(result.current.slots[0].end).toBe('12:00');
-      expect(window.alert).toHaveBeenCalled();
+      // Now allows cross-day changes (no blocking), just produces warnings
+      expect(result.current.slots[0].end).toBe('06:00');
+      expect(result.current.slotWarnings.some(w => w.type === 'cross_day')).toBe(true);
     });
 
-    it('rejects overlapping time changes', () => {
+    it('allows overlapping time changes with warning', () => {
       const { result } = renderHook(() => useWatchSlots('pl-PL'));
 
       act(() => {
@@ -585,13 +585,13 @@ describe('useWatchSlots', () => {
         ]);
       });
 
-      // Try to extend x1 end to overlap with x2
+      // Extend x1 end to overlap with x2
       act(() => {
         result.current.updateSlot('x1', 'end', '12:00');
       });
 
-      expect(result.current.slots[0].end).toBe('08:00'); // unchanged
-      expect(window.alert).toHaveBeenCalled();
+      expect(result.current.slots[0].end).toBe('12:00'); // change is accepted
+      expect(result.current.slotWarnings.some(w => w.type === 'overlap')).toBe(true);
     });
 
     it('allows 24:00 as end time', () => {
@@ -721,40 +721,37 @@ describe('useWatchSlots', () => {
 });
 
 // ===========================================================================
-// validateSlotTime — additional edge cases
+// computeSlotWarnings — additional edge cases
 // ===========================================================================
-describe('validateSlotTime (extended)', () => {
-  beforeEach(() => {
-    window.alert = vi.fn();
+describe('computeSlotWarnings (extended)', () => {
+  it('produces cross_day warning with en-US locale', () => {
+    const testSlots: WatchSlot[] = [{ id: 's1', start: '08:00', end: '06:00', reqCrew: 1 }];
+    const warnings = computeSlotWarnings(testSlots, 'en-US');
+    expect(warnings.some(w => w.type === 'cross_day')).toBe(true);
   });
 
-  it('validates with en-US locale', () => {
-    const testSlots: WatchSlot[] = [{ id: 's1', start: '08:00', end: '12:00', reqCrew: 1 }];
-    expect(validateSlotTime(testSlots, 's1', 'end', '06:00', 'en-US')).toBe(false);
-    expect(window.alert).toHaveBeenCalled();
+  it('no warnings when end is 24:00', () => {
+    const testSlots: WatchSlot[] = [{ id: 's1', start: '00:00', end: '24:00', reqCrew: 1 }];
+    const warnings = computeSlotWarnings(testSlots, 'pl-PL');
+    expect(warnings).toHaveLength(0);
   });
 
-  it('returns true when start equals end at 24:00', () => {
-    const testSlots: WatchSlot[] = [{ id: 's1', start: '00:00', end: '04:00', reqCrew: 1 }];
-    expect(validateSlotTime(testSlots, 's1', 'end', '24:00', 'pl-PL')).toBe(true);
-  });
-
-  it('handles adjacent (non-overlapping) slots', () => {
+  it('no warnings for adjacent (non-overlapping) slots', () => {
     const testSlots: WatchSlot[] = [
       { id: 's1', start: '00:00', end: '08:00', reqCrew: 1 },
       { id: 's2', start: '08:00', end: '16:00', reqCrew: 1 },
     ];
-    // Change s1 end to exactly meet s2 start — should not overlap
-    expect(validateSlotTime(testSlots, 's1', 'end', '08:00', 'pl-PL')).toBe(true);
+    const warnings = computeSlotWarnings(testSlots, 'pl-PL');
+    expect(warnings).toHaveLength(0);
   });
 
-  it('detects overlap with 24:00 end on other slot', () => {
+  it('detects overlap when other slot ends at 24:00', () => {
     const testSlots: WatchSlot[] = [
       { id: 's1', start: '20:00', end: '24:00', reqCrew: 1 },
-      { id: 's2', start: '18:00', end: '19:00', reqCrew: 1 },
+      { id: 's2', start: '18:00', end: '22:00', reqCrew: 1 },
     ];
-    // Try to extend s2 end into s1's range
-    expect(validateSlotTime(testSlots, 's2', 'end', '22:00', 'pl-PL')).toBe(false);
+    const warnings = computeSlotWarnings(testSlots, 'pl-PL');
+    expect(warnings.some(w => w.type === 'overlap')).toBe(true);
   });
 });
 

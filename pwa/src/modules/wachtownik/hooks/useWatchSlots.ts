@@ -1,7 +1,13 @@
 import { useState, useCallback } from 'react';
 import type { WatchSlot, CoverageResult, Locale } from '../types';
 import { defaultSlots, WATCH_TEMPLATES, t } from '../constants';
-import { calculateCoverage } from '../utils/schedule-logic';
+import { calculateCoverage, isCrossDaySlot } from '../utils/schedule-logic';
+
+export interface SlotWarning {
+  slotId: string;
+  type: 'cross_day' | 'overlap';
+  message: string;
+}
 
 export interface WatchSlotsReturn {
   slots: WatchSlot[];
@@ -15,83 +21,120 @@ export interface WatchSlotsReturn {
   ) => void;
   applyTemplate: (templateKey: string) => void;
   getCoverage: () => CoverageResult;
+  slotWarnings: SlotWarning[];
 }
 
-export function validateSlotTime(
-  slots: WatchSlot[],
-  id: string,
-  field: string,
-  value: string,
-  userLocale: Locale,
-): boolean {
-  const slot = slots.find((s) => s.id === id);
-  if (!slot) return true;
+/**
+ * Compute validation warnings for the current set of slots.
+ * This does NOT block the user from making changes — it just produces
+ * informational warnings to display as a banner.
+ */
+export function computeSlotWarnings(slots: WatchSlot[], userLocale: Locale): SlotWarning[] {
+  const warnings: SlotWarning[] = [];
 
-  const newSlot = { ...slot, [field]: value };
+  for (const slot of slots) {
+    if (!slot.start || !slot.end) continue;
 
-  if (newSlot.start && newSlot.end) {
-    const startMinutes =
-      parseInt(newSlot.start.split(':')[0]) * 60 + parseInt(newSlot.start.split(':')[1]);
-    const endMinutes =
-      newSlot.end === '24:00'
-        ? 1440
-        : parseInt(newSlot.end.split(':')[0]) * 60 + parseInt(newSlot.end.split(':')[1]);
-
-    if (endMinutes <= startMinutes && newSlot.end !== '24:00') {
-      alert(t('msg.endAfterStart', userLocale));
-      return false;
+    // Cross-day warning
+    if (isCrossDaySlot(slot)) {
+      warnings.push({
+        slotId: slot.id,
+        type: 'cross_day',
+        message: `${slot.start}-${slot.end}: ${t('msg.crossDaySlot', userLocale)}`,
+      });
     }
 
-    const otherSlots = slots.filter((s) => s.id !== id);
-    for (const otherSlot of otherSlots) {
-      const otherStartMinutes =
-        parseInt(otherSlot.start.split(':')[0]) * 60 + parseInt(otherSlot.start.split(':')[1]);
-      const otherEndMinutes =
-        otherSlot.end === '24:00'
-          ? 1440
-          : parseInt(otherSlot.end.split(':')[0]) * 60 + parseInt(otherSlot.end.split(':')[1]);
+    // Overlap warning
+    const startMinutes =
+      parseInt(slot.start.split(':')[0]) * 60 + parseInt(slot.start.split(':')[1]);
+    const endMinutes =
+      slot.end === '24:00'
+        ? 1440
+        : parseInt(slot.end.split(':')[0]) * 60 + parseInt(slot.end.split(':')[1]);
+    const effectiveEnd = isCrossDaySlot(slot) ? endMinutes + 1440 : endMinutes;
 
-      if (startMinutes < otherEndMinutes && endMinutes > otherStartMinutes) {
-        alert(`${t('msg.watchOverlap', userLocale)} (${otherSlot.start} - ${otherSlot.end})`);
-        return false;
+    const otherSlots = slots.filter((s) => s.id !== slot.id);
+    for (const other of otherSlots) {
+      const otherStart =
+        parseInt(other.start.split(':')[0]) * 60 + parseInt(other.start.split(':')[1]);
+      const otherEnd =
+        other.end === '24:00'
+          ? 1440
+          : parseInt(other.end.split(':')[0]) * 60 + parseInt(other.end.split(':')[1]);
+      const otherEffectiveEnd = isCrossDaySlot(other) ? otherEnd + 1440 : otherEnd;
+
+      const overlaps = isCrossDaySlot(slot) || isCrossDaySlot(other)
+        ? (startMinutes < otherEffectiveEnd && effectiveEnd > otherStart) ||
+          (startMinutes < otherEnd && effectiveEnd > otherStart)
+        : (startMinutes < otherEnd && endMinutes > otherStart);
+
+      if (overlaps) {
+        // Avoid duplicate warnings (only warn from the slot that appears first)
+        const alreadyWarned = warnings.some(
+          (w) => w.type === 'overlap' && w.slotId === other.id && w.message.includes(slot.start),
+        );
+        if (!alreadyWarned) {
+          warnings.push({
+            slotId: slot.id,
+            type: 'overlap',
+            message: `${slot.start}-${slot.end}: ${t('msg.watchOverlap', userLocale)} (${other.start}-${other.end})`,
+          });
+        }
+        break;
       }
     }
   }
 
-  return true;
+  return warnings;
 }
 
 export function useWatchSlots(userLocale: Locale): WatchSlotsReturn {
   const [slots, setSlots] = useState<WatchSlot[]>(defaultSlots);
+  const [slotWarnings, setSlotWarnings] = useState<SlotWarning[]>([]);
+
+  const recalcWarnings = useCallback(
+    (newSlots: WatchSlot[]) => {
+      setSlotWarnings(computeSlotWarnings(newSlots, userLocale));
+    },
+    [userLocale],
+  );
 
   const addSlot = useCallback(() => {
-    setSlots((prev) => [
-      ...prev,
-      {
-        id: Math.random().toString(36).slice(2, 11),
-        start: '12:00',
-        end: '16:00',
-        reqCrew: 1,
-      },
-    ]);
-  }, []);
+    setSlots((prev) => {
+      const newSlots = [
+        ...prev,
+        {
+          id: Math.random().toString(36).slice(2, 11),
+          start: '12:00',
+          end: '16:00',
+          reqCrew: 1,
+        },
+      ];
+      recalcWarnings(newSlots);
+      return newSlots;
+    });
+  }, [recalcWarnings]);
 
-  const removeSlot = useCallback((id: string) => {
-    setSlots((prev) => prev.filter((s) => s.id !== id));
-  }, []);
+  const removeSlot = useCallback(
+    (id: string) => {
+      setSlots((prev) => {
+        const newSlots = prev.filter((s) => s.id !== id);
+        recalcWarnings(newSlots);
+        return newSlots;
+      });
+    },
+    [recalcWarnings],
+  );
 
   const updateSlot = useCallback(
     (id: string, field: string, value: string | number) => {
-      if (field === 'start' || field === 'end') {
-        setSlots((prev) => {
-          if (!validateSlotTime(prev, id, field, value as string, userLocale)) return prev;
-          return prev.map((s) => (s.id === id ? { ...s, [field]: value } : s));
-        });
-      } else {
-        setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
-      }
+      setSlots((prev) => {
+        const newSlots = prev.map((s) => (s.id === id ? { ...s, [field]: value } : s));
+        recalcWarnings(newSlots);
+        return newSlots;
+      });
     },
-    [userLocale],
+    [recalcWarnings],
   );
 
   const applyDogWatches = useCallback(
@@ -114,34 +157,39 @@ export function useWatchSlots(userLocale: Locale): WatchSlotsReturn {
         });
 
         showToast(t('msg.dogWatchesApplied', _userLocale), 'success');
+        recalcWarnings(newSlots);
         return newSlots;
       });
     },
-    [],
+    [recalcWarnings],
   );
 
-  const applyTemplate = useCallback((templateKey: string) => {
-    const template = WATCH_TEMPLATES[templateKey];
-    if (template) {
-      const newSlots = template.slots.map((slot) => ({
-        id: Math.random().toString(36).slice(2, 11),
-        ...slot,
-      }));
-      setSlots(newSlots);
+  const applyTemplate = useCallback(
+    (templateKey: string) => {
+      const template = WATCH_TEMPLATES[templateKey];
+      if (template) {
+        const newSlots = template.slots.map((slot) => ({
+          id: Math.random().toString(36).slice(2, 11),
+          ...slot,
+        }));
+        setSlots(newSlots);
+        recalcWarnings(newSlots);
 
-      requestAnimationFrame(() => {
-        const slotsSection = document.getElementById('slots-configuration');
-        if (slotsSection) {
-          const prefersReducedMotion =
-            window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          slotsSection.scrollIntoView({
-            behavior: prefersReducedMotion ? 'auto' : 'smooth',
-            block: 'nearest',
-          });
-        }
-      });
-    }
-  }, []);
+        requestAnimationFrame(() => {
+          const slotsSection = document.getElementById('slots-configuration');
+          if (slotsSection) {
+            const prefersReducedMotion =
+              window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            slotsSection.scrollIntoView({
+              behavior: prefersReducedMotion ? 'auto' : 'smooth',
+              block: 'nearest',
+            });
+          }
+        });
+      }
+    },
+    [recalcWarnings],
+  );
 
   const getCoverage = useCallback(() => calculateCoverage(slots), [slots]);
 
@@ -154,5 +202,6 @@ export function useWatchSlots(userLocale: Locale): WatchSlotsReturn {
     applyDogWatches,
     applyTemplate,
     getCoverage,
+    slotWarnings,
   };
 }

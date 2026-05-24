@@ -2,6 +2,7 @@ import React from 'react';
 import { Icon } from './Icon';
 import { WATCH_TEMPLATES, t } from '../constants';
 import type { WatchSlot, Recommendation, CoverageResult, Locale } from '../types';
+import type { SlotWarning } from '../hooks/useWatchSlots';
 
 interface WatchSlotsPanelProps {
   isNightMode: boolean;
@@ -14,6 +15,7 @@ interface WatchSlotsPanelProps {
   applyDogWatches: () => void;
   applyTemplate: (key: string) => void;
   getCoverage: () => CoverageResult;
+  slotWarnings?: SlotWarning[];
 }
 
 export function WatchSlotsPanel({
@@ -27,6 +29,7 @@ export function WatchSlotsPanel({
   applyDogWatches,
   applyTemplate,
   getCoverage,
+  slotWarnings,
 }: WatchSlotsPanelProps) {
   return (
     <div
@@ -256,6 +259,24 @@ export function WatchSlotsPanel({
             </div>
           );
         })()}
+
+      {/* Validation warnings banner */}
+      {slotWarnings && slotWarnings.length > 0 && (
+        <div
+          className={`mb-4 p-3 rounded-lg border ${isNightMode ? 'bg-yellow-950/30 border-yellow-800 text-yellow-500' : 'bg-amber-50 border-amber-200 text-amber-800'}`}
+          role="alert"
+          data-testid="slot-warnings-banner"
+        >
+          <div className="flex items-start space-x-2">
+            <Icon name="AlertTriangle" className="w-4 h-4 mt-0.5 shrink-0" />
+            <div className="text-xs space-y-1">
+              {slotWarnings.map((warning, idx) => (
+                <p key={idx}>{warning.message}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile card view for slots */}
       <div className="sm:hidden space-y-3 mb-4" id="slots-configuration">
