@@ -160,6 +160,7 @@ function App() {
     downloadICS,
     handlePrint,
     handleExportPDF,
+    handleExportBlankPDF,
     handleExportConfig,
     handleImportConfig,
     handleShare,
@@ -226,6 +227,7 @@ function App() {
         handleExportConfig={handleExportConfig}
         handleImportConfig={handleImportConfig}
         handleExportPDF={handleExportPDF}
+        handleExportBlankPDF={handleExportBlankPDF}
         handlePrint={handlePrint}
       />
 
