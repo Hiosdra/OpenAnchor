@@ -32,6 +32,7 @@ import {
   BarChart3,
   TrendingUp,
   ChevronDown,
+  FileSpreadsheet,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 
@@ -68,6 +69,7 @@ const iconMap: Record<string, React.ComponentType<LucideProps>> = {
   BarChart3,
   TrendingUp,
   ChevronDown,
+  FileSpreadsheet,
 };
 
 interface IconProps extends LucideProps {

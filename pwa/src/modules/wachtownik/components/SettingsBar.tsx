@@ -19,6 +19,7 @@ interface SettingsBarProps {
   handleExportConfig: () => void;
   handleImportConfig: () => void;
   handleExportPDF: () => void;
+  handleExportBlankPDF: () => void;
   handlePrint: () => void;
 }
 
@@ -37,6 +38,7 @@ export function SettingsBar({
   handleExportConfig,
   handleImportConfig,
   handleExportPDF,
+  handleExportBlankPDF,
   handlePrint,
 }: SettingsBarProps) {
   return (
@@ -172,6 +174,12 @@ export function SettingsBar({
             onClick={handleExportPDF}
             icon="Download"
             label="Eksportuj PDF"
+            isNightMode={isNightMode}
+          />
+          <DropdownItem
+            onClick={handleExportBlankPDF}
+            icon="FileSpreadsheet"
+            label="Drukuj szablon (pusty)"
             isNightMode={isNightMode}
           />
           <DropdownItem

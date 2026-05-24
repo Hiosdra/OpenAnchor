@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import LZString from 'lz-string';
 import type { CrewMember, DaySchedule, DashboardData, CrewStat, Locale, AppState } from '../types';
 import { t } from '../constants';
-import { exportScheduleToPDF } from '../utils/pdf-export';
+import { exportScheduleToPDF, exportBlankScheduleToPDF } from '../utils/pdf-export';
 import { generateICSContent } from '../utils/ics-export';
 import { generateQRCode } from '../utils/qr-utils';
 
@@ -16,6 +16,7 @@ export interface ExportShareReturn {
   downloadICS: (person: CrewMember) => void;
   handlePrint: () => void;
   handleExportPDF: () => void;
+  handleExportBlankPDF: () => void;
   handleExportConfig: () => void;
   handleImportConfig: () => void;
   handleShare: (readOnly?: boolean) => void;
@@ -132,6 +133,26 @@ export function useExportShare(
       alert('Błąd podczas eksportowania do PDF. Spróbuj ponownie.');
     }
   }, [appState, crewStats, dashboardData, userLocale, showToast]);
+
+  const handleExportBlankPDF = useCallback(() => {
+    if (!appState.isGenerated || appState.schedule.length === 0) {
+      alert('Najpierw wygeneruj grafik, aby wyeksportować szablon PDF.');
+      return;
+    }
+
+    try {
+      exportBlankScheduleToPDF(
+        appState.schedule,
+        appState.startDate,
+        appState.slots,
+        userLocale,
+      );
+      showToast('Szablon PDF wyeksportowany pomyślnie!');
+    } catch (error) {
+      console.error('Blank PDF export error:', error);
+      alert('Błąd podczas eksportowania szablonu PDF. Spróbuj ponownie.');
+    }
+  }, [appState, userLocale, showToast]);
 
   const handleExportConfig = useCallback(() => {
     try {
@@ -266,6 +287,7 @@ export function useExportShare(
     downloadICS,
     handlePrint,
     handleExportPDF,
+    handleExportBlankPDF,
     handleExportConfig,
     handleImportConfig,
     handleShare,
