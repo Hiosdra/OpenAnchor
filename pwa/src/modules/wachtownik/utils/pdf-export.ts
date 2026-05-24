@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 import type { DaySchedule, CrewStat, DashboardData, Locale, WatchSlot } from '../types';
 import { t } from '../constants';
@@ -73,7 +73,7 @@ export function exportScheduleToPDF(
   const slotColWidth = Math.max(25, (tableWidth - dateColWidth) / numSlots);
   void slotColWidth; // used implicitly by autoTable auto-sizing
 
-  (doc as unknown as { autoTable: (opts: unknown) => void }).autoTable({
+  autoTable(doc, {
     head: [headers],
     body: rows,
     startY: 28,
@@ -146,7 +146,7 @@ export function exportScheduleToPDF(
         ];
       });
 
-    (doc as unknown as { autoTable: (opts: unknown) => void }).autoTable({
+    autoTable(doc, {
       head: [statsHeaders],
       body: statsRows,
       startY: statsStartY + 5,
@@ -255,7 +255,7 @@ export function exportBlankScheduleToPDF(
   const slotColWidth = Math.max(25, (tableWidth - dateColWidth) / numSlots);
   void slotColWidth;
 
-  (doc as unknown as { autoTable: (opts: unknown) => void }).autoTable({
+  autoTable(doc, {
     head: [headers],
     body: rows,
     startY: 28,
