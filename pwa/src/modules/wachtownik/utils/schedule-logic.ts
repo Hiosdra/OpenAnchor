@@ -155,17 +155,25 @@ export function validateSlotTime(slot: WatchSlot, allSlots: WatchSlot[]): SlotVa
   return { valid: true, warnings: warnings.length > 0 ? warnings : undefined };
 }
 
-/** Check if two time ranges overlap (handles ranges that may exceed 1440). */
+/**
+ * Check if two time ranges overlap.
+ * Handles ranges that may exceed 1440 (cross-day slots are represented
+ * with end > 1440 to indicate wrapping past midnight).
+ */
 function rangesOverlap(s1: number, e1: number, s2: number, e2: number): boolean {
-  // Normalize: if either range wraps past 1440, expand it
-  // Range 1: [s1, e1), Range 2: [s2, e2)
-  if (e1 > 1440) {
-    // Split range1 into [s1, 1440) and [0, e1-1440)
-    return (s1 < e2 && e1 > s2) || (0 < e2 && (e1 - 1440) > s2) || (s1 < (e2 > 1440 ? e2 : e2 + 1440) && 1440 > s2);
-  }
+  // If range2 wraps, swap so we only handle wrapping on range1
   if (e2 > 1440) {
     return rangesOverlap(s2, e2, s1, e1);
   }
+
+  if (e1 > 1440) {
+    // Range1 wraps past midnight: split into [s1, 1440) and [0, e1-1440)
+    const firstPartOverlaps = s1 < e2 && 1440 > s2; // [s1, 1440) vs [s2, e2)
+    const secondPartOverlaps = 0 < e2 && (e1 - 1440) > s2; // [0, e1-1440) vs [s2, e2)
+    return firstPartOverlaps || secondPartOverlaps;
+  }
+
+  // Normal case: both ranges are within a single day
   return s1 < e2 && e1 > s2;
 }
 
