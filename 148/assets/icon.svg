@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="512" height="512">
+    <!-- Deep blue background -->
+    <rect x="-4" y="-4" width="32" height="32" rx="6" fill="#0f172a" />
+    
+    <!-- Safe Zone Area -->
+    <circle cx="12" cy="12" r="9.5" fill="#3b82f6" fill-opacity="0.15" />
+    
+    <!-- Radar Ring -->
+    <circle cx="12" cy="12" r="6" fill="none" stroke="#1e293b" stroke-width="0.5" />
+    
+    <!-- Alert Boundary -->
+    <circle cx="12" cy="12" r="9.5" fill="none" stroke="#3b82f6" stroke-width="0.6" stroke-dasharray="1.5 1" />
+    
+    <!-- Anchor -->
+    <path d="M12 20.5V7.5" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M5.5 11.5H3a9 9 0 0 0 18 0h-2.5" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M9.5 11.5v1.5a2.5 2.5 0 0 0 5 0v-1.5" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="12" cy="4.5" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
