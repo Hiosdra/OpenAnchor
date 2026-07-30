@@ -84,6 +84,11 @@ describe('router', () => {
       window.location.hash = '#/wachtownik';
       expect(getHashPath()).toBe('/wachtownik');
     });
+
+    it('normalizes a hash without a slash', () => {
+      window.location.hash = '#anchor';
+      expect(getHashPath()).toBe('/anchor');
+    });
   });
 
   // ─── initRouter ───────────────────────────────────────────────────
@@ -154,6 +159,50 @@ describe('router', () => {
       expect(cfg.outlet.style.display).not.toBe('none');
       expect(cfg.dashboardEl.style.display).toBe('none');
       expect(cfg.outlet.querySelector('#spa-root')).toBeTruthy();
+    });
+
+    it('keeps the default title when a route has no title', async () => {
+      document.title = 'OpenAnchor';
+      const cfg = makeConfig([{ path: '/plain', loader: () => Promise.resolve(fakeModule()) }]);
+      destroy = initRouter(cfg);
+      await navigateTo('/plain');
+      expect(document.title).toBe('OpenAnchor');
+    });
+
+    it('ignores a stale module result after navigating elsewhere', async () => {
+      let resolveLoader!: (module: ModuleMount) => void;
+      const cfg = makeConfig([
+        {
+          path: '/slow',
+          loader: () => new Promise<ModuleMount>((resolve) => { resolveLoader = resolve; }),
+        },
+      ]);
+      destroy = initRouter(cfg);
+      const pending = navigateTo('/slow');
+      await navigateTo('/');
+      const mod = fakeModule();
+      resolveLoader(mod);
+      await pending;
+      expect(mod.mounted).toBe(false);
+    });
+
+    it('ignores outlet clicks that are not navigation links', async () => {
+      const cfg = makeConfig([{ path: '/plain', loader: () => Promise.resolve(fakeModule()) }]);
+      destroy = initRouter(cfg);
+      await navigateTo('/plain');
+      cfg.outlet.querySelector('p')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(window.location.hash).toBe('');
+    });
+
+    it.each(['/', '../', '../../'])('intercepts the legacy back href %s', async (href) => {
+      const cfg = makeConfig([{ path: '/plain', loader: () => Promise.resolve(fakeModule()) }]);
+      destroy = initRouter(cfg);
+      await navigateTo('/plain');
+      const link = document.createElement('a');
+      link.setAttribute('href', href);
+      cfg.outlet.querySelector('#spa-root')!.appendChild(link);
+      link.click();
+      expect(window.location.hash).toBe('#/');
     });
 
     it('unmounts the previous module on new navigation', async () => {

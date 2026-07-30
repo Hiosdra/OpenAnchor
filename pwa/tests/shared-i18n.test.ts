@@ -2,6 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { setLocale, getLocale, t, translations } from '../src/shared/i18n/index';
 
 describe('shared/i18n', () => {
+  it('falls back to the key for an unknown translation', () => {
+    expect(t('missing.translation' as any)).toBe('missing.translation');
+  });
   beforeEach(() => {
     // Reset to default locale
     setLocale('pl');

@@ -527,6 +527,43 @@ describe('SettingsBar', () => {
     expect(undo).toHaveBeenCalledOnce();
     expect(redo).toHaveBeenCalledOnce();
   });
+
+  it('runs language, sharing, file, and export actions from the menus', async () => {
+    const { SettingsBar } = await import('../src/modules/wachtownik/components/SettingsBar');
+    const props = baseProps();
+    render(<SettingsBar {...props} />);
+
+    fireEvent.click(screen.getByLabelText('Switch to English'));
+    expect(props.toggleLanguage).toHaveBeenCalledOnce();
+
+    fireEvent.click(screen.getByRole('button', { name: /Udostępnij/ }));
+    fireEvent.click(screen.getByText('QR Kod'));
+    expect(props.handleShowQR).toHaveBeenCalledOnce();
+
+    fireEvent.click(screen.getByRole('button', { name: /Udostępnij/ }));
+    fireEvent.click(screen.getByText('Link edytowalny'));
+    expect(props.handleShare).toHaveBeenCalledWith(false);
+
+    fireEvent.click(screen.getByRole('button', { name: /Udostępnij/ }));
+    fireEvent.click(screen.getByText('Link tylko do odczytu'));
+    expect(props.handleShare).toHaveBeenCalledWith(true);
+
+    fireEvent.click(screen.getByRole('button', { name: /Plik/ }));
+    fireEvent.click(screen.getByText('Eksportuj konfigurację'));
+    expect(props.handleExportConfig).toHaveBeenCalledOnce();
+
+    fireEvent.click(screen.getByRole('button', { name: /Plik/ }));
+    fireEvent.click(screen.getByText('Importuj konfigurację'));
+    expect(props.handleImportConfig).toHaveBeenCalledOnce();
+
+    fireEvent.click(screen.getByRole('button', { name: /Eksport/ }));
+    fireEvent.click(screen.getByText('Eksportuj PDF'));
+    expect(props.handleExportPDF).toHaveBeenCalledOnce();
+
+    fireEvent.click(screen.getByRole('button', { name: /Eksport/ }));
+    fireEvent.click(screen.getByText('Drukuj'));
+    expect(props.handlePrint).toHaveBeenCalledOnce();
+  });
 });
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -1055,6 +1092,28 @@ describe('CrewPanel', () => {
     const input = screen.getByPlaceholderText('Imię...');
     fireEvent.change(input, { target: { value: 'Test' } });
     expect(setNewCrewName).toHaveBeenCalledWith('Test');
+  });
+
+  it('updates all crew and cruise form controls', async () => {
+    const { CrewPanel } = await import('../src/modules/wachtownik/components/CrewPanel');
+    const props = baseProps();
+    const { container } = render(<CrewPanel {...props} />);
+
+    fireEvent.change(container.querySelector('select')!, { target: { value: 'officer' } });
+    expect(props.setNewCrewRole).toHaveBeenCalledWith('officer');
+
+    fireEvent.click(container.querySelector('input[type="checkbox"]')!);
+    expect(props.setCaptainParticipates).toHaveBeenCalledWith(false);
+
+    fireEvent.change(container.querySelector('input[type="date"]')!, {
+      target: { value: '2024-07-15' },
+    });
+    expect(props.setStartDate).toHaveBeenCalledWith('2024-07-15');
+
+    fireEvent.change(container.querySelector('input[type="number"]')!, {
+      target: { value: '14' },
+    });
+    expect(props.setDays).toHaveBeenCalledWith(14);
   });
 });
 
@@ -1739,5 +1798,46 @@ describe('App', () => {
     );
     fireEvent.click(schedBtn!);
     expect(hookState.settings.setActiveTab).toHaveBeenCalledWith('schedule');
+  });
+
+  it('runs every tab callback', () => {
+    hookState.engine.isGenerated = true;
+    hookState.settings.activeTab = 'schedule';
+    const { container } = render(<App />);
+    for (const [label, tab] of [
+      ['Konfiguracja', 'setup'],
+      ['Harmonogram', 'schedule'],
+      ['Gantt', 'gantt'],
+      ['Analityka', 'analytics'],
+    ] as const) {
+      const button = Array.from(container.querySelectorAll('button')).find(
+        (candidate) =>
+          candidate.textContent?.includes(label) &&
+          !candidate.textContent?.includes('Generuj'),
+      );
+      fireEvent.click(button!);
+      expect(hookState.settings.setActiveTab).toHaveBeenCalledWith(tab);
+    }
+  });
+
+  it('runs dog-watch and template adapters from setup', () => {
+    hookState.settings.activeTab = 'setup';
+    const { container } = render(<App />);
+
+    const dogWatches = Array.from(container.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Dodaj Psie Wachty'),
+    );
+    fireEvent.click(dogWatches!);
+    expect(hookState.watchSlots.applyDogWatches).toHaveBeenCalledWith(
+      hookState.settings.userLocale,
+      hookState.exportShare.showToast,
+    );
+
+    const template = Array.from(container.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('6 wacht × 4h'),
+    );
+    fireEvent.click(template!);
+    expect(hookState.watchSlots.applyTemplate).toHaveBeenCalled();
+    expect(hookState.engine.setIsGenerated).toHaveBeenCalledWith(false);
   });
 });

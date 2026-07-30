@@ -6,8 +6,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── main.ts deps ─────────────────────────────────────────────────────────
 const mockInitDashboard = vi.fn();
+const mockInitRouter = vi.fn();
+const mockNavigateToModule = vi.fn();
 vi.mock('../src/modules/dashboard/dashboard-ui', () => ({
   initDashboard: mockInitDashboard,
+}));
+vi.mock('../src/router', () => ({
+  initRouter: mockInitRouter,
+  navigateToModule: mockNavigateToModule,
 }));
 
 // ── anchor/entry deps (React) ────────────────────────────────────────────
@@ -29,7 +35,7 @@ vi.mock('leaflet', () => ({
 }));
 
 // ── egzamin/entry deps ──────────────────────────────────────────────────
-const mockCreateRoot = vi.fn(() => ({ render: vi.fn() }));
+const mockCreateRoot = vi.fn(() => ({ render: vi.fn(), unmount: vi.fn() }));
 vi.mock('react-dom/client', () => ({
   createRoot: mockCreateRoot,
 }));
@@ -68,11 +74,48 @@ describe('main.ts entry', () => {
   beforeEach(() => {
     vi.resetModules();
     mockInitDashboard.mockClear();
+    mockInitRouter.mockClear();
+    document.body.innerHTML = '';
   });
 
   it('calls initDashboard on import', async () => {
     await import('../src/main');
     expect(mockInitDashboard).toHaveBeenCalledOnce();
+  });
+
+  it('wires all SPA routes when the dashboard DOM is complete', async () => {
+    document.body.innerHTML = `
+      <main id="dashboard-content"></main>
+      <div id="router-outlet"></div>
+      <div id="router-loading"></div>
+    `;
+    await import('../src/main');
+    expect(mockInitRouter).toHaveBeenCalledOnce();
+    const config = mockInitRouter.mock.calls[0][0];
+    expect(config.routes.map((route: { path: string }) => route.path)).toEqual([
+      '/egzamin',
+      '/wachtownik',
+      '/zeglowanie',
+      '/anchor',
+    ]);
+    for (const route of config.routes) {
+      const module = await route.loader();
+      expect(module.mount).toEqual(expect.any(Function));
+      expect(module.unmount).toEqual(expect.any(Function));
+      const container = document.createElement('div');
+      module.mount(container);
+      module.unmount();
+    }
+  });
+
+  it.each([
+    ['router-outlet', '<div id="dashboard-content"></div><div id="router-loading"></div>'],
+    ['dashboard-content', '<div id="router-outlet"></div><div id="router-loading"></div>'],
+    ['router-loading', '<div id="router-outlet"></div><div id="dashboard-content"></div>'],
+  ])('does not initialize the router without %s', async (_missing, html) => {
+    document.body.innerHTML = html;
+    await import('../src/main');
+    expect(mockInitRouter).not.toHaveBeenCalled();
   });
 });
 

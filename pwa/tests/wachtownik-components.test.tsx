@@ -182,4 +182,96 @@ describe('wachtownik/components — ScheduleTableRow', () => {
     expect(container.textContent).toContain('Anna');
     expect(container.textContent).toContain('Piotr');
   });
+
+  it('handles editable drag and drop and marks the dragged assignment', async () => {
+    const { ScheduleTableRow } = await import('../src/modules/wachtownik/components/ScheduleTableRow');
+    const onDragStart = vi.fn();
+    const onDrop = vi.fn();
+    const onDragOver = vi.fn();
+    const { container } = render(
+      <table>
+        <tbody>
+          <ScheduleTableRow
+            daySchedule={minimalDaySchedule}
+            dayIndex={0}
+            startDate="2024-06-01"
+            isNightMode={false}
+            isReadOnly={false}
+            draggedItem={{ dayIdx: 0, slotIdx: 0, pIdx: 0 }}
+            onDragStart={onDragStart}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            t={mockT}
+            userLocale="pl-PL"
+          />
+        </tbody>
+      </table>,
+    );
+    const assignment = container.querySelector('[draggable="true"]')!;
+    expect(assignment.className).toContain('opacity-50');
+
+    fireEvent.dragStart(assignment);
+    fireEvent.dragOver(assignment);
+    fireEvent.drop(assignment);
+
+    expect(onDragStart).toHaveBeenCalledWith(expect.anything(), 0, 0, 0);
+    expect(onDragOver).toHaveBeenCalledOnce();
+    expect(onDrop).toHaveBeenCalledWith(expect.anything(), 0, 0, 0);
+  });
+
+  it('does not run drag handlers in read-only mode', async () => {
+    const { ScheduleTableRow } = await import('../src/modules/wachtownik/components/ScheduleTableRow');
+    const onDragStart = vi.fn();
+    const onDrop = vi.fn();
+    const onDragOver = vi.fn();
+    const { container } = render(
+      <table>
+        <tbody>
+          <ScheduleTableRow
+            daySchedule={minimalDaySchedule}
+            dayIndex={0}
+            startDate="2024-06-01"
+            isNightMode={false}
+            isReadOnly={true}
+            draggedItem={null}
+            onDragStart={onDragStart}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            t={mockT}
+            userLocale="pl-PL"
+          />
+        </tbody>
+      </table>,
+    );
+    const assignment = container.querySelector('[draggable="false"]')!;
+    fireEvent.dragStart(assignment);
+    fireEvent.dragOver(assignment);
+    fireEvent.drop(assignment);
+    expect(onDragStart).not.toHaveBeenCalled();
+    expect(onDragOver).not.toHaveBeenCalled();
+    expect(onDrop).not.toHaveBeenCalled();
+  });
+
+  it('uses the memo comparison for unchanged and changed props', async () => {
+    const { ScheduleTableRow } = await import('../src/modules/wachtownik/components/ScheduleTableRow');
+    const props = {
+      daySchedule: minimalDaySchedule,
+      dayIndex: 0,
+      startDate: '2024-06-01',
+      isNightMode: false,
+      isReadOnly: false,
+      draggedItem: null,
+      onDragStart: vi.fn(),
+      onDrop: vi.fn(),
+      onDragOver: vi.fn(),
+      t: mockT,
+      userLocale: 'pl-PL' as Locale,
+    };
+    const { rerender } = render(
+      <table><tbody><ScheduleTableRow {...props} /></tbody></table>,
+    );
+    rerender(<table><tbody><ScheduleTableRow {...props} /></tbody></table>);
+    rerender(<table><tbody><ScheduleTableRow {...props} dayIndex={1} /></tbody></table>);
+    expect(screen.getByText('label.day 1')).toBeDefined();
+  });
 });

@@ -100,6 +100,44 @@ describe('Header', () => {
     render(<Header {...baseProps} unit="meters" />, { wrapper: Wrapper });
     expect(screen.getByText(/METRY|METERS/)).toBeTruthy();
   });
+
+  it('renders offline, lost-GPS, peer, charging, eco, feet, and connected states', async () => {
+    const Header = await importComponent();
+    const onToggleUnit = vi.fn();
+    const onToggleLang = vi.fn();
+    const { container, rerender } = render(
+      <Header
+        {...baseProps}
+        isOnline={false}
+        unit="feet"
+        wsConnected={true}
+        peerBattery={73}
+        peerCharging={true}
+        hasGpsFix={true}
+        gpsSignalLost={true}
+        batterySaverActive={true}
+        onToggleUnit={onToggleUnit}
+        onToggleLang={onToggleLang}
+      />,
+      { wrapper: Wrapper },
+    );
+    expect(container.querySelector('.connection-status--offline')).toBeTruthy();
+    expect(container.textContent).toContain('73% ⚡');
+    expect(container.textContent).toContain('Eco');
+    expect(container.querySelector('#gps-status-text')?.className).toBeDefined();
+    fireEvent.click(container.querySelector('#unit-toggle')!);
+    fireEvent.click(container.querySelector('#lang-toggle')!);
+    expect(onToggleUnit).toHaveBeenCalledOnce();
+    expect(onToggleLang).toHaveBeenCalledOnce();
+
+    rerender(
+      <Wrapper>
+        <Header {...baseProps} peerBattery={42} peerCharging={false} />
+      </Wrapper>,
+    );
+    expect(container.textContent).toContain('42%');
+    expect(container.textContent).not.toContain('42% ⚡');
+  });
 });
 
 // ── Dashboard ────────────────────────────────────────────────────────
@@ -321,6 +359,51 @@ describe('SimpleMonitor', () => {
     render(<SimpleMonitor {...baseProps} alarmState="ALARM" onDismissAlarm={onDismiss} />, { wrapper: Wrapper });
     const muteBtn = screen.getByText(/Wycisz|Mute/i);
     expect(muteBtn).toBeTruthy();
+  });
+
+  it('covers warning, feet, missing GPS/COG, night filter, fallback state, and actions', async () => {
+    const SimpleMonitor = await importComponent();
+    const onDismissAlarm = vi.fn();
+    const onToggleNightRed = vi.fn();
+    const onOpenMap = vi.fn();
+    const { container, rerender } = render(
+      <SimpleMonitor
+        {...baseProps}
+        unit="feet"
+        alarmState="WARNING"
+        hasGpsFix={false}
+        cog={null}
+        nightRedFilter={true}
+        onDismissAlarm={onDismissAlarm}
+        onToggleNightRed={onToggleNightRed}
+        onOpenMap={onOpenMap}
+      />,
+      { wrapper: Wrapper },
+    );
+    expect(container.textContent).toContain('---');
+    expect(container.textContent).toContain('ft');
+    expect(container.querySelector('.simple-monitor-bg-warning')).toBeTruthy();
+    fireEvent.click(screen.getByText(/Wycisz|Mute/i));
+    fireEvent.click(container.querySelector('#sm-close-btn')!);
+    fireEvent.click(Array.from(container.querySelectorAll('button')).find((button) =>
+      button.querySelector('[data-icon="Moon"]'),
+    )!);
+    expect(onDismissAlarm).toHaveBeenCalledOnce();
+    expect(onOpenMap).toHaveBeenCalledOnce();
+    expect(onToggleNightRed).toHaveBeenCalledOnce();
+
+    rerender(
+      <Wrapper>
+        <SimpleMonitor
+          {...baseProps}
+          alarmState="UNKNOWN"
+          hasGpsFix={true}
+          gpsSignalLost={true}
+        />
+      </Wrapper>,
+    );
+    expect(container.querySelector('.simple-monitor-bg-safe')).toBeTruthy();
+    expect(container.textContent).toContain('UNKNOWN');
   });
 });
 

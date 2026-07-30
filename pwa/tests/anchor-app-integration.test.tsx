@@ -12,6 +12,7 @@ import React from 'react';
 import {
   installMockGeolocation,
   createMockGeolocation,
+  createMockPositionWithMotion,
 } from './mocks/geolocation';
 import { installMockWakeLock, installMockBattery } from './mocks/wake-lock';
 import { installMockAudioContext } from './mocks/web-audio';
@@ -226,9 +227,7 @@ describe('AnchorApp integration', () => {
     localStorage.setItem('anchor_onboarding_done', '1');
     await renderApp();
 
-    const beforeUnloadCalls = addSpy.mock.calls.filter(
-      ([event]) => event === 'beforeunload',
-    );
+    const beforeUnloadCalls = addSpy.mock.calls.filter(([event]) => event === 'beforeunload');
     expect(beforeUnloadCalls.length).toBeGreaterThanOrEqual(1);
     addSpy.mockRestore();
   });
@@ -263,5 +262,59 @@ describe('AnchorApp integration', () => {
     expect(container.querySelector('#val-dist')).toBeTruthy();
     expect(container.querySelector('#val-sog')).toBeTruthy();
     expect(container.querySelector('#val-cog')).toBeTruthy();
+  });
+
+  it('drives GPS, header controls, tools, sharing, and the anchor lifecycle', async () => {
+    localStorage.setItem('anchor_onboarding_done', '1');
+    (globalThis as any).AudioContext = function MockAudioContext() {
+      return audioMock.context;
+    };
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    const { container } = await renderApp();
+
+    const onPosition = geo.watchPosition.mock.calls[0][0];
+    await act(async () => {
+      onPosition(createMockPositionWithMotion(52, 20, 4, 2.5, 180));
+    });
+    await waitFor(() =>
+      expect((container.querySelector('#main-btn') as HTMLButtonElement).disabled).toBe(false),
+    );
+
+    fireEvent.click(container.querySelector('#night-mode-btn')!);
+    expect(document.body.classList.contains('night-vision')).toBe(true);
+    fireEvent.click(container.querySelector('#unit-toggle')!);
+    fireEvent.click(container.querySelector('#lang-toggle')!);
+
+    fireEvent.change(container.querySelector('#radius-number')!, { target: { value: '75' } });
+    fireEvent.click(container.querySelector('#tool-calc')!);
+    expect(container.querySelector('#calc-modal')).toBeTruthy();
+    fireEvent.click(container.querySelector('#calc-modal .modal-close-btn')!);
+
+    fireEvent.click(container.querySelector('#share-pos-btn')!);
+    expect(share).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'OpenAnchor',
+        url: 'https://www.google.com/maps?q=52,20',
+      }),
+    );
+
+    await act(async () => {
+      fireEvent.click(container.querySelector('#main-btn')!);
+    });
+    await waitFor(() =>
+      expect(container.querySelector('#main-btn-text')?.textContent).toMatch(/Podnieś|Raise/),
+    );
+
+    await act(async () => {
+      onPosition(createMockPositionWithMotion(52.0001, 20.0001, 3, 3.5, 90));
+    });
+
+    await act(async () => {
+      fireEvent.click(container.querySelector('#main-btn')!);
+    });
+    await waitFor(() =>
+      expect(container.querySelector('#main-btn-text')?.textContent).toMatch(/Rzuć|Drop/),
+    );
   });
 });

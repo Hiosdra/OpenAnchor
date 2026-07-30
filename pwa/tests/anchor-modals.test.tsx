@@ -511,6 +511,22 @@ describe('WeatherModal', () => {
     // Loading spinner icon should be present
     expect(container.querySelector('[data-icon="Loader2"]')).toBeTruthy();
   });
+
+  it('renders forecast charts and missing-value placeholders', async () => {
+    const WeatherModal = await importComponent();
+    const { container } = render(
+      <Wrapper>
+        <WeatherModal
+          {...defaultProps}
+          windForecast={[4, 8, 12]}
+          gustForecast={[6, 10, 14]}
+          waveForecast={[0.4, 0.8, 1.2]}
+        />
+      </Wrapper>,
+    );
+    expect(container.querySelectorAll('svg rect.weather-bar').length).toBe(9);
+    expect(container.textContent).toContain('--');
+  });
 });
 
 // ── AlertModals ─────────────────────────────────────────────────────
@@ -718,6 +734,79 @@ describe('AIModal', () => {
     );
     expect(container.querySelector('[data-icon="Loader2"]')).toBeTruthy();
   });
+
+  it('sends trimmed messages by button and Enter but ignores invalid sends', async () => {
+    const AIModal = await importComponent();
+    const onSendMessage = vi.fn();
+    const { container } = render(
+      <Wrapper><AIModal {...defaultProps} onSendMessage={onSendMessage} /></Wrapper>,
+    );
+    const input = container.querySelector('input[type="text"]')!;
+    const send = container.querySelector('[data-icon="Send"]')!.closest('button')!;
+
+    fireEvent.change(input, { target: { value: '  status kotwicy  ' } });
+    fireEvent.click(send);
+    expect(onSendMessage).toHaveBeenCalledWith('status kotwicy');
+
+    fireEvent.change(input, { target: { value: 'kolejne pytanie' } });
+    fireEvent.keyDown(input, { key: 'Enter', shiftKey: false });
+    expect(onSendMessage).toHaveBeenCalledWith('kolejne pytanie');
+
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.keyDown(input, { key: 'Enter', shiftKey: true });
+    expect(onSendMessage).toHaveBeenCalledTimes(2);
+  });
+
+  it('runs chat, API-key, and logbook actions and renders both message roles', async () => {
+    const AIModal = await importComponent();
+    const props = {
+      ...defaultProps,
+      chatMessages: [
+        { role: 'user' as const, content: 'Pytanie' },
+        { role: 'assistant' as const, content: 'Odpowiedź' },
+      ],
+      logbookEntry: {
+        summary: 'Podsumowanie',
+        logEntry: 'Wpis dziennika',
+        safetyNote: 'Uwaga bezpieczeństwa',
+      },
+      onClearChat: vi.fn(),
+      onOpenApiKeyModal: vi.fn(),
+      onSaveLogbook: vi.fn(),
+    };
+    const { container } = render(<Wrapper><AIModal {...props} /></Wrapper>);
+    fireEvent.click(container.querySelector('#ai-clear-chat-btn')!);
+    fireEvent.click(container.querySelector('#edit-api-key-btn')!);
+    fireEvent.click(Array.from(container.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Zapisz'),
+    )!);
+    expect(props.onClearChat).toHaveBeenCalledOnce();
+    expect(props.onOpenApiKeyModal).toHaveBeenCalledOnce();
+    expect(props.onSaveLogbook).toHaveBeenCalledOnce();
+    expect(container.textContent).toContain('Pytanie');
+    expect(container.textContent).toContain('Odpowiedź');
+  });
+
+  it('offers API-key setup when no key is configured', async () => {
+    const AIModal = await importComponent();
+    const onOpenApiKeyModal = vi.fn();
+    const { container } = render(
+      <Wrapper>
+        <AIModal
+          {...defaultProps}
+          hasApiKey={false}
+          onOpenApiKeyModal={onOpenApiKeyModal}
+        />
+      </Wrapper>,
+    );
+    const input = container.querySelector('input[type="text"]') as HTMLInputElement;
+    expect(input.disabled).toBe(true);
+    const setup = Array.from(container.querySelectorAll('button')).find((button) =>
+      button.className.includes('underline'),
+    );
+    fireEvent.click(setup!);
+    expect(onOpenApiKeyModal).toHaveBeenCalledOnce();
+  });
 });
 
 // ── ApiKeyModal ─────────────────────────────────────────────────────
@@ -765,6 +854,32 @@ describe('ApiKeyModal', () => {
 
     expect(onSave).toHaveBeenCalledWith('AIzaSyTest123');
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('keeps an empty key unsaved and clears an existing key', async () => {
+    const ApiKeyModal = await importComponent();
+    const onSave = vi.fn();
+    const onClear = vi.fn();
+    const onClose = vi.fn();
+    const { container } = render(
+      <Wrapper>
+        <ApiKeyModal
+          {...defaultProps}
+          hasKey={true}
+          onSave={onSave}
+          onClear={onClear}
+          onClose={onClose}
+        />
+      </Wrapper>,
+    );
+    fireEvent.click(container.querySelector('#save-api-key-btn')!);
+    expect(onSave).not.toHaveBeenCalled();
+    fireEvent.click(container.querySelector('#delete-api-key-btn')!);
+    fireEvent.click(Array.from(container.querySelectorAll('button')).find((button) =>
+      button.textContent?.match(/Anuluj|Cancel/),
+    )!);
+    expect(onClear).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledOnce();
   });
 });
 

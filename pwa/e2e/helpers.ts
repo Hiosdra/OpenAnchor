@@ -7,6 +7,7 @@ export const MODULES = {
   anchor: '/modules/anchor/',
   egzamin: '/#/egzamin',
   wachtownik: '/#/wachtownik',
+  zeglowanie: '/#/zeglowanie',
 } as const;
 
 /** Common localStorage keys used across the app */
@@ -19,7 +20,7 @@ export const STORAGE_KEYS = {
 /** Mock geolocation coordinates */
 export const GEO = {
   gdyniaHarbor: { latitude: 54.5189, longitude: 18.5305 },
-  gdanskPort: { latitude: 54.3520, longitude: 18.6466 },
+  gdanskPort: { latitude: 54.352, longitude: 18.6466 },
 } as const;
 
 /** Polish UI strings used across anchor module tests */
@@ -31,7 +32,8 @@ export const ANCHOR_STRINGS = {
   behind: 'Z tyłu',
 } as const;
 
-const EGZAMIN_PLACEHOLDER_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+const EGZAMIN_PLACEHOLDER_PNG =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
 
 export async function installEgzaminPdfTestHook(page: Page): Promise<void> {
   await page.addInitScript(

@@ -405,7 +405,6 @@ function AnchorApp() {
         cog={state.cog}
         accuracy={state.accuracy}
         unit={state.unit === 'ft' ? 'feet' : 'meters'}
-        isAnchored={state.isAnchored}
       />
 
       <MapContainer

@@ -6,7 +6,6 @@ export interface DashboardProps {
   cog: number | null;
   accuracy: number;
   unit: string;
-  isAnchored: boolean;
 }
 
 const M_TO_FT = 3.28084;
