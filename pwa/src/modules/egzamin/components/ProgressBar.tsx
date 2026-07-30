@@ -28,8 +28,12 @@ export function ProgressBar({ current, total, correct, incorrect, onNavigate }: 
           Pytanie {current} / {total}
         </span>
         <div className="flex gap-2 sm:gap-3 whitespace-nowrap">
-          <span className="text-green-400">{correct} OK</span>
-          <span className="text-red-400">{incorrect} Err</span>
+          <span className="text-green-400" data-testid="learn-correct-count">
+            {correct} OK
+          </span>
+          <span className="text-red-400" data-testid="learn-incorrect-count">
+            {incorrect} Err
+          </span>
         </div>
       </div>
       <div
