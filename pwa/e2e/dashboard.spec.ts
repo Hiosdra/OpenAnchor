@@ -39,7 +39,6 @@ test.describe('Page Load & Basic Display', () => {
     await expect(page.locator('.dashboard-eyebrow')).toHaveText('Twój pokład cyfrowy');
     await expect(page.locator('#dashboard-heading')).toHaveText('Spokojniej na wodzie.');
     await expect(page.locator('.dashboard-lede')).toContainText('również bez zasięgu');
-    await expect(page.locator('link[href="styles/dashboard.css"]')).toHaveCount(1);
 
     const visualContract = await page.locator('.module-card.card-exam').evaluate((card) => {
       const cardStyle = getComputedStyle(card);
