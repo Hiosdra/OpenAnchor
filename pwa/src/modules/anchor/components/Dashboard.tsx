@@ -11,7 +11,7 @@ export interface DashboardProps {
 
 const M_TO_FT = 3.28084;
 
-export function Dashboard({ distance, sog, cog, accuracy, unit, isAnchored }: DashboardProps) {
+export function Dashboard({ distance, sog, cog, accuracy, unit }: DashboardProps) {
   const { t } = useI18n();
 
   const hasData = accuracy > 0;
@@ -32,13 +32,15 @@ export function Dashboard({ distance, sog, cog, accuracy, unit, isAnchored }: Da
 
   return (
     <div
-      className="grid grid-cols-4 bg-slate-800 border-b border-slate-700 divide-x divide-slate-700 text-center z-20 shadow-lg"
+      className="anchor-metrics grid grid-cols-4 text-center z-20"
       role="region"
       aria-label="Navigation metrics"
       aria-live="polite"
     >
       <div className="p-1.5 sm:p-2">
-        <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">{t.dashDistance}</div>
+        <div className="anchor-metric-label text-[9px] sm:text-[10px] uppercase">
+          {t.dashDistance}
+        </div>
         <div id="val-dist" className="font-mono font-bold text-lg sm:text-xl text-white">
           {distDisplay}
           {hasData && <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>}
@@ -46,25 +48,33 @@ export function Dashboard({ distance, sog, cog, accuracy, unit, isAnchored }: Da
       </div>
 
       <div className="p-1.5 sm:p-2">
-        <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">
+        <div className="anchor-metric-label text-[9px] sm:text-[10px] uppercase">
           SOG <span className="text-[7px] sm:text-[8px]">({t.dashSog})</span>
         </div>
-        <div id="val-sog" className="font-mono font-bold text-lg sm:text-xl text-blue-400">
+        <div
+          id="val-sog"
+          className="anchor-metric-value--accent font-mono font-bold text-lg sm:text-xl"
+        >
           {sog.toFixed(1)}
         </div>
       </div>
 
       <div className="p-1.5 sm:p-2">
-        <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">
+        <div className="anchor-metric-label text-[9px] sm:text-[10px] uppercase">
           COG <span className="text-[7px] sm:text-[8px]">({t.dashCogUnit})</span>
         </div>
-        <div id="val-cog" className="font-mono font-bold text-lg sm:text-xl text-blue-400">
+        <div
+          id="val-cog"
+          className="anchor-metric-value--accent font-mono font-bold text-lg sm:text-xl"
+        >
           {cog !== null ? `${Math.round(cog)}°` : '---'}
         </div>
       </div>
 
       <div className="p-1.5 sm:p-2">
-        <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase">{t.dashGpsAcc}</div>
+        <div className="anchor-metric-label text-[9px] sm:text-[10px] uppercase">
+          {t.dashGpsAcc}
+        </div>
         <div id="val-acc" className="font-mono font-bold text-lg sm:text-xl text-slate-300">
           {accDisplay}
           {hasData && <span className="text-xs text-slate-400 ml-0.5">{unitLabel}</span>}

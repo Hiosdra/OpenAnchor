@@ -16,6 +16,14 @@ function readPwaFile(relativePath: string): string {
 }
 
 describe('manifest asset wiring', () => {
+  it('loads the shared theme and dashboard skin from the main entry', () => {
+    const dashboardHtml = readPwaFile('index.html');
+
+    expect(dashboardHtml).toContain('href="styles/theme.css"');
+    expect(dashboardHtml).toContain('href="styles/dashboard.css"');
+    expect(existsSync(resolve(pwaRoot, 'styles/dashboard.css'))).toBe(true);
+  });
+
   it('points every HTML entry to the root-served manifest', () => {
     for (const relativePath of entryHtmlFiles) {
       expect(readPwaFile(relativePath)).toContain('href="/manifest.json"');
@@ -27,6 +35,8 @@ describe('manifest asset wiring', () => {
 
     expect(manifest.start_url).toBe('./');
     expect(manifest.scope).toBe('./');
+    expect(manifest.background_color).toBe('#07131f');
+    expect(manifest.theme_color).toBe('#07131f');
     expect(manifest.shortcuts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ url: './modules/anchor/' }),

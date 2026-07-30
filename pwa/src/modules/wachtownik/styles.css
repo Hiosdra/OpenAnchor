@@ -2,6 +2,34 @@
 
 /* Module-specific styles only - base styles in theme.css */
 
+/* Calm, professional bridge-workspace skin for the utility-heavy scheduler. */
+.wachtownik-app:not(.wachtownik-app--night) {
+  color: #173042;
+}
+
+.wachtownik-app:not(.wachtownik-app--night) input,
+.wachtownik-app:not(.wachtownik-app--night) select {
+  border-radius: 0.7rem;
+}
+
+.wachtownik-app main {
+  max-width: 80rem;
+}
+
+.wachtownik-app h2 {
+  letter-spacing: -0.025em;
+}
+
+.wachtownik-app button {
+  min-height: 40px;
+}
+
+@media (max-width: 639px) {
+  .oa-header {
+    align-items: flex-start;
+  }
+}
+
 @page {
   size: A4 landscape;
   margin: 0.5cm;

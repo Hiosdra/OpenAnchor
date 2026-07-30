@@ -203,7 +203,7 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen font-sans pb-10 transition-colors duration-300 print:text-black print:bg-white ${isNightMode ? 'bg-black text-red-600' : 'text-slate-100'}`}
+      className={`wachtownik-app min-h-screen font-sans pb-10 transition-colors duration-300 print:text-black print:bg-white ${isNightMode ? 'wachtownik-app--night bg-black text-red-600' : 'text-slate-100'}`}
       data-night-mode={isNightMode}
     >
       {/* Skip to main content link for keyboard navigation */}
