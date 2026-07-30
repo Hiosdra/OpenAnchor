@@ -32,6 +32,97 @@ test.describe('Page Load & Basic Display', () => {
     await page.goto(MODULES.dashboard, GOTO_OPTS);
     await expect(page.locator('.settings-btn')).toBeVisible();
   });
+
+  test('professional dashboard skin and hero are applied', async ({ page }) => {
+    await page.goto(MODULES.dashboard, GOTO_OPTS);
+
+    await expect(page.locator('.dashboard-eyebrow')).toHaveText('Twój pokład cyfrowy');
+    await expect(page.locator('#dashboard-heading')).toHaveText('Spokojniej na wodzie.');
+    await expect(page.locator('.dashboard-lede')).toContainText('również bez zasięgu');
+
+    const visualContract = await page.locator('.module-card.card-exam').evaluate((card) => {
+      const cardStyle = getComputedStyle(card);
+      const headingStyle = getComputedStyle(document.querySelector('#dashboard-heading')!);
+      return {
+        minHeight: cardStyle.minHeight,
+        borderRadius: cardStyle.borderRadius,
+        headingSize: Number.parseFloat(headingStyle.fontSize),
+      };
+    });
+
+    expect(visualContract.minHeight).toBe('270px');
+    expect(visualContract.borderRadius).toBe('16px');
+    expect(visualContract.headingSize).toBeGreaterThan(30);
+  });
+});
+
+test.describe('Responsive Visual Contract', () => {
+  for (const viewport of [
+    { name: 'mobile', width: 390, height: 844 },
+    { name: 'desktop', width: 1280, height: 720 },
+  ]) {
+    test(`dashboard has no horizontal overflow at ${viewport.name} size`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(MODULES.dashboard, GOTO_OPTS);
+
+      const dimensions = await page.evaluate(() => ({
+        clientWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      }));
+
+      expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+    });
+  }
+
+  test('module grid changes from one to three columns', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(MODULES.dashboard, GOTO_OPTS);
+
+    const mobileColumns = await page
+      .locator('.modules-grid')
+      .evaluate((grid) => getComputedStyle(grid).gridTemplateColumns.split(' ').length);
+    expect(mobileColumns).toBe(1);
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+    const desktopColumns = await page
+      .locator('.modules-grid')
+      .evaluate((grid) => getComputedStyle(grid).gridTemplateColumns.split(' ').length);
+    expect(desktopColumns).toBe(3);
+  });
+});
+
+test.describe('Dashboard Themes', () => {
+  test('theme selection changes the visual surface and persists after reload', async ({ page }) => {
+    await page.goto(MODULES.dashboard, GOTO_OPTS);
+    const card = page.locator('.module-card.card-exam');
+    const darkBackground = await card.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    );
+
+    await page.locator('.settings-btn').click();
+    await page.locator('[data-theme-value="light"]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem('openanchor-theme')))
+      .toBe('light');
+
+    const lightBackground = await card.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    );
+    expect(lightBackground).not.toBe(darkBackground);
+
+    await page.reload(GOTO_OPTS);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+    await page.locator('.settings-btn').click();
+    await page.locator('[data-theme-value="night"]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'night');
+
+    const nightBackground = await card.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    );
+    expect(nightBackground).not.toBe(lightBackground);
+  });
 });
 
 test.describe('Beta Mode Toggle', () => {

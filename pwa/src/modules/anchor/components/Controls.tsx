@@ -104,7 +104,7 @@ export function Controls({
   const showMute = isAnchored && (alarmState === 'WARNING' || alarmState === 'ALARM');
 
   return (
-    <div className="w-full bg-slate-800 p-3 sm:p-4 rounded-t-3xl shadow-[0_-10px_15px_rgba(0,0,0,0.3)] border-t border-slate-700 z-20 relative">
+    <div className="anchor-controls w-full p-3 sm:p-4 z-20 relative">
       {/* Radius controls */}
       <div className="mb-3 sm:mb-4 max-w-md mx-auto">
         <div className="flex justify-between items-end mb-2">
@@ -127,7 +127,7 @@ export function Controls({
               min={unit === 'feet' ? Math.round(10 * M_TO_FT) : 10}
               max={numberMax}
               onChange={handleNumberChange}
-              className="bg-slate-700 text-white font-mono text-lg sm:text-xl w-16 sm:w-20 text-right rounded p-1 outline-none focus:ring-2 ring-blue-500"
+              className="anchor-radius-input text-white font-mono text-lg sm:text-xl w-16 sm:w-20 text-right rounded p-1 outline-none focus:ring-2 ring-blue-500"
               aria-label={t.safeRadius}
             />
             <span className="text-slate-400 text-sm">{unitLabel}</span>
@@ -153,8 +153,8 @@ export function Controls({
           disabled={!hasGpsFix && !isAnchored}
           className={`flex-grow py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 ${
             isAnchored
-              ? 'bg-slate-600 hover:bg-slate-500 text-white'
-              : 'bg-blue-600 hover:bg-blue-500 text-white'
+              ? 'anchor-primary-action anchor-primary-action--inactive text-white'
+              : 'anchor-primary-action text-white'
           } disabled:opacity-50`}
         >
           <Anchor className="w-4 sm:w-5 h-4 sm:h-5" />
@@ -164,7 +164,7 @@ export function Controls({
           id="offset-btn"
           onClick={onOffset}
           disabled={!hasGpsFix}
-          className="w-12 sm:w-14 py-2.5 sm:py-3 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center bg-slate-700 border border-slate-600 text-slate-300 disabled:opacity-50"
+          className="anchor-tool-button w-12 sm:w-14 py-2.5 sm:py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center disabled:opacity-50"
           title={t.offsetBack}
           aria-label={t.offsetBack}
         >
@@ -204,7 +204,7 @@ export function Controls({
               className={`py-1.5 sm:py-2 rounded-xl flex flex-col items-center justify-center gap-0.5 sm:gap-1 border transition-colors ${tool.colSpan} ${
                 isAi
                   ? 'bg-purple-700 hover:bg-purple-600 text-white border-purple-500 shadow-[0_0_10px_rgba(147,51,234,0.3)]'
-                  : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600'
+                  : 'anchor-tool-button'
               }`}
             >
               {Icon && (
@@ -222,7 +222,7 @@ export function Controls({
       <div className="flex gap-2 max-w-md mx-auto mt-2">
         <button
           onClick={onToggleMapLayer}
-          className="flex-1 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600 text-xs flex items-center justify-center gap-1"
+          className="anchor-tool-button flex-1 py-1.5 rounded-lg text-xs flex items-center justify-center gap-1"
           aria-label="Toggle map layer"
         >
           <Layers className="w-3.5 h-3.5" />
@@ -230,7 +230,7 @@ export function Controls({
         {!mapAutoCenter && (
           <button
             onClick={onCenterMap}
-            className="flex-1 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-blue-400 border border-slate-600 text-xs flex items-center justify-center gap-1"
+            className="anchor-tool-button anchor-tool-button--accent flex-1 py-1.5 rounded-lg text-xs flex items-center justify-center gap-1"
             aria-label="Center map on anchor position"
           >
             <Crosshair className="w-3.5 h-3.5" />
@@ -242,7 +242,7 @@ export function Controls({
       {showMute && (
         <button
           onClick={onMuteAlarm}
-          className="w-full max-w-md mx-auto py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white mt-2 sm:mt-3 border border-slate-600"
+          className="anchor-tool-button w-full max-w-md mx-auto py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all active:scale-95 flex items-center justify-center gap-2 text-white mt-2 sm:mt-3"
         >
           <BellOff className="w-4 sm:w-5 h-4 sm:h-5" />
           <span>{t.muteAlarm}</span>

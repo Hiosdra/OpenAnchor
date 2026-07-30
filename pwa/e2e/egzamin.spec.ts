@@ -233,10 +233,10 @@ test.describe('Learn Mode', () => {
     await page.locator('.answer-btn').first().click();
 
     // Stats should update — either OK or Err increments
-    const okText = await page.locator('text=OK').first().textContent();
-    const errText = await page.locator('text=Err').first().textContent();
-    const okCount = parseInt(okText?.replace(' OK', '') || '0');
-    const errCount = parseInt(errText?.replace(' Err', '') || '0');
+    const okText = await page.getByTestId('learn-correct-count').textContent();
+    const errText = await page.getByTestId('learn-incorrect-count').textContent();
+    const okCount = Number.parseInt(okText ?? '', 10);
+    const errCount = Number.parseInt(errText ?? '', 10);
     expect(okCount + errCount).toBe(1);
   });
 });

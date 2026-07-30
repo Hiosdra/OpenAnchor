@@ -46,9 +46,9 @@ export function MenuScreen({
   return (
     <>
       <Header title="Egzamin ŻJ / JSM" />
-      <div className="relative z-10 max-w-lg md:max-w-2xl mx-auto px-4 py-8">
+      <div className="exam-menu relative z-10 max-w-lg md:max-w-2xl mx-auto px-4 py-8">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="exam-hero text-center mb-8">
           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/20 border border-amber-500/20 flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
@@ -72,12 +72,12 @@ export function MenuScreen({
         </div>
 
         {/* Stats card */}
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-5 mb-6">
+        <div className="exam-progress-card rounded-2xl bg-white/5 border border-white/10 p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-semibold text-white/70">Postęp nauki</span>
             <span className="text-lg font-bold text-amber-400">{pctLearned}%</span>
           </div>
-          <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-4">
+          <div className="exam-progress-track h-2 rounded-full overflow-hidden mb-4">
             <div
               className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-500"
               style={{ width: `${pctLearned}%` }}
@@ -101,7 +101,7 @@ export function MenuScreen({
 
         {/* Categories */}
         <div className="mb-6">
-          <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-3 px-1">
+          <h2 className="exam-section-label text-sm font-semibold uppercase tracking-wider mb-3 px-1">
             Kategorie
           </h2>
           <div className="space-y-2">
@@ -111,7 +111,7 @@ export function MenuScreen({
               return (
                 <div
                   key={cat.id}
-                  className="flex items-center justify-between rounded-xl bg-white/5 border border-white/5 px-4 py-3"
+                  className="exam-category-row flex items-center justify-between rounded-xl border px-4 py-3"
                 >
                   <div className="flex items-center gap-2">
                     <span
@@ -130,7 +130,7 @@ export function MenuScreen({
         <div className="space-y-3">
           <button
             onClick={onStartLearn}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold text-base hover:from-amber-500 hover:to-amber-400 transition-all active:scale-[0.98]"
+            className="exam-action exam-action--primary w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
           >
             <div className="flex items-center justify-center gap-2">
               <svg
@@ -153,7 +153,7 @@ export function MenuScreen({
 
           <button
             onClick={onStartExam}
-            className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-base hover:bg-white/10 transition-all active:scale-[0.98]"
+            className="exam-action exam-action--secondary w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
           >
             <div className="flex items-center justify-center gap-2">
               <svg

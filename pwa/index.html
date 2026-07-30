@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="assets/icon-192x192.png">
 
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#0a0f1e">
+    <meta name="theme-color" content="#07131f">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -916,8 +916,9 @@
             min-height: 100dvh;
         }
     </style>
+    <link rel="stylesheet" href="styles/dashboard.css">
 </head>
-<body>
+<body class="dashboard-shell">
     <!-- Update notification banner -->
     <div id="updateBanner" class="update-banner" role="status" aria-live="polite">
         <div class="update-banner-content">
@@ -960,10 +961,20 @@
                 <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m-6 6l-4.2 4.2M23 12h-6m-6 0H1m18.2 5.2l-4.2-4.2m-6-6l-4.2-4.2"/>
             </svg>
         </button>
-        <img src="assets/icon.svg" alt="OpenAnchor" class="app-logo" onerror="this.style.display='none'">
-        <h1 class="app-title">OpenAnchor</h1>
-        <p class="app-subtitle">Morska Superapp</p>
+        <div class="brand-lockup">
+            <img src="assets/icon.svg" alt="" class="app-logo" onerror="this.style.display='none'">
+            <div>
+                <h1 class="app-title">OpenAnchor</h1>
+                <p class="app-subtitle">Narzędzia na wodę</p>
+            </div>
+        </div>
     </header>
+
+    <section class="dashboard-intro" aria-labelledby="dashboard-heading">
+        <p class="dashboard-eyebrow">Twój pokład cyfrowy</p>
+        <h2 id="dashboard-heading" class="dashboard-heading">Spokojniej na wodzie.</h2>
+        <p class="dashboard-lede">Nawigacja, bezpieczeństwo, organizacja wacht i wiedza żeglarska — zawsze pod ręką, również bez zasięgu.</p>
+    </section>
 
     <!-- Main Content -->
     <main class="content">
