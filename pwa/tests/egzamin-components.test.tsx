@@ -105,6 +105,34 @@ describe('egzamin/components — ProgressBar', () => {
     const bar = container.querySelector('[style]');
     if (bar?.parentElement) fireEvent.click(bar.parentElement);
   });
+
+  it('clamps navigation clicks and handles zero totals and no callback', async () => {
+    const { ProgressBar } = await import('../src/modules/egzamin/components/ProgressBar');
+    const onNavigate = vi.fn();
+    const { container, rerender } = render(
+      <ProgressBar current={0} total={5} correct={0} incorrect={0} onNavigate={onNavigate} />,
+    );
+    const track = container.querySelector('.progress-fill')!.parentElement!;
+    vi.spyOn(track, 'getBoundingClientRect').mockReturnValue({
+      left: 100,
+      width: 200,
+      top: 0,
+      right: 300,
+      bottom: 10,
+      height: 10,
+      x: 100,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    fireEvent.click(track, { clientX: 0 });
+    fireEvent.click(track, { clientX: 500 });
+    expect(onNavigate).toHaveBeenNthCalledWith(1, 0);
+    expect(onNavigate).toHaveBeenNthCalledWith(2, 4);
+
+    rerender(<ProgressBar current={0} total={0} correct={0} incorrect={0} />);
+    fireEvent.click(container.querySelector('.progress-fill')!.parentElement!);
+    expect((container.querySelector('.progress-fill') as HTMLElement).style.width).toBe('0%');
+  });
 });
 
 describe('egzamin/components — CategoryBadge', () => {
@@ -274,6 +302,78 @@ describe('egzamin/components — MenuScreen', () => {
       expect(onStartLearn).toHaveBeenCalled();
     }
   });
+
+  it('runs exam, Leitner, PDF-change, and reset confirmation paths', async () => {
+    const { MenuScreen } = await import('../src/modules/egzamin/components/MenuScreen');
+    const { saveProgress } = await import('../src/modules/egzamin/exam-storage');
+    const onStartExam = vi.fn();
+    const onStartLeitner = vi.fn();
+    const onChangePdf = vi.fn();
+    const confirmSpy = vi.fn();
+    Object.defineProperty(window, 'confirm', { value: confirmSpy, configurable: true });
+    const progress = {
+      answered: { q1: { correct: true } },
+      stats: { correct: 1, incorrect: 0, total: 1 },
+    };
+    render(
+      <MenuScreen
+        questions={[makeQuestion()]}
+        progress={progress}
+        leitnerState={emptyLeitner}
+        onStartLearn={vi.fn()}
+        onStartExam={onStartExam}
+        onStartLeitner={onStartLeitner}
+        onChangePdf={onChangePdf}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Egzamin').closest('button')!);
+    fireEvent.click(screen.getByText('Leitner').closest('button')!);
+    expect(onStartExam).toHaveBeenCalledOnce();
+    expect(onStartLeitner).toHaveBeenCalledOnce();
+
+    confirmSpy.mockReturnValueOnce(false);
+    fireEvent.click(screen.getByText('Resetuj postęp'));
+    expect(saveProgress).not.toHaveBeenCalled();
+    confirmSpy.mockReturnValueOnce(true);
+    fireEvent.click(screen.getByText('Resetuj postęp'));
+    expect(saveProgress).toHaveBeenCalled();
+
+    confirmSpy.mockReturnValueOnce(false);
+    fireEvent.click(screen.getByText('Zmień bazę pytań (PDF)'));
+    expect(onChangePdf).not.toHaveBeenCalled();
+    confirmSpy.mockReturnValueOnce(true);
+    fireEvent.click(screen.getByText('Zmień bazę pytań (PDF)'));
+    expect(onChangePdf).toHaveBeenCalledOnce();
+  });
+
+  it('handles an empty question set and repeated categories', async () => {
+    const { MenuScreen } = await import('../src/modules/egzamin/components/MenuScreen');
+    const { container, rerender } = render(
+      <MenuScreen
+        questions={[]}
+        progress={emptyProgress}
+        leitnerState={emptyLeitner}
+        onStartLearn={vi.fn()}
+        onStartExam={vi.fn()}
+        onStartLeitner={vi.fn()}
+        onChangePdf={vi.fn()}
+      />,
+    );
+    expect(container.textContent).toContain('0%');
+    rerender(
+      <MenuScreen
+        questions={[makeQuestion(), makeQuestion({ id: 'q2' })]}
+        progress={emptyProgress}
+        leitnerState={emptyLeitner}
+        onStartLearn={vi.fn()}
+        onStartExam={vi.fn()}
+        onStartLeitner={vi.fn()}
+        onChangePdf={vi.fn()}
+      />,
+    );
+    expect(container.textContent).toContain('2 pytań');
+  });
 });
 
 describe('egzamin/components — ExamScreen', () => {
@@ -350,6 +450,34 @@ describe('egzamin/components — ResultsScreen', () => {
       fireEvent.click(retryBtn);
       expect(onRetry).toHaveBeenCalled();
     }
+  });
+
+  it('renders passed mixed-category details and runs all result actions', async () => {
+    const { ResultsScreen } = await import('../src/modules/egzamin/components/ResultsScreen');
+    const onBack = vi.fn();
+    const onRetry = vi.fn();
+    const results: ExamResult[] = [
+      { question: makeQuestion({ id: 'q1', category: 'nawigacja' }), userAnswer: 'A', correct: true },
+      { question: makeQuestion({ id: 'q2', category: 'nawigacja' }), userAnswer: '', correct: false },
+      { question: makeQuestion({ id: 'q3', category: 'locja' }), userAnswer: 'A', correct: true },
+      { question: makeQuestion({ id: 'q4', category: 'locja' }), userAnswer: 'A', correct: true },
+    ];
+    const { container } = render(
+      <ResultsScreen results={results} timeTaken={125} onBack={onBack} onRetry={onRetry} />,
+    );
+    expect(container.textContent).toContain('Egzamin zdany!');
+    expect(container.textContent).toContain('2:05');
+
+    fireEvent.click(screen.getByText('Pokaż szczegóły pytań'));
+    expect(container.textContent).toContain('brak');
+    expect(container.textContent).toContain('OK');
+    expect(container.textContent).toContain('ERR');
+    fireEvent.click(screen.getByText('Ukryj szczegóły'));
+
+    fireEvent.click(screen.getByText('Spróbuj ponownie'));
+    fireEvent.click(screen.getByText('Powrót do menu'));
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(onBack).toHaveBeenCalledOnce();
   });
 });
 

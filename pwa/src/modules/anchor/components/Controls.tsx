@@ -242,7 +242,7 @@ export function Controls({
       {showMute && (
         <button
           onClick={onMuteAlarm}
-          className="anchor-tool-button w-full max-w-md mx-auto py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all active:scale-95 flex items-center justify-center gap-2 text-white mt-2 sm:mt-3"
+          className="anchor-tool-button anchor-tool-button--inverse w-full max-w-md mx-auto py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all active:scale-95 flex items-center justify-center gap-2 mt-2 sm:mt-3"
         >
           <BellOff className="w-4 sm:w-5 h-4 sm:h-5" />
           <span>{t.muteAlarm}</span>

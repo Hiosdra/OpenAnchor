@@ -55,19 +55,17 @@ function makeSessionOps(overrides: Record<string, any> = {}) {
     db: {
       current: {
         db: {
-          getLogbookEntries: vi
-            .fn()
-            .mockResolvedValue([
-              {
-                id: 1,
-                sessionId: 1,
-                createdAt: Date.now(),
-                summary: 'test',
-                logEntry: 'log',
-                safetyNote: '',
-                isAiGenerated: false,
-              },
-            ]),
+          getLogbookEntries: vi.fn().mockResolvedValue([
+            {
+              id: 1,
+              sessionId: 1,
+              createdAt: Date.now(),
+              summary: 'test',
+              logEntry: 'log',
+              safetyNote: '',
+              isAiGenerated: false,
+            },
+          ]),
         },
       },
     },
@@ -398,6 +396,27 @@ describe('useSessionHistory', () => {
 
       rerender({ open: true });
       await waitFor(() => expect(ops.getSessionHistory).toHaveBeenCalled());
+    });
+
+    it('does not reload history when only the session wrapper identity changes', async () => {
+      const ops = makeSessionOps();
+      const { result, rerender } = renderHook(() =>
+        useSessionHistory({
+          session: { ...ops },
+          isSessionModalOpen: true,
+          isStatsModalOpen: false,
+        }),
+      );
+
+      await waitFor(() => expect(ops.getSessionHistory).toHaveBeenCalledTimes(1));
+      await act(async () => {
+        await result.current.handleReplaySession(1);
+      });
+
+      rerender();
+
+      expect(ops.getSessionHistory).toHaveBeenCalledTimes(1);
+      expect(result.current.replayData?.session.id).toBe(1);
     });
 
     it('loads stats when isStatsModalOpen becomes true', async () => {

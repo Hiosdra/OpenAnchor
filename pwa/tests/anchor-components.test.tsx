@@ -100,6 +100,47 @@ describe('Header', () => {
     render(<Header {...baseProps} unit="meters" />, { wrapper: Wrapper });
     expect(screen.getByText(/METRY|METERS/)).toBeTruthy();
   });
+
+  it('renders offline, lost-GPS, peer, charging, eco, feet, and connected states', async () => {
+    const Header = await importComponent();
+    const onToggleUnit = vi.fn();
+    const onToggleLang = vi.fn();
+    const { container, rerender } = render(
+      <Header
+        {...baseProps}
+        isOnline={false}
+        unit="feet"
+        wsConnected={true}
+        peerBattery={73}
+        peerCharging={true}
+        hasGpsFix={true}
+        gpsSignalLost={true}
+        batterySaverActive={true}
+        onToggleUnit={onToggleUnit}
+        onToggleLang={onToggleLang}
+      />,
+      { wrapper: Wrapper },
+    );
+    expect(container.querySelector('.connection-status--offline')).toBeTruthy();
+    expect(container.textContent).toContain('73% ⚡');
+    expect(container.textContent).toContain('Eco');
+    expect(container.querySelector('#gps-status-text')?.textContent).toMatch(/Utrata|Lost/i);
+    expect(container.querySelector('#gps-status-text')?.parentElement?.className).toContain(
+      'text-red-500',
+    );
+    fireEvent.click(container.querySelector('#unit-toggle')!);
+    fireEvent.click(container.querySelector('#lang-toggle')!);
+    expect(onToggleUnit).toHaveBeenCalledOnce();
+    expect(onToggleLang).toHaveBeenCalledOnce();
+
+    rerender(
+      <Wrapper>
+        <Header {...baseProps} peerBattery={42} peerCharging={false} />
+      </Wrapper>,
+    );
+    expect(container.textContent).toContain('42%');
+    expect(container.textContent).not.toContain('42% ⚡');
+  });
 });
 
 // ── Dashboard ────────────────────────────────────────────────────────
@@ -133,7 +174,7 @@ describe('Dashboard', () => {
     const Dashboard = await importComponent();
     const { container } = render(<Dashboard {...baseProps} />, { wrapper: Wrapper });
     const unitLabels = container.querySelectorAll('.text-xs.text-slate-400');
-    const mLabels = Array.from(unitLabels).filter(el => el.textContent === 'm');
+    const mLabels = Array.from(unitLabels).filter((el) => el.textContent === 'm');
     expect(mLabels.length).toBeGreaterThanOrEqual(2);
   });
 
@@ -141,7 +182,7 @@ describe('Dashboard', () => {
     const Dashboard = await importComponent();
     const { container } = render(<Dashboard {...baseProps} unit="feet" />, { wrapper: Wrapper });
     const unitLabels = container.querySelectorAll('.text-xs.text-slate-400');
-    const ftLabels = Array.from(unitLabels).filter(el => el.textContent === 'ft');
+    const ftLabels = Array.from(unitLabels).filter((el) => el.textContent === 'ft');
     expect(ftLabels.length).toBeGreaterThanOrEqual(2);
   });
 
@@ -178,13 +219,17 @@ describe('AlarmBar', () => {
 
   it('returns null when not anchored', async () => {
     const AlarmBar = await importComponent();
-    const { container } = render(<AlarmBar {...baseProps} isAnchored={false} />, { wrapper: Wrapper });
+    const { container } = render(<AlarmBar {...baseProps} isAnchored={false} />, {
+      wrapper: Wrapper,
+    });
     expect(container.innerHTML).toBe('');
   });
 
   it('renders SAFE state with alarm-bar-safe class', async () => {
     const AlarmBar = await importComponent();
-    const { container } = render(<AlarmBar {...baseProps} alarmState="SAFE" />, { wrapper: Wrapper });
+    const { container } = render(<AlarmBar {...baseProps} alarmState="SAFE" />, {
+      wrapper: Wrapper,
+    });
     const bar = container.querySelector('#alarm-state-bar');
     expect(bar).toBeTruthy();
     expect(bar!.className).toContain('alarm-bar-safe');
@@ -193,7 +238,9 @@ describe('AlarmBar', () => {
 
   it('renders WARNING state with alarm-bar-warning class', async () => {
     const AlarmBar = await importComponent();
-    const { container } = render(<AlarmBar {...baseProps} alarmState="WARNING" />, { wrapper: Wrapper });
+    const { container } = render(<AlarmBar {...baseProps} alarmState="WARNING" />, {
+      wrapper: Wrapper,
+    });
     const bar = container.querySelector('#alarm-state-bar');
     expect(bar!.className).toContain('alarm-bar-warning');
   });
@@ -201,7 +248,9 @@ describe('AlarmBar', () => {
   it('renders ALARM state with mute button', async () => {
     const onDismiss = vi.fn();
     const AlarmBar = await importComponent();
-    render(<AlarmBar {...baseProps} alarmState="ALARM" onDismissAlarm={onDismiss} />, { wrapper: Wrapper });
+    render(<AlarmBar {...baseProps} alarmState="ALARM" onDismissAlarm={onDismiss} />, {
+      wrapper: Wrapper,
+    });
 
     const muteBtn = screen.getByRole('button', { name: /Wycisz|Mute/i });
     expect(muteBtn).toBeTruthy();
@@ -298,7 +347,9 @@ describe('SimpleMonitor', () => {
 
   it('returns null when not visible', async () => {
     const SimpleMonitor = await importComponent();
-    const { container } = render(<SimpleMonitor {...baseProps} visible={false} />, { wrapper: Wrapper });
+    const { container } = render(<SimpleMonitor {...baseProps} visible={false} />, {
+      wrapper: Wrapper,
+    });
     expect(container.innerHTML).toBe('');
   });
 
@@ -318,9 +369,53 @@ describe('SimpleMonitor', () => {
   it('shows mute button in ALARM state', async () => {
     const onDismiss = vi.fn();
     const SimpleMonitor = await importComponent();
-    render(<SimpleMonitor {...baseProps} alarmState="ALARM" onDismissAlarm={onDismiss} />, { wrapper: Wrapper });
+    render(<SimpleMonitor {...baseProps} alarmState="ALARM" onDismissAlarm={onDismiss} />, {
+      wrapper: Wrapper,
+    });
     const muteBtn = screen.getByText(/Wycisz|Mute/i);
     expect(muteBtn).toBeTruthy();
+  });
+
+  it('covers warning, feet, missing GPS/COG, night filter, fallback state, and actions', async () => {
+    const SimpleMonitor = await importComponent();
+    const onDismissAlarm = vi.fn();
+    const onToggleNightRed = vi.fn();
+    const onOpenMap = vi.fn();
+    const { container, rerender } = render(
+      <SimpleMonitor
+        {...baseProps}
+        unit="feet"
+        alarmState="WARNING"
+        hasGpsFix={false}
+        cog={null}
+        nightRedFilter={true}
+        onDismissAlarm={onDismissAlarm}
+        onToggleNightRed={onToggleNightRed}
+        onOpenMap={onOpenMap}
+      />,
+      { wrapper: Wrapper },
+    );
+    expect(container.textContent).toContain('---');
+    expect(container.textContent).toContain('ft');
+    expect(container.querySelector('.simple-monitor-bg-warning')).toBeTruthy();
+    fireEvent.click(screen.getByText(/Wycisz|Mute/i));
+    fireEvent.click(container.querySelector('#sm-close-btn')!);
+    fireEvent.click(
+      Array.from(container.querySelectorAll('button')).find((button) =>
+        button.querySelector('[data-icon="Moon"]'),
+      )!,
+    );
+    expect(onDismissAlarm).toHaveBeenCalledOnce();
+    expect(onOpenMap).toHaveBeenCalledOnce();
+    expect(onToggleNightRed).toHaveBeenCalledOnce();
+
+    rerender(
+      <Wrapper>
+        <SimpleMonitor {...baseProps} alarmState="UNKNOWN" hasGpsFix={true} gpsSignalLost={true} />
+      </Wrapper>,
+    );
+    expect(container.querySelector('.simple-monitor-bg-safe')).toBeTruthy();
+    expect(container.textContent).toContain('UNKNOWN');
   });
 });
 
@@ -334,7 +429,9 @@ describe('Onboarding', () => {
 
   it('returns null when not visible', async () => {
     const Onboarding = await importComponent();
-    const { container } = render(<Onboarding visible={false} onComplete={vi.fn()} />, { wrapper: Wrapper });
+    const { container } = render(<Onboarding visible={false} onComplete={vi.fn()} />, {
+      wrapper: Wrapper,
+    });
     expect(container.innerHTML).toBe('');
   });
 
@@ -374,7 +471,9 @@ describe('MapContainer', () => {
   it('renders map div with correct id', async () => {
     const ref = React.createRef<HTMLDivElement>();
     const MapContainer = await importComponent();
-    render(<MapContainer mapRef={ref} hasGpsFix={true} gpsSignalLost={false} />, { wrapper: Wrapper });
+    render(<MapContainer mapRef={ref} hasGpsFix={true} gpsSignalLost={false} />, {
+      wrapper: Wrapper,
+    });
     const mapDiv = document.getElementById('map');
     expect(mapDiv).toBeTruthy();
     expect(mapDiv!.getAttribute('role')).toBe('application');
@@ -383,7 +482,9 @@ describe('MapContainer', () => {
   it('passes ref to the map div', async () => {
     const ref = React.createRef<HTMLDivElement>();
     const MapContainer = await importComponent();
-    render(<MapContainer mapRef={ref} hasGpsFix={true} gpsSignalLost={false} />, { wrapper: Wrapper });
+    render(<MapContainer mapRef={ref} hasGpsFix={true} gpsSignalLost={false} />, {
+      wrapper: Wrapper,
+    });
     expect(ref.current).toBeTruthy();
     expect(ref.current!.id).toBe('map');
   });
@@ -391,7 +492,9 @@ describe('MapContainer', () => {
   it('shows no-signal overlay when GPS fix is missing', async () => {
     const ref = React.createRef<HTMLDivElement>();
     const MapContainer = await importComponent();
-    render(<MapContainer mapRef={ref} hasGpsFix={false} gpsSignalLost={false} />, { wrapper: Wrapper });
+    render(<MapContainer mapRef={ref} hasGpsFix={false} gpsSignalLost={false} />, {
+      wrapper: Wrapper,
+    });
     expect(screen.getByText(/Brak sygnału GPS|No GPS signal/)).toBeTruthy();
   });
 });

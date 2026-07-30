@@ -181,7 +181,6 @@ input[type='range']::-webkit-slider-thumb {
 .anchor-tool-button {
   background: rgba(151, 190, 211, 0.08);
   border: 1px solid var(--oa-border);
-  border-color: var(--oa-border);
   color: #aebdc6;
 }
 
@@ -191,6 +190,10 @@ input[type='range']::-webkit-slider-thumb {
 
 .anchor-tool-button--accent {
   color: #67d5e8;
+}
+
+.anchor-tool-button--inverse {
+  color: #fff;
 }
 
 .anchor-primary-action {

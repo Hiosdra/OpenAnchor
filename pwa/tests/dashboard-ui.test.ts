@@ -328,6 +328,18 @@ describe('dashboard-ui', () => {
       // Should not throw
     });
 
+    it('prompts for installation and consumes the deferred event', async () => {
+      const prompt = vi.fn().mockResolvedValue(undefined);
+      const event = new Event('beforeinstallprompt') as any;
+      event.prompt = prompt;
+      event.userChoice = Promise.resolve({ outcome: 'accepted' });
+      window.dispatchEvent(event);
+      document.getElementById('installBtn')!.click();
+      await event.userChoice;
+      expect(prompt).toHaveBeenCalledOnce();
+      expect(document.getElementById('installBanner')!.classList.contains('show')).toBe(false);
+    });
+
     it('dismiss button hides banner and sets sessionStorage', () => {
       document.getElementById('installBanner')!.classList.add('show');
       document.getElementById('installDismissBtn')!.click();
@@ -426,6 +438,13 @@ describe('dashboard-ui', () => {
       initDashboard();
       // controllerchange handler was registered
       expect(addEventListenerSpy).toHaveBeenCalledWith('controllerchange', expect.any(Function));
+      const handler = addEventListenerSpy.mock.calls.find(
+        ([event]) => event === 'controllerchange',
+      )![1];
+      expect(() => {
+        handler();
+        handler();
+      }).not.toThrow();
     });
 
     it('updateBtn posts SKIP_WAITING when newWorker is set', () => {
@@ -439,6 +458,78 @@ describe('dashboard-ui', () => {
       initDashboard();
       // Without newWorker set, click falls through to else
       document.getElementById('updateBtn')!.click();
+    });
+
+    it('shows an update waiting at registration and activates it', async () => {
+      document.body.innerHTML = `
+        <button id="forceUpdateBtn"></button>
+        <div id="installBanner"></div>
+        <div id="updateBanner"></div>
+        <button id="updateBtn"></button>
+        <button id="dismissBtn"></button>
+      `;
+      const waiting = { postMessage: vi.fn() };
+      Object.defineProperty(navigator, 'serviceWorker', {
+        value: {
+          addEventListener: vi.fn(),
+          register: vi.fn().mockResolvedValue({
+            waiting,
+            installing: null,
+            addEventListener: vi.fn(),
+            update: vi.fn(),
+          }),
+          controller: {},
+        },
+        configurable: true,
+      });
+      initDashboard();
+      window.dispatchEvent(new Event('load'));
+      await vi.waitFor(() =>
+        expect(document.getElementById('updateBanner')!.classList.contains('show')).toBe(true),
+      );
+      document.getElementById('updateBtn')!.click();
+      expect(waiting.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+    });
+
+    it('shows the update banner when an installing worker becomes installed', async () => {
+      document.body.innerHTML = `
+        <button id="forceUpdateBtn"></button>
+        <div id="installBanner"></div>
+        <div id="updateBanner"></div>
+        <button id="updateBtn"></button>
+        <button id="dismissBtn"></button>
+      `;
+      let updateFound!: () => void;
+      let stateChange!: () => void;
+      const installing = {
+        state: 'installing',
+        addEventListener: vi.fn((_event: string, handler: () => void) => {
+          stateChange = handler;
+        }),
+      };
+      const registration = {
+        waiting: null,
+        installing,
+        update: vi.fn(),
+        addEventListener: vi.fn((_event: string, handler: () => void) => {
+          updateFound = handler;
+        }),
+      };
+      Object.defineProperty(navigator, 'serviceWorker', {
+        value: {
+          addEventListener: vi.fn(),
+          register: vi.fn().mockResolvedValue(registration),
+          controller: {},
+        },
+        configurable: true,
+      });
+      initDashboard();
+      window.dispatchEvent(new Event('load'));
+      await vi.waitFor(() => expect(updateFound).toEqual(expect.any(Function)));
+      updateFound();
+      installing.state = 'installed';
+      stateChange();
+      expect(document.getElementById('updateBanner')!.classList.contains('show')).toBe(true);
     });
 
     it('dismissBtn hides update banner', () => {

@@ -1,6 +1,5 @@
 import {
   History as HistoryIcon,
-  BarChart3,
   Download,
   FileSpreadsheet,
   Trash2,
@@ -62,6 +61,7 @@ export function SessionModal({
             return (
               <button
                 key={s.id}
+                data-testid="session-history-item"
                 onClick={() => s.id != null && onReplay(s.id)}
                 className="w-full text-left bg-slate-900 p-3 rounded-xl border border-slate-700 hover:border-blue-500 transition-colors"
               >
@@ -173,11 +173,6 @@ export function SessionModal({
   return (
     <Modal open={open} onClose={onClose} id="history-modal" className="flex flex-col max-h-[90vh]">
       {replaySession ? renderReplay() : renderSessionList()}
-
-      {/* Always attach export button for E2E discoverability */}
-      {!replaySession && (
-        <button id="replay-export-btn" className="hidden" aria-hidden="true" tabIndex={-1} />
-      )}
 
       <button
         onClick={onClose}
