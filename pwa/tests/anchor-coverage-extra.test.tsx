@@ -1050,7 +1050,7 @@ describe('SessionModal — branch coverage', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('shows hidden export button when no replay session', async () => {
+  it('does not render export actions when no replay session is selected', async () => {
     const SessionModal = await importSessionModal();
 
     const { container } = render(
@@ -1068,7 +1068,6 @@ describe('SessionModal — branch coverage', () => {
       />,
     );
 
-    const hiddenBtn = container.querySelector('#replay-export-btn');
-    expect(hiddenBtn).not.toBeNull();
+    expect(container.querySelector('#replay-export-btn')).toBeNull();
   });
 });

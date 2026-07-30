@@ -35,6 +35,8 @@ export function useSessionHistory({
   isSessionModalOpen,
   isStatsModalOpen,
 }: UseSessionHistoryParams) {
+  const { getSessionHistory, getSessionReplay, deleteSession, getStats, db } = session;
+
   // ── Session history state ──
   const [sessions, setSessions] = useState<AnchorSession[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
@@ -60,35 +62,35 @@ export function useSessionHistory({
     setSessionsLoading(true);
     setReplayData(null);
     try {
-      const list = await session.getSessionHistory();
+      const list = await getSessionHistory();
       setSessions(list);
     } catch {
       setSessions([]);
     }
     setSessionsLoading(false);
-  }, [session]);
+  }, [getSessionHistory]);
 
   const handleReplaySession = useCallback(
     async (sessionId: number) => {
-      const { session: s, points } = await session.getSessionReplay(sessionId);
+      const { session: s, points } = await getSessionReplay(sessionId);
       if (!s) return;
       let logEntries: LogbookEntry[] = [];
       try {
-        const db = session.db.current;
-        if (db?.db) {
-          logEntries = await db.db.getLogbookEntries(sessionId);
+        const database = db.current;
+        if (database?.db) {
+          logEntries = await database.db.getLogbookEntries(sessionId);
         }
       } catch {
         /* ignore */
       }
       setReplayData({ session: s, points, logEntries });
     },
-    [session],
+    [db, getSessionReplay],
   );
 
   const handleExportGPX = useCallback(
     async (sessionId: number) => {
-      const { session: s, points } = await session.getSessionReplay(sessionId);
+      const { session: s, points } = await getSessionReplay(sessionId);
       if (!s || points.length === 0) return;
 
       const gpxLines = [
@@ -111,12 +113,12 @@ export function useSessionHistory({
       a.click();
       URL.revokeObjectURL(url);
     },
-    [session],
+    [getSessionReplay],
   );
 
   const handleExportCSV = useCallback(
     async (sessionId: number) => {
-      const { points } = await session.getSessionReplay(sessionId);
+      const { points } = await getSessionReplay(sessionId);
       if (points.length === 0) return;
 
       const header = 'timestamp,lat,lng,accuracy,distance,alarmState';
@@ -133,25 +135,23 @@ export function useSessionHistory({
       a.click();
       URL.revokeObjectURL(url);
     },
-    [session],
+    [getSessionReplay],
   );
 
   const handleDeleteSession = useCallback(
     async (sessionId: number) => {
-      await session.deleteSession(sessionId);
+      await deleteSession(sessionId);
       setSessions((prev) => prev.filter((s) => s.id !== sessionId));
-      if (replayData?.session.id === sessionId) {
-        setReplayData(null);
-      }
+      setReplayData((current) => (current?.session.id === sessionId ? null : current));
     },
-    [session, replayData],
+    [deleteSession],
   );
 
   // ── Stats handler ──
 
   const loadStats = useCallback(async () => {
     try {
-      const s = await session.getStats();
+      const s = await getStats();
       setStatsData({
         totalSessions: s.totalSessions,
         totalAlarms: s.totalAlarms,
@@ -163,7 +163,7 @@ export function useSessionHistory({
     } catch {
       setStatsData(null);
     }
-  }, [session]);
+  }, [getStats]);
 
   // ── Auto-load effects ──
 

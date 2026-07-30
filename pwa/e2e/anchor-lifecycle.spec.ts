@@ -24,24 +24,23 @@ test.describe('Anchor — persisted session lifecycle', () => {
     await page.locator('#main-btn').click();
 
     await context.setGeolocation({ ...START, latitude: START.latitude + 0.00021 });
-    await page.waitForTimeout(600);
     await expect(page.locator('#alarm-state-bar')).toContainText(/uwaga|caution/i);
 
     // Active state is restored from IndexedDB after a full application reload.
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#main-btn-text')).not.toHaveText('Rzuć Kotwicę', {
+    await expect(page.locator('#main-btn-text')).toHaveText(/Podnieś Kotwicę|Raise Anchor/i, {
       timeout: 10_000,
     });
 
     await context.setGeolocation({ ...START, latitude: START.latitude + 0.00005 });
     await page.locator('#main-btn').click();
-    await expect(page.locator('#main-btn-text')).toHaveText('Rzuć Kotwicę');
+    await expect(page.locator('#main-btn-text')).toHaveText(/Rzuć Kotwicę|Drop Anchor/i);
 
     await page.locator('#open-history-btn').click();
     const history = page.locator('#history-modal');
     await expect(history).toBeVisible();
-    await expect(history.getByRole('button').filter({ hasText: /\d/ }).first()).toBeVisible();
-    await history.getByRole('button').filter({ hasText: /\d/ }).first().click();
+    await expect(history.getByTestId('session-history-item').first()).toBeVisible();
+    await history.getByTestId('session-history-item').first().click();
     await expect(page.locator('#replay-export-btn')).toBeVisible({ timeout: 15_000 });
 
     const gpxDownload = page.waitForEvent('download');

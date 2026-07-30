@@ -50,9 +50,7 @@ function Wrapper({ children }: { children: React.ReactNode }) {
 
 describe('Modal (base)', () => {
   async function importComponent() {
-    const { Modal } = await import(
-      '../src/modules/anchor/components/modals/Modal'
-    );
+    const { Modal } = await import('../src/modules/anchor/components/modals/Modal');
     return Modal;
   }
 
@@ -104,9 +102,7 @@ describe('Modal (base)', () => {
 
 describe('CalcModal', () => {
   async function importComponent() {
-    const { CalcModal } = await import(
-      '../src/modules/anchor/components/modals/CalcModal'
-    );
+    const { CalcModal } = await import('../src/modules/anchor/components/modals/CalcModal');
     return CalcModal;
   }
 
@@ -123,7 +119,9 @@ describe('CalcModal', () => {
   it('renders input fields for depth and ratio selector', async () => {
     const CalcModal = await importComponent();
     const { container } = render(
-      <Wrapper><CalcModal {...defaultProps} /></Wrapper>,
+      <Wrapper>
+        <CalcModal {...defaultProps} />
+      </Wrapper>,
     );
     expect(container.querySelector('#calc-depth')).toBeTruthy();
     expect(container.querySelector('#calc-ratio')).toBeTruthy();
@@ -132,7 +130,9 @@ describe('CalcModal', () => {
   it('computes swing radius using sqrt(chain²-depth²) × 1.2', async () => {
     const CalcModal = await importComponent();
     const { container } = render(
-      <Wrapper><CalcModal {...defaultProps} /></Wrapper>,
+      <Wrapper>
+        <CalcModal {...defaultProps} />
+      </Wrapper>,
     );
     // Default: depth=5, ratio=5 → chain=25
     // swing = sqrt(25²-5²) = sqrt(600) ≈ 24.49, radius = round(24.49 * 1.2) = 29
@@ -170,9 +170,7 @@ describe('CalcModal', () => {
 
 describe('SessionModal', () => {
   async function importComponent() {
-    const { SessionModal } = await import(
-      '../src/modules/anchor/components/modals/SessionModal'
-    );
+    const { SessionModal } = await import('../src/modules/anchor/components/modals/SessionModal');
     return SessionModal;
   }
 
@@ -216,10 +214,7 @@ describe('SessionModal', () => {
         <SessionModal {...defaultProps} sessions={sessions} />
       </Wrapper>,
     );
-    // Each session renders as a button
-    const buttons = screen.getAllByRole('button');
-    // Should have session buttons + close button + hidden export button
-    expect(buttons.length).toBeGreaterThanOrEqual(3);
+    expect(screen.getAllByTestId('session-history-item')).toHaveLength(2);
   });
 
   it('duration uses formatDuration with ms (not seconds)', async () => {
@@ -259,9 +254,7 @@ describe('SessionModal', () => {
 
 describe('StatsModal', () => {
   async function importComponent() {
-    const { StatsModal } = await import(
-      '../src/modules/anchor/components/modals/StatsModal'
-    );
+    const { StatsModal } = await import('../src/modules/anchor/components/modals/StatsModal');
     return StatsModal;
   }
 
@@ -269,7 +262,7 @@ describe('StatsModal', () => {
     totalSessions: 10,
     totalAlarms: 2,
     totalTime: 7200000, // 2h in ms
-    avgTime: 3600000,   // 1h in ms
+    avgTime: 3600000, // 1h in ms
     maxDistance: 25.3,
     maxSog: 1.7,
   };
@@ -304,9 +297,7 @@ describe('StatsModal', () => {
 
 describe('WatchModal', () => {
   async function importComponent() {
-    const { WatchModal } = await import(
-      '../src/modules/anchor/components/modals/WatchModal'
-    );
+    const { WatchModal } = await import('../src/modules/anchor/components/modals/WatchModal');
     return WatchModal;
   }
 
@@ -330,7 +321,9 @@ describe('WatchModal', () => {
       { start: '12:00', end: '16:00', person: 'Bob' },
     ];
     const { container } = render(
-      <Wrapper><WatchModal {...defaultProps} schedule={schedule} /></Wrapper>,
+      <Wrapper>
+        <WatchModal {...defaultProps} schedule={schedule} />
+      </Wrapper>,
     );
     expect(container.textContent).toContain('Alice');
     expect(container.textContent).toContain('Bob');
@@ -356,7 +349,7 @@ describe('WatchModal', () => {
 
     // Click add button
     const addBtns = Array.from(container.querySelectorAll('button'));
-    const addBtn = addBtns.find(b => b.textContent?.includes('Dodaj'))!;
+    const addBtn = addBtns.find((b) => b.textContent?.includes('Dodaj'))!;
     fireEvent.click(addBtn);
 
     expect(onAddScheduleItem).toHaveBeenCalledWith({
@@ -389,9 +382,7 @@ describe('WatchModal', () => {
 
 describe('SyncModal', () => {
   async function importComponent() {
-    const { SyncModal } = await import(
-      '../src/modules/anchor/components/modals/SyncModal'
-    );
+    const { SyncModal } = await import('../src/modules/anchor/components/modals/SyncModal');
     return SyncModal;
   }
 
@@ -408,7 +399,9 @@ describe('SyncModal', () => {
   it('renders URL input field with value', async () => {
     const SyncModal = await importComponent();
     const { container } = render(
-      <Wrapper><SyncModal {...defaultProps} /></Wrapper>,
+      <Wrapper>
+        <SyncModal {...defaultProps} />
+      </Wrapper>,
     );
     const input = container.querySelector('input[type="text"]') as HTMLInputElement;
     expect(input).toBeTruthy();
@@ -423,15 +416,13 @@ describe('SyncModal', () => {
     // Test connect when disconnected
     const { unmount } = render(
       <Wrapper>
-        <SyncModal
-          {...defaultProps}
-          onConnect={onConnect}
-          onDisconnect={onDisconnect}
-        />
+        <SyncModal {...defaultProps} onConnect={onConnect} onDisconnect={onDisconnect} />
       </Wrapper>,
     );
     const buttons = Array.from(document.querySelectorAll('button'));
-    const connectBtn = buttons.find(b => b.textContent?.includes('Połącz') || b.textContent?.includes('Connect'));
+    const connectBtn = buttons.find(
+      (b) => b.textContent?.includes('Połącz') || b.textContent?.includes('Connect'),
+    );
     fireEvent.click(connectBtn!);
     expect(onConnect).toHaveBeenCalledWith('ws://192.168.1.1:8080');
     unmount();
@@ -448,7 +439,11 @@ describe('SyncModal', () => {
       </Wrapper>,
     );
     const buttons2 = Array.from(document.querySelectorAll('button'));
-    const disconnectBtn = buttons2.find(b => !b.disabled && (b.textContent?.includes('Rozłącz') || b.textContent?.includes('Disconnect')));
+    const disconnectBtn = buttons2.find(
+      (b) =>
+        !b.disabled &&
+        (b.textContent?.includes('Rozłącz') || b.textContent?.includes('Disconnect')),
+    );
     fireEvent.click(disconnectBtn!);
     expect(onDisconnect).toHaveBeenCalled();
   });
@@ -458,9 +453,7 @@ describe('SyncModal', () => {
 
 describe('WeatherModal', () => {
   async function importComponent() {
-    const { WeatherModal } = await import(
-      '../src/modules/anchor/components/modals/WeatherModal'
-    );
+    const { WeatherModal } = await import('../src/modules/anchor/components/modals/WeatherModal');
     return WeatherModal;
   }
 
@@ -506,7 +499,9 @@ describe('WeatherModal', () => {
   it('shows loading state', async () => {
     const WeatherModal = await importComponent();
     const { container } = render(
-      <Wrapper><WeatherModal {...defaultProps} loading={true} /></Wrapper>,
+      <Wrapper>
+        <WeatherModal {...defaultProps} loading={true} />
+      </Wrapper>,
     );
     // Loading spinner icon should be present
     expect(container.querySelector('[data-icon="Loader2"]')).toBeTruthy();
@@ -533,9 +528,7 @@ describe('WeatherModal', () => {
 
 describe('AlertModals', () => {
   async function importComponent() {
-    const { AlertModals } = await import(
-      '../src/modules/anchor/components/modals/AlertModals'
-    );
+    const { AlertModals } = await import('../src/modules/anchor/components/modals/AlertModals');
     return AlertModals;
   }
 
@@ -581,11 +574,7 @@ describe('AlertModals', () => {
     const AlertModals = await importComponent();
     const { container } = render(
       <Wrapper>
-        <AlertModals
-          {...allClosed}
-          watchAlertOpen={true}
-          onWatchAlertOk={onWatchAlertOk}
-        />
+        <AlertModals {...allClosed} watchAlertOpen={true} onWatchAlertOk={onWatchAlertOk} />
       </Wrapper>,
     );
     const okBtn = container.querySelector('#watch-alert-ok-btn')!;
@@ -599,9 +588,7 @@ describe('AlertModals', () => {
 
 describe('OffsetModal', () => {
   async function importComponent() {
-    const { OffsetModal } = await import(
-      '../src/modules/anchor/components/modals/OffsetModal'
-    );
+    const { OffsetModal } = await import('../src/modules/anchor/components/modals/OffsetModal');
     return OffsetModal;
   }
 
@@ -615,7 +602,9 @@ describe('OffsetModal', () => {
   it('renders distance and bearing inputs', async () => {
     const OffsetModal = await importComponent();
     const { container } = render(
-      <Wrapper><OffsetModal {...defaultProps} /></Wrapper>,
+      <Wrapper>
+        <OffsetModal {...defaultProps} />
+      </Wrapper>,
     );
     expect(container.querySelector('#offset-dist')).toBeTruthy();
     expect(container.querySelector('#offset-bearing')).toBeTruthy();
@@ -643,15 +632,32 @@ describe('OffsetModal', () => {
     expect(onApply).toHaveBeenCalledWith(50, 180);
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('sets the reciprocal bearing from COG and falls back to south without COG', async () => {
+    const OffsetModal = await importComponent();
+    const { container, rerender } = render(
+      <Wrapper>
+        <OffsetModal {...defaultProps} cog={270} />
+      </Wrapper>,
+    );
+    fireEvent.click(container.querySelector('#set-bearing-behind-btn')!);
+    expect((container.querySelector('#offset-bearing') as HTMLInputElement).value).toBe('90');
+
+    rerender(
+      <Wrapper>
+        <OffsetModal {...defaultProps} cog={null} />
+      </Wrapper>,
+    );
+    fireEvent.click(container.querySelector('#set-bearing-behind-btn')!);
+    expect((container.querySelector('#offset-bearing') as HTMLInputElement).value).toBe('180');
+  });
 });
 
 // ── SectorModal ─────────────────────────────────────────────────────
 
 describe('SectorModal', () => {
   async function importComponent() {
-    const { SectorModal } = await import(
-      '../src/modules/anchor/components/modals/SectorModal'
-    );
+    const { SectorModal } = await import('../src/modules/anchor/components/modals/SectorModal');
     return SectorModal;
   }
 
@@ -667,7 +673,9 @@ describe('SectorModal', () => {
   it('renders bearing and width inputs', async () => {
     const SectorModal = await importComponent();
     const { container } = render(
-      <Wrapper><SectorModal {...defaultProps} /></Wrapper>,
+      <Wrapper>
+        <SectorModal {...defaultProps} />
+      </Wrapper>,
     );
     expect(container.querySelector('#sector-bearing')).toBeTruthy();
     expect(container.querySelector('#sector-width')).toBeTruthy();
@@ -699,9 +707,7 @@ describe('SectorModal', () => {
 
 describe('AIModal', () => {
   async function importComponent() {
-    const { AIModal } = await import(
-      '../src/modules/anchor/components/modals/AIModal'
-    );
+    const { AIModal } = await import('../src/modules/anchor/components/modals/AIModal');
     return AIModal;
   }
 
@@ -721,7 +727,9 @@ describe('AIModal', () => {
   it('renders send button and chat area', async () => {
     const AIModal = await importComponent();
     const { container } = render(
-      <Wrapper><AIModal {...defaultProps} /></Wrapper>,
+      <Wrapper>
+        <AIModal {...defaultProps} />
+      </Wrapper>,
     );
     expect(container.querySelector('#ai-chat-area')).toBeTruthy();
     expect(container.querySelector('[data-icon="Send"]')).toBeTruthy();
@@ -730,7 +738,9 @@ describe('AIModal', () => {
   it('shows loading state while generating', async () => {
     const AIModal = await importComponent();
     const { container } = render(
-      <Wrapper><AIModal {...defaultProps} loading={true} /></Wrapper>,
+      <Wrapper>
+        <AIModal {...defaultProps} loading={true} />
+      </Wrapper>,
     );
     expect(container.querySelector('[data-icon="Loader2"]')).toBeTruthy();
   });
@@ -739,7 +749,9 @@ describe('AIModal', () => {
     const AIModal = await importComponent();
     const onSendMessage = vi.fn();
     const { container } = render(
-      <Wrapper><AIModal {...defaultProps} onSendMessage={onSendMessage} /></Wrapper>,
+      <Wrapper>
+        <AIModal {...defaultProps} onSendMessage={onSendMessage} />
+      </Wrapper>,
     );
     const input = container.querySelector('input[type="text"]')!;
     const send = container.querySelector('[data-icon="Send"]')!.closest('button')!;
@@ -774,12 +786,18 @@ describe('AIModal', () => {
       onOpenApiKeyModal: vi.fn(),
       onSaveLogbook: vi.fn(),
     };
-    const { container } = render(<Wrapper><AIModal {...props} /></Wrapper>);
+    const { container } = render(
+      <Wrapper>
+        <AIModal {...props} />
+      </Wrapper>,
+    );
     fireEvent.click(container.querySelector('#ai-clear-chat-btn')!);
     fireEvent.click(container.querySelector('#edit-api-key-btn')!);
-    fireEvent.click(Array.from(container.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Zapisz'),
-    )!);
+    fireEvent.click(
+      Array.from(container.querySelectorAll('button')).find((button) =>
+        button.textContent?.includes('Zapisz'),
+      )!,
+    );
     expect(props.onClearChat).toHaveBeenCalledOnce();
     expect(props.onOpenApiKeyModal).toHaveBeenCalledOnce();
     expect(props.onSaveLogbook).toHaveBeenCalledOnce();
@@ -792,11 +810,7 @@ describe('AIModal', () => {
     const onOpenApiKeyModal = vi.fn();
     const { container } = render(
       <Wrapper>
-        <AIModal
-          {...defaultProps}
-          hasApiKey={false}
-          onOpenApiKeyModal={onOpenApiKeyModal}
-        />
+        <AIModal {...defaultProps} hasApiKey={false} onOpenApiKeyModal={onOpenApiKeyModal} />
       </Wrapper>,
     );
     const input = container.querySelector('input[type="text"]') as HTMLInputElement;
@@ -813,9 +827,7 @@ describe('AIModal', () => {
 
 describe('ApiKeyModal', () => {
   async function importComponent() {
-    const { ApiKeyModal } = await import(
-      '../src/modules/anchor/components/modals/ApiKeyModal'
-    );
+    const { ApiKeyModal } = await import('../src/modules/anchor/components/modals/ApiKeyModal');
     return ApiKeyModal;
   }
 
@@ -830,7 +842,9 @@ describe('ApiKeyModal', () => {
   it('renders API key input', async () => {
     const ApiKeyModal = await importComponent();
     const { container } = render(
-      <Wrapper><ApiKeyModal {...defaultProps} /></Wrapper>,
+      <Wrapper>
+        <ApiKeyModal {...defaultProps} />
+      </Wrapper>,
     );
     const input = container.querySelector('#api-key-input') as HTMLInputElement;
     expect(input).toBeTruthy();
@@ -875,9 +889,11 @@ describe('ApiKeyModal', () => {
     fireEvent.click(container.querySelector('#save-api-key-btn')!);
     expect(onSave).not.toHaveBeenCalled();
     fireEvent.click(container.querySelector('#delete-api-key-btn')!);
-    fireEvent.click(Array.from(container.querySelectorAll('button')).find((button) =>
-      button.textContent?.match(/Anuluj|Cancel/),
-    )!);
+    fireEvent.click(
+      Array.from(container.querySelectorAll('button')).find((button) =>
+        button.textContent?.match(/Anuluj|Cancel/),
+      )!,
+    );
     expect(onClear).toHaveBeenCalledOnce();
     expect(onClose).toHaveBeenCalledOnce();
   });
@@ -887,9 +903,7 @@ describe('ApiKeyModal', () => {
 
 describe('QRScanModal', () => {
   async function importComponent() {
-    const { QRScanModal } = await import(
-      '../src/modules/anchor/components/modals/QRScanModal'
-    );
+    const { QRScanModal } = await import('../src/modules/anchor/components/modals/QRScanModal');
     return QRScanModal;
   }
 

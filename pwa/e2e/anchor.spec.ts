@@ -834,9 +834,11 @@ test.describe('Anchor — Drag Warning Modal', () => {
 // 16. GPX Export Button
 // ---------------------------------------------------------------------------
 test.describe('Anchor — GPX Export', () => {
-  test('replay export button exists in DOM', async ({ page, mockGeolocation }) => {
+  test('export action is hidden until a replay is selected', async ({ page, mockGeolocation }) => {
     await mockGeolocation();
     await gotoAnchor(page);
-    await expect(page.locator('#replay-export-btn')).toBeAttached();
+    await page.locator('#open-history-btn').click();
+    await expect(page.locator('#history-modal')).toBeVisible();
+    await expect(page.locator('#replay-export-btn')).toHaveCount(0);
   });
 });
