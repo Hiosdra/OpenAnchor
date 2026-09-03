@@ -1,0 +1,1 @@
+function e(){let e=document.createElement(`div`);e.className=`ocean-bg`,e.innerHTML=`<div class="wave wave-1"></div><div class="wave wave-2"></div><div class="wave wave-3"></div>`;let t=document.createElement(`div`);t.className=`stars`,document.body.prepend(e),document.body.prepend(t)}export{e as t};
