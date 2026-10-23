@@ -11,6 +11,10 @@ runs:
         java-version: '17'
         cache: 'gradle'
 
+    - name: Install Android API 37
+      shell: bash
+      run: sdkmanager --install "platforms;android-37"
+
     - name: Grant execute permission for gradlew
       shell: bash
       working-directory: ./android
