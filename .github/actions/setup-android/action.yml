@@ -13,7 +13,18 @@ runs:
 
     - name: Install Android API 37
       shell: bash
-      run: sdkmanager --install "platforms;android-37"
+      run: |
+        SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+        if [[ -z "$SDK_ROOT" ]]; then
+          echo "::error::ANDROID_HOME and ANDROID_SDK_ROOT are both unset"
+          exit 1
+        fi
+        SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+        if [[ ! -x "$SDKMANAGER" ]]; then
+          echo "::error::sdkmanager not found at $SDKMANAGER"
+          exit 1
+        fi
+        "$SDKMANAGER" --install "platforms;android-37"
 
     - name: Grant execute permission for gradlew
       shell: bash
