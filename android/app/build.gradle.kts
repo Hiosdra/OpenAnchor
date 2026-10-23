@@ -10,6 +10,7 @@ plugins {
 android {
     namespace = "com.hiosdra.openanchor"
     compileSdk = 37
+    compileSdkMinor = 0
 
     defaultConfig {
         applicationId = "com.hiosdra.openanchor"
