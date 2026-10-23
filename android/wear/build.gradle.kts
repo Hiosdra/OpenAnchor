@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.hiosdra.openanchor.wear"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.hiosdra.openanchor.wear"
