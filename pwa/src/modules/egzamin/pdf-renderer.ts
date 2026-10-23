@@ -5,7 +5,7 @@
  */
 
 import * as pdfjsLib from 'pdfjs-dist';
-import type { PDFDocumentProxy } from 'pdfjs-dist';
+import type { PDFDocumentLoadingTask, PDFDocumentProxy } from 'pdfjs-dist';
 
 // Configure pdf.js worker using the npm package (guard against duplicate init during HMR)
 if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
@@ -17,13 +17,16 @@ if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
 
 export const PdfRenderer = {
   _pdfDoc: null as PDFDocumentProxy | null,
+  _loadingTask: null as PDFDocumentLoadingTask | null,
   _cache: new Map<string, HTMLCanvasElement>(),
   _MAX_CACHE: 32,
   _blobUrls: [] as string[],
 
   async loadFromBlob(blob: Blob): Promise<number> {
     const arrayBuffer = await blob.arrayBuffer();
-    this._pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+    this._loadingTask = loadingTask;
+    this._pdfDoc = await loadingTask.promise;
     this._cache.clear();
     return this._pdfDoc.numPages;
   },
@@ -115,8 +118,9 @@ export const PdfRenderer = {
   unload(): void {
     this._blobUrls.forEach((url) => URL.revokeObjectURL(url));
     this._blobUrls = [];
-    if (this._pdfDoc) {
-      this._pdfDoc.destroy();
+    if (this._loadingTask) {
+      void this._loadingTask.destroy();
+      this._loadingTask = null;
       this._pdfDoc = null;
     }
     this._cache.clear();
