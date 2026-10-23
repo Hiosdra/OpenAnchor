@@ -24,7 +24,7 @@ runs:
           echo "::error::sdkmanager not found at $SDKMANAGER"
           exit 1
         fi
-        "$SDKMANAGER" --install "platforms;android-37"
+        "$SDKMANAGER" --install "platforms;android-37.0" --channel=3
 
     - name: Grant execute permission for gradlew
       shell: bash
