@@ -76,6 +76,7 @@ describe('PdfRenderer', () => {
 
   beforeEach(() => {
     PdfRenderer._pdfDoc = null;
+    PdfRenderer._loadingTask = null;
     PdfRenderer._cache.clear();
     PdfRenderer._blobUrls = [];
 
@@ -112,7 +113,7 @@ describe('PdfRenderer', () => {
   describe('loadFromBlob', () => {
     it('should load a PDF and return the page count', async () => {
       const doc = mockPdfDoc(10);
-      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc) });
+      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc), destroy: vi.fn() });
 
       const n = await PdfRenderer.loadFromBlob(new Blob(['pdf']));
       expect(n).toBe(10);
@@ -121,7 +122,7 @@ describe('PdfRenderer', () => {
 
     it('should pass ArrayBuffer to mockGetDocument', async () => {
       const doc = mockPdfDoc();
-      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc) });
+      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc), destroy: vi.fn() });
 
       await PdfRenderer.loadFromBlob(new Blob(['data']));
       expect(mockGetDocument).toHaveBeenCalledWith({ data: expect.any(ArrayBuffer) });
@@ -130,7 +131,7 @@ describe('PdfRenderer', () => {
     it('should clear the cache on load', async () => {
       PdfRenderer._cache.set('old', 'val' as unknown as HTMLCanvasElement);
       const doc = mockPdfDoc();
-      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc) });
+      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc), destroy: vi.fn() });
 
       await PdfRenderer.loadFromBlob(new Blob(['pdf']));
       expect(PdfRenderer._cache.size).toBe(0);
@@ -168,7 +169,7 @@ describe('PdfRenderer', () => {
 
     beforeEach(async () => {
       doc = mockPdfDoc();
-      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc) });
+      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc), destroy: vi.fn() });
       await PdfRenderer.loadFromBlob(new Blob(['pdf']));
       canvases = [];
     });
@@ -234,7 +235,7 @@ describe('PdfRenderer', () => {
   describe('renderQuestion', () => {
     beforeEach(async () => {
       const doc = mockPdfDoc();
-      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc) });
+      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc), destroy: vi.fn() });
       await PdfRenderer.loadFromBlob(new Blob(['pdf']));
       canvases = [];
     });
@@ -283,7 +284,7 @@ describe('PdfRenderer', () => {
     });
 
     it('should return true after loading', async () => {
-      mockGetDocument.mockReturnValue({ promise: Promise.resolve(mockPdfDoc()) });
+      mockGetDocument.mockReturnValue({ promise: Promise.resolve(mockPdfDoc()), destroy: vi.fn() });
       await PdfRenderer.loadFromBlob(new Blob(['pdf']));
       expect(PdfRenderer.isLoaded()).toBe(true);
     });
@@ -292,15 +293,16 @@ describe('PdfRenderer', () => {
   // --- unload ---
 
   describe('unload', () => {
-    it('should destroy the document and clear cache', async () => {
+    it('should destroy the loading task and clear cache', async () => {
       const doc = mockPdfDoc();
-      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc) });
+      const destroyLoadingTask = vi.fn();
+      mockGetDocument.mockReturnValue({ promise: Promise.resolve(doc), destroy: destroyLoadingTask });
       await PdfRenderer.loadFromBlob(new Blob(['pdf']));
       PdfRenderer._cache.set('k', 'v' as unknown as HTMLCanvasElement);
       PdfRenderer._blobUrls.push('blob:test1', 'blob:test2');
 
       PdfRenderer.unload();
-      expect(doc.destroy).toHaveBeenCalled();
+      expect(destroyLoadingTask).toHaveBeenCalled();
       expect(PdfRenderer._pdfDoc).toBeNull();
       expect(PdfRenderer._cache.size).toBe(0);
       expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test1');
